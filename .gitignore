@@ -1,0 +1,13 @@
+# Google Drive
+*.gdoc
+*.gsheet
+*.gslides
+Thumbs.db
+.DS_Store
+
+# Dev/test files
+test_path.pl
+serve.pl
+
+# Renamed duplicates from Google Drive
+Turley energy Consultants website.html
