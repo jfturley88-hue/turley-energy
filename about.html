@@ -4,16 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About — Turley Energy Consultants</title>
-  <meta name="description" content="About Turley Energy Consultants — founded by John Turley in 2009. SEAI registered building energy assessors based in Co. Monaghan, serving homeowners and developers across the North East.">
+  <meta name="description" content="About Turley Energy Consultants — founded by John Turley in 2009. SEAI registered building energy assessors based in Co. Monaghan.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .about-main {
+      background: #fff;
+      padding: 100px 0;
+    }
+
+    .about-layout {
+      display: flex;
+      align-items: center;
+      gap: 72px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .about-logo-col {
+      flex: 0 0 280px;
+    }
+
+    .about-logo-col img {
+      width: 280px;
+      height: auto;
+      display: block;
+    }
+
+    .about-text-col {
+      flex: 1;
+    }
+
+    .about-text-col h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--green-800);
+      margin: 0 0 28px;
+      line-height: 1.15;
+    }
+
+    .about-text-col p {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text-body);
+      margin: 0 0 20px;
+    }
+
+    .about-text-col p:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 680px) {
+      .about-main {
+        padding: 64px 0;
+      }
+
+      .about-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+        text-align: center;
+        padding: 0 24px;
+      }
+
+      .about-logo-col {
+        flex: none;
+      }
+
+      .about-logo-col img {
+        width: 220px;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <!-- ===========================
-     HEADER (same as index)
+     HEADER
      =========================== -->
 <header class="site-header" id="site-header">
   <div class="container header-inner">
@@ -43,7 +116,7 @@
         </li>
 
         <li class="nav-item"><a href="index.html#seai-grants" class="nav-link">SEAI Grants</a></li>
-        <li class="nav-item"><a href="about.html"             class="nav-link" aria-current="page">About</a></li>
+        <li class="nav-item"><a href="about.html" class="nav-link" aria-current="page">About</a></li>
       </ul>
 
       <a href="index.html#contact" class="btn btn-primary mobile-cta" style="display:none;">Contact Us</a>
@@ -60,198 +133,29 @@
 
 
 <!-- ===========================
-     PAGE HERO
+     ABOUT
      =========================== -->
-<section class="about-hero" aria-label="About Turley Energy Consultants">
-  <div class="container" style="max-width: 720px;">
-    <span class="eyebrow">Est. 2009</span>
-    <h1>Built on a Commitment<br>to Future Generations</h1>
-    <p>
-      Founded by John Turley in 2009, Turley Energy Consultants has spent over fifteen years helping Irish homeowners, self-builders, and developers make better energy decisions.
-    </p>
-  </div>
-</section>
+<main class="about-main">
+  <div class="about-layout">
 
-
-<!-- ===========================
-     OUR STORY
-     =========================== -->
-<section class="about-story section section--white">
-  <div class="container">
-    <div class="about-story-inner">
-
-      <!-- Logo illustration panel -->
-      <div class="about-logo-feature">
-        <!--
-          This is the standalone illustration from your logo
-          (mother, child, and globe — without the wordmark).
-          Save the image as: images/logo-icon.png
-        -->
-        <img
-          src="images/logo-icon.png"
-          alt="Turley Energy Consultants logo illustration — a mother and child holding the Earth"
-          class="about-icon-img"
-        >
-        <p class="about-icon-caption">
-          Caring for the planet we pass on<br>to future generations.
-        </p>
-      </div>
-
-      <!-- Story text -->
-      <div class="about-story-text">
-        <span class="about-est-badge">Est. 2009</span>
-
-        <h2>Our Story</h2>
-
-        <p>
-          Turley Energy Consultants was founded in 2009 by John Turley, a Building Energy Rating assessor based in Co. Monaghan. What started as a straightforward BER assessment service has grown into a broader energy consultancy, helping homeowners, self-builders, and developers across the North East navigate the complexity of energy compliance, retrofit planning, and SEAI grants.
-        </p>
-
-        <p>
-          Over fifteen years, we've worked on everything from simple property sale certificates to complex new builds, heat pump evaluations, and whole-home retrofit plans. The work has changed as the industry has evolved — but the approach has stayed the same: honest, practical, and squarely on the client's side.
-        </p>
-
-        <p>
-          We work independently, without ties to any contractor or product supplier. Our only job is to give you clear, accurate advice — whether you're selling a home, building a new one, or planning a major upgrade.
-        </p>
-
-        <p>
-          Based in Monaghan, we serve clients across the North East including Cavan, Louth, Meath, and Dublin. We're registered with SEAI as Building Energy Rating assessors and technical advisors.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ===========================
-     THE LOGO STORY
-     =========================== -->
-<section class="about-logo-story section section--alt">
-  <div class="container" style="max-width: 760px; text-align: center;">
-
-    <span class="eyebrow">The Logo</span>
-    <h2>Why the Mother, Child, and Earth?</h2>
-
-    <p style="font-size: 1.05rem; color: var(--text-body); line-height: 1.8; margin-bottom: 1.4rem;">
-      The Turley Energy Consultants logo has a simple but deliberate meaning. It shows a mother and child alongside the Earth — the next generation alongside the planet they'll inherit.
-    </p>
-
-    <p style="font-size: 1.05rem; color: var(--text-body); line-height: 1.8; margin-bottom: 1.4rem;">
-      It's a reminder of why energy efficiency matters: not just for energy bills or compliance paperwork, but for the kind of world we hand on to those who come after us. Every well-built home, every avoided tonne of carbon, and every good energy decision is a small contribution to that bigger picture.
-    </p>
-
-    <p style="font-size: 1.05rem; color: var(--text-body); line-height: 1.8;">
-      That thinking shapes the way we approach our work — with care, with honesty, and with an eye on what actually matters.
-    </p>
-
-  </div>
-</section>
-
-
-<!-- ===========================
-     OUR VALUES
-     =========================== -->
-<section class="about-values section section--white">
-  <div class="container">
-    <div class="section-header">
-      <span class="eyebrow">How We Work</span>
-      <h2>Our Approach</h2>
-      <p>We believe good energy guidance should be clear, honest, and genuinely useful — not wrapped in jargon or tied to a sales agenda.</p>
+    <div class="about-logo-col">
+      <img src="images/mother-earth.png" alt="Turley Energy Consultants — mother, child and earth logo">
     </div>
 
-    <div class="values-grid">
+    <div class="about-text-col">
+      <h1>About Turley Energy</h1>
 
-      <div class="value-card">
-        <div class="value-card-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-        </div>
-        <h3>Independent</h3>
-        <p>We have no affiliation with any contractor, installer, or product supplier. The advice we give is based solely on what's right for your project — nothing else.</p>
-      </div>
+      <p>Founded by John Turley in 2009, Turley Energy Consultants has spent over fifteen years helping Irish homeowners, self-builders, and developers make better energy decisions.</p>
 
-      <div class="value-card">
-        <div class="value-card-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-          </svg>
-        </div>
-        <h3>Plain-Spoken</h3>
-        <p>Energy compliance can be complex. We explain it clearly — in plain language, without unnecessary jargon — so you can make informed decisions with confidence.</p>
-      </div>
-
-      <div class="value-card">
-        <div class="value-card-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <h3>Experienced</h3>
-        <p>Fifteen years of assessments, new builds, retrofits, and grant applications across the North East. We've seen the full range — and we bring that experience to every project.</p>
-      </div>
-
+      <p>The logo says it all: mother earth, passing the world on to the next generation below. That's the ethos. Do the job right today so there's something worth handing on tomorrow.</p>
     </div>
+
   </div>
-</section>
+</main>
 
 
 <!-- ===========================
-     CREDENTIALS / STATS
-     =========================== -->
-<section class="about-credentials section section--alt">
-  <div class="container">
-    <div class="section-header">
-      <span class="eyebrow">By the Numbers</span>
-      <h2>Track Record</h2>
-    </div>
-
-    <div class="credentials-grid">
-
-      <div class="credential-item">
-        <div class="credential-num">15+</div>
-        <div class="credential-label">Years Registered</div>
-      </div>
-
-      <div class="credential-item">
-        <div class="credential-num">A–G</div>
-        <div class="credential-label">Full BER Rating Range</div>
-      </div>
-
-      <div class="credential-item">
-        <div class="credential-num">SEAI</div>
-        <div class="credential-label">Registered Assessors</div>
-      </div>
-
-      <div class="credential-item">
-        <div class="credential-num">NE</div>
-        <div class="credential-label">North East &amp; Beyond</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ===========================
-     CONTACT CTA
-     =========================== -->
-<section class="section section--white" style="text-align: center;">
-  <div class="container" style="max-width: 620px;">
-    <span class="eyebrow">Ready to Start?</span>
-    <h2 style="margin: 12px 0 18px;">Get in Touch</h2>
-    <p style="margin-bottom: 32px; color: var(--text-muted);">
-      Whether you're selling, building, renovating, or just exploring your options — we're happy to talk through what you need.
-    </p>
-    <a href="index.html#contact" class="btn btn-primary btn-lg">Enquire Now</a>
-  </div>
-</section>
-
-
-<!-- ===========================
-     FOOTER (same as index)
+     FOOTER
      =========================== -->
 <footer class="site-footer">
   <div class="container">

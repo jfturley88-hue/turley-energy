@@ -255,14 +255,16 @@ p {
 
 /* Logo */
 .site-logo {
-  flex-shrink: 0;
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .site-logo img {
-  height: 42px;
+  height: 70px;
   width: auto;
+  padding: 6px 4px;
 }
 
 /* Nav */
@@ -319,7 +321,8 @@ p {
   transition: transform 0.25s;
 }
 
-.nav-item.open .dropdown-arrow {
+.nav-item.open .dropdown-arrow,
+.has-dropdown:hover .dropdown-arrow {
   transform: rotate(180deg);
 }
 
@@ -344,7 +347,8 @@ p {
   z-index: 300;
 }
 
-.nav-item.open .dropdown-menu {
+.nav-item.open .dropdown-menu,
+.has-dropdown:hover .dropdown-menu {
   opacity: 1;
   pointer-events: all;
   transform: translateX(-50%) translateY(0);
@@ -532,8 +536,20 @@ p {
 
 /* === SERVICES OVERVIEW === */
 .services-overview {
-  background: var(--white);
+  background: var(--green-800);
   padding: var(--section-py) 0;
+}
+
+.services-overview .section-header h2 {
+  color: #fff;
+}
+
+.services-overview .section-header .eyebrow {
+  color: rgba(255,255,255,0.55);
+}
+
+.services-overview .section-header p {
+  color: rgba(255,255,255,0.72);
 }
 
 .services-grid {
@@ -543,8 +559,8 @@ p {
 }
 
 .service-card {
-  background: var(--bg);
-  border: 1px solid var(--border-light);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
   border-radius: var(--radius-md);
   padding: 28px;
   display: flex;
@@ -555,19 +571,19 @@ p {
 .service-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: var(--green-200);
+  border-color: rgba(255,255,255,0.28);
 }
 
 .service-card-icon {
   width: 46px;
   height: 46px;
-  background: var(--green-50);
+  background: rgba(255,255,255,0.12);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  color: var(--green-800);
+  color: #fff;
 }
 
 .service-card-icon svg {
@@ -583,11 +599,12 @@ p {
 .service-card h3 {
   font-size: 1.0rem;
   margin-bottom: 8px;
+  color: #fff;
 }
 
 .service-card p {
   font-size: 0.87rem;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.72);
   line-height: 1.65;
   flex: 1;
   margin-bottom: 18px;
@@ -599,7 +616,7 @@ p {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--green-800);
+  color: rgba(255,255,255,0.85);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -793,12 +810,6 @@ p {
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: var(--radius-md);
   padding: 28px;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.grant-card:hover {
-  background: rgba(255,255,255,0.11);
-  border-color: rgba(255,255,255,0.22);
 }
 
 .grant-card-icon {
@@ -1040,11 +1051,18 @@ p {
   margin-bottom: 48px;
 }
 
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .footer-brand .footer-logo {
-  height: 38px;
+  height: 70px;
   width: auto;
   mix-blend-mode: normal;
   opacity: 1;
+  padding: 6px 4px;
   margin-bottom: 16px;
 }
 
