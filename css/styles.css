@@ -536,20 +536,20 @@ p {
 
 /* === SERVICES OVERVIEW === */
 .services-overview {
-  background: var(--green-800);
+  background: var(--bg);
   padding: var(--section-py) 0;
 }
 
 .services-overview .section-header h2 {
-  color: #fff;
+  color: var(--text);
 }
 
 .services-overview .section-header .eyebrow {
-  color: rgba(255,255,255,0.55);
+  color: var(--green-800);
 }
 
 .services-overview .section-header p {
-  color: rgba(255,255,255,0.72);
+  color: var(--text-muted);
 }
 
 .services-grid {
@@ -559,8 +559,8 @@ p {
 }
 
 .service-card {
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: var(--bg-alt);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: 28px;
   display: flex;
@@ -571,19 +571,19 @@ p {
 .service-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.28);
+  border-color: var(--border);
 }
 
 .service-card-icon {
   width: 46px;
   height: 46px;
-  background: rgba(255,255,255,0.12);
+  background: var(--green-50);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  color: #fff;
+  color: var(--green-800);
 }
 
 .service-card-icon svg {
@@ -599,12 +599,12 @@ p {
 .service-card h3 {
   font-size: 1.0rem;
   margin-bottom: 8px;
-  color: #fff;
+  color: var(--text);
 }
 
 .service-card p {
   font-size: 0.87rem;
-  color: rgba(255,255,255,0.72);
+  color: var(--text-muted);
   line-height: 1.65;
   flex: 1;
   margin-bottom: 18px;
@@ -616,7 +616,7 @@ p {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.85);
+  color: var(--green-800);
   display: flex;
   align-items: center;
   gap: 6px;
