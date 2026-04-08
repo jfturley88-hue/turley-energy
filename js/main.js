@@ -136,6 +136,25 @@
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Require name + at least one of phone or email
+      const emailVal = (contactForm.querySelector('#email').value || '').trim();
+      const phoneVal = (contactForm.querySelector('#phone').value || '').trim();
+
+      let errorEl = contactForm.querySelector('.contact-form-error');
+      if (!errorEl) {
+        errorEl = document.createElement('p');
+        errorEl.className = 'contact-form-error';
+        errorEl.style.cssText = 'color:#c0392b;font-size:.9rem;margin:-8px 0 12px;';
+        contactForm.querySelector('#phone').closest('.form-row').after(errorEl);
+      }
+
+      if (!emailVal && !phoneVal) {
+        errorEl.textContent = 'Please provide at least a phone number or email address.';
+        contactForm.querySelector('#email').focus();
+        return;
+      }
+      errorEl.textContent = '';
+
       const btn          = contactForm.querySelector('[type="submit"]');
       const originalText = btn.textContent;
 
@@ -143,8 +162,7 @@
       btn.disabled    = true;
 
       try {
-        // Replace YOUR_FORM_ID with your Formspree form ID
-        const res = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        const res = await fetch('https://formspree.io/f/mzdkwayw', {
           method:  'POST',
           body:    new FormData(contactForm),
           headers: { 'Accept': 'application/json' }
