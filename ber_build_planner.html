@@ -5786,6 +5786,12 @@ function getMaterialsFromUI() {
     cylinder:         v('mat-cylinder',  1200),
     radiator:         v('mat-radiator',  220),
     oilBoiler:        v('mat-oil-boiler',2200),
+    gasBoiler:        v('mat-gas-boiler',2400),
+    lpgBoiler:        v('mat-lpg-boiler',2800),
+    gshp:             v('mat-gshp',      11000),
+    stoveBB:          v('mat-stove-bb',  3200),
+    mvhr:             v('mat-mvhr',      3500),
+    mev:              v('mat-mev',       1200),
     spec:             getBuildSpecRates(),   // New Build element rates (Build Spec tab)
   };
 }
@@ -6451,10 +6457,16 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   // ── Heating supply-rate adjustment factors (Material Database panel) ─────────
   // Proportional: factor = userRate / panelDefault. At defaults all = 1.0 (no
   // change). Applied to the MATERIAL portion only — install labour is unaffected.
-  const ashpFactor = (mat.ashp8     > 0) ? mat.ashp8     / 4800 : 1;
-  const oilFactor  = (mat.oilBoiler > 0) ? mat.oilBoiler / 2200 : 1;
-  const cylFactor  = (mat.cylinder  > 0) ? mat.cylinder  / 1200 : 1;
-  const radFactor  = (mat.radiator  > 0) ? mat.radiator  / 220  : 1;
+  const ashpFactor  = (mat.ashp8     > 0) ? mat.ashp8     / 4800  : 1;
+  const oilFactor   = (mat.oilBoiler > 0) ? mat.oilBoiler / 2200  : 1;
+  const cylFactor   = (mat.cylinder  > 0) ? mat.cylinder  / 1200  : 1;
+  const radFactor   = (mat.radiator  > 0) ? mat.radiator  / 220   : 1;
+  const gasFactor   = (mat.gasBoiler > 0) ? mat.gasBoiler / 2400  : 1;
+  const lpgFactor   = (mat.lpgBoiler > 0) ? mat.lpgBoiler / 2800  : 1;
+  const gshpFactor  = (mat.gshp      > 0) ? mat.gshp      / 11000 : 1;
+  const stoveFactor = (mat.stoveBB   > 0) ? mat.stoveBB   / 3200  : 1;
+  const mvhrFactor  = (mat.mvhr      > 0) ? mat.mvhr      / 3500  : 1;
+  const mevFactor   = (mat.mev       > 0) ? mat.mev       / 1200  : 1;
 
   const autoFloorArea   = d.floorArea;
   const autoCylSize     = d.cylinderSize > 100 ? d.cylinderSize : cylinderSize(d.bedrooms);
@@ -6473,7 +6485,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Ground Source Heat Pump') {
     const c = gshpCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`Ground source heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`Ground source heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*gshpFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Oil Boiler') {
     const c = oilBoilerCost(heatKW);
@@ -6481,15 +6493,15 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Stove with Back Boiler') {
     const c = stoveBackBoilerCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`Stove with back boiler - ${c.label} (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`Stove with back boiler - ${c.label} (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*stoveFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'LPG Boiler') {
     const c = lpgBoilerCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`LPG condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`LPG condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*lpgFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else {
     const c = gasBoilerCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`Gas condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`Gas condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*gasFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   }
   if (d.hasUFH) {
@@ -6517,11 +6529,11 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   }
   if (d.ventilation === 'MVHR') {
     const mv = mvhrCost(autoFloorArea);
-    msItems.push({ ref:`${msId}.7`, description:`MVHR unit — ${mv.label} (supply, full ductwork & commission)`, unit:'nr', quantity:1, matRate:Math.round(mv.mat*ventM), labRate:Math.round(mv.lab*ventM),
+    msItems.push({ ref:`${msId}.7`, description:`MVHR unit — ${mv.label} (supply, full ductwork & commission)`, unit:'nr', quantity:1, matRate:Math.round(mv.mat*ventM*mvhrFactor), labRate:Math.round(mv.lab*ventM),
       note:`Sized for ${autoFloorArea}m² floor area · Plumber/craft all-in rates`, status:'ok', deapSource:'DEAP ventilation + floor area' });
   } else if (d.ventilation === 'MEV') {
     const mv = mevCost(autoFloorArea);
-    msItems.push({ ref:`${msId}.7`, description:'Mechanical extract ventilation (MEV) system', unit:'nr', quantity:1, matRate:Math.round(mv.mat*ventM), labRate:Math.round(mv.lab*ventM),
+    msItems.push({ ref:`${msId}.7`, description:'Mechanical extract ventilation (MEV) system', unit:'nr', quantity:1, matRate:Math.round(mv.mat*ventM*mevFactor), labRate:Math.round(mv.lab*ventM),
       note:`Sized for ${autoFloorArea}m² floor area · Plumber/craft all-in rates`, status:'ok', deapSource:'DEAP ventilation + floor area' });
   } else {
     msItems.push({ ref:`${msId}.7`, description:'Natural ventilation (trickle vents & extract fans)', unit:'item', quantity:1, matRate:400, labRate:lM(12.5, L.catB),
@@ -15591,7 +15603,7 @@ function _ufType(t) {
 
           <!-- HEATING & HOT WATER -->
           <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:18px 0 10px;">&#128293; Heating &amp; Hot Water</div>
-          <div style="font-size:10px;color:#64748b;margin:-4px 0 8px;line-height:1.5;">Editing these supply rates scales the matching New Build heat-pump / boiler / cylinder / radiator costs proportionally (install labour unaffected). ASHP 8kW is the heat-pump baseline.</div>
+          <div style="font-size:10px;color:#64748b;margin:-4px 0 8px;line-height:1.5;">Editing any of these supply rates scales the matching New Build cost proportionally (install labour unaffected). Covers ASHP, GSHP, gas/oil/LPG boilers, stove, cylinder, radiators, MVHR &amp; MEV. Each rate is the baseline for its system — edits move all size bands by the same %.</div>
           <table class="mdb-tbl">
             <thead><tr><th>Material</th><th>Unit</th><th>Price</th><th>Badge</th></tr></thead>
             <tbody>
@@ -15600,6 +15612,12 @@ function _ufType(t) {
               <tr><td>Unvented cylinder 210L</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-cylinder" class="mdb-pi" type="number" min="1" step="50" value="1200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">Mains pressure</span></td></tr>
               <tr><td>Panel radiator (standard)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-radiator" class="mdb-pi" type="number" min="1" step="10" value="220" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">With TRV</span></td></tr>
               <tr><td>Oil condensing boiler</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-oil-boiler" class="mdb-pi" type="number" min="1" step="100" value="2200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">New build/replace</span></td></tr>
+              <tr><td>Gas condensing boiler</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-gas-boiler" class="mdb-pi" type="number" min="1" step="100" value="2400" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">New build/replace</span></td></tr>
+              <tr><td>LPG condensing boiler</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-lpg-boiler" class="mdb-pi" type="number" min="1" step="100" value="2800" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">New build/replace</span></td></tr>
+              <tr><td>Ground source heat pump (8kW ref)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-gshp" class="mdb-pi" type="number" min="1" step="100" value="11000" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">Excl. ground loop</span></td></tr>
+              <tr><td>Stove with back boiler</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-stove-bb" class="mdb-pi" type="number" min="1" step="100" value="3200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Solid fuel</span></td></tr>
+              <tr><td>MVHR unit (≤100m² ref)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-mvhr" class="mdb-pi" type="number" min="1" step="100" value="3500" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">Heat recovery</span></td></tr>
+              <tr><td>MEV system (≤120m² ref)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-mev" class="mdb-pi" type="number" min="1" step="50" value="1200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Extract only</span></td></tr>
             </tbody>
           </table>
 
@@ -15616,6 +15634,11 @@ function _ufType(t) {
               <tr><td>LED downlight fitting IP65</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-led" class="mdb-pi" type="number" min="1" step="1" value="28" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">All rooms</span></td></tr>
             </tbody>
           </table>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-top:18px;">
+            <button onclick="matRatesReset()" style="padding:7px 18px;border-radius:8px;background:#2e3d52;border:1px solid #E8A020;color:#E8A020;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;flex-shrink:0;">&#8635; Reset to defaults</button>
+            <span style="font-size:10px;color:#64748b;">Edits are saved automatically and persist after a page refresh.</span>
+          </div>
 
         </div>
       </div>
@@ -16383,6 +16406,42 @@ function toggleMatOverlay() {
 </script>
 
 <script>
+// Material Database rates — persistence (localStorage 'mat_ov').
+// All editable rate inputs carry class 'mdb-pi'. We save every changed value and
+// restore it on load so edits survive a page refresh. getMaterialsFromUI() reads
+// the live DOM, so restoring the inputs is enough to feed the cost engine.
+(function(){
+  var KEY = 'mat_ov';
+  function fields(){ return document.querySelectorAll('input.mdb-pi'); }
+  window.matRatesSave = function(){
+    var ov = {};
+    fields().forEach(function(el){
+      if (!el.id || el.disabled) return;       // skip reference-only inputs
+      var v = parseFloat(el.value);
+      if (!isNaN(v) && v > 0) ov[el.id] = v;
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(ov)); } catch(e){}
+  };
+  window.matRatesLoad = function(){
+    var ov = {};
+    try { ov = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){}
+    fields().forEach(function(el){
+      if (el.id && ov[el.id] != null) el.value = ov[el.id];
+    });
+  };
+  window.matRatesReset = function(){ try { localStorage.removeItem(KEY); } catch(e){} location.reload(); };
+  document.addEventListener('DOMContentLoaded', function(){
+    // Defer so the reference-only disabling pass runs first; that way the initial
+    // auto-save (inside mdbRefresh) correctly excludes the disabled, unwired inputs.
+    setTimeout(function(){
+      window.matRatesLoad();
+      if (typeof mdbRefresh === 'function') mdbRefresh();
+    }, 0);
+  });
+})();
+</script>
+
+<script>
 function mdbTab(panelId, btnEl) {
   document.querySelectorAll('.mdb-tab-panel').forEach(function(p){ p.style.display='none'; });
   document.querySelectorAll('.mdb-tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -16404,6 +16463,8 @@ function mdbRefresh() {
   if (bCell) bCell.textContent = '€' + (10.5 * block).toFixed(2) + '/m²';
   if (mCell) mCell.textContent = '€' + (14   * mortar).toFixed(2)  + '/m²';
   if (tCell) tCell.textContent = '€' + (2.5  * walltie).toFixed(2) + '/m²';
+  // Persist edited rates so they survive a page refresh
+  if (typeof window.matRatesSave === 'function') window.matRatesSave();
 }
 </script>
 
