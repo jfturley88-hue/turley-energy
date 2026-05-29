@@ -11,3 +11,10 @@ serve.pl
 
 # Renamed duplicates from Google Drive
 Turley energy Consultants website.html
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
