@@ -6063,10 +6063,12 @@ function computeSummary(sections, projType, fa, grants, grantScheme, ao) {
   const grantsTotal = (grants || []).reduce(function(a, g) { return a + (g.amount || 0); }, 0);
   const netConstruction = Math.max(0, gross - grantsTotal);
 
-  // Professional fees — check BOQ for already-itemised fee types to avoid double-counting
+  // Professional fees — check BOQ for already-itemised fee types to avoid double-counting.
+  // Scan every section (not just "Professional Fees") so tagged fees living in other
+  // sections — e.g. the structural-engineer cert in D.8 — also suppress the summary fee.
   var _boqPFSection = sections.find(function(s) { return s.title === 'Professional Fees'; });
   var _boqFeeTypes = {};
-  if (_boqPFSection) (_boqPFSection.items || []).forEach(function(i) { if (i.feeType) _boqFeeTypes[i.feeType] = true; });
+  sections.forEach(function(s) { (s.items || []).forEach(function(i) { if (i.feeType) _boqFeeTypes[i.feeType] = true; }); });
   var _boqHasAnyFees = !!_boqPFSection;
 
   var profFees = null;
@@ -10791,7 +10793,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
   const has = function(key) { return !!inputs[key]; };
   const n   = function(key) { return parseFloat(inputs[key]) || 0; };
   // EU panel trumps WS for heating and floor — suppress WS lines when EU panel is authoritative
-  const euHasHeating = !!(inputs.eu_ashp || inputs.gshp || inputs.ref_eu_boiler || inputs.biomass || inputs.ref_eu_air_air);
+  const euHasHeating = !!(inputs.eu_ashp || inputs.gshp || inputs.eu_boiler || inputs.biomass || inputs.eu_air_air);
 
   const fa  = inputs.floorArea   || 100;
   const wa  = inputs.wallArea    || Math.round(fa * 1.5);
@@ -10813,6 +10815,9 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
 
   const sections = [];
   let sid = 1;
+  // Duplication warnings surfaced to the user when a Works Selector item overlaps
+  // an Energy-Upgrade panel measure that already covers the same scope.
+  const dupWarnings = [];
 
   // PRELIMINARIES — only when at least one work item is selected
   const skipSizes = {mini: 130, standard: 250, large: 320};
@@ -10878,7 +10883,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
     demoItems.push(mkItem('D.5', 'RSJ steel beam(s) — supply & install', 'm', openCount * span, beamCostPerM, lM(2.5, L.craft), span + 'm avg span — UC 203×133 or engineer-specified'));
     demoItems.push(mkItem('D.6', 'Padstones — precast concrete (2 per beam)', 'nr', openCount * 2, 88, lM(2, L.craft), 'Bearing padstones'));
     demoItems.push(mkItem('D.7', 'Plasterboard box-out to beam & making good', 'item', openCount, 180, lM(8, L.craft), 'FR plasterboard boxing, skim finish'));
-    demoItems.push(mkItem('D.8', 'Structural engineer — design & certification', 'item', 1, 0, 1400, 'Per opening sign-off'));
+    demoItems.push(Object.assign(mkItem('D.8', 'Structural engineer — design & certification', 'item', 1, 0, 1400, 'Per opening sign-off'), {feeType: 'structural'}));
   }
   if (has('chimney_breast')) {
     const chimneyCount = n('chimney_count') || 1;
@@ -11024,6 +11029,11 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
   if (has('replaster')) {
     const pArea = n('plaster_area') || fa * 2.5;
     const full = (inputs.plasterType || 'skim') === 'full';
+    // IWI dry-lining already plasters the external walls internally. Keep this line
+    // (it also covers partitions & ceilings) but warn so the user can trim overlap.
+    if (inputs.eu_iwi) {
+      dupWarnings.push('Re-plastering and Internal Wall Insulation both selected — IWI already finishes external walls internally; reduce the re-plaster area to external-wall-only overlap to avoid double-counting.');
+    }
     fabricItems.push(mkItem('F.4', (full ? 'Sand & cement render + skim' : 'Skim / patch') + ' plaster',
       'm²', pArea, full ? 8.5 : 3.5, full ? lM(0.9, L.craft) : lM(0.35, L.craft), full ? 'Two-coat render + finish coat' : 'Finish skim only'));
   }
@@ -11062,7 +11072,12 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       fabricItems.push(mkItem('F.10', 'Roof lights — ' + rlType.replace(/-/g, ' '), 'nr', rlCount, rlMat, lM(4, L.craft), 'Supply & install, upstand & flashing'));
     }
   }
-  if (has('ext_render')) {
+  // EWI already includes the external render finish coat — suppress the standalone
+  // external-render line when EWI is selected to avoid double-charging the finish.
+  if (has('ext_render') && inputs.eu_ewi) {
+    dupWarnings.push('External render (Works Selector) suppressed — External Wall Insulation already includes the render finish coat.');
+  }
+  if (has('ext_render') && !inputs.eu_ewi) {
     const erArea  = n('ext_render_area') || wa;
     const erScope = inputs.ext_render_scope || 'render';
     const erRates = { repoint: {mat: 5,  lab: lM(0.5, L.craft), desc: 'External repointing — raked & filled'},
@@ -11301,8 +11316,10 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
   if (inputs.eu_cavity)     { euPanelMeasures.push('wall_cavity');    euPanelMeasures.push('wall_insulation'); }
   if (inputs.eu_ewi)        { euPanelMeasures.push('wall_ewi');       euPanelMeasures.push('ewi'); }
   if (inputs.eu_iwi)        { euPanelMeasures.push('wall_iwi');       euPanelMeasures.push('iwi'); }
-  if (inputs.eu_ashp)       euPanelMeasures.push('heating');
+  if (inputs.eu_ashp || inputs.eu_boiler) euPanelMeasures.push('heating'); // retrofit branches on newHeating (ASHP vs boiler)
   if (inputs.gshp)          euPanelMeasures.push('gshp');
+  if (inputs.biomass)       euPanelMeasures.push('biomass');
+  if (inputs.eu_air_air)    euPanelMeasures.push('air_air');
   if (inputs.eu_mvhr)       euPanelMeasures.push('ventilation');
   if (inputs.eu_mev)        euPanelMeasures.push('ventilation');
   if (inputs.eu_pv)         euPanelMeasures.push('solar_pv');
@@ -11337,7 +11354,13 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       windowArea:   winAEU,
       doorCount:    inputs.doorCount || inputs.door_count || 2,
       existWallType: inputs.eu_ewi ? 'Solid Masonry — uninsulated' : 'Cavity Wall — uninsulated',
-      newHeating:   inputs.eu_ashp ? 'ASHP' : inputs.gshp ? 'GSHP' : 'none',
+      newHeating:   inputs.eu_ashp ? 'ASHP' : inputs.gshp ? 'GSHP' : inputs.eu_boiler ? (inputs.eu_boiler_fuel || 'Gas Boiler') : 'none',
+      boilerCombi:  inputs.eu_boiler_combi || 'system',
+      ashpRemove:   inputs.eu_remove_heat || 'oil',
+      airAirZones:  inputs.eu_air_air_zones || 1,
+      airAirTier:   inputs.eu_air_air_tier || 'standard',
+      biomassStore: inputs.eu_biomass_store || 'integrated',
+      biomass_remove: inputs.eu_biomass_remove || 'oil',
       ventilation:  inputs.eu_mvhr ? 'MVHR' : inputs.eu_mev ? 'MEV' : 'none',
       pvArea:       inputs.eu_pv ? (inputs.eu_pv_area || 12) : 0,
       battery:      inputs.eu_battery || 'no',
@@ -11347,10 +11370,25 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       floor_system: document.getElementById('ref-eu-floor-system')?.value || 'solid-overlay',
       measures:     euPanelMeasures,
     };
+    // The refurb engine supplies its own prelims, skip hire, making-good, BER,
+    // structural-engineer and additional-works lines, so drop the retrofit's
+    // equivalents to avoid double-counting. Matched by keyword (not exact title)
+    // so a future title tweak in buildBOQRetrofit can't silently reintroduce a dup.
+    var _isRetrofitAdminSection = function(title) {
+      var t = (title || '').toUpperCase();
+      return t.indexOf('PRELIMINARIES') === 0
+          || t.indexOf('SKIP HIRE') === 0
+          || t.indexOf('AIR PRESSURE TEST') === 0
+          || t.indexOf('STRUCTURAL ENGINEER') === 0
+          || t.indexOf('ADDITIONAL WORKS') === 0
+          || t.indexOf('BER ASSESSMENT') === 0
+          || t.indexOf('MAKING GOOD') !== -1
+          || t.indexOf('ANCILLARY') !== -1;
+    };
     try {
       const euPanelBOQ = buildBOQRetrofit(euPanelInputs, '', county, dwellingType, grantScheme);
       (euPanelBOQ.sections || []).forEach(function(s) {
-        if (!['PRELIMINARIES', 'PRELIMINARIES & SCAFFOLDING', 'ANCILLARY WORKS & MAKING GOOD', 'MAKING GOOD & DECORATION', 'ADDITIONAL WORKS', 'BER ASSESSMENT & CERTIFICATION', 'SKIP HIRE & WASTE DISPOSAL', 'AIR PRESSURE TEST (AIRTIGHTNESS)', 'STRUCTURAL ENGINEER'].includes(s.title)) {
+        if (!_isRetrofitAdminSection(s.title)) {
           s.part = 'C';
           sections.push(Object.assign({}, s, {id: String(sid++)}));
         }
@@ -11442,7 +11480,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       disclaimer: 'Indicative cost estimate based on current Irish market rates (researched 2025-26). Subject to detailed pricing for tender. Adjust rates via Materials panel.'},
     sections: sections, grants: grants,
     summary: su,
-    flags: [],
+    flags: dupWarnings,
     assumptions: ['Room counts used to estimate internal wall areas', 'All rates at 2026 Irish market levels (SEO + on-costs)'],
     deapDataReceived: ['Floor area: ' + fa + 'm\u00b2', 'Wall area: ' + wa + 'm\u00b2', 'Total rooms: ' + totalRooms]
   };
@@ -11958,6 +11996,14 @@ function readRefurbSelector(prefix) {
     eu_ashp:          document.getElementById('ref-eu-ashp')?.checked || false,
     eu_emitter:       document.getElementById('ref-eu-emitter-type')?.value || 'rads',
     eu_remove_heat:   document.getElementById('ref-eu-ashp-remove')?.value || 'oil',
+    eu_boiler:        document.getElementById('ref-eu-boiler')?.checked || false,
+    eu_boiler_fuel:   document.getElementById('ref-eu-boiler-fuel')?.value || 'Gas Boiler',
+    eu_boiler_combi:  document.getElementById('ref-eu-boiler-combi')?.value || 'system',
+    eu_air_air:       document.getElementById('ref-eu-air-air')?.checked || false,
+    eu_air_air_zones: parseFloat(document.getElementById('ref-eu-air-air-zones')?.value) || 1,
+    eu_air_air_tier:  document.getElementById('ref-eu-air-air-tier')?.value || 'standard',
+    eu_biomass_store: document.getElementById('ref-eu-biomass-store')?.value || 'integrated',
+    eu_biomass_remove: document.getElementById('ref-eu-biomass-remove')?.value || 'oil',
     eu_mvhr:          document.getElementById('ref-eu-mvhr')?.checked || false,
     eu_mev:           document.getElementById('ref-eu-mev')?.checked || false,
     eu_pv:            document.getElementById('ref-eu-pv')?.checked || false,
@@ -12010,14 +12056,7 @@ function readRefurbSelector(prefix) {
     // Works Selector heating extras
     ws_heat_ref_combi: sv('heat-ref-combi'),
     ws_heat_ref_store:  sv('heat-ref-store'),
-    // ref-eu heating group additions (direct element access — no prefix)
-    ref_eu_boiler:        document.getElementById('ref-eu-boiler')?.checked || false,
-    ref_eu_boiler_fuel:   document.getElementById('ref-eu-boiler-fuel')?.value || '',
-    ref_eu_boiler_combi:  document.getElementById('ref-eu-boiler-combi')?.value || 'system',
-    ref_eu_biomass_store: document.getElementById('ref-eu-biomass-store')?.value || 'integrated',
-    ref_eu_air_air:       document.getElementById('ref-eu-air-air')?.checked || false,
-    ref_eu_air_air_zones: parseFloat(document.getElementById('ref-eu-air-air-zones')?.value) || 1,
-    ref_eu_air_air_tier:  document.getElementById('ref-eu-air-air-tier')?.value || 'standard',
+    // ref-eu boiler / biomass / air-air group is read above as eu_boiler / eu_air_air / eu_biomass_*
   };
 }
 
