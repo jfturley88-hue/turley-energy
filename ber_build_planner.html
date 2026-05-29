@@ -5778,6 +5778,14 @@ function getMaterialsFromUI() {
     feeSupervisor:    v('mat-fee-supervisor',   g.feeSupervisor.price),
     feeFireCert:      v('mat-fee-fire',         g.feeFireCert.price),
     feeDAC:           v('mat-fee-dac',          g.feeDAC.price),
+    // Heating & hot water supply rates (Material Database panel) — used as
+    // proportional baselines to scale the BOQ heating costs. Defaults match the
+    // panel input defaults; factor = userValue / default (1.0 = no change).
+    ashp8:            v('mat-ashp-8',    4800),
+    ashp12:           v('mat-ashp-12',   6800),
+    cylinder:         v('mat-cylinder',  1200),
+    radiator:         v('mat-radiator',  220),
+    oilBoiler:        v('mat-oil-boiler',2200),
     spec:             getBuildSpecRates(),   // New Build element rates (Build Spec tab)
   };
 }
@@ -6440,6 +6448,14 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const radMat = d.floorArea > 200 ? 230 : d.floorArea > 130 ? 200 : 175;
   const radLab = lM(4.5, L.plumber);  // Plumber 4.5hr/nr × €52/hr
 
+  // ── Heating supply-rate adjustment factors (Material Database panel) ─────────
+  // Proportional: factor = userRate / panelDefault. At defaults all = 1.0 (no
+  // change). Applied to the MATERIAL portion only — install labour is unaffected.
+  const ashpFactor = (mat.ashp8     > 0) ? mat.ashp8     / 4800 : 1;
+  const oilFactor  = (mat.oilBoiler > 0) ? mat.oilBoiler / 2200 : 1;
+  const cylFactor  = (mat.cylinder  > 0) ? mat.cylinder  / 1200 : 1;
+  const radFactor  = (mat.radiator  > 0) ? mat.radiator  / 220  : 1;
+
   const autoFloorArea   = d.floorArea;
   const autoCylSize     = d.cylinderSize > 100 ? d.cylinderSize : cylinderSize(d.bedrooms);
 
@@ -6453,7 +6469,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const sizeBand = kw => kw <= 8 ? 'Small' : kw <= 12 ? 'Medium' : kw <= 16 ? 'Large' : 'XL';
   if (d.heatingSystem === 'ASHP') {
     const c = ashpCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`Air-to-water heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`Air-to-water heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*ashpFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Ground Source Heat Pump') {
     const c = gshpCost(heatKW);
@@ -6461,7 +6477,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Oil Boiler') {
     const c = oilBoilerCost(heatKW);
-    msItems.push({ ref:`${msId}.1`, description:`Oil condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM), labRate:Math.round(c.lab*heatM),
+    msItems.push({ ref:`${msId}.1`, description:`Oil condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*oilFactor), labRate:Math.round(c.lab*heatM),
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Stove with Back Boiler') {
     const c = stoveBackBoilerCost(heatKW);
@@ -6481,15 +6497,15 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
       note:`Ground floor UFH: ${d.ufhArea}m² · Plumber 0.83hr/m² × €52/hr`, status:'ok', deapSource:'DEAP emitters' });
   }
   if (d.hasRadiators && d.radiatorCount > 0) {
-    msItems.push({ ref:`${msId}.3`, description:`Radiators with TRVs (${d.radiatorCount}nr)`, unit:'nr', quantity:d.radiatorCount, matRate:radMat, labRate:radLab,
+    msItems.push({ ref:`${msId}.3`, description:`Radiators with TRVs (${d.radiatorCount}nr)`, unit:'nr', quantity:d.radiatorCount, matRate:Math.round(radMat*radFactor), labRate:radLab,
       note:`${d.hasUFH ? 'Upper floor only — UFH on ground floor' : 'All floors'} · sized for ${heatKW}kW system`, status:'ok', deapSource:'DEAP emitters/rooms' });
   }
   if (d.hotWater === 'HP Cylinder') {
-    const cylMat = autoCylSize <= 200 ? 1650 : autoCylSize <= 300 ? 2000 : 2600;
+    const cylMat = Math.round((autoCylSize <= 200 ? 1650 : autoCylSize <= 300 ? 2000 : 2600) * cylFactor);
     msItems.push({ ref:`${msId}.4`, description:`Heat pump cylinder ${autoCylSize}L (supply & connect)`, unit:'nr', quantity:1, matRate:cylMat, labRate:lM(18, L.plumber),
       note:`${autoCylSize}L sized for ${d.bedrooms} bed — HP compatible · Plumber 18hr × €52/hr`, status:'ok', deapSource:'DEAP hot water / bedrooms' });
   } else {
-    const cylMat = autoCylSize <= 200 ? 1100 : autoCylSize <= 300 ? 1350 : 1800;
+    const cylMat = Math.round((autoCylSize <= 200 ? 1100 : autoCylSize <= 300 ? 1350 : 1800) * cylFactor);
     msItems.push({ ref:`${msId}.4`, description:`Unvented cylinder ${autoCylSize}L (supply & connect)`, unit:'nr', quantity:1, matRate:cylMat, labRate:lM(15, L.plumber),
       note:`${autoCylSize}L sized for ${d.bedrooms} bed · Plumber 15hr × €52/hr`, status:'ok', deapSource:'DEAP hot water / bedrooms' });
   }
@@ -15575,6 +15591,7 @@ function _ufType(t) {
 
           <!-- HEATING & HOT WATER -->
           <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:18px 0 10px;">&#128293; Heating &amp; Hot Water</div>
+          <div style="font-size:10px;color:#64748b;margin:-4px 0 8px;line-height:1.5;">Editing these supply rates scales the matching New Build heat-pump / boiler / cylinder / radiator costs proportionally (install labour unaffected). ASHP 8kW is the heat-pump baseline.</div>
           <table class="mdb-tbl">
             <thead><tr><th>Material</th><th>Unit</th><th>Price</th><th>Badge</th></tr></thead>
             <tbody>
@@ -16395,13 +16412,14 @@ function mdbRefresh() {
 // These inputs are NOT read by the cost engine. Element rates live elsewhere:
 //   • retrofit/refurb element rates → EU Rates tab (eu_ov / eu_cat, applied in buildBOQRetrofit)
 //   • new-build element rates       → hardcoded in buildBOQ (future: a "Build Spec rates" surface)
+//   • new-build heating supply rates → wired into buildBOQ as proportional baselines
+//     (ashp-8/12, cylinder, radiator, oil-boiler — applied via getMaterialsFromUI)
 // Leaving them editable misleads users into thinking edits change the estimate, so they are
 // disabled + tagged. To re-enable any once it's wired to an engine, remove its id from REF_ONLY.
 (function(){
   var REF_ONLY = ['mat-rebar','mat-timber','mat-rooftile','mat-slate','mat-sarking','mat-grp',
     'mat-render','mat-skim','mat-screed','mat-plasterboard','mat-cavitybead','mat-ewi',
     'mat-window-triple','mat-window-double','mat-ext-door','mat-int-door',
-    'mat-ashp-8','mat-ashp-12','mat-cylinder','mat-radiator','mat-oil-boiler',
     'mat-pv-panel','mat-inverter','mat-battery','mat-consumer-unit','mat-ev-charger','mat-led'];
   var EU_TAB = { 'mat-cavitybead':1, 'mat-ewi':1 }; // these ARE editable — via the EU Rates tab
   // these ARE editable — via the new Build Spec tab (windows, doors, roof covering)
