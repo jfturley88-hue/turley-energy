@@ -5792,6 +5792,18 @@ function getMaterialsFromUI() {
     stoveBB:          v('mat-stove-bb',  3200),
     mvhr:             v('mat-mvhr',      3500),
     mev:              v('mat-mev',       1200),
+    // Renewables & electrical supply rates — proportional baselines
+    pvPanel:      v('mat-pv-panel',     280),
+    inverter:     v('mat-inverter',     850),
+    battery:      v('mat-battery',      3500),
+    consumerUnit: v('mat-consumer-unit',380),
+    evCharger:    v('mat-ev-charger',   650),
+    led:          v('mat-led',          28),
+    // Floor finishes & fabric extras
+    floorTile:    v('mat-floor-tile',   28),
+    floorTimber:  v('mat-floor-timber', 32),
+    ufh:          v('mat-ufh',          30),
+    rooflight:    v('mat-rooflight',    620),
     spec:             getBuildSpecRates(),   // New Build element rates (Build Spec tab)
   };
 }
@@ -6309,7 +6321,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const wdId = String(sid++);
   const winMat = d.windowType === 'triple-alu' ? SR.win_triple_alu : d.windowType === 'triple' ? SR.win_triple : SR.win_double;
   const doorMatRate = d.doorType === 'Aluminium' ? SR.door_alu : d.doorType === 'Timber Panel' ? SR.door_timber : d.doorType === 'uPVC' ? SR.door_upvc : SR.door_composite;
-  const rlMatRate   = d.roofLightSize === '940x1600' ? 850 : d.roofLightSize === '780x980' ? 620 : 480;
+  const rlMatRate   = Math.round((d.roofLightSize === '940x1600' ? 850 : d.roofLightSize === '780x980' ? 620 : 480) * rooflightFactor);
   const wdItems = [
     { ref:`${wdId}.1`, description:`${d.windowType==='triple-alu'?'Triple-glazed aluminium-clad':d.windowType==='triple'?'Triple-glazed uPVC':'Double-glazed uPVC'} windows (supply & install)`, unit:'m²', quantity:d.windowArea, matRate:winMat, labRate:lM(3, L.craft), note:`DEAP window area ${d.windowArea}m² — ${d.windowType} glazed · Craft 3hr/m² × €44/hr`, status:d.windowAreaAssumed?'assumed':'ok', deapSource:'DEAP window area' },
     { ref:`${wdId}.2`, description:`External door sets — ${d.doorType || 'composite insulated'} (supply & hang)`, unit:'nr', quantity:d.doorCount, matRate:doorMatRate, labRate:lM(9, L.craft), note:`${d.doorCount} nr · Craft 9hr/nr × €44/hr`, status:'ok', deapSource:'DEAP door count' },
@@ -6327,8 +6339,8 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const ifId = String(sid++);
   sections.push({ id: ifId, title: 'INTERNAL FINISHES', items: [
     { ref:`${ifId}.1`, description:'Sand/cement screed to ground floor (65mm)', unit:'m²', quantity:sceedArea, matRate:12, labRate:lM(0.52, L.craft), note:`Ground floor area ${sceedArea}m² · Craft 0.52hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
-    { ref:`${ifId}.2`, description:'Floor tiling to kitchen, utility & bathrooms', unit:'m²', quantity:tileBathArea, matRate:28, labRate:lM(0.6, L.craft), note:'Estimated tile areas in wet/utility rooms · Craft 0.6hr/m² × €44/hr', status:'assumed', deapSource:'derived' },
-    ...(d.floorSpec !== 'screed-only' ? [    { ref:`${ifId}.3`, description:'Timber/laminate flooring to living & bedroom areas', unit:'m²', quantity:timberFlrArea, matRate:32, labRate:lM(0.58, L.catB), note:`~55% of total floor area (${timberFlrArea}m²) · Cat B 0.58hr/m² × €35/hr`, status:'assumed', deapSource:'derived' }] : []),
+    { ref:`${ifId}.2`, description:'Floor tiling to kitchen, utility & bathrooms', unit:'m²', quantity:tileBathArea, matRate:Math.round(28*floorTileFactor), labRate:lM(0.6, L.craft), note:'Estimated tile areas in wet/utility rooms · Craft 0.6hr/m² × €44/hr', status:'assumed', deapSource:'derived' },
+    ...(d.floorSpec !== 'screed-only' ? [    { ref:`${ifId}.3`, description:'Timber/laminate flooring to living & bedroom areas', unit:'m²', quantity:timberFlrArea, matRate:Math.round(32*floorTimberFactor), labRate:lM(0.58, L.catB), note:`~55% of total floor area (${timberFlrArea}m²) · Cat B 0.58hr/m² × €35/hr`, status:'assumed', deapSource:'derived' }] : []),
     { ref:`${ifId}.4`, description:'Internal wall plaster (sand/cement + skim)', unit:'m²', quantity:d.wallArea, matRate:6, labRate:lM(0.72, L.craft), note:`Net wall area ${d.wallArea}m² · Craft 0.72hr/m² × €44/hr`, status:'ok', deapSource:'DEAP wall area' },
     { ref:`${ifId}.5`, description:'Wet room wall tiling (bathrooms & en-suites)', unit:'m²', quantity:wetTilingArea, matRate:22, labRate:lM(0.92, L.craft), note:`${d.bathrooms+d.ensuites} wet rooms × 12m² = ${wetTilingArea}m² · Craft 0.92hr/m² × €44/hr`, status:'assumed', deapSource:'derived' },
     { ref:`${ifId}.6`, description:'Plasterboard ceiling (taped & skimmed)', unit:'m²', quantity:ceilingArea, matRate:11, labRate:lM(1.05, L.craft), note:`Total ceiling area ${ceilingArea}m² · Craft 1.05hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
@@ -6467,6 +6479,15 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const stoveFactor = (mat.stoveBB   > 0) ? mat.stoveBB   / 3200  : 1;
   const mvhrFactor  = (mat.mvhr      > 0) ? mat.mvhr      / 3500  : 1;
   const mevFactor   = (mat.mev       > 0) ? mat.mev       / 1200  : 1;
+  // Renewables, electrical & fabric factors (Material Database panel)
+  const batteryFactor    = (mat.battery     > 0) ? mat.battery     / 3500  : 1;
+  const cuFactor         = (mat.consumerUnit> 0) ? mat.consumerUnit/ 380   : 1;
+  const evFactor         = (mat.evCharger   > 0) ? mat.evCharger   / 650   : 1;
+  const ledFactor        = (mat.led         > 0) ? mat.led         / 28    : 1;
+  const floorTileFactor  = (mat.floorTile   > 0) ? mat.floorTile   / 28    : 1;
+  const floorTimberFactor= (mat.floorTimber > 0) ? mat.floorTimber / 32    : 1;
+  const ufhFactor        = (mat.ufh         > 0) ? mat.ufh         / 30    : 1;
+  const rooflightFactor  = (mat.rooflight   > 0) ? mat.rooflight   / 620   : 1;
 
   const autoFloorArea   = d.floorArea;
   const autoCylSize     = d.cylinderSize > 100 ? d.cylinderSize : cylinderSize(d.bedrooms);
@@ -6505,7 +6526,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
       note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   }
   if (d.hasUFH) {
-    msItems.push({ ref:`${msId}.2`, description:'Underfloor heating (pipes, manifold, controls)', unit:'m²', quantity:d.ufhArea, matRate:30, labRate:lM(0.83, L.plumber),
+    msItems.push({ ref:`${msId}.2`, description:'Underfloor heating (pipes, manifold, controls)', unit:'m²', quantity:d.ufhArea, matRate:Math.round(30*ufhFactor), labRate:lM(0.83, L.plumber),
       note:`Ground floor UFH: ${d.ufhArea}m² · Plumber 0.83hr/m² × €52/hr`, status:'ok', deapSource:'DEAP emitters' });
   }
   if (d.hasRadiators && d.radiatorCount > 0) {
@@ -6574,10 +6595,10 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const esId = String(sid++);
   sections.push({ id: esId, title: 'ELECTRICAL SERVICES', items: [
     { ref:`${esId}.1`, description:'First fix wiring (ring mains, lighting circuits, sockets)', unit:'m²', quantity:d.floorArea, matRate:18, labRate:lM(0.72, L.electrician), note:`Total floor area ${d.floorArea}m² · Electrician 0.72hr/m² × €55/hr`, status:'assumed', deapSource:'derived' },
-    { ref:`${esId}.2`, description:`Consumer unit (${d.consumerUnit || '16-way with RCDs'})`, unit:'nr', quantity:1, matRate:340, labRate:lM(5.8, L.electrician), note:'Standard domestic unit · Electrician 5.8hr × €55/hr', status:'assumed', deapSource:'assumed' },
-    { ref:`${esId}.3`, description:'Recessed LED light fittings (supply & fix)', unit:'nr', quantity:lightFittings, matRate:48, labRate:lM(0.87, L.electrician), note:`~1 per 5m² = ${lightFittings}nr · Electrician 0.87hr/nr × €55/hr`, status:'assumed', deapSource:'derived' },
+    { ref:`${esId}.2`, description:`Consumer unit (${d.consumerUnit || '16-way with RCDs'})`, unit:'nr', quantity:1, matRate:Math.round(340*cuFactor), labRate:lM(5.8, L.electrician), note:'Standard domestic unit · Electrician 5.8hr × €55/hr', status:'assumed', deapSource:'assumed' },
+    { ref:`${esId}.3`, description:'Recessed LED light fittings (supply & fix)', unit:'nr', quantity:lightFittings, matRate:Math.round(48*ledFactor), labRate:lM(0.87, L.electrician), note:`~1 per 5m² = ${lightFittings}nr · Electrician 0.87hr/nr × €55/hr`, status:'assumed', deapSource:'derived' },
     { ref:`${esId}.4`, description:'Double socket outlets (supply & fix)', unit:'nr', quantity:socketCount, matRate:28, labRate:lM(0.58, L.electrician), note:`~1 per 4m² = ${socketCount}nr · Electrician 0.58hr/nr × €55/hr`, status:'assumed', deapSource:'derived' },
-    ...(d.hasEV ? [{ ref:`${esId}.5`, description:'EV charging point (7kW, outdoor)', unit:'nr', quantity:1, matRate:680, labRate:lM(8, L.electrician), note:'Assumed for new build / ASHP home · Electrician 8hr × €55/hr', status:'assumed', deapSource:'assumed' }] : []),
+    ...(d.hasEV ? [{ ref:`${esId}.5`, description:'EV charging point (7kW, outdoor)', unit:'nr', quantity:1, matRate:Math.round(680*evFactor), labRate:lM(8, L.electrician), note:'Assumed for new build / ASHP home · Electrician 8hr × €55/hr', status:'assumed', deapSource:'assumed' }] : []),
   ]});
 
   // ── BUILDER'S WORK IN CONNECTION WITH SERVICES ────────────────────────────
@@ -6597,12 +6618,12 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
     const rnId = String(sid++);
     const rnItems = [];
     if (d.pvArea > 0) {
-      rnItems.push({ ref:`${rnId}.1`, description:`Solar PV panels (${d.pvArea}m²)`, unit:'m²', quantity:d.pvArea, matRate:295, labRate:lM(3.9, L.electrician), note:`DEAP renewables: ${d.pvArea}m² PV · Electrician 3.9hr/m² × €55/hr`, status:'ok', deapSource:'DEAP renewables' });
-      rnItems.push({ ref:`${rnId}.2`, description:'PV string inverter (supply & commission)', unit:'nr', quantity:1, matRate:850, labRate:lM(11.6, L.electrician), note:'1 inverter assumed · Electrician 11.6hr × €55/hr', status:'assumed', deapSource:'derived' });
+      rnItems.push({ ref:`${rnId}.1`, description:`Solar PV panels (${d.pvArea}m²)`, unit:'m²', quantity:d.pvArea, matRate:Math.round(mat.pvPanel / 1.7 + 130), labRate:lM(3.9, L.electrician), note:`DEAP renewables: ${d.pvArea}m² PV · Electrician 3.9hr/m² × €55/hr`, status:'ok', deapSource:'DEAP renewables' });
+      rnItems.push({ ref:`${rnId}.2`, description:'PV string inverter (supply & commission)', unit:'nr', quantity:1, matRate:mat.inverter, labRate:lM(11.6, L.electrician), note:'1 inverter assumed · Electrician 11.6hr × €55/hr', status:'assumed', deapSource:'derived' });
     }
     if (d.hasBattery) {
       const battKwh = parseFloat(d.batteryKwh) || 10;
-      const battMat = battKwh <= 5 ? 2500 : battKwh <= 10 ? 4500 : battKwh <= 15 ? 6500 : 8500;
+      const battMat = Math.round((battKwh <= 5 ? 2500 : battKwh <= 10 ? 4500 : battKwh <= 15 ? 6500 : 8500) * batteryFactor);
       const battDesc = battKwh + 'kWh battery storage (LiFePO4 — supply & install)';
       rnItems.push({ ref:`${rnId}.3`, description:battDesc, unit:'nr', quantity:1, matRate:battMat, labRate:lM(20, L.electrician), note:battKwh + 'kWh from Tab 8 · Electrician 20hr × €55', status:'ok', deapSource:'DEAP renewables' });
     }
@@ -15571,6 +15592,16 @@ function _ufType(t) {
             </tbody>
           </table>
 
+          <!-- FLOOR FINISHES -->
+          <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:18px 0 10px;">&#127795; Floor Finishes</div>
+          <table class="mdb-tbl">
+            <thead><tr><th>Material</th><th>Unit</th><th>Price</th><th>Badge</th></tr></thead>
+            <tbody>
+              <tr><td>Ceramic/porcelain floor tile 600&#215;600</td><td>m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-floor-tile" class="mdb-pi" type="number" min="1" step="1" value="28" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Wet rooms/kitchen</span></td></tr>
+              <tr><td>Timber/laminate flooring (15mm)</td><td>m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-floor-timber" class="mdb-pi" type="number" min="1" step="1" value="32" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Living/bedrooms</span></td></tr>
+            </tbody>
+          </table>
+
         </div>
 
         <!-- RIGHT COLUMN -->
@@ -15598,12 +15629,13 @@ function _ufType(t) {
               <tr><td>Double-glazed uPVC window A-rated</td><td>m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-window-double" class="mdb-pi" type="number" min="1" step="1" value="380" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Supply &amp; install</span></td></tr>
               <tr><td>Composite external door</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-ext-door" class="mdb-pi" type="number" min="1" step="1" value="1100" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Supply &amp; hang</span></td></tr>
               <tr><td>Internal door set (door+frame+ironmongery)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-int-door" class="mdb-pi" type="number" min="1" step="1" value="380" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Standard solid core</span></td></tr>
+              <tr><td>Roof light 780&#215;980mm (centre-pivot)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-rooflight" class="mdb-pi" type="number" min="1" step="50" value="620" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Incl. flashing kit</span></td></tr>
             </tbody>
           </table>
 
           <!-- HEATING & HOT WATER -->
           <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:18px 0 10px;">&#128293; Heating &amp; Hot Water</div>
-          <div style="font-size:10px;color:#64748b;margin:-4px 0 8px;line-height:1.5;">Editing any of these supply rates scales the matching New Build cost proportionally (install labour unaffected). Covers ASHP, GSHP, gas/oil/LPG boilers, stove, cylinder, radiators, MVHR &amp; MEV. Each rate is the baseline for its system — edits move all size bands by the same %.</div>
+          <div style="font-size:10px;color:#64748b;margin:-4px 0 8px;line-height:1.5;">Editing any of these supply rates scales the matching New Build cost proportionally (install labour unaffected). Covers ASHP, GSHP, gas/oil/LPG boilers, stove, cylinder, radiators, MVHR, MEV &amp; UFH. Each rate is the baseline for its system — edits move all size bands by the same %.</div>
           <table class="mdb-tbl">
             <thead><tr><th>Material</th><th>Unit</th><th>Price</th><th>Badge</th></tr></thead>
             <tbody>
@@ -15618,6 +15650,7 @@ function _ufType(t) {
               <tr><td>Stove with back boiler</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-stove-bb" class="mdb-pi" type="number" min="1" step="100" value="3200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Solid fuel</span></td></tr>
               <tr><td>MVHR unit (≤100m² ref)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-mvhr" class="mdb-pi" type="number" min="1" step="100" value="3500" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">Heat recovery</span></td></tr>
               <tr><td>MEV system (≤120m² ref)</td><td>nr</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-mev" class="mdb-pi" type="number" min="1" step="50" value="1200" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-grey">Extract only</span></td></tr>
+              <tr><td>UFH pipe &amp; manifold (per m&#178;)</td><td>m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="mat-ufh" class="mdb-pi" type="number" min="1" step="1" value="30" oninput="mdbRefresh()"></td><td><span class="mdb-badge mdb-badge-green">Screed-based ground floor</span></td></tr>
             </tbody>
           </table>
 
@@ -16477,11 +16510,12 @@ function mdbRefresh() {
 //     (ashp-8/12, cylinder, radiator, oil-boiler — applied via getMaterialsFromUI)
 // Leaving them editable misleads users into thinking edits change the estimate, so they are
 // disabled + tagged. To re-enable any once it's wired to an engine, remove its id from REF_ONLY.
+// Wired (no longer in REF_ONLY): heating, ventilation, renewables, electrical, floor finishes, rooflight.
 (function(){
   var REF_ONLY = ['mat-rebar','mat-timber','mat-rooftile','mat-slate','mat-sarking','mat-grp',
     'mat-render','mat-skim','mat-screed','mat-plasterboard','mat-cavitybead','mat-ewi',
     'mat-window-triple','mat-window-double','mat-ext-door','mat-int-door',
-    'mat-pv-panel','mat-inverter','mat-battery','mat-consumer-unit','mat-ev-charger','mat-led'];
+    ];
   var EU_TAB = { 'mat-cavitybead':1, 'mat-ewi':1 }; // these ARE editable — via the EU Rates tab
   // these ARE editable — via the new Build Spec tab (windows, doors, roof covering)
   var SPEC_TAB = { 'mat-window-triple':1, 'mat-window-double':1, 'mat-ext-door':1,
