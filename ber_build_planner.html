@@ -304,14 +304,6 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .extras-subtotal-row td:last-child{color:#E8A020;text-align:right;}
 .mode-fields{display:none;}
 .mode-fields.active{display:block;}
-
-/* ADVISORY UPLOAD ZONE */
-.advisory-zone{border:2px dashed rgba(129,140,248,0.4);border-radius:10px;background:rgba(129,140,248,0.04);padding:18px 16px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
-.advisory-zone:hover,.advisory-zone.drag-over{border-color:#818CF8;background:rgba(129,140,248,0.09);}
-.advisory-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.advisory-zone-label{font-size:12px;font-weight:600;color:#818CF8;margin-bottom:3px;}
-.advisory-zone-sub{font-size:10px;color:#8090A8;}
-.badge-advisory{background:rgba(139,92,246,0.12);color:#7C3AED;}
 .ref-subsection{border:1px solid #2E3D52;border-radius:8px;padding:12px;background:rgba(255,255,255,0.02);margin-bottom:10px;}
 .ref-subsection-title{font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .extension-toggle-row{display:flex;align-items:center;gap:8px;padding:10px 0;margin-bottom:4px;}
@@ -5008,12 +5000,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
     <div style="height:1px;background:linear-gradient(90deg,transparent,#2e3d52,transparent);margin:6px 0 10px;"></div>
     <div id="spec-panel" style="margin-bottom:16px;">
-      <button id="advisory-clear-btn" style="display:none"></button>
-      <div id="advisory-pdf-panel" style="display:none"><div id="advisory-drop-zone"></div></div>
       <textarea id="notes-input" style="display:none"></textarea>
-      <textarea id="advisory-text" style="display:none" oninput="onAdvisoryTextChange()"></textarea>
-      <input type="file" id="advisory-file-input" accept=".pdf,application/pdf" style="display:none" onchange="handleAdvisoryFile(this.files[0])"/>
-      <span id="advisory-upload-status" style="display:none"></span>
       <div id="spec-content"></div>
     </div>
 
@@ -5466,7 +5453,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
 <!-- ═══ REPORT SCREEN ══════════════════════════════════════════════════════ -->
 <div id="screen-report">
-  <div id="advisory-status-badge" style="display:none;margin:8px 24px 0 24px;"></div>
   <div class="report-hdr">
     <div class="report-hdr-inner">
       <div class="report-hdr-top">
@@ -5599,183 +5585,6 @@ let extensionCount = 0;
 // ── TRADE ALL-IN HOURLY RATES (SEO 2024 — effective Aug 2025) ─────────────────
 // All-in = base wage × 1.35 (employer PRSI 11.05%, pension 4%, sick pay, overhead)
 // Source: SEO National Wage Agreement 2024 / SCSI Labour Cost Guide Aug 2025
-// ANTHROPIC API — developer-set key, never shown to users
-const ANTHROPIC_API_KEY = '';
-
-// ADVISORY_BOQ_PROMPT — system prompt sent to Claude with each advisory enrichment call
-const ADVISORY_BOQ_PROMPT = `You are a quantity surveyor reading BER advisory notes for an Irish construction project.
-
-The BOQ already has default line items. The sections for a New Build are:
-PRELIMINARIES, SUBSTRUCTURE, FRAME & WALLS, UPPER FLOORS, ROOF, WINDOWS & EXTERNAL DOORS, INTERNAL FINISHES, PAINTING & DECORATING, FITTINGS & FURNISHINGS, FIRE PROTECTION, MECHANICAL SERVICES, ELECTRICAL SERVICES, BUILDER'S WORK IN CONNECTION, RENEWABLES, EXTERNAL WORKS, COMPLIANCE & CERTIFICATION, PC & PROVISIONAL SUMS
-
-The sections for a Refurbishment are:
-PRELIMINARIES & SCAFFOLDING, ROOF & ATTIC INSULATION, FLOOR INSULATION, WINDOWS & EXTERNAL DOORS, AIRTIGHTNESS & MAKING GOOD, HEATING SYSTEM, VENTILATION, RENEWABLES, ELECTRICAL UPGRADES, PLUMBING, ADDITIONAL & DEMOLITION WORKS
-
-Your job: read the advisory notes carefully, then return ONLY valid JSON with two arrays:
-
-1. "modifications" — where the advisory specifies something that differs from a default BOQ item already listed. Match by item_ref. Be tolerant of spelling mistakes and abbreviations. For thickness/depth increases, scale labour rate proportionally (e.g. insulation goes from 300mm to 400mm → increase labRate by 33%). Each modification needs:
-   { "item_ref": "1.7", "field_to_change": "description|matRate|labRate|quantity|unit|note", "new_value": ..., "reason": "..." }
-
-2. "additions" — completely new items not already covered by any default BOQ line. Use section_title exactly as listed above. Each addition needs:
-   { "section_title": "ROOF", "description": "...", "unit": "m2|m|nr|item", "qty_formula": "roofArea|wallArea|floorArea|windowArea|1", "mat_rate": 0.00, "lab_rate": 0.00, "note": "..." }
-
-Return NOTHING except valid JSON. No preamble, no explanation, no markdown fences.`;
-
-// Applies advisory enrichment to the BOQ: modifies existing items and adds new advisory sections
-async function generateAdvisoryItems(advisoryText, measurements) {
-  if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'YOUR_API_KEY_HERE') return;
-
-  function evalQty(formula) {
-    try {
-      const floorArea  = measurements.floorArea  || 0;
-      const wallArea   = measurements.wallArea   || 0;
-      const roofArea   = measurements.roofArea   || 0;
-      const windowArea = measurements.windowArea || 0;
-      const val = new Function(
-        'floorArea','wallArea','roofArea','windowArea',
-        'return (' + formula + ');'
-      )(floorArea, wallArea, roofArea, windowArea);
-      return Math.max(0, +val || 1);
-    } catch(e) { return 1; }
-  }
-
-  // Build a structured BOQ snapshot grouped by section for Claude context
-  const boqSnapshot = (BOQ && BOQ.sections ? BOQ.sections : []).map(sec =>
-    '[' + sec.title + ']\n' +
-    (sec.items || []).map(it =>
-      `  ${it.ref}: ${it.description} [${it.unit}] mat €${it.matRate} lab €${it.labRate}`
-    ).join('\n')
-  ).join('\n');
-
-  const userMsg =
-    `Advisory Notes:\n${advisoryText}\n\n` +
-    `Project Type: ${measurements.projectType || 'New Build'}\n` +
-    `Floor Area: ${measurements.floorArea} m²\n` +
-    `Wall Area: ${measurements.wallArea} m²\n` +
-    `Roof Area: ${measurements.roofArea} m²\n` +
-    `Window Area: ${measurements.windowArea || 0} m²\n\n` +
-    `Existing BOQ Items:\n${boqSnapshot}`;
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 2048,
-      system: ADVISORY_BOQ_PROMPT,
-      messages: [{ role: 'user', content: userMsg }],
-    }),
-  });
-  if (!response.ok) throw new Error('API ' + response.status);
-
-  const data    = await response.json();
-  const rawText = data.content?.[0]?.text || '{}';
-  const clean   = rawText.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
-  let parsed;
-  try { parsed = JSON.parse(clean); } catch(e) {
-    BOQ.assumptions.push('Advisory enrichment: could not parse AI response');
-    return;
-  }
-
-  // ── 1. Apply modifications to existing items ──────────────────────────
-  const mods = Array.isArray(parsed.modifications) ? parsed.modifications : [];
-  let modsApplied = 0;
-  mods.forEach(mod => {
-    if (!mod.item_ref) return;
-    for (const sec of (BOQ.sections || [])) {
-      const item = (sec.items || []).find(it => String(it.ref) === String(mod.item_ref));
-      if (!item) continue;
-      const field = mod.field_to_change;
-      const val   = mod.new_value;
-      if      (field === 'description') { item.description = String(val); }
-      else if (field === 'unit')        { item.unit        = String(val); }
-      else if (field === 'note')        { item.note        = String(val); }
-      else if (field === 'matRate')     { item.matRate     = Math.max(0, parseFloat(val) || 0); }
-      else if (field === 'labRate')     { item.labRate     = Math.max(0, parseFloat(val) || 0); }
-      else if (field === 'quantity')    { item.quantity    = Math.max(0, parseFloat(val) || 0); }
-      BOQ.assumptions.push('\u270F Advisory \u2014 ' + item.ref + ': ' + (mod.reason || field + ' updated'));
-      modsApplied++;
-      break;
-    }
-  });
-  if (modsApplied > 0) {
-    (BOQ.sections || []).forEach(sec => {
-      sec.subtotal = Math.round((sec.items || []).reduce(
-        (a, it) => a + (it.quantity || 0) * ((it.matRate || 0) + (it.labRate || 0)), 0));
-    });
-    recalcTotals();
-  }
-
-  // ── 2. Group additions by section_title and insert as advisory sections ─
-  const adds = Array.isArray(parsed.additions) ? parsed.additions : [];
-  if (adds.length === 0) { BOQ.advisoryStatus = { ok: true, mods: modsApplied, adds: 0 }; return; }
-
-  // Group by section_title
-  const groups = new Map();
-  adds.forEach(item => {
-    const title = (item.section_title || 'ADVISORY ITEMS').trim().toUpperCase();
-    if (!groups.has(title)) groups.set(title, []);
-    groups.get(title).push(item);
-  });
-
-  // Find best matching existing section title (fuzzy: normalise spaces/ampersands)
-  const normalize = s => s.toUpperCase().replace(/[^A-Z0-9]/g,' ').replace(/\s+/g,' ').trim();
-  const existingTitles = (BOQ.sections || []).map(s => ({ orig: s.title, norm: normalize(s.title) }));
-
-  groups.forEach((rawItems, groupTitle) => {
-    const normGroup = normalize(groupTitle);
-    // Try exact then partial match against existing section titles
-    const match = existingTitles.find(et => et.norm === normGroup)
-               || existingTitles.find(et => et.norm.includes(normGroup) || normGroup.includes(et.norm));
-    const displayTitle = match ? ('ADVISORY: ' + match.orig) : ('ADVISORY: ' + groupTitle);
-
-    const mappedItems = rawItems.map((item, i) => ({
-      ref:         (i + 1) + 'A',
-      description: item.description || 'Advisory item',
-      unit:        item.unit        || 'item',
-      quantity:    +evalQty(String(item.qty_formula ?? 1)).toFixed(2),
-      matRate:     parseFloat(item.mat_rate)  || 0,
-      labRate:     parseFloat(item.lab_rate)  || 0,
-      note:        item.note                  || '',
-      status:      'assumed',
-      isAdvisory:  true,
-    }));
-
-    const subtotal = mappedItems.reduce((a, it) => a + it.quantity * (it.matRate + it.labRate), 0);
-    BOQ.sections.push({
-      id:                String((BOQ.sections.length || 0) + 1),
-      title:             displayTitle,
-      part:              null,
-      isAdvisorySection: true,
-      items:             mappedItems,
-      subtotal:          Math.round(subtotal),
-    });
-  });
-
-  BOQ.advisoryStatus = { ok: true, mods: modsApplied, adds: adds.length };
-  recalcTotals();
-}
-
-function addAdvisorySection(items) {
-  const sid = String((BOQ.sections.length || 0) + 1);
-  const subtotal = items.reduce((a,i) => a + i.quantity * (i.matRate + i.labRate), 0);
-  BOQ.sections.push({
-    id: sid,
-    title: 'ADVISORY ITEMS - BER ADVISORY REPORT',
-    part: null,
-    isAdvisorySection: true,
-    items,
-    subtotal: Math.round(subtotal),
-  });
-  recalcTotals();
-}
-
-
 
 const TRADE_RATES = {
   craft:       44,
@@ -7192,73 +7001,6 @@ function toggleExtension() {
   const sec = document.getElementById('ref-extension-section');
   if (sec) sec.style.display = cb?.checked ? 'block' : 'none';
 }
-
-// ── ADVISORY REPORT HANDLERS ──────────────────────────────────────────────────
-let advisoryContent = null; // { type:'pdf'|'text', data: base64|string, filename? }
-
-function setAdvisoryStatus(msg, ok) {
-  const el = document.getElementById('advisory-upload-status');
-  if (el) { el.textContent = msg; el.style.color = ok ? '#10B981' : '#94A3B8'; }
-  const clearBtn = document.getElementById('advisory-clear-btn');
-  if (clearBtn) clearBtn.style.display = msg ? 'inline-block' : 'none';
-}
-
-function handleAdvisoryDrop(event) {
-  const file = event.dataTransfer?.files[0];
-  if (file) handleAdvisoryFile(file);
-}
-
-async function handleAdvisoryFile(file) {
-  if (!file || file.type !== 'application/pdf') {
-    setAdvisoryStatus('Please upload a PDF file.', false); return;
-  }
-  setAdvisoryStatus('Reading PDF…', false);
-  const zone = document.getElementById('advisory-drop-zone');
-  if (zone) zone.style.borderColor = '#818CF8';
-  try {
-    const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    advisoryContent = { type:'pdf', data:base64, filename:file.name };
-    setAdvisoryStatus('✓ ' + file.name + ' ready — advisory will be processed on Generate', true);
-    if (zone) zone.style.borderColor = '#10B981';
-  } catch(e) {
-    setAdvisoryStatus('✗ Could not read file: ' + e.message, false);
-  }
-}
-
-function toggleAdvisoryText() {
-  const panel = document.getElementById('advisory-text-panel');
-  if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-}
-
-function onAdvisoryTextChange() {
-  const text = (document.getElementById('advisory-text')?.value || '').trim();
-  if (text.length > 80) {
-    advisoryContent = { type:'text', data:text };
-    setAdvisoryStatus('✓ Advisory text ready — will be processed on Generate', true);
-  } else {
-    if (advisoryContent?.type === 'text') advisoryContent = null;
-    setAdvisoryStatus('', false);
-  }
-}
-
-function clearAdvisory() {
-  advisoryContent = null;
-  const fileInput = document.getElementById('advisory-file-input');
-  if (fileInput) fileInput.value = '';
-  const textArea = document.getElementById('advisory-text');
-  if (textArea) textArea.value = '';
-  const zone = document.getElementById('advisory-drop-zone');
-  if (zone) zone.style.borderColor = '';
-  setAdvisoryStatus('', false);
-}
-
-// ADVISORY SYSTEM PROMPT — generates BOQ items from advisory + measurements
-
 
 function showManualEntry() {
   const panel = document.getElementById('manual-entry-panel');
@@ -10014,11 +9756,6 @@ function loadNewBuildExample() {
   s('t8-battery',         'No');
   s('t8-solarThermal',    'No');
   onVentChange();
-  const adv = document.getElementById('advisory-text');
-  if(adv) {
-    const sep = adv.value.trim() ? '\n\n' : '';
-    adv.value += sep + 'BER advisory recommends attic insulation top-up to 300mm, external wall insulation to south and west elevations, upgrade to A-rated heat pump, triple glazed windows throughout, and MVHR ventilation system. Property currently D-rated, target B2 rating.';
-  }
   ['t1','t2','t3','t4','t6'].forEach(function(t) {
     const c = document.getElementById(t + '-cards');
     if (c) c.innerHTML = '';
@@ -10141,265 +9878,6 @@ function loadRefurbExample() {
   s('t8-battery',         'No');
   s('t8-solarThermal',    'No');
   onVentChange();
-  const adv = document.getElementById('advisory-text');
-  if(adv) {
-    const sep = adv.value.trim() ? '\n\n' : '';
-    adv.value = 'BER Rating: E2 → Target B2. Semi-detached, Loughrea, Co. Galway. Built c.1975. Floor area 95m².\n\nRecommended measures:\n1. Attic insulation — top-up to 300mm mineral wool.\n2. Internal wall insulation — insulated plasterboard 62mm.\n3. Triple-glazed uPVC windows + 2 composite doors.\n4. Replace oil boiler with 10kW Air-to-Water Heat Pump.\n5. 210L HP unvented cylinder.\n6. MEV whole-house mechanical extract ventilation.\n7. Solar PV — 8m² south-facing.\n8. 30m² kitchen/dining extension — flat GRP roof.';
-  }
-
-  // Card-based geometry — wrapped in try-catch to surface JS errors
-  try {
-    ['t1','t2','t3','t4'].forEach(function(t) {
-      const c = document.getElementById(t + '-cards');
-      if (c) c.innerHTML = '';
-      if (typeof _dynCount === 'object' && _dynCount) _dynCount[t] = 0;
-      if (typeof _dynEmpty === 'function') _dynEmpty(t);
-    });
-  } catch(e) { console.error('clearing cards:', e); }
-  try {
-    if (typeof addFloorCard === 'function') {
-      addFloorCard();
-      var _l1 = document.getElementById('fc-t1-level-1'), _ar1 = document.getElementById('fc-t1-area-1'),
-          _pe1 = document.getElementById('fc-t1-perim-1'), _ht1 = document.getElementById('fc-t1-height-1');
-      if (_l1) _l1.value = 'Ground Floor'; if (_ar1) _ar1.value = '50';
-      if (_pe1) _pe1.value = '28';         if (_ht1) _ht1.value = '2.4';
-      addFloorCard();
-      var _l2 = document.getElementById('fc-t1-level-2'), _ar2 = document.getElementById('fc-t1-area-2'),
-          _ht2 = document.getElementById('fc-t1-height-2');
-      if (_l2) _l2.value = 'First Floor'; if (_ar2) _ar2.value = '45'; if (_ht2) _ht2.value = '2.4';
-    }
-  } catch(e) { console.error('addFloorCard:', e); }
-  try {
-    if (typeof addWallCard === 'function') {
-      addWallCard();
-      var _wa1 = document.getElementById('fc-t2-area-1'); if (_wa1) _wa1.value = '120';
-    }
-  } catch(e) { console.error('addWallCard:', e); }
-  try {
-    if (typeof addRoofCard === 'function') {
-      addRoofCard();
-      var _rt1 = document.getElementById('fc-t3-type-1'), _ra1 = document.getElementById('fc-t3-area-1');
-      if (_rt1) _rt1.value = 'ceiling'; if (_ra1) _ra1.value = '50';
-    }
-  } catch(e) { console.error('addRoofCard:', e); }
-  try {
-    if (typeof addWindowCard === 'function') {
-      addWindowCard();
-      var _wc1 = document.getElementById('fc-t4-count-1'),
-          _wa1b = document.getElementById('fc-t4-area-1');
-      if (_wc1) _wc1.value = '8'; if (_wa1b) _wa1b.value = '16';
-    }
-  } catch(e) { console.error('addWindowCard:', e); }
-  try {
-    if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
-  } catch(e) { console.error('mirrorDynamicToLegacy:', e); }
-
-  // Open input screen first — checkboxes go in setTimeout so onModeChange doesn't clear them
-  try {
-    selectProjectType('Refurbishment');
-    if (typeof openProjectSections === 'function') openProjectSections();
-  } catch(e) {
-    alert('ERROR in selectProjectType/openProjectSections:\n' + e.message + '\n' + e.stack);
-  }
-
-  setTimeout(function() {
-    const ck = (id, ch) => { const el = document.getElementById(id); if(el) { el.checked = ch; el.dispatchEvent(new Event('change')); } };
-
-    // Works Selector — existing house
-    ck('ws-chimney',        true); s('ws-chimney-count', '1');
-    ck('ws-skip',           true); s('ws-skip-count', '4');
-    ck('ws-strip-bathroom', true); s('ws-stripbath-count', '1');
-    ck('ws-new-bath',       true); s('ws-bath-count', '1');
-    ck('ws-new-ensuite',    true); s('ws-ensuite-count', '1');
-    ck('ws-plumbing-alt',   true);
-    ck('ws-rewire',         true);
-    ck('ws-consumer',       true);
-    ck('ws-led',            true);
-    ck('ws-heating-ref',    true);
-    s('ws-heat-ref-type',      'ASHP');
-    s('ws-heat-ref-existing',  'Oil Boiler');
-    ck('ws-rads-ref',       true);
-    ck('ws-hw-ref',         true);
-    ck('ws-smart-ref',      true);
-    ck('ws-ev-ref',         true);
-    ck('ws-ber-post',       true);
-    ck('ws-making-good',    true);
-
-    // Energy Upgrade measures
-    ck('ref-eu-roof-ceiling', true);
-    ck('ref-eu-iwi',          true);
-    ck('ref-eu-windows',      true);
-    ck('ref-eu-ashp',         true);
-    ck('ref-eu-hw-cyl',       true);
-    ck('ref-eu-mev',          true);
-    ck('ref-eu-pv',           true);
-    if (typeof refEuAutoFinish === 'function') refEuAutoFinish();
-    if (typeof refurbDeriveAreas === 'function') refurbDeriveAreas();
-
-    // Extension — 30m² kitchen/dining, flat GRP roof
-    if (typeof addExtension === 'function') {
-      addExtension();
-      setTimeout(function() {
-        const se = function(id, val) { const el = document.getElementById(id); if(el) el.value = val; };
-        se('ext1-fa',      '30');
-        se('ext1-opening', 'full');
-        se('ext1-span',    '4.0');
-        se('ext1-living',  '1');
-        se('ext1-wall-const',  'cavity-block');
-        se('ext1-cavity-ins',  'bead');
-        se('ext1-dry-lining',  '52mm');
-        se('ext1-wall-finish', 'smooth-render');
-        se('ext1-roof-type',   'flat-grp');
-        se('ext1-roof-ins',    'rafter');
-        se('ext1-spec-floors',     'tile');
-        se('ext1-spec-partitions', 'timber-stud');
-        se('ext1-spec-decorating', 'full');
-        se('ext1-spec-stairs',     'none');
-        se('ext1-spec-skirtings',  'mdf');
-        se('ext1-spec-int-doors',  'standard');
-        se('ext1-spec-level',    'standard');
-        se('ext1-spec-kitchen',  'mid');
-        se('ext1-spec-bathroom', 'standard');
-        se('ext1-glazing',      'triple');
-        se('ext1-heat-connect', 'yes');
-        se('ext1-vent-type',    'natural');
-        se('ext1-heat-sys',     'match');
-        se('ext1-emitters',     'rads');
-        se('ext1-rads',         '2');
-        if (typeof extDeriveAreas === 'function') extDeriveAreas(1);
-        if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
-        if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
-      }, 150);
-    } else {
-      if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
-      if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
-    }
-  }, 200);
-}
-
-function loadNewBuildExample2() {
-  const s = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
-  s('t0-projName',        '22 Hazel Grove, Lucan, Co. Dublin');
-  s('t0-projType',        'New Build');
-  s('t0-dwellingType',    'Semi-Detached');
-  s('t0-county',          'Dublin');
-  s('t0-grantScheme',     'None');
-  s('t0-airPerm',         '3.0');
-  s('t1-storeys',         '2');
-  s('t1-gfType',          'Insulated Solid Concrete Slab 150mm');
-  s('t1-gfArea',          '62');
-  s('t1-perimeter',       '32');
-  s('t1-floorIns',        'PIR Floor Insulation 100mm');
-  s('t1-screed',          'Sand/Cement Screed 65mm');
-  s('t1-f1Type',          'Timber Joists');
-  s('t1-f1Area',          '58');
-  onStoreysChange();
-  s('t2-wallType',        '325mm Cavity Block');
-  s('t2-wallArea',        '115');
-  s('t2-cavityIns',       'Full Fill EPS Bead');
-  s('t2-extFinish',       'Smooth Render');
-  s('t2-dryLining',       'Insulated Plasterboard 25mm');
-  s('t3-roofType',        'Pitched Insulated at Ceiling');
-  s('t3-roofArea',        '62');
-  s('t3-ceilIns',         'Mineral Wool 300mm');
-  s('t3-roofFinish',      'Concrete Tile');
-  s('t4-glazingType',     'Triple uPVC');
-  s('t4-windowArea',      '22');
-  s('t4-doorCount',       '2');
-  s('t4-doorArea',        '3.8');
-  s('t4-doorType',        'Composite Insulated');
-  s('t5-bedrooms',        '4');
-  s('t5-bathrooms',       '1');
-  s('t5-ensuites',        '2');
-  s('t5-livingAreas',     '2');
-  s('t5-additionalRooms', '1');
-  s('t7-heating',         'ASHP');
-  s('t7-emitters',        'UFH Ground Floor + Radiators Upper');
-  s('t7-hotWater',        'HP Cylinder 210L');
-  s('t8-ventType',        'MEV');
-  s('t8-pvArea',          '8');
-  s('t8-battery',         'No');
-  s('t8-solarThermal',    'No');
-  onVentChange();
-  selectProjectType('New Build');
-  openProjectSections();
-}
-
-function loadRefurbExample1() {
-  const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
-  const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
-  s('t0-projName',        '8 Mallow Road, Cork');
-  s('t0-projType',        'Refurbishment');
-  s('t0-dwellingType',    'Semi-Detached');
-  s('t0-county',          'Cork');
-  s('t0-grantScheme',     'One Stop Shop â€” National Upgrade Scheme');
-  s('t0-airPerm',         '4.5');
-  s('t1-storeys',         '2');
-  s('t1-gfType',          'Suspended Timber Floor');
-  s('t1-gfArea',          '50');
-  s('t1-perimeter',       '28');
-  s('t1-floorIns',        'Mineral Wool Between Joists 200mm');
-  s('t1-screed',          'None');
-  s('t1-f1Type',          'Timber Joists');
-  s('t1-f1Area',          '48');
-  onStoreysChange();
-  s('t2-wallType',        '225mm Cavity Block');
-  s('t2-wallArea',        '105');
-  s('t2-cavityIns',       'None');
-  s('t2-extFinish',       'Pebbledash Render');
-  s('t2-dryLining',       'None');
-  s('t3-roofType',        'Pitched Insulated at Ceiling');
-  s('t3-roofArea',        '50');
-  s('t3-ceilIns',         'Mineral Wool 100mm');
-  s('t3-roofFinish',      'Concrete Tile');
-  s('t4-glazingType',     'Single Glazed Metal Frame');
-  s('t4-windowArea',      '18');
-  s('t4-doorCount',       '2');
-  s('t4-doorArea',        '3.6');
-  s('t4-doorType',        'Timber Panel');
-  s('t5-bedrooms',        '3');
-  s('t5-bathrooms',       '1');
-  s('t5-ensuites',        '1');
-  s('t5-livingAreas',     '2');
-  s('t5-additionalRooms', '0');
-  s('t7-heating',         'ASHP');
-  s('t7-emitters',        'Radiators Only');
-  s('t7-hotWater',        'HP Cylinder 210L');
-  s('t8-ventType',        'MEV');
-  s('t8-pvArea',          '0');
-  s('t8-battery',         'No');
-  s('t8-solarThermal',    'No');
-  onVentChange();
-  // Works Selector
-  ck('ws-chimney',       true); s('ws-chimney-count', '1');
-  ck('ws-skip',          true); s('ws-skip-count', '3');
-  ck('ws-ext-windows',   true); s('ws-win-area', '18'); s('ws-door-count', '2');
-  ck('ws-plumbing-alt',  true);
-  ck('ws-rewire',        true);
-  ck('ws-consumer',      true);
-  ck('ws-led',           true);
-  ck('ws-ev-ref',        true);
-  ck('ws-heating-ref',   true);
-  s('ws-heat-ref-type',     'ASHP');
-  s('ws-heat-ref-existing', 'Oil Boiler');
-  ck('ws-hw-ref',        true);
-  ck('ws-smart-ref',     true);
-  ck('ws-ber-post',      true);
-  ck('ws-making-good',   true);
-  // Energy Upgrade measures
-  ck('ref-eu-roof-ceiling',     true);
-  ck('ref-eu-cavity',    true);
-  ck('ref-eu-windows',   true);
-  ck('ref-eu-doors',     true);
-  ck('ref-eu-ashp',      true);
-  ck('ref-eu-hw-cyl',    true);
-  ck('ref-eu-mev',       true);
-  refEuAutoFinish();
-  const adv = document.getElementById('advisory-text');
-  if(adv) {
-    const sep = adv.value.trim() ? '\n\n' : '';
-    adv.value += sep + 'BER advisory: attic insulation top-up to 300mm; cavity wall insulation (blown EPS bead ~105mÂ²); replace all windows with triple-glazed A-rated uPVC (18mÂ²) + 2 composite doors; replace oil boiler with 8â€“10kW ASHP; 210L HP cylinder; MEV whole-house ventilation. Property currently E-rated, target B2.';
-  }
   selectProjectType('Refurbishment');
   openProjectSections();
 }
@@ -10453,11 +9931,6 @@ function loadRefurbExample2() {
   ck('ref-eu-mev',          true);
   ck('ref-eu-pv',           true);
   refEuAutoFinish();
-  const adv = document.getElementById('advisory-text');
-  if(adv) {
-    const sep = adv.value.trim() ? '\n\n' : '';
-    adv.value += sep + 'BER advisory: attic insulation top-up to 300mm; cavity wall insulation; airtightness measures; replace oil boiler with 10–12kW ASHP; 210L HP cylinder; MEV; 12m² solar PV. 45m² kitchen/dining extension priced separately. Property currently F-rated, target B2.';
-  }
   // Card-based geometry — 1-storey detached bungalow 95m²
   ['t1','t2','t3','t4'].forEach(function(t) {
     const c = document.getElementById(t + '-cards');
@@ -11021,94 +10494,7 @@ function loadEUExample() {
   s('eu-windowArea','16'); s('eu-doorCount','2');
 }
 
-// LEGACY alias — keep advisory-text textarea in sync if used
-function loadEUExampleOLD() {
-  const ta = document.getElementById('advisory-text');
-  if (!ta) return;
-  ta.value = 'BER Advisory Report \u2014 Sample\n' +
-    'Dwelling: Semi-Detached, Co. Galway\n' +
-    'Current BER: D1 (225 kWh/m\u00b2/yr)   Target BER: B2 (100 kWh/m\u00b2/yr)\n\n' +
-    'Recommended Measures:\n' +
-    '1. Attic Insulation \u2014 install 300mm mineral wool (current: 100mm)\n' +
-    '2. External Wall Insulation \u2014 100mm EWI system + silicone render\n' +
-    '3. Windows \u2014 replace single-glazed with triple-glazed A-rated uPVC\n' +
-    '4. External Doors \u2014 replace 2 doors with A-rated composite doors\n' +
-    '5. Air Source Heat Pump \u2014 replace oil boiler with 12kW ASHP\n' +
-    '6. UFH \u2014 underfloor heating to ground floor\n' +
-    '7. HP Cylinder \u2014 210L heat pump cylinder\n' +
-    '8. MVHR \u2014 mechanical ventilation with heat recovery\n' +
-    '9. Solar PV \u2014 4kWp array + 5kWh battery storage';
-  ta.dispatchEvent(new Event('input'));
-  // Also populate EU measurement fields with example values
-  const s = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-  s('eu-floor-area', '92'); s('eu-wall-area', '110'); s('eu-roof-area', '48');
-  s('eu-window-area', '16'); s('eu-door-count', '2');
-}
 
-function handleEUFile(file) {
-  if (!file || !file.type.includes('pdf')) return;
-  const r = new FileReader();
-  r.onload = function(e) {
-    window.euAdvisoryPDF = { data: e.target.result.split(',')[1], filename: file.name };
-    const s = document.getElementById('eu-advisory-status');
-    if (s) s.textContent = '\u2713 ' + file.name;
-  };
-  r.readAsDataURL(file);
-}
-
-async function prefillEUSelector() {
-  const advisory = ((document.getElementById('eu-advisory') ? document.getElementById('eu-advisory').value : '') || '').trim();
-  const apiKey   = ((document.getElementById('eu-apiKey') ? document.getElementById('eu-apiKey').value : '') ||
-    sessionStorage.getItem('planitber_eu_key') || '').trim();
-  if (!advisory && !window.euAdvisoryPDF) {
-    alert('Please paste recommendations text or attach a PDF first.');
-    return;
-  }
-  if (!apiKey) {
-    alert('Please enter your Anthropic API key in API Configuration to use AI pre-fill.\n\nYou can also tick the measures manually below.');
-    return;
-  }
-  const statusEl = document.getElementById('eu-advisory-status');
-  if (statusEl) statusEl.textContent = '\u23f3 Reading recommendations\u2026';
-
-  const SYSTEM = 'You are an expert Irish BER assessor. Read upgrade recommendations and return ONLY valid JSON \u2014 no markdown, no explanation.\nReturn this exact structure:\n{"measures":["roof_insulation","wall_insulation","windows","heating","ventilation_mev","solar_pv","consumer_unit","led_lighting","ev_charger"],"params":{"newHeating":"ASHP","pvArea":12,"battery":"yes","solarThermalArea":0,"doorCount":2,"winArea":18,"chimneyCount":1},"scope":"one sentence summary"}\nAllowed measure values: roof_insulation, rafter_insulation, flat_roof_insulation, wall_insulation, ewi, iwi, floor_insulation, suspended_floor_insulation, draught_proofing, airtightness, windows, secondary_glazing, doors, heating, boiler_replacement, gshp, biomass, ufh, smart_controls, hw_cylinder, solar_thermal, pipe_insulation, ventilation_mvhr, ventilation_mev, solar_pv, consumer_unit, led_lighting, ev_charger';
-
-  const fa       = parseFloat(document.getElementById('eu-floorArea') ? document.getElementById('eu-floorArea').value : '') || 100;
-  const wa       = parseFloat(document.getElementById('eu-wallArea')  ? document.getElementById('eu-wallArea').value  : '') || fa * 1.5;
-  const wallType = document.getElementById('eu-wallType') ? document.getElementById('eu-wallType').value : '';
-  const USER     = 'Floor: ' + fa + 'm\u00b2, Walls: ' + wa + 'm\u00b2, Wall type: ' + wallType + '\n\nRecommendations:\n' + advisory;
-
-  try {
-    const msgContent = [];
-    if (window.euAdvisoryPDF && window.euAdvisoryPDF.data) {
-      msgContent.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:window.euAdvisoryPDF.data}});
-    }
-    msgContent.push({type:'text',text:USER});
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
-        system: SYSTEM,
-        messages: [{role: 'user', content: msgContent}]
-      })
-    });
-    const data = await resp.json();
-    const text = ((data.content && data.content[0] && data.content[0].text) || '').replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(text);
-    applyEUSelectorFromMeasures(parsed);
-    if (statusEl) statusEl.textContent = '\u2713 Selector pre-filled \u2014 review and adjust below.';
-  } catch(e) {
-    if (statusEl) statusEl.textContent = '\u26a0 Could not parse \u2014 please tick measures manually.';
-    console.warn('prefillEUSelector error:', e);
-  }
-}
 
 function applyEUSelectorFromMeasures(parsed) {
   const ms = parsed.measures || [];
@@ -11224,9 +10610,6 @@ async function runEnergyUpgradeGenerate(projName, county, dwelling, grantScheme)
   if (apiKey) {
     try {
       var msgContent = [];
-      if (window.euAdvisoryPDF && window.euAdvisoryPDF.data) {
-        msgContent.push({ type:'document', source:{ type:'base64', media_type:'application/pdf', data:window.euAdvisoryPDF.data } });
-      }
       msgContent.push({ type:'text', text:USER });
       var resp = await fetch('https://api.anthropic.com/v1/messages', {
         method:'POST',
@@ -13092,20 +12475,7 @@ async function generate() {
     const materials = getMaterialsFromUI();
     BOQ = buildBOQ(d, d.projectName||'New Build Project', d.projectType||'New Build', d.county||county, d.dwellingType||dwelling, d.grantScheme||scheme, materials);
     if (notes) BOQ.assumptions.push(...notes.split('\n').filter(l=>l.trim()));
-    // advisory
-    BOQ.advisoryStatus = null;
-    if (advisoryContent && advisoryContent.type === 'text') {
-      BOQ.advisoryNotes = advisoryContent.data;
-      await runProgress([[93,'Processing Advisory Notes...']]);
-      try {
-        const advMeas = { floorArea:d.floorArea||0, wallArea:d.wallArea||0, roofArea:d.roofArea||0, windowArea:d.windowArea||0, projectType:mode };
-        await generateAdvisoryItems(advisoryContent.data, advMeas);
-      } catch(e) {
-        console.error('Advisory API error:', e);
-        BOQ.advisoryStatus = { ok: false, error: e.message };
-        BOQ.assumptions.push('Advisory enrichment skipped: ' + e.message);
-      }
-    }
+
 
   } else if (mode === 'Renovation') {
     const extFA = parseFloat(document.getElementById('kf-extFloorArea')?.value)||0;
@@ -13174,20 +12544,7 @@ async function generate() {
 
 // ── BUILD REPORT ──────────────────────────────────────────────────────────────
 function buildReport() {
-  // â”€â”€ Advisory status badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  (function() {
-    const advEl = document.getElementById('advisory-status-badge');
-    if (!advEl) return;
-    const s = BOQ.advisoryStatus;
-    if (!s) { advEl.style.display = 'none'; return; }
-    if (s.ok) {
-      const m = s.mods || 0, a = s.adds || 0;
-      advEl.innerHTML = '<span style="background:#16a34a;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">' + '&#10003; Advisory processed &mdash; ' + m + ' modification' + (m===1?'':'s') + ', ' + a + ' addition' + (a===1?'':'s') + '</span>';
-    } else {
-      advEl.innerHTML = '<span style="background:#d97706;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">&#9888; Advisory not processed' + (s.error ? ': ' + s.error : '') + '</span>';
-    }
-    advEl.style.display = 'block';
-  })();
+
   const b=BOQ; if (!b) return;
   const pi=b.projectInfo, su=b.summary;
   document.getElementById('rpt-name').textContent = pi.name||'BOQ Report';
@@ -13346,17 +12703,6 @@ function renderGrantsPanel() {
 function renderMainPanel() {
   const b = BOQ;
   if (activeSectionId === 'grants') { renderGrantsPanel(); return; }
-  if (activeSectionId === 'advisory-notes') {
-    document.querySelectorAll('.sec-btn').forEach(btn => btn.classList.remove('active'));
-    const advBtn2 = document.getElementById('sec-btn-advisory-notes');
-    if (advBtn2) advBtn2.classList.add('active');
-    const rawNotes = BOQ.advisoryNotes || '';
-    const escNotes = rawNotes.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    document.getElementById('main-panel').innerHTML = `
-      <div class='sec-header'><div><div class='sec-header-num'>Advisory</div><div class='sec-header-title'>Advisory Notes</div></div></div>
-      <div style='padding:20px 24px;line-height:1.8;color:#c8d0dc;white-space:pre-wrap;font-size:14px;'>${escNotes}</div>`;
-    return;
-  }
   const sec = b.sections.find(s => s.id === activeSectionId);
   if (!sec) return;
   const secIdx = b.sections.findIndex(s => s.id === activeSectionId);
@@ -13375,8 +12721,7 @@ function renderMainPanel() {
     const badges = [
       item.status==='info_needed' ? '<span class="badge badge-needed">⚠ INFO NEEDED</span>' : '',
       item.status==='assumed'     ? '<span class="badge badge-assumed">~ ASSUMED</span>'     : '',
-      item.isAdvisory             ? '<span class="badge badge-advisory">✦ Advisory Item</span>' : '',
-      (item.deapSource && item.deapSource!=='ok' && item.deapSource!=='assumed' && item.deapSource!=='advisory')
+      (item.deapSource && item.deapSource!=='ok' && item.deapSource!=='assumed')
         ? `<span class="badge badge-derived">${item.deapSource==='derived'?'📐 derived':'📋 '+item.deapSource}</span>` : ''
     ].filter(Boolean).join('');
     const esc = s => (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -14208,10 +13553,6 @@ function exportPDF() {
   let lastPDFPart=null;
   let pdfHTML='';
   b.sections.forEach(sec => {
-    if (sec.isAdvisorySection) {
-      pdfHTML+=`<div style="background:#4C1D95;color:#DDD6FE;padding:10px 16px;border-radius:6px;margin:20px 0 4px;font-weight:700;font-size:11pt;page-break-before:always;">✦ BER Advisory Items</div>`;
-      lastPDFPart=null;
-    }
     if (sec.part && sec.part!==lastPDFPart) {
       const hasExtPdf = pi.hasExtension;
       const ptMapPdf = pi.type==='Refurbishment'
@@ -14468,14 +13809,6 @@ function exportExcel() {
   let lastExcelPart = null;
 
   b.sections.forEach(sec => {
-
-    if (sec.isAdvisorySection) {
-      p1(r,0,'\u2746 ADVISORY ITEMS \u2014 BER ADVISORY REPORT',mkS(F.aPale,true,'FF4C1D95','left',false));
-      f1(r,1,6,mkS(F.aPale,false,'FF4C1D95','left',false)); m1(r,0,6);
-      p1(r,7,'',SR.divider); navyRow(r,SR.row); r++;
-      f1(r,0,6,SL.blank); p1(r,7,'',SR.divider); navyRow(r,SR.row); r++;
-      lastExcelPart = null;
-    }
 
     if (sec.part && sec.part !== lastExcelPart) {
       const hasExtXl = BOQ.projectInfo.hasExtension;
@@ -17135,8 +16468,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.getElementById(id);
     if (el) document.body.appendChild(el);
   });
-  // EU Advisory PDF holder & API key restore
-  window.euAdvisoryPDF = null;
   const savedKey = sessionStorage.getItem('planitber_eu_key');
   if (savedKey) { const k = document.getElementById('eu-apiKey'); if (k) k.value = savedKey; }
   // Initialise home screen
