@@ -9884,13 +9884,15 @@ function loadNewBuildExample() {
 }
 
 function loadRefurbExample() {
-  const s = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
+  const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
   s('t0-projName',        'Sample Project \u2014 Refurbishment, Galway');
   s('t0-projType',        'Refurbishment');
   s('t0-dwellingType',    'Semi-Detached');
   s('t0-county',          'Galway');
   s('t0-grantScheme',     'oss');
   s('t0-airPerm',         '5.0');
+  s('eu-floorArea',       '95');
   s('t1-storeys',         '2');
   s('t1-gfType',          'Insulated Solid Concrete Slab 150mm');
   s('t1-gfArea',          '48');
@@ -9927,8 +9929,32 @@ function loadRefurbExample() {
   s('t8-battery',         'No');
   s('t8-solarThermal',    'No');
   onVentChange();
+  // Works Selector \u2014 general refurb works
+  ck('ws-strip-bathroom', true); s('ws-stripbath-count', '1');
+  ck('ws-new-bath',       true); s('ws-bath-count', '1');
+  ck('ws-skip',           true); s('ws-skip-count', '3');
+  ck('ws-rewire',         true);
+  ck('ws-consumer',       true);
+  ck('ws-led',            true);
+  ck('ws-heating-ref',    true);
+  s('ws-heat-ref-type',     'ASHP');
+  s('ws-heat-ref-existing', 'Oil Boiler');
+  ck('ws-rads-ref',       true);
+  ck('ws-hw-ref',         true);
+  ck('ws-smart-ref',      true);
+  ck('ws-ber-post',       true);
+  ck('ws-making-good',    true);
+  // Energy upgrade measures matching the spec
+  ck('ref-eu-roof-ceiling', true);
+  ck('ref-eu-iwi',          true);
+  ck('ref-eu-ashp',         true);
+  ck('ref-eu-hw-cyl',       true);
+  ck('ref-eu-mev',          true);
+  ck('ref-eu-pv',           true);
+  if (typeof refEuAutoFinish === 'function') refEuAutoFinish();
   selectProjectType('Refurbishment');
   openProjectSections();
+  if (typeof evaluateGenerateBarGate === 'function') evaluateGenerateBarGate();
 }
 
 function loadRefurbExample2() {
