@@ -481,6 +481,8 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .ws-group-toggle.open{border-radius:8px 8px 0 0;border-bottom-color:transparent;}
 .ws-group-body{display:none;padding:10px 12px;border-radius:0 0 8px 8px;border:1px solid rgba(46,61,82,0.9);border-top:none;background:#1a2438;}
 .ws-group-body.open{display:block;}
+.ws-group-badge{display:none;background:#E8A020;color:#1a2332;font-size:9px;font-weight:800;border-radius:10px;padding:1px 6px;margin-right:6px;min-width:16px;text-align:center;}
+.ws-group-sel{display:none;font-size:10px;color:#94a3b8;padding:4px 13px 6px;font-style:italic;border-left:2px solid rgba(232,160,32,0.25);margin:0 2px 4px;background:rgba(232,160,32,0.04);border-radius:0 0 6px 6px;line-height:1.5;}
 .ws-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(46,61,82,0.4);}
 .ws-item:last-child{border-bottom:none;}
 .ws-item input[type=checkbox]{margin-top:3px;accent-color:#E8A020;width:14px;height:14px;flex-shrink:0;cursor:pointer;}
@@ -1634,7 +1636,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
 
             <div class="ws-item">
-              <input type="checkbox" id="ws-wall-struct" onchange="wsCheck(this,'ws-wall-s-sub')">
+              <input type="checkbox" id="ws-wall-struct" onchange="wsWallStruct(this)">
               <div style="flex:1">
                 <label class="ws-item-label" for="ws-wall-struct">Remove structural wall &#8212; RSJ beam required</label>
                 <div class="ws-item-sub" id="ws-wall-s-sub">
@@ -10313,11 +10315,67 @@ function wsToggle(btn) {
   btn.classList.toggle('open');
   const body = btn.nextElementSibling;
   if (body) body.classList.toggle('open');
+  if (typeof wsUpdateGroupSummary === 'function') wsUpdateGroupSummary();
 }
 function wsCheck(cb, subId) {
   const sub = document.getElementById(subId);
   if (sub) sub.classList.toggle('open', cb.checked);
   if (typeof wsAutoPlaceholders === 'function') wsAutoPlaceholders();
+  if (typeof wsUpdateGroupSummary === 'function') wsUpdateGroupSummary();
+}
+function wsWallStruct(cb) {
+  wsCheck(cb, 'ws-wall-s-sub');
+  const se = document.getElementById('ws-struct-eng');
+  if (se) se.checked = cb.checked;
+}
+function wsUpdateGroupSummary() {
+  document.querySelectorAll('.ws-group').forEach(function(group) {
+    const toggle = group.querySelector(':scope > .ws-group-toggle');
+    const body   = group.querySelector(':scope > .ws-group-body');
+    if (!toggle || !body) return;
+
+    // Collect labels of checked top-level (non-sub) items
+    const selected = [];
+    group.querySelectorAll('.ws-item').forEach(function(item) {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      if (!checkbox || checkbox.closest('.ws-item-sub') || !checkbox.checked) return;
+      const lbl = item.querySelector('.ws-item-title') || item.querySelector('.ws-item-label') || item.querySelector('label');
+      if (!lbl) return;
+      const raw = lbl.textContent.replace(/[ \s]+/g, ' ').trim();
+      const short = raw.split(/[—–\-]/)[0].trim().split(' ').slice(0, 5).join(' ');
+      if (short) selected.push(short);
+    });
+
+    // Update/insert count badge (before the arrow span)
+    let badge = toggle.querySelector('.ws-group-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'ws-group-badge';
+      const arrow = toggle.querySelector('span:last-of-type');
+      toggle.insertBefore(badge, arrow || null);
+    }
+    if (selected.length) {
+      badge.textContent = selected.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Update/insert collapsed-state summary (after body)
+    let sel = group.querySelector(':scope > .ws-group-sel');
+    if (!sel) {
+      sel = document.createElement('div');
+      sel.className = 'ws-group-sel';
+      body.after(sel);
+    }
+    const isOpen = body.classList.contains('open');
+    if (selected.length && !isOpen) {
+      sel.textContent = selected.join(' · ');
+      sel.style.display = 'block';
+    } else {
+      sel.style.display = 'none';
+    }
+  });
 }
 
 // Auto-populate Works Selector measurement fields from already-entered geometry.
@@ -10883,7 +10941,9 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
     demoItems.push(mkItem('D.5', 'RSJ steel beam(s) — supply & install', 'm', openCount * span, beamCostPerM, lM(2.5, L.craft), span + 'm avg span — UC 203×133 or engineer-specified'));
     demoItems.push(mkItem('D.6', 'Padstones — precast concrete (2 per beam)', 'nr', openCount * 2, 88, lM(2, L.craft), 'Bearing padstones'));
     demoItems.push(mkItem('D.7', 'Plasterboard box-out to beam & making good', 'item', openCount, 180, lM(8, L.craft), 'FR plasterboard boxing, skim finish'));
-    demoItems.push(Object.assign(mkItem('D.8', 'Structural engineer — design & certification', 'item', 1, 0, 1400, 'Per opening sign-off'), {feeType: 'structural'}));
+    if (has('struct_eng')) {
+      demoItems.push(Object.assign(mkItem('D.8', 'Structural engineer — design & certification', 'item', 1, 0, 1400, 'Per opening sign-off'), {feeType: 'structural'}));
+    }
   }
   if (has('chimney_breast')) {
     const chimneyCount = n('chimney_count') || 1;
@@ -11890,7 +11950,7 @@ function readRefurbSelector(prefix) {
     autoSkips:        autoSkips,
     // Strip-out
     wall_non_structural: cb('wall-non-struct'),  wall_ns_count: nv('wall-ns-count'),  wall_ns_area: nv('wall-ns-area'),
-    wall_structural:     cb('wall-struct'),       wall_s_count: nv('wall-s-count'),    wall_s_span: nv('wall-s-span'),
+    wall_structural:     cb('wall-struct'),       wall_s_count: nv('wall-s-count'),    wall_s_span: nv('wall-s-span'),    struct_eng: cb('struct-eng'),
     chimney_breast:      cb('chimney'),           chimney_count: nv('chimney-count'),  chimneyLoc: sv('chimney-loc'),
     floor_strip:         cb('floor-tiles'),       floor_strip_area: nv('floor-strip-area') || Math.round(fa),
     slab_breakout:       cb('slab'),              slab_area: nv('slab-area') || Math.round(gfa),
@@ -15232,6 +15292,7 @@ function refUpdateBundleSub(name) {
   const cb = document.getElementById('ref-eu-' + name);
   const sub = document.getElementById('ref-eu-' + name + '-sub');
   if (cb && sub) sub.style.display = cb.checked ? 'block' : 'none';
+  if (typeof wsUpdateGroupSummary === 'function') wsUpdateGroupSummary();
 }
 
 window.updateBundleSub = updateBundleSub;
@@ -16664,6 +16725,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cb.addEventListener('change', window.refreshConditionalItems);
   });
   if (typeof wsAutoPlaceholders === 'function') wsAutoPlaceholders();
+  if (typeof wsUpdateGroupSummary === 'function') wsUpdateGroupSummary();
   if (typeof nbAutoFill === 'function') nbAutoFill();
 });
 </script>
