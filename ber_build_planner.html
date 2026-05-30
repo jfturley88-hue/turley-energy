@@ -13503,7 +13503,10 @@ function buildCostSummaryRows(su) {
     var _netBase = hasg ? (su.netTotal || su.netConstruction || su.gross || 0) : (su.gross || su.total || 0);
     var _totalInclFees = _netBase + su.profFees.total;
 
-    h += '<tr style="background:#0D1829;"><td colspan="10" style="padding:6px 12px;font-size:10px;font-weight:700;color:#8090A8;text-transform:uppercase;letter-spacing:0.06em;">Professional Fees (indicative)</td></tr>';
+    h += '<tr style="background:#0D1829;border-top:2px solid rgba(46,61,82,0.6);">' +
+      '<td colspan="7" style="padding:6px 12px;font-size:10px;font-weight:700;color:#8090A8;text-transform:uppercase;letter-spacing:0.06em;">Professional Fees (indicative)</td>' +
+      '<td></td><td></td>' +
+      '<td style="padding:4px 6px;"><button onclick="openQuickEdit()" title="Quick Edit — adjust cost modifiers and jump to any input tab" style="background:transparent;border:1px solid #3d4f66;color:#8090A8;border-radius:4px;cursor:pointer;padding:3px 8px;font-size:11px;font-weight:600;white-space:nowrap;" onmouseover="this.style.borderColor=\'#E8A020\';this.style.color=\'#E8A020\'" onmouseout="this.style.borderColor=\'#3d4f66\';this.style.color=\'#8090A8\'">&#9881; Edit</button></td></tr>';
     if (su.profFees.aoUsed) {
       h += '<tr><td colspan="7" style="padding:4px 6px 4px 14px;font-size:11px;color:#8090A8;">Professional Fees (8% combined)</td><td style="text-align:right;padding:4px 6px;font-size:11px;color:#8090A8;">' + fmt(su.profFees.combined) + '</td><td></td><td></td></tr>';
     } else {
