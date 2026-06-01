@@ -6360,7 +6360,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
     msItems.push({ ref:`${msId}.3`, description:`Radiators with TRVs (${d.radiatorCount}nr)`, unit:'nr', quantity:d.radiatorCount, matRate:Math.round(radMat*radFactor), labRate:radLab,
       note:`${d.hasUFH ? 'Upper floor only — UFH on ground floor' : 'All floors'} · sized for ${heatKW}kW system`, status:'ok', deapSource:'DEAP emitters/rooms' });
   }
-  if (d.hotWater === 'HP Cylinder') {
+  if ((d.hotWater || '').startsWith('HP Cylinder')) {
     const cylMat = Math.round((autoCylSize <= 200 ? 1650 : autoCylSize <= 300 ? 2000 : 2600) * cylFactor);
     msItems.push({ ref:`${msId}.4`, description:`Heat pump cylinder ${autoCylSize}L (supply & connect)`, unit:'nr', quantity:1, matRate:cylMat, labRate:lM(18, L.plumber),
       note:`${autoCylSize}L sized for ${d.bedrooms} bed — HP compatible · Plumber 18hr × €52/hr`, status:'ok', deapSource:'DEAP hot water / bedrooms' });
@@ -9722,6 +9722,7 @@ function loadNewBuildExample() {
     s('spec-glazing',     'triple');
     s('spec-heating',     'ashp-ufh-rads');
     s('spec-ventilation', 'MVHR');
+    s('t8-pvArea',        '12');
   }, 200);
   selectProjectType('New Build');
   if (typeof openProjectSections === 'function') openProjectSections();
@@ -12453,11 +12454,13 @@ async function generate() {
 
   if (mode === 'New Build') {
     const fa = getCurrentFloorAreaSum();
+    console.log('[BER] New Build generate — floor area sum:', fa);
     if (!fa||fa<10) { errEl.textContent='Please enter the floor area in the Floors tab (minimum 10m²).'; errEl.style.display='block'; return; }
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[10,'Reading key figures...'],[25,'Deriving quantities...'],[45,'Applying material rates...'],[65,'Calculating labour costs...'],[80,'Applying SEAI grants...'],[95,'Assembling BOQ...']]);
     mirrorDynamicToLegacy();
     const d = getTabInputs();
+    console.log('[BER] getTabInputs floorArea:', d.floorArea, 'hotWater:', d.hotWater);
     // Read Build Spec panel and merge into d
     d.kitchenSpec  = document.getElementById('spec-kitchen')?.value    || 'mid';
     d.bathroomSpec = document.getElementById('spec-bathroom')?.value   || 'mid';
@@ -12493,7 +12496,9 @@ async function generate() {
       d.radiatorCount = Math.max(upperRooms, Math.round((d.floorArea || 150) / 18));
     }
     const materials = getMaterialsFromUI();
+    console.log('[BER] calling buildBOQ — floorArea:', d.floorArea, 'heating:', d.heatingSystem, 'hotWater:', d.hotWater);
     BOQ = buildBOQ(d, d.projectName||'New Build Project', d.projectType||'New Build', d.county||county, d.dwellingType||dwelling, d.grantScheme||scheme, materials);
+    console.log('[BER] buildBOQ complete — sections:', BOQ.sections.length, 'total:', BOQ.summary.total);
     if (notes) BOQ.assumptions.push(...notes.split('\n').filter(l=>l.trim()));
 
 
@@ -12549,16 +12554,29 @@ async function generate() {
   document.getElementById('progress-fill').style.width='100%';
   await new Promise(r=>setTimeout(r,300));
   if (BOQ) { BOQ.projectInfo.clientName = clientName; BOQ.projectInfo.preparedBy = preparedBy; BOQ.projectInfo.reportDate = dateDisplay; }
+  console.log('[BER] calling buildReport()');
   buildReport();
+  console.log('[BER] buildReport() done — showing screen-report');
   show('screen-report'); hide('screen-generating'); hide('screen-input');
   (function(){ const gb=document.getElementById('generate-bar'); if(gb) gb.style.display='none'; })();
 
   } catch(e) {
     console.error('[BER] generate() error:', e);
     const errEl2 = document.getElementById('error-msg');
-    if(errEl2) { errEl2.textContent = 'An error occurred: ' + e.message; errEl2.style.display='block'; }
+    if(errEl2) {
+      errEl2.innerHTML = '<strong>Error generating BOQ:</strong> ' + (e.message || String(e)) +
+        '<br><span style="font-size:11px;opacity:0.75;">Check the browser console (F12) for details.</span>';
+      errEl2.style.display='block';
+    }
     hide('screen-generating'); show('screen-input');
-    (function(){ const gb=document.getElementById('generate-bar'); if(gb) gb.style.display='flex'; if(window.evaluateGenerateBarGate) window.evaluateGenerateBarGate(); })();
+    (function(){
+      const gb=document.getElementById('generate-bar'); if(gb) gb.style.display='flex';
+      if(window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
+      // Scroll to top so the error message is visible
+      const si=document.getElementById('screen-input');
+      if(si) si.scrollTop=0;
+      window.scrollTo(0,0);
+    })();
   }
 }
 
