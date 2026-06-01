@@ -184,6 +184,9 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .flag-item.green{border-left:2px solid rgba(5,150,105,0.3);}
 .flag-item.red{border-left:2px solid rgba(220,38,38,0.3);}
 .flag-item.amber{border-left:2px solid rgba(232,160,32,0.4);}
+.flags-box.basis{padding:13px;border-radius:9px;background:rgba(148,163,184,0.06);border:1px solid rgba(148,163,184,0.2);grid-column:1/-1;}
+.flags-title.basis{color:#8090A8;}
+.flag-item.basis{border-left:2px solid rgba(148,163,184,0.35);}
 .assumptions-inner{display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;}
 
 /* KEY FIGURES PANEL */
@@ -380,10 +383,10 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
   .pdf-subtotal-row td.amber { color: #E8A020 !important; font-size: 10pt; text-align: right; }
 
   /* ASSUMPTIONS & FLAGS */
-  .pdf-assumptions { background: #FFFBEB !important; border: 1px solid #FDE68A; border-radius: 5px; padding: 12px 14px; margin-top: 14px; page-break-inside: avoid; }
-  .pdf-assumptions-title { font-size: 8.5pt; font-weight: 700; color: #92400E; margin-bottom: 6px; text-transform: uppercase; }
+  .pdf-assumptions { background: #F8FAFC !important; border: 1px solid #E2E8F0; border-radius: 5px; padding: 12px 14px; margin-top: 14px; page-break-inside: avoid; }
+  .pdf-assumptions-title { font-size: 8.5pt; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
   .pdf-assumptions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
-  .pdf-assumption-item { font-size: 8pt; color: #78350F; padding: 2px 0 2px 6px; border-left: 2px solid #E8A020; }
+  .pdf-assumption-item { font-size: 8pt; color: #64748B; padding: 2px 0 2px 6px; border-left: 2px solid #CBD5E1; }
 
   /* FOOTER */
   .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #fff !important; border-top: 1px solid #E2E8F0; padding: 5px 36px; display: flex; justify-content: space-between; font-size: 7.5pt; color: #94a3b8; }
@@ -12961,11 +12964,11 @@ function renderMainPanel() {
   if (secIdx === 0) {
     const dr = (b.deapDataReceived||[]).map(d=>`<div class="flag-item green">${d}</div>`).join('');
     const fl = (b.flags||[]).map(f=>`<div class="flag-item red">${f}</div>`).join('');
-    const as = (b.assumptions||[]).map(a=>`<div class="flag-item amber">${a}</div>`).join('');
+    const as = (b.assumptions||[]).map(a=>`<div class="flag-item basis">${a}</div>`).join('');
     flagsHTML = `<div class="flags-grid">
       ${dr ? `<div class="flags-box green"><div class="flags-title green">✓ DEAP Data Extracted</div>${dr}</div>` : ''}
       ${fl ? `<div class="flags-box red"><div class="flags-title red">⚠ Would Improve Accuracy</div>${fl}</div>` : ''}
-      ${as ? `<div class="flags-box amber"><div class="flags-title amber">~ Assumptions Made</div><div class="assumptions-inner">${as}</div></div>` : ''}
+      ${as ? `<div class="flags-box basis"><div class="flags-title basis">Basis of Estimate</div><div class="assumptions-inner">${as}</div></div>` : ''}
     </div>`;
   }
 
@@ -13801,7 +13804,7 @@ function exportPDF() {
   }
 
   const assumHTML = (b.assumptions||[]).length > 0
-    ? `<div class="pdf-assumptions"><div class="pdf-assumptions-title">∼ Assumptions Made</div><div class="pdf-assumptions-grid">${(b.assumptions||[]).map(function(a){return`<div class="pdf-assumption-item">${a}</div>`;}).join('')}</div></div>` : '';
+    ? `<div class="pdf-assumptions"><div class="pdf-assumptions-title">Basis of Estimate</div><div class="pdf-assumptions-grid">${(b.assumptions||[]).map(function(a){return`<div class="pdf-assumption-item">${a}</div>`;}).join('')}</div></div>` : '';
 
   const flagsHTML = (b.flags||[]).length > 0
     ? `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:5px;padding:12px 14px;margin-top:10px;page-break-inside:avoid"><div style="font-size:8.5pt;font-weight:700;color:#DC2626;margin-bottom:5px;">⚠ Items That Would Improve Accuracy</div>${(b.flags||[]).map(function(f){return`<div style="font-size:8pt;color:#991B1B;padding:2px 0 2px 6px;border-left:2px solid #DC2626">${f}</div>`;}).join('')}</div>` : '';
