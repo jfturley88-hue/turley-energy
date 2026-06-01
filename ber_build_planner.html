@@ -14068,15 +14068,70 @@ function exportExcel() {
   const secRefs = [];   // { leftF, rightP, title }
   let lastExcelPart = null;
 
-  b.sections.forEach(sec => {
+  // Multi-group Refurbishment: Works / EU / Extension
+  const _xlGrpKey = function(s) {
+    if (s.isExtension)     return 'ext' + (s.extensionIndex || 1);
+    if (s.isEnergyUpgrade) return 'eu';
+    return 'works';
+  };
+  const _xlGrpLabel = function(key, s) {
+    if (key === 'works') return 'REFURBISHMENT WORKS';
+    if (key === 'eu')    return 'ENERGY UPGRADE — SEAI MEASURES';
+    const extSecs = (b.sections || []).filter(x => x.isExtension);
+    return extSecs.length > 1 ? ('EXTENSION ' + ((s && s.extensionIndex) || 1)) : 'EXTENSION WORKS';
+  };
+  const _xlMultiGroup = (BOQ.projectInfo.type === 'Refurbishment') && (function() {
+    const _keys = new Set((b.sections || []).map(_xlGrpKey));
+    return _keys.size > 1;
+  })();
+  let xlSections = b.sections.slice();
+  if (_xlMultiGroup) {
+    const _xlRank = s => s.isExtension ? (2 + (s.extensionIndex||1)*0.0001) : (s.isEnergyUpgrade ? 1 : 0);
+    xlSections.sort((a, b2) => _xlRank(a) - _xlRank(b2));
+  }
+  let _xlCurGrp = null;
+  const _xlGrpSecRefs = {};
 
-    if (sec.part && sec.part !== lastExcelPart) {
+  xlSections.forEach(sec => {
+
+    if (_xlMultiGroup) {
+      const gk = _xlGrpKey(sec);
+      if (gk !== _xlCurGrp) {
+        // Close previous group with subtotal
+        if (_xlCurGrp !== null) {
+          const _grpRefs = _xlGrpSecRefs[_xlCurGrp] || [];
+          if (_grpRefs.length) {
+            const _grpSubLbl = _xlGrpLabel(_xlCurGrp, null) + ' — ELEMENTS SUBTOTAL';
+            const _grpLF = _grpRefs.map(x => x.leftF).join(',');
+            const _grpRP = _grpRefs.map(x => x.rightP).join(',');
+            p1(r,0,'',SL.subL); p1(r,1,_grpSubLbl,SL.subL); f1(r,2,4,SL.subL); m1(r,0,1);
+            p1(r,5,null,SL.sub,`SUM(${_grpLF})`,'#,##0');
+            p1(r,6,'',SL.subL);
+            p1(r,7,'',SR.divider);
+            p1(r,8,'',SR.subL); p1(r,9,_grpSubLbl,SR.subL); navyRow(r,SR.subL); m1(r,8,9);
+            p1(r,15,null,SR.sub,`SUM(${_grpRP})`,'#,##0');
+            p1(r,16,'',SR.subL);
+            r++;
+            f1(r,0,6,SL.blank); p1(r,7,'',SR.divider); navyRow(r,SR.row);
+            lastNavyRow = r; r++;
+          }
+        }
+        _xlCurGrp = gk;
+        _xlGrpSecRefs[gk] = [];
+        // Emit group header row
+        const _grpHdr = _xlGrpLabel(gk, sec);
+        p1(r,0,_grpHdr,SL.totL); f1(r,1,6,SL.totL); m1(r,0,6);
+        p1(r,7,'',SR.divider);
+        p1(r,8,_grpHdr,SR.totL); navyRow(r,SR.totL); m1(r,8,16);
+        r++;
+      }
+    } else if (sec.part && sec.part !== lastExcelPart) {
       const hasExtXl = BOQ.projectInfo.hasExtension;
       const ptMap = BOQ.projectInfo.type==='Refurbishment'
         ? (hasExtXl
-            ? {A:'PART A \u2014 Extension Works',B:'PART B \u2014 Existing Structure Upgrade',C:'PART C \u2014 Whole-House Services',D:'PART D \u2014 Additional & Demolition Works'}
-            : {A:'PART A \u2014 Existing Structure Upgrade',B:'PART B \u2014 Whole-House Services',C:'PART C \u2014 Additional & Demolition Works'})
-        : {A:'PART A \u2014 Upgrade Works',B:'PART B \u2014 Services & Renewables',C:'PART C \u2014 Whole-House Works',D:'PART D \u2014 Additional Works'};
+            ? {A:'PART A — Extension Works',B:'PART B — Existing Structure Upgrade',C:'PART C — Whole-House Services',D:'PART D — Additional & Demolition Works'}
+            : {A:'PART A — Existing Structure Upgrade',B:'PART B — Whole-House Services',C:'PART C — Additional & Demolition Works'})
+        : {A:'PART A — Upgrade Works',B:'PART B — Services & Renewables',C:'PART C — Whole-House Works',D:'PART D — Additional Works'};
       const ptLabel = ptMap[sec.part]||('PART '+sec.part);
       p1(r,0,ptLabel,SL.totL); f1(r,1,6,SL.totL); m1(r,0,6);
       p1(r,7,'',SR.divider);
@@ -14112,6 +14167,7 @@ function exportExcel() {
       p1(r,15,null,SR.sub,`SUM(P${extrasStart+1}:P${extrasEnd+1})`,'#,##0');
       p1(r,16,'',SR.subL);
       secRefs.push({ leftF:`F${xr_sub}`, rightP:`P${xr_sub}`, title:sec.title });
+      if (_xlMultiGroup && _xlCurGrp) (_xlGrpSecRefs[_xlCurGrp] = _xlGrpSecRefs[_xlCurGrp] || []).push({ leftF:`F${xr_sub}`, rightP:`P${xr_sub}`, title:sec.title });
       r++;
       f1(r,0,6,SL.blank); p1(r,7,'',SR.divider); navyRow(r,SR.row);
       lastNavyRow = r; r++;
@@ -14188,12 +14244,33 @@ function exportExcel() {
     p1(r,16,'',SR.subL);
 
     secRefs.push({ leftF:`F${xr_sub}`, rightP:`P${xr_sub}`, title:sec.title });
+    if (_xlMultiGroup && _xlCurGrp) (_xlGrpSecRefs[_xlCurGrp] = _xlGrpSecRefs[_xlCurGrp] || []).push({ leftF:`F${xr_sub}`, rightP:`P${xr_sub}`, title:sec.title });
     r++;
 
     // Blank spacer
     f1(r,0,6,SL.blank); p1(r,7,'',SR.divider); navyRow(r,SR.row);
     lastNavyRow = r; r++;
   });
+
+  // Close final group subtotal for multi-group Refurbishment
+  if (_xlMultiGroup && _xlCurGrp !== null) {
+    const _grpRefs2 = _xlGrpSecRefs[_xlCurGrp] || [];
+    if (_grpRefs2.length) {
+      const _grpSubLbl2 = _xlGrpLabel(_xlCurGrp, null) + ' — ELEMENTS SUBTOTAL';
+      const _grpLF2 = _grpRefs2.map(x => x.leftF).join(',');
+      const _grpRP2 = _grpRefs2.map(x => x.rightP).join(',');
+      p1(r,0,'',SL.subL); p1(r,1,_grpSubLbl2,SL.subL); f1(r,2,4,SL.subL); m1(r,0,1);
+      p1(r,5,null,SL.sub,`SUM(${_grpLF2})`,'#,##0');
+      p1(r,6,'',SL.subL);
+      p1(r,7,'',SR.divider);
+      p1(r,8,'',SR.subL); p1(r,9,_grpSubLbl2,SR.subL); navyRow(r,SR.subL); m1(r,8,9);
+      p1(r,15,null,SR.sub,`SUM(${_grpRP2})`,'#,##0');
+      p1(r,16,'',SR.subL);
+      r++;
+      f1(r,0,6,SL.blank); p1(r,7,'',SR.divider); navyRow(r,SR.row);
+      lastNavyRow = r; r++;
+    }
+  }
 
   // ── Grand total rows ──────────────────────────────────────────────────────────
   const leftList  = secRefs.map(s => s.leftF).join(',');
