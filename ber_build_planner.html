@@ -6148,6 +6148,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const wdId = String(sid++);
   const winMat = d.windowType === 'triple-alu' ? SR.win_triple_alu : d.windowType === 'triple' ? SR.win_triple : SR.win_double;
   const doorMatRate = d.doorType === 'Aluminium' ? SR.door_alu : d.doorType === 'Timber Panel' ? SR.door_timber : d.doorType === 'uPVC' ? SR.door_upvc : SR.door_composite;
+  const rooflightFactor = (mat.rooflight > 0) ? mat.rooflight / 620 : 1;
   const rlMatRate   = Math.round((d.roofLightSize === '940x1600' ? 850 : d.roofLightSize === '780x980' ? 620 : 480) * rooflightFactor);
   const wdItems = [
     { ref:`${wdId}.1`, description:`${d.windowType==='triple-alu'?'Triple-glazed aluminium-clad':d.windowType==='triple'?'Triple-glazed uPVC':'Double-glazed uPVC'} windows (supply & install)`, unit:'m²', quantity:d.windowArea, matRate:winMat, labRate:lM(3, L.craft), note:`DEAP window area ${d.windowArea}m² — ${d.windowType} glazed · Craft 3hr/m² × €44/hr`, status:d.windowAreaAssumed?'assumed':'ok', deapSource:'DEAP window area' },
@@ -6160,6 +6161,8 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   sections.push({ id: wdId, title: 'WINDOWS & EXTERNAL DOORS', items: wdItems });
 
   // ── 5. INTERNAL FINISHES
+  const floorTileFactor   = (mat.floorTile   > 0) ? mat.floorTile   / 28 : 1;
+  const floorTimberFactor = (mat.floorTimber > 0) ? mat.floorTimber / 32 : 1;
   const stairMat   = d.stairSpec === 'steel' ? SR.stair_steel : d.stairSpec === 'hardwood' ? SR.stair_hardwood : SR.stair_standard;
   const stairLab   = d.stairSpec === 'steel' ? lM(32, L.craft) : d.stairSpec === 'hardwood' ? lM(24, L.craft) : lM(20, L.craft);
   const intDoorMat = d.intDoorSpec === 'premium' ? SR.intdoor_premium : d.intDoorSpec === 'mid' ? SR.intdoor_mid : SR.intdoor_standard;
@@ -6311,10 +6314,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const cuFactor         = (mat.consumerUnit> 0) ? mat.consumerUnit/ 380   : 1;
   const evFactor         = (mat.evCharger   > 0) ? mat.evCharger   / 650   : 1;
   const ledFactor        = (mat.led         > 0) ? mat.led         / 28    : 1;
-  const floorTileFactor  = (mat.floorTile   > 0) ? mat.floorTile   / 28    : 1;
-  const floorTimberFactor= (mat.floorTimber > 0) ? mat.floorTimber / 32    : 1;
   const ufhFactor        = (mat.ufh         > 0) ? mat.ufh         / 30    : 1;
-  const rooflightFactor  = (mat.rooflight   > 0) ? mat.rooflight   / 620   : 1;
 
   const autoFloorArea   = d.floorArea;
   const autoCylSize     = d.cylinderSize > 100 ? d.cylinderSize : cylinderSize(d.bedrooms);
