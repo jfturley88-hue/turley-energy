@@ -13699,8 +13699,40 @@ function exportPDF() {
   </div>`;
 
   // ── PART A — COST PLAN SUMMARY ─────────────────────────────────────────────
-  const sectionRows = b.sections.map(function(s) {
-    return `<tr class="sec-row">
+  // Group sections into Works / Energy Upgrade / Extension streams (Refurbishment)
+  function _pdfGroupKey(s) {
+    if (s.isExtension)     return 'ext' + (s.extensionIndex || 1);
+    if (s.isEnergyUpgrade) return 'eu';
+    return 'works';
+  }
+  function _pdfGroupLabel(key, s) {
+    if (key === 'works') return 'Refurbishment Works';
+    if (key === 'eu')    return 'Energy Upgrade — SEAI Measures';
+    var _en = s ? (s.extensionIndex || 1) : 1;
+    return (pi.extensionCount > 1) ? ('Extension ' + _en) : 'Extension Works';
+  }
+  const _pdfMultiGroup = (pi.type === 'Refurbishment') &&
+    (new Set(b.sections.map(_pdfGroupKey)).size > 1);
+  const _pdfOrdered = b.sections.map(function(s, i){ return {s:s, i:i}; });
+  if (_pdfMultiGroup) {
+    const _rk = function(s){ return s.isExtension ? (2 + (s.extensionIndex||1)*0.0001) : (s.isEnergyUpgrade ? 1 : 0); };
+    _pdfOrdered.sort(function(a,b){ return _rk(a.s) - _rk(b.s); });
+  }
+  let _paGrp = null, _paSub = 0, _pdfPrevSec = null;
+  let sectionRows = '';
+  _pdfOrdered.forEach(function(_e) {
+    const s = _e.s;
+    if (_pdfMultiGroup) {
+      const gk = _pdfGroupKey(s);
+      if (gk !== _paGrp) {
+        if (_paGrp !== null) sectionRows += `<tr class="subtotal-row"><td colspan="3">${_pdfGroupLabel(_paGrp, _pdfPrevSec).toUpperCase()} — Subtotal</td><td class="r">${fmt(_paSub)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+        _paGrp = gk; _paSub = 0;
+        sectionRows += `<tr><td colspan="6" style="background:#F1F5F9!important;font-weight:700;color:#1E293B;font-size:8.5pt;text-transform:uppercase;letter-spacing:0.05em;padding:6px 8px;border-left:4px solid #E8A020">${_pdfGroupLabel(gk, s)}</td></tr>`;
+      }
+      _paSub += (s.subtotal || 0);
+      _pdfPrevSec = s;
+    }
+    sectionRows += `<tr class="sec-row">
       <td style="width:26px;color:#8090A8;font-weight:600;font-size:8pt">${s.id}</td>
       <td>${s.title}</td>
       <td style="text-align:right;width:32px;color:#8090A8">${(s.items||[]).length}</td>
@@ -13708,7 +13740,8 @@ function exportPDF() {
       <td class="write r" style="width:82px">&nbsp;</td>
       <td class="write" style="width:150px">&nbsp;</td>
     </tr>`;
-  }).join('');
+  });
+  if (_pdfMultiGroup && _paGrp !== null) sectionRows += `<tr class="subtotal-row"><td colspan="3">${_pdfGroupLabel(_paGrp, _pdfPrevSec).toUpperCase()} — Subtotal</td><td class="r">${fmt(_paSub)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
 
   const _pPrelimsLabel = (su.prelimsLabel || "Contractor's Overhead &amp; Profit");
   let costRows = '';
@@ -13778,9 +13811,19 @@ function exportPDF() {
   // ── PART B — DETAILED BOQ ──────────────────────────────────────────────────
   let partBHTML = `<div class="pdf-part-page"><div class="pdf-part-header">B — Detailed Bill of Quantities</div><div class="pdf-part-sub">Full line-item breakdown · record actual costs and site observations as work progresses</div></div>`;
 
-  let lastPDFPart = null;
-  b.sections.forEach(function(sec) {
-    if (sec.part && sec.part !== lastPDFPart) {
+  // Refurbishment: group by Works / Energy Upgrade / Extension (mirrors on-screen
+  // BOQ). Other project types keep their Part A/B/C/D structure.
+  let lastPDFPart = null, _pbGrp = null;
+  const _pbOrdered = _pdfMultiGroup ? _pdfOrdered : b.sections.map(function(s,i){ return {s:s,i:i}; });
+  _pbOrdered.forEach(function(_e) {
+    const sec = _e.s;
+    if (_pdfMultiGroup) {
+      const gk = _pdfGroupKey(sec);
+      if (gk !== _pbGrp) {
+        partBHTML += `<div style="border-left:3px solid #E8A020;background:#F1F5F9!important;padding:6px 12px;margin:0 36px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;letter-spacing:0.06em">${_pdfGroupLabel(gk, sec)}</div>`;
+        _pbGrp = gk;
+      }
+    } else if (sec.part && sec.part !== lastPDFPart) {
       const ptMapPdf = pi.type === 'Refurbishment'
         ? {A:'Part A — Existing Structure Upgrade', B:'Part B — Whole-House Services', C:'Part C — Additional Works', D:'Part D — Extension / Additional Works'}
         : pi.type === 'New Build'
