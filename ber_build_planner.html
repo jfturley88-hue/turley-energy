@@ -1421,201 +1421,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     <!-- ═══ MODE-SPECIFIC WORKS SELECTOR PANELS ══════════════════════════════ -->
     <div class="mode-fields" id="mode-fields-newbuild">
 
-      <!-- ═══ NEW BUILD — BUILD SPECIFICATION ═════════════════════════════════ -->
-      <button class="kf-toggle open" style="margin-top:10px;"
-        onclick="this.classList.toggle('open');document.getElementById('nb-spec-panel').classList.toggle('open');">
-        &#128203; BUILD SPECIFICATION <i class="kf-toggle-arrow">&#9660;</i>
-      </button>
-      <div class="kf-panel open" id="nb-spec-panel">
 
-        <div style="background:#1a2332;border:1px solid #2e3d52;border-radius:8px;padding:14px 14px 10px;margin-bottom:10px;">
-
-          <!-- Structure & Envelope -->
-          <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(232,160,32,0.22);">&#9632; Structure &amp; Envelope</div>
-          <div class="kf-grid" style="margin-bottom:14px;">
-            <div class="kf-field"><label>Roof Type &amp; Covering <span class="ws-geo-note">× roof area m²</span></label>
-              <select id="nb-spec-roof-type">
-                <option value="pitched-tile" selected>Pitched &mdash; Concrete tiles</option>
-                <option value="pitched-slate">Pitched &mdash; Natural slate</option>
-                <option value="pitched-fibre">Pitched &mdash; Fibre cement slate</option>
-                <option value="flat-grp">Flat &mdash; GRP fibreglass</option>
-                <option value="flat-epdm">Flat &mdash; EPDM membrane</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Roof Insulation <span class="ws-geo-note">× roof area m²</span></label>
-              <select id="nb-spec-roof-ins">
-                <option value="attic-200">Ceiling level &mdash; 200mm mineral wool</option>
-                <option value="attic-300" selected>Ceiling level &mdash; 300mm mineral wool</option>
-                <option value="rafter">Rafter level &mdash; PIR 180mm</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Internal Finishes -->
-          <div style="font-size:10px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(74,222,128,0.22);">&#9632; Internal Finishes</div>
-          <div class="kf-grid" style="margin-bottom:6px;">
-            <div class="kf-field"><label>Floor Finishes <span class="ws-geo-note">banded · floor area m²</span></label>
-              <select id="nb-spec-floors">
-                <option value="screed-only">Screeds only (PC sum)</option>
-                <option value="tile" selected>Tile allowance included</option>
-                <option value="timber">Engineered timber included</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Partition Construction <span class="ws-geo-note">× partition area m²</span></label>
-              <select id="nb-spec-partitions">
-                <option value="timber-stud" selected>Timber stud (100mm)</option>
-                <option value="blockwork">Blockwork (100mm)</option>
-                <option value="metal-stud">Metal stud</option>
-                <option value="mixed">Mixed</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Painting &amp; Decorating <span class="ws-geo-note">× (walls + ceilings) m²</span></label>
-              <select id="nb-spec-decorating">
-                <option value="basic">Basic</option>
-                <option value="full" selected>Full decorating</option>
-                <option value="premium">Premium</option>
-              </select>
-            </div>
-          </div>
-          <div class="kf-grid" style="margin-bottom:14px;">
-            <div class="kf-field"><label>Staircase</label>
-              <select id="nb-spec-stairs">
-                <option value="none">None (single storey)</option>
-                <option value="softwood" selected>Softwood staircase</option>
-                <option value="hardwood">Hardwood staircase</option>
-                <option value="steel">Steel &amp; glass</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Skirtings &amp; Architraves <span class="ws-geo-note">× room perimeter lm</span></label>
-              <select id="nb-spec-skirtings">
-                <option value="mdf" selected>MDF primed</option>
-                <option value="softwood">Softwood painted</option>
-                <option value="hardwood">Hardwood stained</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Internal Doors <span class="ws-geo-note">× room count nr</span></label>
-              <select id="nb-spec-int-doors">
-                <option value="standard" selected>Standard solid core</option>
-                <option value="mid">Mid &mdash; hardwood veneer</option>
-                <option value="premium">Premium &mdash; solid hardwood</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Fit-Out & Fixtures -->
-          <div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(167,139,250,0.22);">&#9632; Fit-Out &amp; Fixtures</div>
-          <div class="kf-grid" style="margin-bottom:14px;">
-            <div class="kf-field"><label>Kitchen Spec</label>
-              <select id="nb-spec-kitchen">
-                <option value="standard">Standard (&euro;8&ndash;12k)</option>
-                <option value="mid" selected>Mid (&euro;12&ndash;20k)</option>
-                <option value="premium">Premium (&euro;20&ndash;40k)</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Bathroom Spec</label>
-              <select id="nb-spec-bathroom">
-                <option value="standard">Standard</option>
-                <option value="mid" selected>Mid</option>
-                <option value="premium">Premium</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Heating & Hot Water -->
-          <div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(232,160,32,0.22);">&#9632; Heating &amp; Hot Water</div>
-          <div class="kf-grid" style="margin-bottom:14px;">
-            <div class="kf-field"><label>Heating System <span class="ws-geo-note">banded · floor area m²</span></label>
-              <select id="t7-heating">
-                <option value="ASHP" selected>ASHP (air-to-water heat pump)</option>
-                <option value="Gas Boiler">Gas condensing boiler</option>
-                <option value="Oil Boiler">Oil condensing boiler</option>
-                <option value="Ground Source Heat Pump">Ground source heat pump</option>
-                <option value="Air-Air HP">Air-to-air heat pump</option>
-                <option value="Stove with Back Boiler">Stove with back boiler</option>
-                <option value="LPG Boiler">LPG boiler</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Heat Emitters <span class="ws-geo-note">× floor area m²</span></label>
-              <select id="t7-emitters">
-                <option value="Radiators Only" selected>Radiators only</option>
-                <option value="UFH Ground Floor + Radiators Upper">UFH ground floor + rads upper</option>
-                <option value="Full UFH">Full UFH</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Hot Water Cylinder</label>
-              <select id="t7-hotWater">
-                <option value="HP Cylinder 150L">HP Cylinder 150L</option>
-                <option value="HP Cylinder 210L" selected>HP Cylinder 210L</option>
-                <option value="HP Cylinder 300L">HP Cylinder 300L</option>
-                <option value="Unvented 210L">Unvented cylinder 210L</option>
-                <option value="Unvented 300L">Unvented cylinder 300L</option>
-                <option value="Solar Thermal + Cylinder">Solar thermal + cylinder</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Ventilation & Renewables -->
-          <div style="font-size:10px;font-weight:700;color:#2dd4bf;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(45,212,191,0.22);">&#9632; Ventilation &amp; Renewables</div>
-          <div class="kf-grid" style="margin-bottom:14px;">
-            <div class="kf-field"><label>Ventilation Strategy <span class="ws-geo-note">banded · floor area m²</span></label>
-              <select id="t8-ventType" onchange="onVentChange()">
-                <option>Natural</option>
-                <option>MEV</option>
-                <option>MVHR</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Solar PV Area</label>
-              <div class="unit-row">
-                <input type="number" id="t8-pvArea" placeholder="e.g. 12" min="0" step="0.5">
-                <span class="unit-label">m&#178;</span>
-              </div>
-            </div>
-            <div class="kf-field"><label>Battery Storage</label>
-              <select id="t8-battery">
-                <option value="No">No battery</option>
-                <option value="5">5 kWh</option>
-                <option value="10">10 kWh</option>
-                <option value="15">15 kWh</option>
-                <option value="20">20 kWh</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>Solar Thermal</label>
-              <select id="t8-solarThermal" onchange="onSolarThermalChange()">
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
-              </select>
-            </div>
-            <div class="kf-field tab-hidden" id="t8-solarThermalAreaRow"><label>Solar Thermal Area</label>
-              <div class="unit-row">
-                <input type="number" id="t8-solarThermalArea" placeholder="4" min="1" max="20" step="0.5">
-                <span class="unit-label">m&#178;</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Electrical Spec -->
-          <div style="font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(96,165,250,0.22);">&#9632; Electrical Spec</div>
-          <div class="kf-grid">
-            <div class="kf-field"><label>Consumer Unit</label>
-              <select id="t6-consumerUnit">
-                <option>12-way with RCDs</option>
-                <option selected>16-way with RCDs</option>
-                <option>18-way with RCBOs</option>
-              </select>
-            </div>
-            <div class="kf-field"><label>EV Charging Point</label>
-              <select id="t6-ev">
-                <option>No</option>
-                <option>Yes &mdash; 7kW Smart Charger</option>
-              </select>
-            </div>
-          </div>
-
-        </div>
-        <div class="kf-hint" style="margin-bottom:10px;">Structure &amp; Finishes drive BOQ rates. Systems &amp; Energy drive the heating, ventilation and renewables sections.</div>
-      </div>
-
-    </div>
 
     <!-- ─── REFURBISHMENT WORKS SELECTOR ─────────────────────────────────── -->
     <div class="mode-fields" id="mode-fields-refurbishment">
@@ -7014,7 +6820,12 @@ function renderSpecPanel() {
 
   if (mode === 'New Build') {
     el.innerHTML =
+      '<button class="kf-toggle open" style="margin-top:10px;" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\');">' +
+      '&#128203; BUILD SPECIFICATION <i class="kf-toggle-arrow">&#9660;</i>' +
+      '</button>' +
+      '<div class="kf-panel open">' +
       '<div style="background:#1a2332;border:1px solid #2e3d52;border-radius:8px;padding:16px 16px 12px;">' +
+
       '<div style="font-size:11px;font-weight:700;color:#c8d0dc;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid #2e3d52;">Build Specification</div>' +
 
       '<div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(232,160,32,0.22);">&#9632; Structure &amp; Envelope</div>' +
@@ -7041,21 +6852,33 @@ function renderSpecPanel() {
         '<div class="kf-field"><label>Internal Doors</label><select id="spec-int-doors"><option value="standard" selected>Standard solid core</option><option value="mid">Mid &mdash; hardwood veneer</option><option value="premium">Premium &mdash; solid hardwood</option></select></div>' +
       '</div>' +
 
-      '<div style="font-size:10px;font-weight:700;color:#60a5fa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(96,165,250,0.22);">&#9632; Fit-Out &amp; Fixtures</div>' +
-      '<div class="kf-grid" style="margin-bottom:4px;">' +
+      '<div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(167,139,250,0.22);">&#9632; Fit-Out &amp; Fixtures</div>' +
+      '<div class="kf-grid" style="margin-bottom:14px;">' +
         '<div class="kf-field"><label>Overall Spec Level</label><select id="spec-level"><option value="budget">Budget</option><option value="standard" selected>Standard</option><option value="mid">Mid-Range</option><option value="premium">Premium</option></select></div>' +
         '<div class="kf-field"><label>Kitchen Spec</label><select id="spec-kitchen"><option value="standard">Standard (&euro;8&ndash;12k)</option><option value="mid" selected>Mid-range (&euro;12&ndash;20k)</option><option value="premium">Premium (&euro;20&ndash;40k)</option></select></div>' +
         '<div class="kf-field"><label>Bathroom Spec</label><select id="spec-bathroom"><option value="standard">Standard (&euro;3.5&ndash;5k)</option><option value="mid" selected>Mid-range (&euro;5&ndash;8k)</option><option value="premium">Premium (&euro;8&ndash;14k)</option></select></div>' +
       '</div>' +
 
-      '<div style="font-size:10px;font-weight:700;color:#2dd4bf;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(45,212,191,0.22);">&#9632; Systems &amp; Energy Performance</div>' +
-      '<div class="kf-grid" style="margin-bottom:4px;">' +
+      '<div style="font-size:10px;font-weight:700;color:#2dd4bf;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(45,212,191,0.22);">&#9632; Systems &amp; Energy</div>' +
+      '<div class="kf-grid" style="margin-bottom:6px;">' +
         '<div class="kf-field"><label>Glazing Spec</label><select id="spec-glazing"><option value="double">Double-glazed uPVC</option><option value="triple" selected>Triple-glazed uPVC</option><option value="triple-alu">Triple-glazed aluminium-clad</option></select></div>' +
         '<div class="kf-field"><label>Heating System</label><select id="spec-heating"><option value="ashp-ufh-rads" selected>ASHP + UFH (G/F) &amp; Radiators</option><option value="ashp-rads">ASHP + Radiators only</option><option value="gas-rads">Gas Condensing + Radiators</option><option value="oil-rads">Oil Condensing + Radiators</option><option value="lpg-rads">LPG Condensing + Radiators</option></select></div>' +
+        '<div class="kf-field"><label>Hot Water Cylinder</label><select id="t7-hotWater"><option value="HP Cylinder 150L">HP Cylinder 150L</option><option value="HP Cylinder 210L" selected>HP Cylinder 210L</option><option value="HP Cylinder 300L">HP Cylinder 300L</option><option value="Unvented 210L">Unvented cylinder 210L</option><option value="Unvented 300L">Unvented cylinder 300L</option></select></div>' +
+      '</div>' +
+      '<div class="kf-grid" style="margin-bottom:6px;">' +
         '<div class="kf-field"><label>Ventilation Strategy</label><select id="spec-ventilation"><option value="MVHR" selected>MVHR (whole-house heat recovery)</option><option value="MEV">MEV (mechanical extract)</option><option value="natural">Natural (trickle vents)</option></select></div>' +
+        '<div class="kf-field"><label>Solar PV Area</label><div class="unit-row"><input type="number" id="t8-pvArea" placeholder="e.g. 12" min="0" step="0.5"><span class="unit-label">m&#178;</span></div></div>' +
+        '<div class="kf-field"><label>Battery Storage</label><select id="t8-battery"><option value="No" selected>No battery</option><option value="5">5 kWh</option><option value="10">10 kWh</option><option value="15">15 kWh</option><option value="20">20 kWh</option></select></div>' +
+      '</div>' +
+      '<div class="kf-grid" style="margin-bottom:14px;">' +
+        '<div class="kf-field"><label>Solar Thermal</label><select id="t8-solarThermal" onchange="onSolarThermalChange()"><option value="No" selected>No</option><option value="Yes">Yes</option></select></div>' +
+        '<div class="kf-field tab-hidden" id="t8-solarThermalAreaRow"><label>Solar Thermal Area</label><div class="unit-row"><input type="number" id="t8-solarThermalArea" placeholder="4" min="1" max="20" step="0.5"><span class="unit-label">m&#178;</span></div></div>' +
+        '<div class="kf-field"><label>EV Charging Point</label><select id="t6-ev"><option value="No" selected>No</option><option value="Yes &mdash; 7kW Smart Charger">Yes &mdash; 7kW Smart Charger</option></select></div>' +
+        '<div class="kf-field"><label>Consumer Unit</label><select id="t6-consumerUnit"><option value="12-way with RCDs">12-way with RCDs</option><option value="16-way with RCDs" selected>16-way with RCDs</option><option value="18-way with RCBOs">18-way with RCBOs</option></select></div>' +
       '</div>' +
 
-      '<div class="kf-hint" style="margin-top:10px;padding-top:8px;border-top:1px solid #2e3d52;"><strong style="color:#c8d0dc;">Structure &amp; Envelope</strong> drives Frame &amp; Walls and Roof. <strong style="color:#c8d0dc;">Internal Finishes</strong> and <strong style="color:#c8d0dc;">Fit-Out</strong> control per-item rates. <strong style="color:#c8d0dc;">Systems</strong> drives heating, ventilation and window BOQ sections.</div>' +
+      '<div class="kf-hint" style="padding-top:8px;border-top:1px solid #2e3d52;">Structure &amp; Envelope drives walls, roof and frame. Internal Finishes and Fit-Out control per-item rates. Systems &amp; Energy drives heating, ventilation, PV and electrical BOQ sections.</div>' +
+      '</div>' +
       '</div>';
 
   } else if (mode === 'Refurbishment') {
@@ -9765,7 +9588,7 @@ function onStoreysChange() {
   tog('t1-f3TypeRow', s < 4); tog('t1-f3AreaRow', s < 4);
   tog('t1-f4TypeRow', s < 5); tog('t1-f4AreaRow', s < 5);
   // Sync staircase spec with storey count
-  const stairsEl = document.getElementById('nb-spec-stairs');
+  const stairsEl = document.getElementById('spec-stairs');
   if (stairsEl) {
     if (s === 1) stairsEl.value = 'none';
     else if (stairsEl.value === 'none') stairsEl.value = 'softwood';
@@ -10316,16 +10139,16 @@ function getTabInputs() {
     hasEV:                 (document.getElementById('t6-ev')?.value || '').includes('Yes'),
     detectorCount:         parseInt(document.getElementById('t6-detectors')?.value) || 0,
     coAlarmCount:          parseInt(document.getElementById('t6-coAlarms')?.value) || 0,
-    roofSpecType:          document.getElementById('nb-spec-roof-type')?.value   || 'pitched-tile',
-    roofSpecIns:           document.getElementById('nb-spec-roof-ins')?.value    || 'attic-300',
-    floorSpec:             document.getElementById('nb-spec-floors')?.value      || 'tile',
-    partitionSpec:         document.getElementById('nb-spec-partitions')?.value  || 'timber-stud',
-    decoSpec:              document.getElementById('nb-spec-decorating')?.value  || 'full',
-    stairSpec:             document.getElementById('nb-spec-stairs')?.value      || 'softwood',
-    skirtingSpec:          document.getElementById('nb-spec-skirtings')?.value   || 'mdf',
-    intDoorSpec:           document.getElementById('nb-spec-int-doors')?.value   || 'standard',
-    kitchenSpec:           document.getElementById('nb-spec-kitchen')?.value     || 'mid',
-    bathroomSpec:          document.getElementById('nb-spec-bathroom')?.value    || 'mid',
+    roofSpecType:          document.getElementById('spec-roof-type')?.value      || 'pitched-tile',
+    roofSpecIns:           document.getElementById('spec-roof-ins')?.value       || 'attic-300',
+    floorSpec:             document.getElementById('spec-floors')?.value         || 'tile',
+    partitionSpec:         document.getElementById('spec-partitions')?.value     || 'timber-stud',
+    decoSpec:              document.getElementById('spec-decorating')?.value     || 'full',
+    stairSpec:             document.getElementById('spec-stairs')?.value         || 'softwood',
+    skirtingSpec:          document.getElementById('spec-skirtings')?.value      || 'mdf',
+    intDoorSpec:           document.getElementById('spec-int-doors')?.value      || 'standard',
+    kitchenSpec:           document.getElementById('spec-kitchen')?.value        || 'mid',
+    bathroomSpec:          document.getElementById('spec-bathroom')?.value       || 'mid',
   };
 }
 function wsToggle(btn) {
