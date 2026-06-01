@@ -13402,8 +13402,7 @@ function buildCostSummaryRows(su) {
   if (su.substructure > 0)    h += row('+ Substructure Allowance (8%)',               WHITE, fmt(su.substructure), null, false);
   if (su.externals > 0)       h += row('+ Externals &amp; Site Works (6%)',           MUTED, fmt(su.externals), null, false);
   if (su.plant > 0)           h += row('+ Plant &amp; Equipment (4%)',                WHITE, fmt(su.plant), aPlt, false);
-  if (su.pvElements > 0)      h += row('&nbsp;&nbsp;Solar PV (0% VAT — Irish Revenue 2023)', '#10B981', fmt(su.pvElements), null, false);
-  h += row('+ VAT @ 13.5%' + (su.pvElements > 0 ? ' (excl. PV)' : ''),       MUTED, fmt(su.vat || 0), aVAT, false);
+  h += row('+ VAT @ 13.5%' + (su.pvElements > 0 ? ' (excl. Solar PV — 0% VAT)' : ''), MUTED, fmt(su.vat || 0), aVAT, false);
   h += row('= GROSS CONSTRUCTION COST',                           WHITE, fmt(su.gross || su.total || 0), aGross, true);
 
   if (hasg) {
@@ -13445,7 +13444,18 @@ function buildCostSummaryRows(su) {
         '<td></td></tr>';
 
       if (seaiGrants.length > 0) {
-        seaiGrants.forEach(function(g) {
+        var firstOSSBoq = seaiGrants.findIndex(function(g){ return g.ossExclusive; });
+        var INDIGO = '#6366f1';
+        seaiGrants.forEach(function(g, gi) {
+          // OSS section header before the first OSS-only grant
+          if (gi === firstOSSBoq) {
+            h += '<tr data-grant-group="seai" style="background:rgba(99,102,241,0.07);border-top:1px solid rgba(99,102,241,0.25);">' +
+              '<td colspan="9" style="padding:4px 8px 4px 14px;font-size:10px;font-weight:700;color:' + INDIGO + ';letter-spacing:0.07em;">&#10303; ONE STOP SHOP ADDITIONAL GRANTS</td>' +
+              '<td></td></tr>';
+          }
+          var isOSS = !!g.ossExclusive;
+          var gColour = isOSS ? INDIGO : GREEN;
+          var gIcon   = isOSS ? '&#9733;' : '&#8722;';
           var isRec = !!gr[g.ref];
           var refEsc = (g.ref || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
           var toggleBtn = '<button onclick="toggleGrantActual(\'' + refEsc + '\')" style="' +
@@ -13459,9 +13469,9 @@ function buildCostSummaryRows(su) {
           var actualCell = isRec
             ? '<td style="text-align:right;padding:4px 8px;font-size:11px;font-weight:700;color:' + DEEP_GREEN + ';white-space:nowrap;background:rgba(5,150,69,0.1);">&#8722;' + fmt(g.amount) + '</td>'
             : '<td style="text-align:right;padding:4px 8px;font-size:11px;color:#384c66;">—</td>';
-          h += '<tr data-grant-group="seai" style="border-bottom:1px solid rgba(16,185,129,0.08);background:rgba(16,185,129,0.03);">' +
-            '<td colspan="7" style="padding:4px 6px 4px 20px;font-size:11px;color:' + GREEN + ';">&#8722;&nbsp;' + shortLabel(g.description) + '</td>' +
-            '<td style="text-align:right;padding:4px 8px;font-size:11px;font-weight:600;color:' + GREEN + ';white-space:nowrap;">&#8722;' + fmt(g.amount) + toggleBtn + '</td>' +
+          h += '<tr data-grant-group="seai" style="border-bottom:1px solid rgba(16,185,129,0.08);background:' + (isOSS ? 'rgba(99,102,241,0.04)' : 'rgba(16,185,129,0.03)') + ';">' +
+            '<td colspan="7" style="padding:4px 6px 4px 20px;font-size:11px;color:' + gColour + ';">' + gIcon + '&nbsp;' + shortLabel(g.description) + '</td>' +
+            '<td style="text-align:right;padding:4px 8px;font-size:11px;font-weight:600;color:' + gColour + ';white-space:nowrap;">&#8722;' + fmt(g.amount) + toggleBtn + '</td>' +
             actualCell + '<td></td></tr>';
         });
         h += '<tr style="background:rgba(16,185,129,0.06);border-top:1px solid rgba(16,185,129,0.2);border-bottom:1px solid rgba(16,185,129,0.2);">' +
