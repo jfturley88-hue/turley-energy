@@ -11509,13 +11509,19 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
     if (has('dac')) {
       feeItems.push(mkItem('PF.' + (pfi++), 'Disability access certificate', 'item', 1, mat.feeDAC, 0, 'LA fee + consultant'));
     }
-    if (has('ber_assessment')) {
-      feeItems.push(Object.assign(mkItem('PF.' + (pfi++), 'BER assessment — post-works dwelling energy rating', 'nr', 1, 300, 0, 'SEAI registered BER assessor'), {feeType: 'ber'}));
-    }
+    // Post-works BER is a SEAI / Energy Upgrade requirement (grant-funded). Group it with the
+    // EU measures it certifies when any are present; otherwise keep it in the general Professional
+    // Fees section so a pure refurb doesn't sprout an Energy Upgrade group for one line.
+    var _berItem = has('ber_assessment')
+      ? Object.assign(mkItem('PF.' + (pfi++), 'BER assessment — post-works dwelling energy rating', 'nr', 1, 300, 0, 'SEAI registered BER assessor'), {feeType: 'ber'})
+      : null;
+    var _berToEU = _berItem && sections.some(function(s){ return s.isEnergyUpgrade; });
+    if (_berItem && !_berToEU) feeItems.push(_berItem);
     if (has('building_control')) {
       feeItems.push(Object.assign(mkItem('PF.' + (pfi++), 'Building control — commencement notice & BCMS registration', 'item', 1, 650, 0, 'Includes Local Authority & BCMS fees'), {feeType: 'bcms'}));
     }
-    sections.push({id: String(sid++), title: 'Professional Fees', part: 'D', items: feeItems});
+    if (feeItems.length) sections.push({id: String(sid++), title: 'Professional Fees', part: 'D', items: feeItems});
+    if (_berToEU) sections.push(Object.assign({id: String(sid++), title: 'Post-Works BER Assessment', part: 'D', items: [_berItem]}, {isEnergyUpgrade: true}));
   }
 
   // Apply Refurb Works category uplifts from Rate Settings
