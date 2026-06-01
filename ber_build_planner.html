@@ -950,7 +950,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       if (m==='New Build'){
         h+=geoChip('Roof area (plan)', gm.roof, 'm²');
         var rt=(val('spec-roof-type')||'');
-        if (gm.roof>0 && rt && rt.indexOf('flat')!==0) h+=chip('Slope area (×1.221)', Math.round(gm.roof*1.221)+' m²','pv-est');
+        if (gm.roof>0 && rt && rt.indexOf('flat')!==0) h+=chip('Slope area (BER)', gm.roof+' m²','pv-ok');
       } else {
         var rb=roofBreakdown();
         if (rb.ceiling||rb.rafter||rb.flat||rb.room){
@@ -5979,7 +5979,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const lM          = (hrs, rate) => Math.round(hrs * rate * labMult);
 
   // ── Derived quantities (DEAP rules)
-  const roofSlopeArea = +(d.roofArea * 1.221).toFixed(1);
+  const roofSlopeArea = d.roofArea; // assessor inputs actual sloped area directly — no factor applied
   const gutterLength  = +(Math.sqrt(d.roofArea) * 4.4).toFixed(1);
   const downpipes     = Math.ceil(gutterLength / 12);
   const partitionLm   = Math.round(d.roomCount * 3.5);
@@ -6134,7 +6134,7 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
     );
   } else {
     roofItems.push(
-      { ref:`${rId}.1`, description:`Roof timbers — rafters, ridge & hips (${roofSpecType.replace('pitched-','')})`, unit:'m²', quantity:roofSlopeArea, matRate:Math.round(28*wasteF.timber), labRate:lM(1.2, L.craft), note:`Plan ${d.roofArea}m² × 1.221 slope = ${roofSlopeArea}m² · Craft 1.2hr/m² × €44/hr · +7.5% timber waste`, status:'ok', deapSource:'DEAP roof area' },
+      { ref:`${rId}.1`, description:`Roof timbers — rafters, ridge & hips (${roofSpecType.replace('pitched-','')})`, unit:'m²', quantity:roofSlopeArea, matRate:Math.round(28*wasteF.timber), labRate:lM(1.2, L.craft), note:`Sloped roof area ${roofSlopeArea}m² (BER assessor) · Craft 1.2hr/m² × €44/hr · +7.5% timber waste`, status:'ok', deapSource:'DEAP roof area' },
       { ref:`${rId}.2`, description:'Roofing underlay (breather membrane) & tiling battens', unit:'m²', quantity:roofSlopeArea, matRate:4, labRate:lM(0.18, L.catB), note:'Full slope area · Cat B 0.18hr/m² × €35/hr', status:'ok', deapSource:'DEAP roof area' },
       { ref:`${rId}.3`, description:coverDesc, unit:'m²', quantity:roofSlopeArea, matRate:coverMat, labRate:coverLab, note:'Full slope area · +10% tile/slate waste', status:'ok', deapSource:'DEAP roof area' },
       { ref:`${rId}.4`, description:insDesc, unit:'m²', quantity:d.roofArea, matRate:insMat, labRate:insLab, note:`Plan area ${d.roofArea}m² · +5% insulation waste`, status:'ok', deapSource:'DEAP roof area' },
@@ -13247,9 +13247,9 @@ function buildCostSummaryRows(su) {
   var _showM2 = _fa2 > 0 && (_pt2 === 'New Build' || _pt2.toLowerCase().includes('extension'));
   h += row('= GROSS CONSTRUCTION COST', WHITE, fmt(_grossVal), aGross, true);
   if (_showM2) {
-    h += '<tr style="background:rgba(232,160,32,0.06);border-bottom:1px solid rgba(232,160,32,0.18);">' +
-      '<td colspan="7" style="padding:4px 6px 5px 18px;border-left:4px solid ' + AMBER + ';font-size:11px;color:#8090A8;">Construction rate &nbsp;·&nbsp; ' + _fa2 + 'm² floor area</td>' +
-      '<td style="text-align:right;padding:4px 10px 5px;font-size:14px;font-weight:700;color:' + AMBER + ';">' + fmt(Math.round(_grossVal / _fa2)) + '/m²</td>' +
+    h += '<tr style="background:rgba(232,160,32,0.10);border-bottom:2px solid rgba(232,160,32,0.25);">' +
+      '<td colspan="7" style="padding:5px 6px 6px 18px;border-left:4px solid ' + AMBER + ';font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);">Construction rate &nbsp;·&nbsp; ' + _fa2 + 'm² floor area</td>' +
+      '<td style="text-align:right;padding:5px 10px 6px;font-size:15px;font-weight:800;color:' + AMBER + ';">' + fmt(Math.round(_grossVal / _fa2)) + '/m²</td>' +
       '<td></td><td></td></tr>';
   }
 
@@ -15941,7 +15941,7 @@ function _ufType(t) {
           <tr><td>2.2</td><td>Wall finishes &mdash; render base coats &amp; dry lining (bundle)</td><td>m&#178;</td><td>DEAP wall area</td><td>&#8364;12 render + dry lining (52mm PIR &#8364;18, 62mm &#8364;22, std PB &#8364;10, None &#8364;0)</td><td>0.65hr craft (render) + 0.52hr craft (if lining present)</td><td>&#8212;</td><td class="mdb-note">Finish type from spec-wall-finish; lining thickness from geometry tab</td></tr>
           <tr class="mdb-variant"><td colspan="8">ROOF &mdash; rates driven by Build Spec panel (Roof Construction &amp; Covering, Roof Insulation)</td></tr>
           <tr class="mdb-variant"><td colspan="8">ROOF &mdash; PITCHED (concrete tile / natural slate / fibre cement)</td></tr>
-          <tr><td>R.1</td><td>Roof timbers &mdash; rafters, ridge &amp; hips</td><td>m&#178;</td><td>plan area &times; 1.221 slope factor</td><td>&#8364;28 &times; 1.075/m&#178;</td><td>1.2hr craft</td><td>+7.5%</td><td class="mdb-note">C16 sawn softwood</td></tr>
+          <tr><td>R.1</td><td>Roof timbers &mdash; rafters, ridge &amp; hips</td><td>m&#178;</td><td>sloped roof area (BER assessor)</td><td>&#8364;28 &times; 1.075/m&#178;</td><td>1.2hr craft</td><td>+7.5%</td><td class="mdb-note">C16 sawn softwood</td></tr>
           <tr><td>R.2</td><td>Sarking felt &amp; battens</td><td>m&#178;</td><td>slope area</td><td>&#8364;4/m&#178;</td><td>0.18hr Cat B</td><td>&#8212;</td><td class="mdb-note">Breathable membrane</td></tr>
           <tr><td>R.3</td><td>Roof covering &mdash; spec driven</td><td>m&#178;</td><td>slope area</td><td>Concrete tile &#8364;22 &times; 1.10 &middot; Slate &#8364;68 &times; 1.10 &middot; Fibre cement &#8364;42 &times; 1.10</td><td>0.65hr craft (tile/fibre) &middot; 1.2hr craft (slate)</td><td>+10%</td><td class="mdb-note">From spec-roof-type</td></tr>
           <tr><td>R.4</td><td>Roof insulation &mdash; spec driven</td><td>m&#178;</td><td>roof plan area</td><td>200mm MW: mineralWool100 &times; 2 &times; 1.05 &middot; 300mm MW: &times; 3 &middot; Rafter PIR 180mm: pir100mm &times; 1.8 &times; 1.05</td><td>0.4hr Cat B (ceiling) &middot; 0.8hr craft (rafter)</td><td>+5%</td><td class="mdb-note">From spec-roof-ins</td></tr>
@@ -15974,7 +15974,7 @@ function _ufType(t) {
           <tr><td>P.1</td><td>Scaffolding</td><td>m&#178;</td><td>extension wall area</td><td>&#8364;6/m&#178;</td><td>0.25hr craft</td><td>&#8212;</td><td class="mdb-note">External elevations</td></tr>
           <tr><td>1.1&#8211;1.7</td><td>Excavation, foundations, slab</td><td>&#8212;</td><td>ext floor area basis</td><td>as New Build</td><td>as New Build</td><td>as NB</td><td class="mdb-note">Extension substructure</td></tr>
           <tr><td>3.1&#8211;3.5</td><td>External cavity walls</td><td>m&#178;</td><td>55% of ext wall area (net)</td><td>as New Build</td><td>as New Build</td><td>as NB</td><td class="mdb-note">Same spec as NB walls</td></tr>
-          <tr><td>R.1&#8211;R.6</td><td>Roof structure, tiles, insulation, gutters</td><td>m&#178;</td><td>ext roof area &times; 1.221</td><td>as NB variant</td><td>as NB</td><td>as NB</td><td class="mdb-note">Match existing finish</td></tr>
+          <tr><td>R.1&#8211;R.6</td><td>Roof structure, tiles, insulation, gutters</td><td>m&#178;</td><td>ext roof area (sloped, BER)</td><td>as NB variant</td><td>as NB</td><td>as NB</td><td class="mdb-note">Match existing finish</td></tr>
           <tr><td>W.1&#8211;W.3</td><td>Windows, doors, airtightness</td><td>&#8212;</td><td>extension openings</td><td>as New Build</td><td>as NB</td><td>&#8212;</td><td class="mdb-note">&#8212;</td></tr>
           <tr><td>6.1&#8211;6.8</td><td>Internal finishes</td><td>&#8212;</td><td>ext floor area basis</td><td>as New Build</td><td>as NB</td><td>&#8212;</td><td class="mdb-note">Extension fitout</td></tr>
           <tr class="mdb-variant"><td colspan="8">PART B &#8212; Existing Building Upgrade</td></tr>
