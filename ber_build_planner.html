@@ -13245,8 +13245,13 @@ function buildCostSummaryRows(su) {
   var _fa2 = (typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) ? (BOQ.projectInfo.floorArea || 0) : 0;
   var _pt2 = (typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) ? (BOQ.projectInfo.type || '') : '';
   var _showM2 = _fa2 > 0 && (_pt2 === 'New Build' || _pt2.toLowerCase().includes('extension'));
-  var _m2Label = _showM2 ? ' <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.4);">' + fmt(Math.round(_grossVal / _fa2)) + '/m²</span>' : '';
-  h += row('= GROSS CONSTRUCTION COST' + _m2Label, WHITE, fmt(_grossVal), aGross, true);
+  h += row('= GROSS CONSTRUCTION COST', WHITE, fmt(_grossVal), aGross, true);
+  if (_showM2) {
+    h += '<tr style="background:rgba(232,160,32,0.06);border-bottom:1px solid rgba(232,160,32,0.18);">' +
+      '<td colspan="7" style="padding:4px 6px 5px 18px;border-left:4px solid ' + AMBER + ';font-size:11px;color:#8090A8;">Construction rate &nbsp;·&nbsp; ' + _fa2 + 'm² floor area</td>' +
+      '<td style="text-align:right;padding:4px 10px 5px;font-size:14px;font-weight:700;color:' + AMBER + ';">' + fmt(Math.round(_grossVal / _fa2)) + '/m²</td>' +
+      '<td></td><td></td></tr>';
+  }
 
   if (hasg) {
     if (BOQ && !BOQ.grantsConfirmed) BOQ.grantsConfirmed = {};
