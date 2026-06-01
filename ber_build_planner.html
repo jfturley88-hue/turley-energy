@@ -11464,7 +11464,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       (euPanelBOQ.sections || []).forEach(function(s) {
         if (!_isRetrofitAdminSection(s.title)) {
           s.part = 'C';
-          sections.push(Object.assign({}, s, {id: String(sid++)}));
+          sections.push(Object.assign({}, s, {id: String(sid++), isEnergyUpgrade: true}));
         }
       });
       if (euPanelBOQ.grants) euPanelGrants = euPanelBOQ.grants;
@@ -13153,77 +13153,100 @@ function renderAccordionReport() {
   // Pre-compute refurb vs extension subtotals and actuals for split display
   var _rpi = BOQ.projectInfo || {};
   var _hasExt = !!(_rpi.hasExtension);
-  var _refurbSub = 0, _refurbActual = 0;
-  var _extSubs = {}, _extActuals = {};
-  if (_hasExt) {
-    BOQ.sections.forEach(function(s) {
-      var sA = (s.actualOverride != null && s.actualOverride !== '') ? +s.actualOverride
-              : (s.items||[]).reduce(function(a,it){ return it.actual ? a + (+it.actual) : a; }, 0);
-      if (s.isExtension) {
-        _extSubs[s.extensionIndex]    = (_extSubs[s.extensionIndex]    || 0) + (s.subtotal || 0);
-        _extActuals[s.extensionIndex] = (_extActuals[s.extensionIndex] || 0) + sA;
-      } else {
-        _refurbSub    += (s.subtotal || 0);
-        _refurbActual += sA;
-      }
-    });
-  }
-  var _rfBndry = false;
-  var _extHdr = {};
-
-  // Existing house section heading (only shown when an extension is also present)
-  if (_hasExt) {
-    rows += '<tr style="background:#181500;border-top:2px solid rgba(253,224,71,0.4);border-bottom:1px solid rgba(253,224,71,0.2);">' +
-      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#fde047;text-transform:uppercase;letter-spacing:0.05em;">Existing House</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
-      '<td></td></tr>';
-  }
-
-  // Mode banner for NB, EU, and Refurb-without-extension
   var _projType = (_rpi.type || '').toString();
-  if (_projType === 'New Build') {
-    rows += '<tr style="background:#001628;border-top:2px solid rgba(56,189,248,0.4);border-bottom:1px solid rgba(56,189,248,0.2);">' +
-      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:0.05em;">New Build Works</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
-      '<td></td></tr>';
-  } else if (_projType === 'Energy Upgrade') {
-    rows += '<tr style="background:#001a0d;border-top:2px solid rgba(74,222,128,0.4);border-bottom:1px solid rgba(74,222,128,0.2);">' +
-      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em;">Energy Upgrade Works</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
-      '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
-      '<td></td></tr>';
-  } else if (_projType === 'Refurbishment' && !_hasExt) {
-    rows += '<tr style="background:#181500;border-top:2px solid rgba(253,224,71,0.4);border-bottom:1px solid rgba(253,224,71,0.2);">' +
-      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#fde047;text-transform:uppercase;letter-spacing:0.05em;">Refurbishment Works</td>' +
+
+  // ── GROUPING (Refurbishment) ──────────────────────────────────────────────
+  // Refurbishment BOQs interleave three work-streams that must read as distinct
+  // groups: the Works Selector items, the Energy-Upgrade (SEAI) measures, and any
+  // Extension. Each group gets its own coloured banner + Elements Subtotal row.
+  // New Build and standalone Energy Upgrade have a single stream (one banner).
+  function _secGroupKey(s) {
+    if (s.isExtension)     return 'ext' + (s.extensionIndex || 1);
+    if (s.isEnergyUpgrade) return 'eu';
+    return 'works';
+  }
+  function _secGroupMeta(key, s) {
+    if (key === 'works') return { label: 'Refurbishment Works',           color: '#fde047', bg: '#181500', barRGBA: '253,224,71' };
+    if (key === 'eu')    return { label: 'Energy Upgrade — SEAI Measures', color: '#4ade80', bg: '#001a0d', barRGBA: '74,222,128' };
+    var _en = s ? (s.extensionIndex || 1) : 1;
+    var _lbl = (_rpi.extensionCount > 1) ? ('Extension ' + _en) : 'Extension Works';
+    return { label: _lbl, color: '#f97316', bg: '#1a1208', barRGBA: '249,115,22' };
+  }
+  function _grpBannerRow(meta) {
+    return '<tr style="background:' + meta.bg + ';border-top:2px solid rgba(' + meta.barRGBA + ',0.4);border-bottom:1px solid rgba(' + meta.barRGBA + ',0.2);">' +
+      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:' + meta.color + ';text-transform:uppercase;letter-spacing:0.05em;">' + meta.label + '</td>' +
       '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
       '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
       '<td></td></tr>';
   }
+  function _grpSubtotalRow(meta, est, act) {
+    return '<tr class="boq-subtotals-row" style="background:' + meta.bg + ';border-top:2px solid rgba(' + meta.barRGBA + ',0.35);border-bottom:1px solid rgba(' + meta.barRGBA + ',0.15);">' +
+      '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:' + meta.color + ';letter-spacing:0.04em;">' + meta.label.toUpperCase() + ' — Elements Subtotal</td>' +
+      '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:' + meta.color + ';white-space:nowrap;">' + fmt(est) + '</td>' +
+      '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:' + meta.color + ';white-space:nowrap;">' + (act > 0 ? fmt(act) : '—') + '</td>' +
+      '<td></td></tr>';
+  }
+  // Count distinct groups so single-stream projects skip per-group subtotals.
+  var _grpKeysSeen = {};
+  BOQ.sections.forEach(function(s) {
+    if (s.isExtras && (s.items||[]).length === 0 && !s.actualOverride) return;
+    _grpKeysSeen[_secGroupKey(s)] = true;
+  });
+  var _multiGroup = (_projType === 'Refurbishment') && (Object.keys(_grpKeysSeen).length > 1);
+  var _curGrp = null, _curGrpMeta = null, _curGrpEst = 0, _curGrpAct = 0;
 
-  BOQ.sections.forEach(function(sec, secIdx) {
-    // Skip Additional Works section when empty
-    if (sec.isExtras && (sec.items||[]).length === 0 && !sec.actualOverride) return;
-
-    // Insert existing house subtotal + extension header at the refurb→extension boundary
-    if (_hasExt && sec.isExtension && !_rfBndry) {
-      rows += '<tr class="boq-subtotals-row" style="background:#181500;border-top:2px solid rgba(253,224,71,0.35);border-bottom:1px solid rgba(253,224,71,0.15);">' +
-        '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#fde047;letter-spacing:0.04em;">EXISTING HOUSE — Elements Subtotal</td>' +
-        '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:#fde047;white-space:nowrap;">' + fmt(_refurbSub) + '</td>' +
-        '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:#fde047;white-space:nowrap;">' + (_refurbActual > 0 ? fmt(_refurbActual) : '—') + '</td>' +
-        '<td></td></tr>';
-      _rfBndry = true;
-    }
-    if (_hasExt && sec.isExtension && !_extHdr[sec.extensionIndex]) {
-      var _en = sec.extensionIndex;
-      var _eHdrLbl = _rpi.extensionCount > 1 ? 'Extension ' + _en : 'Extension Works';
-      rows += '<tr style="background:#1a1208;border-top:2px solid rgba(249,115,22,0.4);border-bottom:1px solid rgba(249,115,22,0.2);">' +
-        '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:0.05em;">' + _eHdrLbl + '</td>' +
+  // Single-stream banner for New Build / standalone Energy Upgrade / single-group Refurb
+  if (!_multiGroup) {
+    if (_projType === 'New Build') {
+      rows += '<tr style="background:#001628;border-top:2px solid rgba(56,189,248,0.4);border-bottom:1px solid rgba(56,189,248,0.2);">' +
+        '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:0.05em;">New Build Works</td>' +
         '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
         '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
         '<td></td></tr>';
-      _extHdr[_en] = true;
+    } else if (_projType === 'Energy Upgrade') {
+      rows += '<tr style="background:#001a0d;border-top:2px solid rgba(74,222,128,0.4);border-bottom:1px solid rgba(74,222,128,0.2);">' +
+        '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:0.05em;">Energy Upgrade Works</td>' +
+        '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Estimated</td>' +
+        '<td style="text-align:right;padding:7px 8px;font-size:10px;color:#8090A8;">Actual</td>' +
+        '<td></td></tr>';
+    } else if (_projType === 'Refurbishment') {
+      rows += _grpBannerRow(_secGroupMeta('works', null));
+    }
+  }
+
+  // Iterate in grouped order so each work-stream stays contiguous even when the
+  // engine pushes a trailing works section (e.g. Professional Fees) after the EU
+  // measures. Keep the real BOQ.sections index for in-place editing handlers.
+  var _iterSecs = BOQ.sections.map(function(s, i) { return { s: s, i: i }; });
+  if (_multiGroup) {
+    var _grpRank = function(s) {
+      if (s.isExtension)     return 2 + (s.extensionIndex || 1) * 0.0001;
+      if (s.isEnergyUpgrade) return 1;
+      return 0;
+    };
+    _iterSecs.sort(function(a, b) { return _grpRank(a.s) - _grpRank(b.s); });
+  }
+
+  _iterSecs.forEach(function(_entry) {
+    var sec = _entry.s, secIdx = _entry.i;
+    // Skip Additional Works section when empty
+    if (sec.isExtras && (sec.items||[]).length === 0 && !sec.actualOverride) return;
+
+    // Group transition (Refurbishment, multi-stream): close the previous group
+    // with an Elements Subtotal row, then open the new group with its banner.
+    if (_multiGroup) {
+      var _gk = _secGroupKey(sec);
+      if (_gk !== _curGrp) {
+        if (_curGrp !== null) rows += _grpSubtotalRow(_curGrpMeta, _curGrpEst, _curGrpAct);
+        _curGrp = _gk;
+        _curGrpMeta = _secGroupMeta(_gk, sec);
+        _curGrpEst = 0; _curGrpAct = 0;
+        rows += _grpBannerRow(_curGrpMeta);
+      }
+      var _sActual = (sec.actualOverride != null && sec.actualOverride !== '') ? +sec.actualOverride
+                    : (sec.items||[]).reduce(function(a,it){ return it.actual ? a + (+it.actual) : a; }, 0);
+      _curGrpEst += (sec.subtotal || 0);
+      _curGrpAct += _sActual;
     }
 
     const est = sec.subtotal || 0;
@@ -13293,20 +13316,12 @@ function renderAccordionReport() {
   var totalEst = (BOQ.sections || []).reduce(function(a, s) { return a + (s.subtotal || 0); }, 0);
   var totalA   = (BOQ.sections || []).reduce(function(a, s) { return s.actualOverride ? a + (+s.actualOverride) : a; }, 0);
 
-  // Extension subtotal rows (before grand total)
-  if (_hasExt && _rfBndry) {
-    var _extIdxList = Object.keys(_extSubs).sort(function(a,b){return a-b;});
-    _extIdxList.forEach(function(ei) {
-      var _eiLbl = _extIdxList.length > 1 ? 'EXTENSION ' + ei + ' — Elements Subtotal' : 'EXTENSION WORKS — Elements Subtotal';
-      rows += '<tr class="boq-subtotals-row" style="background:#1a1208;border-top:2px solid rgba(249,115,22,0.4);border-bottom:1px solid rgba(249,115,22,0.2);">' +
-        '<td colspan="7" style="padding:7px 6px 7px 14px;font-size:11px;font-weight:700;color:#f97316;letter-spacing:0.04em;">' + _eiLbl + '</td>' +
-        '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:#f97316;white-space:nowrap;">' + fmt(_extSubs[ei]) + '</td>' +
-        '<td style="text-align:right;padding:7px 8px;font-size:11px;font-weight:700;color:#f97316;white-space:nowrap;">' + (_extActuals[ei] > 0 ? fmt(_extActuals[ei]) : '—') + '</td>' +
-        '<td></td></tr>';
-    });
+  // Close the final group's Elements Subtotal (Refurbishment, multi-stream)
+  if (_multiGroup && _curGrp !== null) {
+    rows += _grpSubtotalRow(_curGrpMeta, _curGrpEst, _curGrpAct);
   }
 
-  var _elLabel = _hasExt ? 'ALL WORKS — ELEMENTS COST' : 'ELEMENTS COST';
+  var _elLabel = _multiGroup ? 'ALL WORKS — ELEMENTS COST' : 'ELEMENTS COST';
   rows += '<tr class="boq-totals-row">' +
     '<td colspan="7"><span class="totals-label">' + _elLabel + '</span>' +
     '<span style="font-size:9px;color:#8090A8;font-weight:400;margin-left:6px;">(excl. prelims, contingency &amp; VAT)</span></td>' +
