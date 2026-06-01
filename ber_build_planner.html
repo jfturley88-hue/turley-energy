@@ -13405,7 +13405,6 @@ function buildCostSummaryRows(su) {
   if (su.pvElements > 0)      h += row('&nbsp;&nbsp;Solar PV (0% VAT — Irish Revenue 2023)', '#10B981', fmt(su.pvElements), null, false);
   h += row('+ VAT @ 13.5%' + (su.pvElements > 0 ? ' (excl. PV)' : ''),       MUTED, fmt(su.vat || 0), aVAT, false);
   h += row('= GROSS CONSTRUCTION COST',                           WHITE, fmt(su.gross || su.total || 0), aGross, true);
-  if (su.feesVat > 0)         h += row('+ VAT @ 23% on Professional Fees',     MUTED, fmt(su.feesVat), null, false);
 
   if (hasg) {
     if (BOQ && !BOQ.grantsConfirmed) BOQ.grantsConfirmed = {};
@@ -13536,7 +13535,7 @@ function buildCostSummaryRows(su) {
 
   if (su.profFees) {
     var _netBase = hasg ? (su.netTotal || su.netConstruction || su.gross || 0) : (su.gross || su.total || 0);
-    var _totalInclFees = _netBase + su.profFees.total;
+    var _totalInclFees = _netBase + su.profFees.total + (su.feesVat || 0);
 
     h += '<tr style="background:#0D1829;border-top:2px solid rgba(46,61,82,0.6);">' +
       '<td colspan="7" style="padding:6px 12px;font-size:10px;font-weight:700;color:#8090A8;text-transform:uppercase;letter-spacing:0.06em;">Professional Fees (indicative)</td>' +
@@ -13553,8 +13552,9 @@ function buildCostSummaryRows(su) {
         h += '<tr><td colspan="7" style="padding:4px 6px 4px 14px;border-bottom:1px solid rgba(46,61,82,0.3);font-size:11px;color:#8090A8;">' + r[0] + '</td><td style="text-align:right;padding:4px 6px;font-size:11px;color:#8090A8;">' + fmt(r[1]) + '</td><td></td><td></td></tr>';
       });
     }
+    if (su.feesVat > 0) h += '<tr><td colspan="7" style="padding:4px 6px 4px 14px;border-bottom:1px solid rgba(46,61,82,0.3);font-size:11px;color:#8090A8;">+ VAT @ 23% on Professional Fees</td><td style="text-align:right;padding:4px 6px;font-size:11px;color:#8090A8;">' + fmt(su.feesVat) + '</td><td></td><td></td></tr>';
     h += '<tr style="background:rgba(16,185,129,0.11);border-top:3px solid #10B981;border-bottom:2px solid rgba(16,185,129,0.3);">' +
-      '<td colspan="7" style="padding:13px 6px 13px 16px;font-size:18px;font-weight:900;color:' + WHITE + ';">= NET COST TO CLIENT <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.55);">(incl. professional fees' + (hasg ? ', after grants' : '') + ')</span></td>' +
+      '<td colspan="7" style="padding:13px 6px 13px 16px;font-size:18px;font-weight:900;color:' + WHITE + ';">= NET COST TO CLIENT <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.55);">(incl. fees + VAT' + (hasg ? ', after grants' : '') + ')</span></td>' +
       '<td style="text-align:right;padding:13px 10px;font-size:18px;font-weight:900;text-decoration:underline;color:' + WHITE + ';">' + fmt(_totalInclFees) + '</td><td></td><td></td></tr>';
   }
 
@@ -13784,9 +13784,10 @@ function exportPDF() {
         costRows += `<tr class="fee-row"><td colspan="3">${r[0]}</td><td class="r">${fmt(r[1])}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
       });
     }
+    if ((su.feesVat||0) > 0) costRows += `<tr class="fee-row"><td colspan="3">+ VAT @ 23% on Professional Fees</td><td class="r">${fmt(su.feesVat)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
     const _netBase   = hasGrants ? (su.netTotal||su.netConstruction||su.gross||0) : (su.gross||su.total||0);
-    const _netClient = _netBase + su.profFees.total;
-    costRows += `<tr class="client-row"><td colspan="3">NET COST TO CLIENT (incl. professional fees${hasGrants ? ', after grants' : ''})</td><td class="r">${fmt(_netClient)}</td><td style="background:#1E293B!important">&nbsp;</td><td style="background:#1E293B!important">&nbsp;</td></tr>`;
+    const _netClient = _netBase + su.profFees.total + (su.feesVat||0);
+    costRows += `<tr class="client-row"><td colspan="3">NET COST TO CLIENT (incl. fees + VAT${hasGrants ? ', after grants' : ''})</td><td class="r">${fmt(_netClient)}</td><td style="background:#1E293B!important">&nbsp;</td><td style="background:#1E293B!important">&nbsp;</td></tr>`;
   }
 
   const assumHTML = (b.assumptions||[]).length > 0
