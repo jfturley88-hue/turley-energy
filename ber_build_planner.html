@@ -313,66 +313,80 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 /* ── PRINT / PDF STYLES ──────────────────────────────────────────────────── */
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  @page { size: A4; margin: 12mm 16mm 22mm 16mm; }
 
-  /* Hide everything except the PDF print view */
   body > *:not(#pdf-print-view) { display: none !important; }
-  #pdf-print-view { display: block !important; }
+  #pdf-print-view { display: block !important; font-family: 'DM Sans', Arial, sans-serif; font-size: 10pt; color: #1E293B; margin: 0; padding: 0; background: #fff; }
 
-  #pdf-print-view { font-family: 'DM Sans', Arial, sans-serif; font-size: 10pt; color: #1E293B; margin: 0; padding: 0; }
+  /* COVER */
+  .pdf-cover { padding: 32px 36px 24px; border-bottom: 5px solid #E8A020; page-break-after: always; background: #fff; }
+  .pdf-cover-brand { font-size: 9pt; color: #8090A8; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .pdf-cover-title { font-family: 'Fraunces', serif; font-size: 26pt; font-weight: 900; color: #1E293B; margin-bottom: 4px; line-height: 1.1; }
+  .pdf-cover-type { font-size: 12pt; color: #E8A020; font-weight: 700; margin-bottom: 22px; }
+  .pdf-cover-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; padding: 14px; background: #F8FAFC !important; border: 1px solid #E2E8F0; border-radius: 6px; }
+  .pdf-cover-stat-label { font-size: 7.5pt; color: #8090A8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+  .pdf-cover-stat-val { font-size: 13pt; font-weight: 700; color: #1E293B; }
+  .pdf-cover-total-box { border: 2px solid #E8A020; border-radius: 6px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .pdf-cover-total-label { font-size: 9pt; color: #475569; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+  .pdf-cover-total-val { font-family: 'Fraunces', serif; font-size: 26pt; font-weight: 900; color: #1E293B; }
+  .pdf-cover-meta { font-size: 8pt; color: #94a3b8; border-top: 1px solid #E2E8F0; padding-top: 10px; }
+  .pdf-cover-labour { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: #F8FAFC !important; border: 1px solid #E2E8F0; border-radius: 5px; margin-bottom: 16px; font-size: 9pt; }
 
-  .pdf-cover { background: #243044 !important; color: #fff !important; padding: 32px 36px; margin-bottom: 0; page-break-after: always; }
-  .pdf-cover-logo { font-size: 28px; margin-bottom: 12px; }
-  .pdf-cover-brand { font-size: 11pt; color: #C8D0DC; margin-bottom: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
-  .pdf-cover-title { font-family: 'Fraunces', serif; font-size: 26pt; font-weight: 900; color: #fff; margin-bottom: 6px; line-height: 1.1; }
-  .pdf-cover-type { font-size: 12pt; color: #E8A020; font-weight: 600; margin-bottom: 24px; }
-  .pdf-cover-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .pdf-cover-stat-label { font-size: 8pt; color: #8090A8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
-  .pdf-cover-stat-val { font-size: 14pt; font-weight: 700; color: #fff; }
-  .pdf-cover-total-box { background: rgba(232,160,32,0.15) !important; border: 1px solid rgba(232,160,32,0.35) !important; border-radius: 8px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-  .pdf-cover-total-label { font-size: 9pt; color: #C8D0DC; text-transform: uppercase; letter-spacing: 0.07em; }
-  .pdf-cover-total-val { font-family: 'Fraunces', serif; font-size: 28pt; font-weight: 900; color: #E8A020; }
-  .pdf-cover-meta { margin-top: 20px; font-size: 9pt; color: #8090A8; border-top: 1px solid rgba(46,61,82,0.5); padding-top: 12px; }
+  /* PART PAGES */
+  .pdf-part-page { padding: 24px 36px 16px; page-break-before: always; }
+  .pdf-part-header { font-family: 'Fraunces', serif; font-size: 15pt; font-weight: 700; color: #1E293B; border-left: 5px solid #E8A020; padding: 6px 0 6px 12px; margin-bottom: 6px; }
+  .pdf-part-sub { font-size: 9pt; color: #8090A8; margin-bottom: 18px; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px; }
 
-  .pdf-summary-page { padding: 28px 36px; page-break-after: always; }
-  .pdf-summary-title { font-family: 'Fraunces', serif; font-size: 16pt; font-weight: 700; color: #243044; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #E8A020; }
-  .pdf-summary-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 9.5pt; }
-  .pdf-summary-table th { background: #243044 !important; color: #fff !important; padding: 7px 10px; text-align: left; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.05em; }
-  .pdf-summary-table th:last-child { text-align: right; }
-  .pdf-summary-table td { padding: 7px 10px; border-bottom: 1px solid #E2E8F0; }
-  .pdf-summary-table td:last-child { text-align: right; font-weight: 600; }
-  .pdf-summary-table tr:nth-child(even) td { background: #F8FAFC !important; }
-  .pdf-summary-table .pdf-sec-total-row td { background: #F1F5F9 !important; font-weight: 700; border-top: 2px solid #E2E8F0; }
-  .pdf-summary-table .pdf-grand-row td { background: #243044 !important; color: #fff !important; font-size: 11pt; font-weight: 700; }
-  .pdf-summary-table .pdf-grand-row td:last-child { color: #E8A020 !important; font-size: 13pt; }
+  /* SUMMARY TABLE (Part A) */
+  .pdf-sum-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  .pdf-sum-tbl th { background: #1E293B !important; color: #fff !important; padding: 7px 8px; text-align: left; font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .pdf-sum-tbl th.r { text-align: right; }
+  .pdf-sum-tbl th.write { background: #F8FAFC !important; color: #475569 !important; border-bottom: 2px dashed #94a3b8 !important; font-style: italic; }
+  .pdf-sum-tbl td { padding: 9px 8px; border-bottom: 1px solid #E2E8F0; vertical-align: middle; }
+  .pdf-sum-tbl tr:nth-child(even) td:not(.write) { background: #F8FAFC !important; }
+  .pdf-sum-tbl td.r { text-align: right; font-weight: 600; }
+  .pdf-sum-tbl td.write { border-bottom: 1px dashed #94a3b8 !important; background: #FAFDF7 !important; }
+  .pdf-sum-tbl .subtotal-row td { background: #F1F5F9 !important; font-weight: 700; border-top: 2px solid #CBD5E1; font-size: 9.5pt; }
+  .pdf-sum-tbl .grand-row td { background: #1E293B !important; color: #fff !important; font-weight: 700; font-size: 10pt; padding: 9px 8px; }
+  .pdf-sum-tbl .grand-row td.r { color: #E8A020 !important; font-size: 12pt; }
+  .pdf-sum-tbl .grant-row td { color: #059669; }
+  .pdf-sum-tbl .net-row td { background: #059669 !important; color: #fff !important; font-weight: 700; font-size: 11pt; padding: 9px 8px; }
+  .pdf-sum-tbl .fee-hdr td { background: #F1F5F9 !important; font-weight: 700; color: #475569; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.05em; border-top: 2px solid #CBD5E1; padding: 6px 8px; }
+  .pdf-sum-tbl .fee-row td { color: #475569; }
+  .pdf-sum-tbl .client-row td { background: #1E293B !important; color: #fff !important; font-weight: 700; font-size: 11pt; padding: 10px 8px; }
+  .pdf-sum-tbl .client-row td.r { color: #10B981 !important; font-size: 13pt; }
 
-  .pdf-assumptions { background: #FFFBEB !important; border: 1px solid #FDE68A !important; border-radius: 6px; padding: 14px 16px; margin-top: 12px; }
-  .pdf-assumptions-title { font-size: 9pt; font-weight: 700; color: #CF8F1A; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-  .pdf-assumptions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
-  .pdf-assumption-item { font-size: 8.5pt; color: #78350F; padding: 2px 0; border-left: 2px solid #E8A020; padding-left: 6px; }
+  /* SECTION PAGES (Part B) */
+  .pdf-section-page { padding: 16px 36px; page-break-before: always; }
+  .pdf-sec-header { display: flex; justify-content: space-between; align-items: flex-start; border-left: 5px solid #E8A020; padding: 8px 12px; background: #F8FAFC !important; margin-bottom: 10px; }
+  .pdf-sec-num { font-size: 7.5pt; color: #8090A8; text-transform: uppercase; letter-spacing: 0.08em; }
+  .pdf-sec-title { font-size: 13pt; font-weight: 700; color: #1E293B; margin-top: 2px; }
+  .pdf-sec-subtotal-label { font-size: 7.5pt; color: #8090A8; text-align: right; }
+  .pdf-sec-subtotal-val { font-size: 16pt; font-weight: 900; color: #E8A020; text-align: right; }
 
-  .pdf-section-page { padding: 22px 36px; page-break-inside: avoid; page-break-before: always; }
-  .pdf-section-page:first-of-type { page-break-before: auto; }
-  .pdf-sec-header { display: flex; justify-content: space-between; align-items: center; background: #243044 !important; color: #fff !important; padding: 10px 14px; border-radius: 6px; margin-bottom: 10px; }
-  .pdf-sec-num { font-size: 8pt; color: #C8D0DC; text-transform: uppercase; letter-spacing: 0.07em; }
-  .pdf-sec-title { font-family: 'Fraunces', serif; font-size: 14pt; font-weight: 700; color: #fff; }
-  .pdf-sec-subtotal-label { font-size: 8pt; color: #C8D0DC; text-align: right; }
-  .pdf-sec-subtotal-val { font-family: 'Fraunces', serif; font-size: 18pt; font-weight: 900; color: #E8A020; text-align: right; }
-
-  .pdf-items-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 8px; }
-  .pdf-items-table th { background: #F1F5F9 !important; padding: 5px 6px; font-size: 7.5pt; font-weight: 700; color: #8090A8; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #E2E8F0; }
-  .pdf-items-table th:nth-child(n+3) { text-align: right; }
-  .pdf-items-table td { padding: 6px 6px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
-  .pdf-items-table tr:nth-child(even) td { background: #F8FAFC !important; }
-  .pdf-items-table td:nth-child(n+3) { text-align: right; white-space: nowrap; }
+  .pdf-items-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 6px; }
+  .pdf-items-table th { background: #F1F5F9 !important; padding: 5px 5px; font-size: 7.5pt; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #CBD5E1; }
+  .pdf-items-table th.r { text-align: right; }
+  .pdf-items-table th.write { background: #F8FAFC !important; color: #94a3b8 !important; border-bottom: 2px dashed #94a3b8 !important; font-style: italic; }
+  .pdf-items-table td { padding: 7px 5px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
+  .pdf-items-table tr:nth-child(even) td:not(.write) { background: #F8FAFC !important; }
   .pdf-items-table .pdf-assumed td { border-left: 3px solid #E8A020; }
-  .pdf-item-desc { font-size: 8.5pt; color: #1E293B; font-weight: 500; }
-  .pdf-item-note { font-size: 7.5pt; color: #8090A8; margin-top: 1px; }
-  .pdf-item-total { font-weight: 700; color: #1E293B; }
-  .pdf-item-total.zero { color: #C8D0DC; }
-  .pdf-subtotal-row td { background: #243044 !important; color: #fff !important; font-weight: 700; padding: 7px 6px; }
-  .pdf-subtotal-row td:last-child { color: #E8A020 !important; font-size: 10pt; }
+  .pdf-item-desc { font-size: 8pt; color: #1E293B; font-weight: 500; }
+  .pdf-item-note { font-size: 7pt; color: #94a3b8; margin-top: 2px; }
+  .pdf-item-est { text-align: right; font-weight: 700; color: #1E293B; white-space: nowrap; }
+  .pdf-item-est.zero { color: #CBD5E1; font-weight: 400; }
+  td.write { border-bottom: 1px dashed #94a3b8 !important; background: #FAFDF7 !important; min-width: 52px; }
+  .pdf-subtotal-row td { background: #1E293B !important; color: #fff !important; font-weight: 700; padding: 7px 5px; }
+  .pdf-subtotal-row td.amber { color: #E8A020 !important; font-size: 10pt; text-align: right; }
 
-  .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #F8FAFC !important; border-top: 1px solid #E2E8F0; padding: 6px 36px; display: flex; justify-content: space-between; font-size: 8pt; color: #C8D0DC; }
+  /* ASSUMPTIONS & FLAGS */
+  .pdf-assumptions { background: #FFFBEB !important; border: 1px solid #FDE68A; border-radius: 5px; padding: 12px 14px; margin-top: 14px; page-break-inside: avoid; }
+  .pdf-assumptions-title { font-size: 8.5pt; font-weight: 700; color: #92400E; margin-bottom: 6px; text-transform: uppercase; }
+  .pdf-assumptions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+  .pdf-assumption-item { font-size: 8pt; color: #78350F; padding: 2px 0 2px 6px; border-left: 2px solid #E8A020; }
+
+  /* FOOTER */
+  .pdf-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #fff !important; border-top: 1px solid #E2E8F0; padding: 5px 36px; display: flex; justify-content: space-between; font-size: 7.5pt; color: #94a3b8; }
 }
 
 /* __ Tab input form ___________________________________________________ */
@@ -13627,201 +13641,212 @@ function showToast(msg) {
 // ── EXPORT PDF ────────────────────────────────────────────────────────────────
 function exportPDF() {
   if (!BOQ) return;
-  const b = BOQ;
+  const b  = BOQ;
   const pi = b.projectInfo;
   const su = b.summary;
+  const hasGrants = su.grantsTotal > 0;
+  const projIcon = pi.type === 'Energy Upgrade' ? '⚡' : pi.type === 'Refurbishment' ? '🔨' : '🏗';
+  const dateStr = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
 
-  // ── Cover page ──────────────────────────────────────────────────────────────
+  // ── COVER ──────────────────────────────────────────────────────────────────
   const coverHTML = `
   <div class="pdf-cover">
-    <div class="pdf-cover-logo">${pi.type==='Energy Upgrade'?'⚡':pi.type==='Refurbishment'?'🔨':'🏗'}</div>
     <div class="pdf-cover-brand">PlanitBER — Approximate Bill of Quantities</div>
     <div class="pdf-cover-title">${pi.name || 'BOQ Report'}</div>
-    <div class="pdf-cover-type">${pi.type} &nbsp;·&nbsp; ${pi.dwellingType || ''}</div>
+    <div class="pdf-cover-type">${projIcon}  ${pi.type}  ·  ${pi.dwellingType || ''}</div>
     <div class="pdf-cover-grid">
       <div><div class="pdf-cover-stat-label">Floor Area</div><div class="pdf-cover-stat-val">${pi.floorArea} m²</div></div>
       <div><div class="pdf-cover-stat-label">Storeys</div><div class="pdf-cover-stat-val">${pi.storeys}</div></div>
       <div><div class="pdf-cover-stat-label">Heating</div><div class="pdf-cover-stat-val">${pi.heatingSystem}</div></div>
       <div><div class="pdf-cover-stat-label">Wall Type</div><div class="pdf-cover-stat-val" style="font-size:11pt">${pi.wallType}</div></div>
       <div><div class="pdf-cover-stat-label">Ventilation</div><div class="pdf-cover-stat-val">${pi.ventilationType}</div></div>
-      <div><div class="pdf-cover-stat-label">BOQ Sections</div><div class="pdf-cover-stat-val">${b.sections.length}</div></div>
+      <div><div class="pdf-cover-stat-label">County</div><div class="pdf-cover-stat-val">${pi.county ? 'Co. ' + pi.county : '—'}</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:10px 14px;background:rgba(46,61,82,0.4);border-radius:7px;border:1px solid rgba(46,61,82,0.9);">
-      <div style="font-size:18px;">📍</div>
-      <div>
-        <div style="font-size:8.5pt;color:#8090A8;text-transform:uppercase;letter-spacing:0.07em;">Regional Labour Rates</div>
-        <div style="font-size:11pt;font-weight:700;color:#fff;">${pi.county ? `Co. ${pi.county}` : 'National Average'} &nbsp;·&nbsp; ${pi.countyRegion}</div>
-        <div style="font-size:9pt;color:${pi.labourMultiplier>1?'#E8A020':'#10B981'};">Labour multiplier: ×${pi.labourMultiplier.toFixed(2)} &nbsp; (${pi.labourMultiplier>=1?'+':''}${Math.round((pi.labourMultiplier-1)*100)}% vs national avg)</div>
-        ${pi.disclaimer ? `<div style="font-size:8pt;color:#a8b4c8;margin-top:4px;font-style:italic;">${pi.disclaimer}</div>` : ''}
+    <div class="pdf-cover-labour">
+      <div style="flex:1">
+        <div style="font-size:8pt;color:#8090A8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:2px;">Regional Labour Rates</div>
+        <div style="font-size:11pt;font-weight:700;color:#1E293B;">${pi.county ? 'Co. ' + pi.county : 'National Average'} · ${pi.countyRegion}</div>
+        <div style="font-size:8.5pt;color:${pi.labourMultiplier > 1 ? '#b45309' : '#059669'};">Labour multiplier ×${pi.labourMultiplier.toFixed(2)}  (${pi.labourMultiplier >= 1 ? '+' : ''}${Math.round((pi.labourMultiplier - 1) * 100)}% vs national avg)</div>
+        ${pi.disclaimer ? `<div style="font-size:7.5pt;color:#94a3b8;margin-top:3px;font-style:italic;">${pi.disclaimer}</div>` : ''}
       </div>
-      <div style="margin-left:auto;font-size:8pt;color:#8090A8;text-align:right;">Source: SEO National Wage Agreement 2024<br>SCSI Regional Cost Supplement Aug 2025</div>
+      <div style="font-size:7.5pt;color:#94a3b8;text-align:right;">Source: SEO National Wage Agreement 2024<br>SCSI Regional Cost Supplement Aug 2025</div>
     </div>
     <div class="pdf-cover-total-box">
       <div>
-        <div class="pdf-cover-total-label">${su.grantsTotal > 0 ? 'Net Total (after Grants)' : 'Total Budget Guide'}</div>
-        <div style="font-size:8.5pt;color:#C8D0DC;margin-top:2px;">${su.grantsTotal > 0 ? `Gross ${fmt(su.total)} · Grants −${fmt(su.grantsTotal)} deducted` : 'Elements · Contractor O&P · Contingency · VAT 13.5% incl.'}</div>
+        <div class="pdf-cover-total-label">${hasGrants ? 'Net Total — after SEAI Grants' : 'Gross Construction Budget'}</div>
+        <div style="font-size:8pt;color:#94a3b8;margin-top:2px;">${hasGrants ? 'Gross ' + fmt(su.gross || su.total) + ' · Grants −' + fmt(su.grantsTotal) + ' deducted' : 'Elements · Prelims · Contingency · VAT 13.5%'}</div>
       </div>
-      <div class="pdf-cover-total-val">${fmt(su.grantsTotal > 0 ? su.netTotal : su.total)}</div>
+      <div class="pdf-cover-total-val">${fmt(hasGrants ? su.netTotal : (su.gross || su.total || 0))}</div>
     </div>
     <div class="pdf-cover-meta">
-      Report generated: ${new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'})} &nbsp;·&nbsp;
-      Guide accuracy ±15–20% &nbsp;·&nbsp; Irish market rates &nbsp;·&nbsp;
-      Not a substitute for a formal Quantity Surveyor's report.
+      Generated: ${dateStr}  ·  Guide accuracy ±15–20%  ·  Irish market rates Q2 2026  ·  Not a substitute for a formal Quantity Surveyor’s report. Engage a SCSI-registered QS for procurement purposes.
     </div>
   </div>`;
 
-  // ── Summary page ─────────────────────────────────────────────────────────────
-  const summaryRows = b.sections.map(s =>
-    `<tr><td>${s.id}</td><td>${s.title}</td><td>${(s.items||[]).length}</td><td>${fmt(s.subtotal)}</td></tr>`
-  ).join('');
-  const grantsRows = (function() {
-    const pGrants = b.grants || [];
-    const firstOSSPdf = pGrants.findIndex(g => g.ossExclusive);
-    return pGrants.map((g, i) => {
-      const divRow = (i === firstOSSPdf)
-        ? `<tr style="background:rgba(99,102,241,0.07);"><td colspan="4" style="font-size:8pt;font-weight:700;color:#6366f1;padding:4px 6px;letter-spacing:0.06em;">⊕ ONE STOP SHOP ADDITIONAL GRANTS</td></tr>`
-        : '';
-      const col = g.vpGrant ? '#7c3aed' : (g.ossExclusive ? '#6366f1' : '#059669');
-      const icon = g.vpGrant ? '🏠' : (g.ossExclusive ? '★' : '✓');
-      const bg = g.vpGrant ? 'rgba(167,139,250,0.06)' : (g.ossExclusive ? 'rgba(99,102,241,0.04)' : '#F0FDF4');
-      return divRow + `<tr style="background:${bg};"><td>${g.ref}</td><td style="color:${col};">${icon} ${g.description}</td><td style="text-align:right;">1</td><td style="text-align:right;color:${col};font-weight:600;">−${fmt(g.amount)}</td></tr>`;
-    }).join('');
-  })();
-  const _pdfPrelimsLabel = su.prelimsLabel || 'Contractor\'s Overhead & Profit';
-  const sumFooter = `
-    <tr class="pdf-sec-total-row"><td colspan="2"><strong>Elements Subtotal</strong></td><td></td><td>${fmt(su.elementsCost)}</td></tr>
-    ${su.prelims > 0 ? `<tr><td colspan="2">${_pdfPrelimsLabel} (${pct(su.prelimsPct)})</td><td></td><td>${fmt(su.prelims)}</td></tr>` : ''}
-    <tr><td colspan="2">Contingency (${pct(su.contingencyPct)})</td><td></td><td>${fmt(su.contingency)}</td></tr>
-    ${su.plant > 0 ? `<tr><td colspan="2">Plant &amp; Equipment (4%)</td><td></td><td>${fmt(su.plant)}</td></tr>` : ''}
-    <tr><td colspan="2">VAT @ 13.5%</td><td></td><td>${fmt(su.vat)}</td></tr>
-    <tr class="pdf-grand-row"><td colspan="2"><strong>GROSS TOTAL (before grants)</strong></td><td></td><td><strong>${fmt(su.total)}</strong></td></tr>
-    ${su.grantsTotal > 0 ? `
-    ${grantsRows}
-    <tr style="background:#DCFCE7;"><td colspan="2" style="color:#059669;font-weight:700;">TOTAL GRANTS DEDUCTED</td><td></td><td style="color:#059669;font-weight:700;">−${fmt(su.grantsTotal)}</td></tr>
-    <tr class="pdf-grand-row" style="background:#059669 !important;"><td colspan="2" style="color:#fff !important;font-weight:700;">NET TOTAL (after SEAI Grants)</td><td></td><td style="color:#fff !important;font-size:13pt;font-weight:700;">${fmt(su.netTotal)}</td></tr>
-    ` : ''}`;
+  // ── PART A — COST PLAN SUMMARY ─────────────────────────────────────────────
+  const sectionRows = b.sections.map(function(s) {
+    return `<tr class="sec-row">
+      <td style="width:26px;color:#8090A8;font-weight:600;font-size:8pt">${s.id}</td>
+      <td>${s.title}</td>
+      <td style="text-align:right;width:32px;color:#8090A8">${(s.items||[]).length}</td>
+      <td class="r" style="width:82px">${fmt(s.subtotal)}</td>
+      <td class="write r" style="width:82px">&nbsp;</td>
+      <td class="write" style="width:150px">&nbsp;</td>
+    </tr>`;
+  }).join('');
+
+  const _pPrelimsLabel = (su.prelimsLabel || "Contractor's Overhead &amp; Profit");
+  let costRows = '';
+  costRows += `<tr class="subtotal-row"><td colspan="3">Elements Subtotal</td><td class="r">${fmt(su.elementsCost||0)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+  if ((su.prelims||0) > 0) costRows += `<tr><td colspan="3" style="color:#475569">${_pPrelimsLabel} (${pct(su.prelimsPct||0)})</td><td class="r">${fmt(su.prelims)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+  costRows += `<tr><td colspan="3" style="color:#475569">Contingency (${pct(su.contingencyPct||0.05)})</td><td class="r">${fmt(su.contingency||0)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+  if ((su.plant||0) > 0) costRows += `<tr><td colspan="3" style="color:#475569">Plant &amp; Equipment (4%)</td><td class="r">${fmt(su.plant)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+  costRows += `<tr><td colspan="3" style="color:#475569">VAT @ 13.5%</td><td class="r">${fmt(su.vat||0)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+  costRows += `<tr class="grand-row"><td colspan="3">GROSS CONSTRUCTION TOTAL</td><td class="r">${fmt(su.gross||su.total||0)}</td><td style="background:#1E293B!important">&nbsp;</td><td style="background:#1E293B!important">&nbsp;</td></tr>`;
+
+  if (hasGrants) {
+    const grants = b.grants || [];
+    const firstOSS = grants.findIndex(function(g){ return g.ossExclusive; });
+    grants.forEach(function(g, i) {
+      if (i === firstOSS) costRows += `<tr><td colspan="6" style="font-size:7.5pt;font-weight:700;color:#6366f1;background:rgba(99,102,241,0.07)!important;padding:4px 8px;letter-spacing:0.06em;">⊕ ONE STOP SHOP ADDITIONAL GRANTS</td></tr>`;
+      const gcol  = g.vpGrant ? '#7c3aed' : (g.ossExclusive ? '#6366f1' : '#059669');
+      const gicon = g.vpGrant ? '🏠' : (g.ossExclusive ? '★' : '✓');
+      costRows += `<tr class="grant-row"><td colspan="3" style="color:${gcol}">${gicon} ${g.description}</td><td style="text-align:right;color:${gcol};font-weight:700">−${fmt(g.amount)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+    });
+    costRows += `<tr style="background:#DCFCE7!important"><td colspan="3" style="color:#059669;font-weight:700">Total SEAI Grants Deducted</td><td style="text-align:right;color:#059669;font-weight:700">−${fmt(su.grantsTotal)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+    costRows += `<tr class="net-row"><td colspan="3">NET TOTAL (after SEAI Grants)</td><td class="r" style="color:#fff!important;font-size:13pt">${fmt(su.netTotal)}</td><td style="background:#059669!important">&nbsp;</td><td style="background:#059669!important">&nbsp;</td></tr>`;
+  }
+
+  if (su.profFees) {
+    costRows += `<tr class="fee-hdr"><td colspan="6">Professional Fees (Indicative)</td></tr>`;
+    if (su.profFees.aoUsed) {
+      costRows += `<tr class="fee-row"><td colspan="3">Professional Fees (8% combined)</td><td class="r">${fmt(su.profFees.combined)}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+    } else {
+      [['Architect / Designer (10%)', su.profFees.architect],
+       ['Structural Engineer',        su.profFees.structural],
+       ['BER Assessment',             su.profFees.ber],
+       ['Building Control (BCMS)',    su.profFees.bcms]].forEach(function(r) {
+        if (!r[1]) return;
+        costRows += `<tr class="fee-row"><td colspan="3">${r[0]}</td><td class="r">${fmt(r[1])}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+      });
+    }
+    const _netBase   = hasGrants ? (su.netTotal||su.netConstruction||su.gross||0) : (su.gross||su.total||0);
+    const _netClient = _netBase + su.profFees.total;
+    costRows += `<tr class="client-row"><td colspan="3">NET COST TO CLIENT (incl. professional fees${hasGrants ? ', after grants' : ''})</td><td class="r">${fmt(_netClient)}</td><td style="background:#1E293B!important">&nbsp;</td><td style="background:#1E293B!important">&nbsp;</td></tr>`;
+  }
 
   const assumHTML = (b.assumptions||[]).length > 0
-    ? `<div class="pdf-assumptions">
-        <div class="pdf-assumptions-title">~ Assumptions Made</div>
-        <div class="pdf-assumptions-grid">
-          ${(b.assumptions||[]).map(a => `<div class="pdf-assumption-item">${a}</div>`).join('')}
-        </div>
-       </div>` : '';
+    ? `<div class="pdf-assumptions"><div class="pdf-assumptions-title">∼ Assumptions Made</div><div class="pdf-assumptions-grid">${(b.assumptions||[]).map(function(a){return`<div class="pdf-assumption-item">${a}</div>`;}).join('')}</div></div>` : '';
 
   const flagsHTML = (b.flags||[]).length > 0
-    ? `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:12px 14px;margin-top:10px;">
-        <div style="font-size:9pt;font-weight:700;color:#DC2626;margin-bottom:6px;">⚠ Items That Would Improve Accuracy</div>
-        ${(b.flags||[]).map(f=>`<div style="font-size:8.5pt;color:#991B1B;padding:2px 0 2px 6px;border-left:2px solid #DC2626;">${f}</div>`).join('')}
-       </div>` : '';
+    ? `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:5px;padding:12px 14px;margin-top:10px;page-break-inside:avoid"><div style="font-size:8.5pt;font-weight:700;color:#DC2626;margin-bottom:5px;">⚠ Items That Would Improve Accuracy</div>${(b.flags||[]).map(function(f){return`<div style="font-size:8pt;color:#991B1B;padding:2px 0 2px 6px;border-left:2px solid #DC2626">${f}</div>`;}).join('')}</div>` : '';
 
-  const summaryPageHTML = `
-  <div class="pdf-summary-page">
-    <div class="pdf-summary-title">Summary of Quantities & Costs</div>
-    <table class="pdf-summary-table">
-      <thead><tr><th style="width:30px">No.</th><th>Section</th><th style="width:50px;text-align:right">Items</th><th style="width:100px">Total (€)</th></tr></thead>
-      <tbody>${summaryRows}${sumFooter}</tbody>
+  const partAHTML = `
+  <div class="pdf-part-page">
+    <div class="pdf-part-header">A — Cost Plan Summary</div>
+    <div class="pdf-part-sub">Overview of all BOQ sections · record final costs in the Actual column as work progresses</div>
+    <table class="pdf-sum-tbl">
+      <thead><tr>
+        <th style="width:26px">#</th>
+        <th>Section</th>
+        <th class="r" style="width:32px">Items</th>
+        <th class="r" style="width:82px">Estimated €</th>
+        <th class="r write" style="width:82px">Actual €</th>
+        <th class="write" style="width:150px">Notes</th>
+      </tr></thead>
+      <tbody>${sectionRows}${costRows}</tbody>
     </table>
     ${flagsHTML}
     ${assumHTML}
   </div>`;
 
-  // ── Section pages ─────────────────────────────────────────────────────────────
-  let lastPDFPart=null;
-  let pdfHTML='';
-  b.sections.forEach(sec => {
-    if (sec.part && sec.part!==lastPDFPart) {
-      const hasExtPdf = pi.hasExtension;
-      const ptMapPdf = pi.type==='Refurbishment'
-        ? (hasExtPdf
-            ? {A:'Part A — Extension Works',B:'Part B — Existing Structure Upgrade',C:'Part C — Whole-House Services',D:'Part D — Additional Works'}
-            : {A:'Part A — Existing Structure Upgrade',B:'Part B — Whole-House Services',C:'Part C — Additional Works'})
-        : pi.type==='New Build'
-        ? {A:'Part A — Structure & Envelope',B:'Part B — Internal Works & Fit-Out',C:'Part C — Services & Renewables',D:'Part D — External Works'}
-        : {A:'Part A — Upgrade Works',B:'Part B — Services & Renewables',C:'Part C — Whole-House Works',D:'Part D — Additional Works'};
-      pdfHTML+=`<div style="background:#243044;color:#E8A020;padding:10px 16px;border-radius:6px;margin:20px 0 4px;font-weight:700;font-size:11pt;page-break-before:always;">${ptMapPdf[sec.part]||'Part '+sec.part}</div>`;
-      lastPDFPart=sec.part;
+  // ── PART B — DETAILED BOQ ──────────────────────────────────────────────────
+  let partBHTML = `<div class="pdf-part-page"><div class="pdf-part-header">B — Detailed Bill of Quantities</div><div class="pdf-part-sub">Full line-item breakdown · record actual costs and site observations as work progresses</div></div>`;
+
+  let lastPDFPart = null;
+  b.sections.forEach(function(sec) {
+    if (sec.part && sec.part !== lastPDFPart) {
+      const ptMapPdf = pi.type === 'Refurbishment'
+        ? {A:'Part A — Existing Structure Upgrade', B:'Part B — Whole-House Services', C:'Part C — Additional Works', D:'Part D — Extension / Additional Works'}
+        : pi.type === 'New Build'
+        ? {A:'Part A — Structure & Envelope', B:'Part B — Internal Works & Fit-Out', C:'Part C — Services & Renewables', D:'Part D — External Works'}
+        : {A:'Part A — Upgrade Works', B:'Part B — Services & Renewables', C:'Part C — Whole-House Works', D:'Part D — Additional Works'};
+      partBHTML += `<div style="border-left:3px solid #E8A020;background:#F8FAFC!important;padding:5px 12px;margin:0 36px;font-size:9pt;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.06em">${ptMapPdf[sec.part]||'Part '+sec.part}</div>`;
+      lastPDFPart = sec.part;
     }
+
     if (sec.isExtras) {
-      const extTotal=(sec.extras||[]).reduce((a,e)=>a+(+e.cost||0),0);
-      const hasContent=(sec.extras||[]).some(e=>e.desc||e.cost);
-      if (hasContent||extTotal>0) {
-        pdfHTML+=`<div class="pdf-section-page"><div class="pdf-sec-header"><div><div class="pdf-sec-num">Part D — Additional Works</div><div class="pdf-sec-title">${sec.title}</div></div><div style="text-align:right;"><div class="pdf-sec-subtotal-label">Part D Total</div><div class="pdf-sec-subtotal-val">${fmt(extTotal)}</div></div></div>`;
-        pdfHTML+=`<table class="pdf-items-table"><thead><tr><th style="width:32px;">#</th><th>Description</th><th>Cost €</th></tr></thead><tbody>`;
-        (sec.extras||[]).forEach((ex,i)=>{
-          if (ex.desc||ex.cost) pdfHTML+=`<tr><td>${i+1}</td><td class="pdf-item-desc">${ex.desc||''}</td><td class="pdf-item-total">${ex.cost?fmt(+ex.cost):''}</td></tr>`;
-        });
-        pdfHTML+=`<tr class="pdf-subtotal-row"><td colspan="2">Part D Sub-total</td><td>${fmt(extTotal)}</td></tr>`;
-        pdfHTML+='</tbody></table></div>';
-      }
-      return; // skip normal section rendering
+      const extTotal = (sec.extras||[]).reduce(function(a,e){ return a+(+e.cost||0); }, 0);
+      if (!(sec.extras||[]).some(function(e){ return e.desc||e.cost; })) return;
+      partBHTML += `<div class="pdf-section-page">
+        <div class="pdf-sec-header">
+          <div><div class="pdf-sec-num">Additional Works</div><div class="pdf-sec-title">${sec.title}</div></div>
+          <div><div class="pdf-sec-subtotal-label">Total</div><div class="pdf-sec-subtotal-val">${fmt(extTotal)}</div></div>
+        </div>
+        <table class="pdf-items-table"><thead><tr>
+          <th style="width:28px">#</th><th>Description</th>
+          <th class="r" style="width:82px">Est. €</th>
+          <th class="r write" style="width:78px">Actual €</th>
+          <th class="write">Notes</th>
+        </tr></thead><tbody>`;
+      (sec.extras||[]).forEach(function(ex,i){
+        if (ex.desc||ex.cost) partBHTML+=`<tr><td>${i+1}</td><td class="pdf-item-desc">${ex.desc||''}</td><td class="pdf-item-est">${ex.cost?fmt(+ex.cost):''}</td><td class="write">&nbsp;</td><td class="write">&nbsp;</td></tr>`;
+      });
+      partBHTML+=`<tr class="pdf-subtotal-row"><td colspan="2">Subtotal</td><td class="amber">${fmt(extTotal)}</td><td style="background:#1E293B!important">&nbsp;</td><td style="background:#1E293B!important">&nbsp;</td></tr>`;
+      partBHTML+='</tbody></table></div>';
+      return;
     }
-    const itemRows = (sec.items||[]).map((item, i) => {
+
+    const itemRows = (sec.items||[]).map(function(item) {
       const rate  = (item.matRate||0) + (item.labRate||0);
       const total = (item.quantity||0) * rate;
       const cls   = item.status === 'assumed' ? ' class="pdf-assumed"' : '';
       return `<tr${cls}>
-        <td style="width:38px;font-size:8pt;color:#C8D0DC;font-weight:600">${item.ref}</td>
-        <td>
-          <div class="pdf-item-desc">${item.description}</div>
-          ${item.note ? `<div class="pdf-item-note">${item.note}</div>` : ''}
-        </td>
-        <td style="width:40px;color:#8090A8">${item.unit}</td>
-        <td style="width:50px;color:#1E293B;font-weight:500">${item.quantity ? +item.quantity.toFixed(1) : '—'}</td>
-        <td style="width:55px;color:#8090A8">€${item.matRate||0}</td>
-        <td style="width:55px;color:#8090A8">€${item.labRate||0}</td>
-        <td style="width:60px;color:#8090A8">€${rate}</td>
-        <td style="width:70px" class="pdf-item-total ${total===0?'zero':''}">${total>0 ? fmt(total) : '—'}</td>
-        <td style="width:65px;color:#059669;font-weight:600">${total>0 ? fmt(total*0.135) : '—'}</td>
+        <td style="width:32px;font-size:7.5pt;color:#94a3b8;font-weight:600">${item.ref}</td>
+        <td><div class="pdf-item-desc">${item.description}</div>${item.note?`<div class="pdf-item-note">${item.note}</div>`:''}</td>
+        <td style="width:28px;color:#94a3b8;text-align:center;font-size:7.5pt">${item.unit}</td>
+        <td style="width:36px;color:#475569;text-align:right">${item.quantity ? +item.quantity.toFixed(1) : '—'}</td>
+        <td style="width:50px;color:#475569;text-align:right">€${rate}</td>
+        <td style="width:68px" class="pdf-item-est${total===0?' zero':''}">${total>0?fmt(total):'—'}</td>
+        <td class="write" style="width:72px">&nbsp;</td>
+        <td class="write">&nbsp;</td>
       </tr>`;
     }).join('');
 
-    pdfHTML += `
-    <div class="pdf-section-page">
+    partBHTML += `<div class="pdf-section-page">
       <div class="pdf-sec-header">
-        <div>
-          <div class="pdf-sec-num">Section ${sec.id}</div>
-          <div class="pdf-sec-title">${sec.title}</div>
-        </div>
-        <div>
-          <div class="pdf-sec-subtotal-label">Section Total</div>
-          <div class="pdf-sec-subtotal-val">${fmt(sec.subtotal)}</div>
-        </div>
+        <div><div class="pdf-sec-num">Section ${sec.id}</div><div class="pdf-sec-title">${sec.title}</div></div>
+        <div><div class="pdf-sec-subtotal-label">Section Total</div><div class="pdf-sec-subtotal-val">${fmt(sec.subtotal)}</div></div>
       </div>
       <table class="pdf-items-table">
         <thead><tr>
-          <th>Ref</th><th>Description</th><th>Unit</th><th>Qty</th>
-          <th>Mat €</th><th>Lab €</th><th>Rate €</th><th>Total €</th><th style="color:#059669;" title="Indicative — elements only. See Cost Summary for full VAT.">VAT 13.5%*</th>
+          <th style="width:32px">Ref</th>
+          <th>Description</th>
+          <th style="width:28px;text-align:center">Unit</th>
+          <th class="r" style="width:36px">Qty</th>
+          <th class="r" style="width:50px">Rate €</th>
+          <th class="r" style="width:68px">Est. €</th>
+          <th class="r write" style="width:72px">Actual €</th>
+          <th class="write">Notes</th>
         </tr></thead>
         <tbody>
           ${itemRows}
           <tr class="pdf-subtotal-row">
-            <td></td>
-            <td><strong>SECTION ${sec.id} SUBTOTAL — ${sec.title}</strong></td>
-            <td></td><td></td><td></td><td></td><td></td>
-            <td>${fmt(sec.subtotal)}</td>
-            <td style="color:#059669;">${fmt(sec.subtotal*0.135)}</td>
+            <td colspan="5">Section ${sec.id} Subtotal — ${sec.title}</td>
+            <td class="amber">${fmt(sec.subtotal)}</td>
+            <td style="background:#1E293B!important">&nbsp;</td>
+            <td style="background:#1E293B!important">&nbsp;</td>
           </tr>
         </tbody>
       </table>
     </div>`;
   });
 
-  // ── Footer ────────────────────────────────────────────────────────────────────
-  const footerHTML = `
-  <div class="pdf-footer">
-    <span>BER Build Planner — Approximate BOQ &nbsp;·&nbsp; ${pi.name || ''} &nbsp;·&nbsp; ${pi.type}</span>
-    <span>Guide accuracy ±15–20% &nbsp;·&nbsp; Irish market rates &nbsp;·&nbsp; Not a substitute for a formal QS report</span>
-  </div>`;
+  const footerHTML = `<div class="pdf-footer"><span>PlanitBER — Approximate BOQ · ${pi.name||''} · ${pi.type}</span><span>Guide accuracy ±15–20% · Irish market rates · Not a substitute for a formal QS report</span></div>`;
 
-  // ── Inject print view & trigger print ─────────────────────────────────────────
   let printDiv = document.getElementById('pdf-print-view');
-  if (!printDiv) {
-    printDiv = document.createElement('div');
-    printDiv.id = 'pdf-print-view';
-    document.body.appendChild(printDiv);
-  }
-  printDiv.innerHTML = coverHTML + summaryPageHTML + pdfHTML + footerHTML;
+  if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
+  printDiv.innerHTML = coverHTML + partAHTML + partBHTML + footerHTML;
   window.print();
 }
 
