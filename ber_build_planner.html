@@ -1420,8 +1420,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
     <!-- ═══ MODE-SPECIFIC WORKS SELECTOR PANELS ══════════════════════════════ -->
     <div class="mode-fields" id="mode-fields-newbuild">
-
-
+      <!-- New Build spec inputs are injected into #spec-content by renderSpecPanel() -->
+    </div>
 
     <!-- ─── REFURBISHMENT WORKS SELECTOR ─────────────────────────────────── -->
     <div class="mode-fields" id="mode-fields-refurbishment">
@@ -12454,13 +12454,11 @@ async function generate() {
 
   if (mode === 'New Build') {
     const fa = getCurrentFloorAreaSum();
-    console.log('[BER] New Build generate — floor area sum:', fa);
     if (!fa||fa<10) { errEl.textContent='Please enter the floor area in the Floors tab (minimum 10m²).'; errEl.style.display='block'; return; }
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[10,'Reading key figures...'],[25,'Deriving quantities...'],[45,'Applying material rates...'],[65,'Calculating labour costs...'],[80,'Applying SEAI grants...'],[95,'Assembling BOQ...']]);
     mirrorDynamicToLegacy();
     const d = getTabInputs();
-    console.log('[BER] getTabInputs floorArea:', d.floorArea, 'hotWater:', d.hotWater);
     // Read Build Spec panel and merge into d
     d.kitchenSpec  = document.getElementById('spec-kitchen')?.value    || 'mid';
     d.bathroomSpec = document.getElementById('spec-bathroom')?.value   || 'mid';
@@ -12496,9 +12494,7 @@ async function generate() {
       d.radiatorCount = Math.max(upperRooms, Math.round((d.floorArea || 150) / 18));
     }
     const materials = getMaterialsFromUI();
-    console.log('[BER] calling buildBOQ — floorArea:', d.floorArea, 'heating:', d.heatingSystem, 'hotWater:', d.hotWater);
     BOQ = buildBOQ(d, d.projectName||'New Build Project', d.projectType||'New Build', d.county||county, d.dwellingType||dwelling, d.grantScheme||scheme, materials);
-    console.log('[BER] buildBOQ complete — sections:', BOQ.sections.length, 'total:', BOQ.summary.total);
     if (notes) BOQ.assumptions.push(...notes.split('\n').filter(l=>l.trim()));
 
 
@@ -12554,9 +12550,7 @@ async function generate() {
   document.getElementById('progress-fill').style.width='100%';
   await new Promise(r=>setTimeout(r,300));
   if (BOQ) { BOQ.projectInfo.clientName = clientName; BOQ.projectInfo.preparedBy = preparedBy; BOQ.projectInfo.reportDate = dateDisplay; }
-  console.log('[BER] calling buildReport()');
   buildReport();
-  console.log('[BER] buildReport() done — showing screen-report');
   show('screen-report'); hide('screen-generating'); hide('screen-input');
   (function(){ const gb=document.getElementById('generate-bar'); if(gb) gb.style.display='none'; })();
 
