@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- BUILD 2026-06-01a · cost audit: IF.4 skim-only rate for dry-lined walls, BER & structural feeType tags suppress profFees double-count -->
+<!-- BUILD 2026-06-01b · summary UX: drop redundant TOTAL BUDGET row when profFees follow; add €/m² to GROSS COST for New Build & Extension -->
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -13241,7 +13241,12 @@ function buildCostSummaryRows(su) {
   if (su.externals > 0)       h += row('+ Externals &amp; Site Works (6%)',           MUTED, fmt(su.externals), null, false);
   if (su.plant > 0)           h += row('+ Plant &amp; Equipment (4%)',                WHITE, fmt(su.plant), aPlt, false);
   h += row('+ VAT @ 13.5%' + (su.pvElements > 0 ? ' (excl. Solar PV — 0% VAT)' : ''), MUTED, fmt(su.vat || 0), aVAT, false);
-  h += row('= GROSS CONSTRUCTION COST',                           WHITE, fmt(su.gross || su.total || 0), aGross, true);
+  var _grossVal = su.gross || su.total || 0;
+  var _fa2 = (typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) ? (BOQ.projectInfo.floorArea || 0) : 0;
+  var _pt2 = (typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) ? (BOQ.projectInfo.type || '') : '';
+  var _showM2 = _fa2 > 0 && (_pt2 === 'New Build' || _pt2.toLowerCase().includes('extension'));
+  var _m2Label = _showM2 ? ' <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.4);">' + fmt(Math.round(_grossVal / _fa2)) + '/m²</span>' : '';
+  h += row('= GROSS CONSTRUCTION COST' + _m2Label, WHITE, fmt(_grossVal), aGross, true);
 
   if (hasg) {
     if (BOQ && !BOQ.grantsConfirmed) BOQ.grantsConfirmed = {};
@@ -13374,7 +13379,8 @@ function buildCostSummaryRows(su) {
         (hasA ? '<td style="text-align:right;padding:11px 10px;font-size:16px;font-weight:900;text-decoration:underline;color:' + WHITE + ';">' + (aNet != null ? fmt(aNet) : '—') + '</td>' : '<td></td>') +
         '<td></td></tr>';
     }
-  } else {
+  } else if (!su.profFees) {
+    // Only show TOTAL BUDGET as the terminal row when no professional fees section follows
     h += '<tr style="background:rgba(232,160,32,0.09);border-top:3px solid ' + AMBER + ';border-bottom:2px solid rgba(232,160,32,0.3);">' +
       '<td colspan="7" style="padding:11px 6px 11px 16px;font-size:16px;font-weight:900;color:' + WHITE + ';">= TOTAL BUDGET</td>' +
       '<td style="text-align:right;padding:11px 10px;font-size:16px;font-weight:900;text-decoration:underline;color:' + WHITE + ';">' + fmt(su.gross || su.total || 0) + '</td>' +
