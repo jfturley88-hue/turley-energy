@@ -624,6 +624,27 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <div class="hdr-title" style="display:block;">BER Build Planner</div>
       <div class="hdr-sub">DEAP Survey &rarr; Bill of Quantities</div>
     </div>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+      <div style="position:relative;display:inline-block;">
+        <button onclick="toggleRecentPopupHome()" style="padding:4px 12px;border-radius:20px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#9729; Recent Projects</button>
+        <div id="recent-popup-home" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:320px;max-height:400px;overflow-y:auto;background:#1e2a3e;border:1px solid #2e3d52;border-radius:8px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.4);">
+          <div style="padding:10px 12px;border-bottom:1px solid #2e3d52;display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:11px;color:#E8A020;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Recent Projects</div>
+            <button onclick="closeRecentPopupHome()" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;">&#10005;</button>
+          </div>
+          <div id="recent-list-container-home"></div>
+          <div style="padding:8px 12px;border-top:1px solid #2e3d52;background:rgba(232,160,32,0.05);">
+            <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">Or enter an 8-character cloud code:</div>
+            <div style="display:flex;gap:6px;">
+              <input id="cloud-code-input-home" type="text" maxlength="8" placeholder="ABCD1234" style="flex:1;padding:5px 8px;border-radius:5px;border:1px solid #2e3d52;background:#1a2332;color:#fff;font-size:11px;outline:none;text-transform:uppercase;letter-spacing:0.1em;" />
+              <button onclick="loadByCodeHome()" style="padding:5px 12px;border-radius:5px;background:#E8A020;border:none;color:#1a2332;font-size:11px;font-weight:700;cursor:pointer;">Load</button>
+            </div>
+            <div id="cloud-load-status-home" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
+          </div>
+        </div>
+      </div>
+      <button onclick="newProject()" style="padding:4px 12px;border-radius:20px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#10010; New Project</button>
+    </div>
   </div>
 
   <div id="screen-home-content" style="max-width:980px;margin:0 auto;padding:20px 20px 60px;">
@@ -5311,7 +5332,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
           <button class="new-project-btn" onclick="hide('screen-report');show('screen-input');" style="padding:6px 13px;font-size:12px;">&#8592; Back to Inputs</button>
-          <button onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#E8A020;color:#1a2332;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#cf8f1a'" onmouseout="this.style.background='#E8A020'">&#128196; Download PDF</button>
+          <button onclick="saveProject()" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#E8A020;color:#1a2332;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#cf8f1a'" onmouseout="this.style.background='#E8A020'">&#128190; Save Project</button>
+          <button onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128196; Download PDF</button>
         </div>
         <div>
           <div class="report-proj-name" id="rpt-name">BOQ Report</div>
@@ -14569,10 +14591,71 @@ function closeRecentPopup() {
   if (pop) pop.style.display = 'none';
 }
 
+function renderRecentListHome() {
+  var container = document.getElementById('recent-list-container-home');
+  if (!container) return;
+  var list = getRecentProjects();
+  if (!list.length) {
+    container.innerHTML = '<div style="font-size:11px;color:#94a3b8;font-style:italic;padding:12px;text-align:center;">No saved projects yet.</div>';
+    return;
+  }
+  container.innerHTML = list.map(function(item) {
+    var dt   = new Date(item.savedAt);
+    var dStr = dt.toLocaleDateString('en-IE', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var safe = (item.name || 'Untitled').replace(/</g, '&lt;');
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(46,61,82,0.4);">' +
+      '<div style="flex:1;min-width:0;cursor:pointer;" onclick="loadRecentProject(\'' + item.code + '\')">' +
+      '<div style="font-size:12px;color:#e2e8f0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + safe + '</div>' +
+      '<div style="font-size:10px;color:#94a3b8;">' + (item.type || 'Unknown') + ' · ' + dStr + ' · ' + item.code + '</div>' +
+      '</div>' +
+      '<button type="button" onclick="deleteRecentProject(\'' + item.code + '\')" ' +
+      'style="background:transparent;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:4px 8px;" title="Delete">✕</button>' +
+      '</div>';
+  }).join('');
+}
+
+function toggleRecentPopupHome() {
+  var pop = document.getElementById('recent-popup-home');
+  if (!pop) return;
+  var isOpen = pop.style.display === 'block';
+  pop.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderRecentListHome();
+}
+
+function closeRecentPopupHome() {
+  var pop = document.getElementById('recent-popup-home');
+  if (pop) pop.style.display = 'none';
+}
+
+async function loadByCodeHome() {
+  const input  = document.getElementById('cloud-code-input-home');
+  const status = document.getElementById('cloud-load-status-home');
+  const code   = (input?.value || '').trim().toUpperCase();
+  if (code.length < 6) { if (status) status.textContent = '⚠ Enter your 8-character project code.'; return; }
+  if (status) status.textContent = '⏳ Loading from cloud…';
+  if (!window.fbReady) {
+    if (status) status.textContent = '⚠ Cloud not available — check your internet connection.';
+    return;
+  }
+  try {
+    const snap = await window.fbLoad(code);
+    if (status) status.textContent = '';
+    if (input) input.value = '';
+    closeRecentPopupHome();
+    restoreSnapshot(snap);
+    showToast(`Project ${code} loaded ✓`);
+  } catch(e) {
+    if (status) status.textContent = `⚠ ${e.message || 'Project not found — check the code and try again.'}`;
+  }
+}
+
 window.loadRecentProject    = loadRecentProject;
 window.deleteRecentProject  = deleteRecentProject;
 window.toggleRecentPopup    = toggleRecentPopup;
 window.closeRecentPopup     = closeRecentPopup;
+window.toggleRecentPopupHome = toggleRecentPopupHome;
+window.closeRecentPopupHome  = closeRecentPopupHome;
+window.loadByCodeHome        = loadByCodeHome;
 
 function loadProject() {
   // Superseded by Recent Projects popup. Stub kept for backwards compatibility.
