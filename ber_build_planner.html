@@ -5258,7 +5258,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
 <!-- ═══ GENERATING SCREEN ══════════════════════════════════════════════════ -->
 <div id="screen-generating">
-  <div class="hdr-logo" style="margin-bottom:8px;">
+  <div class="hdr-logo" style="margin-bottom:4px;">
     <div class="hdr-globe-wrap">
       <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" style="width:65px;height:65px;display:block;">
         <defs>
@@ -5286,10 +5286,11 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <span class="hdr-planit">Planit</span><span class="hdr-ber">BER</span>
     </div>
   </div>
-  <div class="gen-icon">🏗</div>
+  <div class="hdr-sub" style="margin-bottom:8px;"><span class="hs-stage">DEAP Geometry</span><span class="hs-op">&times;</span><span class="hs-stage">Works</span><span class="hs-op">&rarr;</span><span class="hs-out">Working BOQ</span></div>
+  <div class="gen-icon" id="gen-icon">🏗</div>
   <div>
-    <div class="gen-title">Generating BOQ Report</div>
-    <div class="gen-sub">Reading DEAP data · Deriving quantities · Applying Irish rates</div>
+    <div class="gen-title" id="gen-title">Generating BOQ Report</div>
+    <div class="gen-sub" id="gen-sub">Reading DEAP data · Deriving quantities · Applying Irish rates</div>
   </div>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progress-fill"></div>
@@ -9470,6 +9471,15 @@ function pct(n) { return Math.round((n || 0) * 100) + '%'; }
 
 let progress = 0;
 
+function setGeneratingScreen(type) {
+  var icons = { 'New Build': '🏗', 'Refurbishment': '🔨', 'Energy Upgrade': '⚡' };
+  var titles = { 'New Build': 'Generating New Build BOQ', 'Refurbishment': 'Generating Refurbishment BOQ', 'Energy Upgrade': 'Generating Energy Upgrade BOQ' };
+  var subs = { 'New Build': 'Reading DEAP geometry · Pricing elements · Applying Irish rates', 'Refurbishment': 'Reading works selector · Pricing trades · Applying SEAI grants', 'Energy Upgrade': 'Reading upgrade scope · Calculating savings · Applying 2026 grants' };
+  var el = document.getElementById('gen-icon');   if (el) el.textContent = icons[type]  || '🏗';
+  var tl = document.getElementById('gen-title');  if (tl) tl.textContent = titles[type] || 'Generating BOQ Report';
+  var sl = document.getElementById('gen-sub');    if (sl) sl.textContent = subs[type]   || 'Reading DEAP data · Deriving quantities · Applying Irish rates';
+}
+
 function setProgress(p) {
   progress = p;
   document.getElementById('progress-fill').style.width = p + '%';
@@ -12339,6 +12349,7 @@ async function generate() {
       errEl.style.display = 'block';
       return;
     }
+    setGeneratingScreen('Refurbishment');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([
       [10, 'Reading works selector…'],
@@ -12430,6 +12441,7 @@ async function generate() {
       errEl.style.display = 'block';
       return;
     }
+    setGeneratingScreen('Energy Upgrade');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([
       [10, 'Reading energy upgrade selector…'],
@@ -12477,6 +12489,7 @@ async function generate() {
   if (mode === 'New Build') {
     const fa = getCurrentFloorAreaSum();
     if (!fa||fa<10) { errEl.textContent='Please enter the floor area in the Floors tab (minimum 10m²).'; errEl.style.display='block'; return; }
+    setGeneratingScreen('New Build');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[10,'Reading key figures...'],[25,'Deriving quantities...'],[45,'Applying material rates...'],[65,'Calculating labour costs...'],[80,'Applying SEAI grants...'],[95,'Assembling BOQ...']]);
     mirrorDynamicToLegacy();
@@ -12524,6 +12537,7 @@ async function generate() {
     const extFA = parseFloat(document.getElementById('kf-extFloorArea')?.value)||0;
     const exsFA = parseFloat(document.getElementById('kf-existFloorArea')?.value)||0;
     if (extFA<1 && exsFA<1) { errEl.textContent='Please enter the Extension Floor Area or Existing Floor Area.'; errEl.style.display='block'; return; }
+    setGeneratingScreen('Refurbishment');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[15,'Reading renovation inputs...'],[35,'Building extension BOQ (Part A)...'],[55,'Building upgrade BOQ (Part B)...'],[75,'Adding whole-house services (Part C)...'],[95,'Assembling report...']]);
     const inputs = {
@@ -12548,6 +12562,7 @@ async function generate() {
   } else if (mode === 'Retrofit') {
     const fa = parseFloat(document.getElementById('kf-retFloorArea')?.value)||0;
     if (fa<10) { errEl.textContent='Please enter the Total Floor Area (m²).'; errEl.style.display='block'; return; }
+    setGeneratingScreen('Energy Upgrade');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[15,'Reading retrofit inputs...'],[40,'Identifying recommended measures...'],[65,'Calculating upgrade costs...'],[85,'Applying SEAI grants...'],[95,'Assembling report...']]);
     const mIds=['ret-m-wallIns','ret-m-roofIns','ret-m-floorIns','ret-m-windows','ret-m-airtight','ret-m-heating','ret-m-vent','ret-m-pv','ret-m-elec','ret-m-ancil'];
