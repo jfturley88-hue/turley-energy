@@ -80,7 +80,7 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .accuracy-text{font-size:11px;color:#C8D0DC;line-height:1.6;}
 
 /* GENERATING SCREEN */
-.gen-icon{width:60px;height:60px;border-radius:14px;background:#E8A020;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.gen-icon{width:74px;height:74px;border-radius:50%;background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.35);display:flex;align-items:center;justify-content:center;font-size:38px;line-height:1;}
 .gen-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:#fff;text-align:center;margin-bottom:6px;}
 .gen-sub{font-size:13px;color:#C8D0DC;text-align:center;}
 .progress-bar-wrap{width:300px;height:6px;background:rgba(46,61,82,0.5);border-radius:4px;overflow:hidden;}
@@ -5287,7 +5287,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     </div>
   </div>
   <div class="hdr-sub" style="margin-bottom:8px;"><span class="hs-stage">DEAP Geometry</span><span class="hs-op">&times;</span><span class="hs-stage">Works</span><span class="hs-op">&rarr;</span><span class="hs-out">Working BOQ</span></div>
-  <div class="gen-icon" id="gen-icon">🏗</div>
+  <div class="gen-icon" id="gen-icon">🏗️</div>
   <div>
     <div class="gen-title" id="gen-title">Generating BOQ Report</div>
     <div class="gen-sub" id="gen-sub">Reading DEAP data · Deriving quantities · Applying Irish rates</div>
@@ -9472,7 +9472,7 @@ function pct(n) { return Math.round((n || 0) * 100) + '%'; }
 let progress = 0;
 
 function setGeneratingScreen(type) {
-  var icons = { 'New Build': '🏗', 'Refurbishment': '🔨', 'Energy Upgrade': '⚡' };
+  var icons = { 'New Build': '🏗️', 'Refurbishment': '🔨', 'Energy Upgrade': '⚡️' };
   var titles = { 'New Build': 'Generating New Build BOQ', 'Refurbishment': 'Generating Refurbishment BOQ', 'Energy Upgrade': 'Generating Energy Upgrade BOQ' };
   var subs = { 'New Build': 'Reading DEAP geometry · Pricing elements · Applying Irish rates', 'Refurbishment': 'Reading works selector · Pricing trades · Applying SEAI grants', 'Energy Upgrade': 'Reading upgrade scope · Calculating savings · Applying 2026 grants' };
   var el = document.getElementById('gen-icon');   if (el) el.textContent = icons[type]  || '🏗';
