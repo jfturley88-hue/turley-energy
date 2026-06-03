@@ -29,8 +29,12 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .hdr-wordmark{display:flex;align-items:baseline;gap:0;border-bottom:2px solid #2e3d52;padding-bottom:4px;}
 .hdr-planit{font-family:'DM Sans',sans-serif;font-size:32px;font-weight:700;color:#ffffff;line-height:1;letter-spacing:-0.5px;background:transparent;}
 .hdr-ber{font-family:'DM Sans',sans-serif;font-size:32px;font-weight:700;color:#e8a020;line-height:1;letter-spacing:-0.5px;background:transparent;}
-.hdr-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;color:#fff;display:none;}
-.hdr-sub{font-size:11px;color:#C8D0DC;}
+.hdr-title{font-family:'Fraunces',serif;font-size:19px;font-weight:700;color:#fff;display:none;letter-spacing:-0.2px;line-height:1.15;}
+.hdr-title .ht-ber{color:#e8a020;}
+.hdr-sub{font-size:11px;color:#8FA0B8;display:flex;align-items:center;gap:7px;margin-top:3px;letter-spacing:0.01em;}
+.hdr-sub .hs-stage{color:#C8D0DC;font-weight:500;}
+.hdr-sub .hs-op{color:#e8a020;font-weight:700;font-size:12px;opacity:0.85;}
+.hdr-sub .hs-out{color:#fff;font-weight:700;letter-spacing:0.02em;}
 .hdr-tags{margin-left:auto;display:flex;gap:6px;}
 .hdr-tag{padding:3px 9px;border-radius:20px;border:1px solid rgba(46,61,82,0.9);font-size:11px;color:#C8D0DC;}
 
@@ -621,8 +625,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       </div>
     </div>
     <div style="margin-left:36px;">
-      <div class="hdr-title" style="display:block;">BER Cost Planner</div>
-      <div class="hdr-sub">DEAP Geometry &times; Works &rarr; Working BOQ</div>
+      <div class="hdr-title" style="display:block;"><span class="ht-ber">BER</span> Cost Planner</div>
+      <div class="hdr-sub"><span class="hs-stage">DEAP Geometry</span><span class="hs-op">&times;</span><span class="hs-stage">Works</span><span class="hs-op">&rarr;</span><span class="hs-out">Working BOQ</span></div>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
       <div style="position:relative;display:inline-block;">
@@ -1068,8 +1072,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   </div>
 </div>
     <div style="margin-left:36px;">
-      <div class="hdr-title">BER Cost Planner</div>
-      <div class="hdr-sub">DEAP Geometry × Works → Working BOQ</div>
+      <div class="hdr-title"><span class="ht-ber">BER</span> Cost Planner</div>
+      <div class="hdr-sub"><span class="hs-stage">DEAP Geometry</span><span class="hs-op">×</span><span class="hs-stage">Works</span><span class="hs-op">→</span><span class="hs-out">Working BOQ</span></div>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
       <button onclick="toggleMatOverlay()" style="padding:4px 12px;border-radius:20px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#9881; Rate Settings</button>
