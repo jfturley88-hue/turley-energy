@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BER Build Planner — DEAP → BOQ</title>
+<title>BER Cost Planner — DEAP × Works → BOQ</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
@@ -621,7 +621,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       </div>
     </div>
     <div style="margin-left:36px;">
-      <div class="hdr-title" style="display:block;">BER Build Planner</div>
+      <div class="hdr-title" style="display:block;">BER Cost Planner</div>
       <div class="hdr-sub">DEAP Geometry &times; Works &rarr; Working BOQ</div>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
@@ -1068,7 +1068,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   </div>
 </div>
     <div style="margin-left:36px;">
-      <div class="hdr-title">BER Build Planner</div>
+      <div class="hdr-title">BER Cost Planner</div>
       <div class="hdr-sub">DEAP Geometry × Works → Working BOQ</div>
     </div>
     <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
@@ -5361,7 +5361,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       </div>
     </div>
   </div>
-  <div class="license-footer">BER Build Planner &nbsp;·&nbsp; Approximate Bill of Quantities &nbsp;·&nbsp; Guide accuracy ±15–20% &nbsp;·&nbsp; Irish market rates 2026 &nbsp;·&nbsp; Not a substitute for a formal Quantity Surveyor's report &nbsp;·&nbsp; All edits are for personal project management only</div>
+  <div class="license-footer">BER Cost Planner &nbsp;·&nbsp; Approximate Bill of Quantities &nbsp;·&nbsp; Guide accuracy ±15–20% &nbsp;·&nbsp; Irish market rates 2026 &nbsp;·&nbsp; Not a substitute for a formal Quantity Surveyor's report &nbsp;·&nbsp; All edits are for personal project management only</div>
 </div>
 <div id="toast"></div>
 
@@ -13910,7 +13910,7 @@ function exportExcel() {
   }
 
   // Row 0 — LEFT title + RIGHT brand banner
-  p1(r,0,'BER Build Planner — Bill of Quantities', SL.title);
+  p1(r,0,'BER Cost Planner — Bill of Quantities', SL.title);
   f1(r,1,6,SL.title); m1(r,0,6);
   p1(r,7,'',SR.divider);
   p1(r,8,'PlanitBER ESTIMATE  ·  Reference Only  ·  Do Not Modify', SR.brand);
