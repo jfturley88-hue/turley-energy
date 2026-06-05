@@ -10149,24 +10149,24 @@ function loadRefurbExample2() {
 function loadEUExample1() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
-  s(‘t0-projName’,     ‘12 Sycamore Drive, Naas, Co. Kildare’);
-  s(‘t0-projType’,     ‘Energy Upgrade’);
-  s(‘t0-dwellingType’, ‘Semi-Detached’);
-  s(‘t0-county’,       ‘Kildare’);
-  s(‘t0-grantScheme’,  ‘oss’);
+  s('t0-projName',     '12 Sycamore Drive, Naas, Co. Kildare');
+  s('t0-projType',     'Energy Upgrade');
+  s('t0-dwellingType', 'Semi-Detached');
+  s('t0-county',       'Kildare');
+  s('t0-grantScheme',  'oss');
   // EU property context
-  s(‘eu-currentBER’,   ‘D’);
-  s(‘eu-targetBER’,    ‘B’);
-  s(‘eu-ageBand’,      ‘1983–1993’);
-  s(‘eu-wallType’,     ‘cavity-uninsulated’);
-  s(‘eu-existHeating’, ‘Oil Boiler’);
+  s('eu-currentBER',   'D');
+  s('eu-targetBER',    'B');
+  s('eu-ageBand',      '1983–1993');
+  s('eu-wallType',     'cavity-uninsulated');
+  s('eu-existHeating', 'Oil Boiler');
   if (window.euUpdateWallOptions) euUpdateWallOptions();
   // EU measurement panel
-  s(‘eu-floorArea’,    ‘88’);
-  s(‘eu-wallArea’,     ‘105’);
-  s(‘eu-roofArea’,     ‘44’);
-  s(‘eu-windowArea’,   ‘18’);
-  s(‘eu-doorCount’,    ‘2’);
+  s('eu-floorArea',    '88');
+  s('eu-wallArea',     '105');
+  s('eu-roofArea',     '44');
+  s('eu-windowArea',   '18');
+  s('eu-doorCount',    '2');
   // EU measures: D → B
   ck('eu-roof-ceiling',       true);
   ck('eu-cavity',      true);
@@ -10178,16 +10178,16 @@ function loadEUExample1() {
   euAutoFinish();
   const adv = document.getElementById('eu-advisory');
   if(adv) adv.value =
-    'BER Rating: D2 (220 kWh/mÂ²/yr) â†’ Target B2 (â‰¤90 kWh/mÂ²/yr)\n' +
-    'Dwelling: Semi-Detached, Naas, Co. Kildare. Built c.1985. Floor area 88mÂ².\n\n' +
+    'BER Rating: D2 (220 kWh/m²/yr) → Target B2 (≤90 kWh/m²/yr)\n' +
+    'Dwelling: Semi-Detached, Naas, Co. Kildare. Built c.1985. Floor area 88m².\n\n' +
     'Recommended measures:\n' +
-    '1. Attic insulation â€” top-up to 300mm mineral wool (existing ~100mm).\n' +
-    '2. Cavity wall insulation â€” blown EPS bead, ~105mÂ².\n' +
-    '3. Replace all windows with triple-glazed A-rated uPVC (~18mÂ²) + 2 composite doors.\n' +
-    '4. Replace oil boiler with 8â€“10kW Air-to-Water Heat Pump.\n' +
+    '1. Attic insulation — top-up to 300mm mineral wool (existing ~100mm).\n' +
+    '2. Cavity wall insulation — blown EPS bead, ~105m².\n' +
+    '3. Replace all windows with triple-glazed A-rated uPVC (~18m²) + 2 composite doors.\n' +
+    '4. Replace oil boiler with 8–10kW Air-to-Water Heat Pump.\n' +
     '5. Install 210L unvented heat pump cylinder.\n' +
     '6. MEV whole-house mechanical extract ventilation.\n' +
-    '7. Solar PV â€” 8mÂ² south-facing array (est. 2.8kWp).';
+    '7. Solar PV — 8m² south-facing array (est. 2.8kWp).';
   ['t1','t2','t3','t4'].forEach(function(t) {
     const c = document.getElementById(t + '-cards');
     if (c) c.innerHTML = '';
@@ -10243,24 +10243,24 @@ function loadEUExample1() {
 function loadEUExample2() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
-  s(‘t0-projName’,     ‘2 Church Street, Castleblayney, Co. Monaghan’);
-  s(‘t0-projType’,     ‘Energy Upgrade’);
-  s(‘t0-dwellingType’, ‘Detached’);
-  s(‘t0-county’,       ‘Monaghan’);
-  s(‘t0-grantScheme’,  ‘One Stop Shop’);
+  s('t0-projName',     '2 Church Street, Castleblayney, Co. Monaghan');
+  s('t0-projType',     'Energy Upgrade');
+  s('t0-dwellingType', 'Detached');
+  s('t0-county',       'Monaghan');
+  s('t0-grantScheme',  'One Stop Shop');
   // EU property context
-  s(‘eu-currentBER’,   ‘F’);
-  s(‘eu-targetBER’,    ‘A’);
-  s(‘eu-ageBand’,      ‘1941–1977’);
-  s(‘eu-wallType’,     ‘solid-stone’);
-  s(‘eu-existHeating’, ‘Solid Fuel Range’);
+  s('eu-currentBER',   'F');
+  s('eu-targetBER',    'A');
+  s('eu-ageBand',      '1941–1977');
+  s('eu-wallType',     'solid-stone');
+  s('eu-existHeating', 'Solid Fuel Range');
   if (window.euUpdateWallOptions) euUpdateWallOptions();
   // EU measurement panel
-  s(‘eu-floorArea’,    ‘112’);
-  s(‘eu-wallArea’,     ‘145’);
-  s(‘eu-roofArea’,     ‘60’);
-  s(‘eu-windowArea’,   ‘22’);
-  s(‘eu-doorCount’,    ‘3’);
+  s('eu-floorArea',    '112');
+  s('eu-wallArea',     '145');
+  s('eu-roofArea',     '60');
+  s('eu-windowArea',   '22');
+  s('eu-doorCount',    '3');
   // EU measures: F → A deep retrofit
   ck('eu-roof-ceiling',       true);
   ck('eu-ewi',         true);
@@ -10274,19 +10274,19 @@ function loadEUExample2() {
   euAutoFinish();
   const adv = document.getElementById('eu-advisory');
   if(adv) adv.value =
-    'BER Rating: F (380 kWh/mÂ²/yr) â†’ Target A3 (â‰¤75 kWh/mÂ²/yr)\n' +
-    'Dwelling: Detached, Castleblayney, Co. Monaghan. Built c.1970. Floor area 112mÂ².\n\n' +
+    'BER Rating: F (380 kWh/m²/yr) → Target A3 (≤75 kWh/m²/yr)\n' +
+    'Dwelling: Detached, Castleblayney, Co. Monaghan. Built c.1970. Floor area 112m².\n\n' +
     'Recommended measures (deep retrofit):\n' +
-    '1. Attic insulation â€” top-up to 300mm mineral wool.\n' +
-    '2. External Wall Insulation (EWI) â€” 100mm PIR + silicone render, all elevations (~145mÂ²).\n' +
-    '3. Floor insulation â€” PIR 100mm below new 65mm screed (solid ground floor).\n' +
-    '4. Airtightness â€” all junctions sealed, target â‰¤3 ACH.\n' +
-    '5. Replace all windows with triple-glazed A-rated uPVC (~22mÂ²) + 3 composite doors.\n' +
-    '6. Replace solid fuel with 12â€“14kW Air-to-Water Heat Pump.\n' +
-    '7. Emitter upgrade â€” UFH to ground floor + oversized rads upstairs.\n' +
+    '1. Attic insulation — top-up to 300mm mineral wool.\n' +
+    '2. External Wall Insulation (EWI) — 100mm PIR + silicone render, all elevations (~145m²).\n' +
+    '3. Floor insulation — PIR 100mm below new 65mm screed (solid ground floor).\n' +
+    '4. Airtightness — all junctions sealed, target ≤3 ACH.\n' +
+    '5. Replace all windows with triple-glazed A-rated uPVC (~22m²) + 3 composite doors.\n' +
+    '6. Replace solid fuel with 12–14kW Air-to-Water Heat Pump.\n' +
+    '7. Emitter upgrade — UFH to ground floor + oversized rads upstairs.\n' +
     '8. Install 300L unvented heat pump cylinder.\n' +
     '9. MVHR whole-house ventilation with 85% heat recovery efficiency.\n' +
-    '10. Solar PV â€” 12mÂ² south-facing array (est. 4.2kWp) + 10kWh battery.';
+    '10. Solar PV — 12m² south-facing array (est. 4.2kWp) + 10kWh battery.';
   selectProjectType('Energy Upgrade');
   openProjectSections();
 }
