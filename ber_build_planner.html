@@ -12876,8 +12876,7 @@ function buildReport() {
       pi.floorArea   ? pi.floorArea + 'm\u00b2'                    : null,
       (pi.currentBER && pi.targetBER) ? 'BER ' + pi.currentBER + ' \u2192 ' + pi.targetBER : null,
       pi.ageBand     || null,
-      _wallLbl,
-      pi.existHeating || null
+      _wallLbl
     ].filter(Boolean).map(_metaSpan).join('');
     document.getElementById('rpt-meta').innerHTML = euMeta;
     if (pi.scopeSummary) {
@@ -12900,8 +12899,7 @@ function buildReport() {
       pi.county      ? 'Co. ' + pi.county                          : null,
       (pi.currentBER && pi.targetBER) ? 'BER ' + pi.currentBER + ' \u2192 ' + pi.targetBER : null,
       pi.ageBand     || null,
-      _wallLbl,
-      pi.existHeating || null
+      _wallLbl
     ].filter(Boolean).map(_metaSpan).join('');
     document.getElementById('rpt-meta').innerHTML = rfMeta;
     var existingSummary = document.getElementById('rpt-scope-summary');
