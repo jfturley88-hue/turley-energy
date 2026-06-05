@@ -9986,6 +9986,13 @@ function loadRefurbExample() {
   ck('ws-smart-ref',      true);
   ck('ws-ber-post',       true);
   ck('ws-making-good',    true);
+  // EU context fields
+  s('ref-eu-currentBER',   'E');
+  s('ref-eu-targetBER',    'B');
+  s('ref-eu-ageBand',      '1941–1977');
+  s('ref-eu-wallType',     'solid-brick');
+  s('ref-eu-existHeating', 'Oil Boiler');
+  if (typeof refEuUpdateWallOptions === 'function') refEuUpdateWallOptions();
   // Energy upgrade measures matching the spec
   ck('ref-eu-roof-ceiling', true);
   ck('ref-eu-iwi',          true);
@@ -10039,6 +10046,13 @@ function loadRefurbExample2() {
   ck('ws-smart-ref',      true);
   ck('ws-ber-post',       true);
   ck('ws-making-good',    true);
+  // EU context fields
+  s('ref-eu-currentBER',   'D');
+  s('ref-eu-targetBER',    'B');
+  s('ref-eu-ageBand',      '1983–1993');
+  s('ref-eu-wallType',     'cavity-uninsulated');
+  s('ref-eu-existHeating', 'Oil Boiler');
+  if (typeof refEuUpdateWallOptions === 'function') refEuUpdateWallOptions();
   // Energy Upgrade measures
   ck('ref-eu-roof-ceiling', true);
   ck('ref-eu-cavity',       true);
@@ -10135,18 +10149,25 @@ function loadRefurbExample2() {
 function loadEUExample1() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
-  s('t0-projName',     '12 Sycamore Drive, Naas, Co. Kildare');
-  s('t0-projType',     'Energy Upgrade');
-  s('t0-dwellingType', 'Semi-Detached');
-  s('t0-county',       'Kildare');
-  s('t0-grantScheme',  'oss');
+  s(‘t0-projName’,     ‘12 Sycamore Drive, Naas, Co. Kildare’);
+  s(‘t0-projType’,     ‘Energy Upgrade’);
+  s(‘t0-dwellingType’, ‘Semi-Detached’);
+  s(‘t0-county’,       ‘Kildare’);
+  s(‘t0-grantScheme’,  ‘oss’);
+  // EU property context
+  s(‘eu-currentBER’,   ‘D’);
+  s(‘eu-targetBER’,    ‘B’);
+  s(‘eu-ageBand’,      ‘1983–1993’);
+  s(‘eu-wallType’,     ‘cavity-uninsulated’);
+  s(‘eu-existHeating’, ‘Oil Boiler’);
+  if (window.euUpdateWallOptions) euUpdateWallOptions();
   // EU measurement panel
-  s('eu-floorArea',    '88');
-  s('eu-wallArea',     '105');
-  s('eu-roofArea',     '44');
-  s('eu-windowArea',   '18');
-  s('eu-doorCount',    '2');
-  // EU measures: D2 â†’ B2
+  s(‘eu-floorArea’,    ‘88’);
+  s(‘eu-wallArea’,     ‘105’);
+  s(‘eu-roofArea’,     ‘44’);
+  s(‘eu-windowArea’,   ‘18’);
+  s(‘eu-doorCount’,    ‘2’);
+  // EU measures: D → B
   ck('eu-roof-ceiling',       true);
   ck('eu-cavity',      true);
   ck('eu-windows',     true);
@@ -10222,18 +10243,25 @@ function loadEUExample1() {
 function loadEUExample2() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
-  s('t0-projName',     '2 Church Street, Castleblayney, Co. Monaghan');
-  s('t0-projType',     'Energy Upgrade');
-  s('t0-dwellingType', 'Detached');
-  s('t0-county',       'Monaghan');
-  s('t0-grantScheme',  'One Stop Shop â€” National Upgrade Scheme');
+  s(‘t0-projName’,     ‘2 Church Street, Castleblayney, Co. Monaghan’);
+  s(‘t0-projType’,     ‘Energy Upgrade’);
+  s(‘t0-dwellingType’, ‘Detached’);
+  s(‘t0-county’,       ‘Monaghan’);
+  s(‘t0-grantScheme’,  ‘One Stop Shop’);
+  // EU property context
+  s(‘eu-currentBER’,   ‘F’);
+  s(‘eu-targetBER’,    ‘A’);
+  s(‘eu-ageBand’,      ‘1941–1977’);
+  s(‘eu-wallType’,     ‘solid-stone’);
+  s(‘eu-existHeating’, ‘Solid Fuel Range’);
+  if (window.euUpdateWallOptions) euUpdateWallOptions();
   // EU measurement panel
-  s('eu-floorArea',    '112');
-  s('eu-wallArea',     '145');
-  s('eu-roofArea',     '60');
-  s('eu-windowArea',   '22');
-  s('eu-doorCount',    '3');
-  // EU measures: F â†’ A3 deep retrofit
+  s(‘eu-floorArea’,    ‘112’);
+  s(‘eu-wallArea’,     ‘145’);
+  s(‘eu-roofArea’,     ‘60’);
+  s(‘eu-windowArea’,   ‘22’);
+  s(‘eu-doorCount’,    ‘3’);
+  // EU measures: F → A deep retrofit
   ck('eu-roof-ceiling',       true);
   ck('eu-ewi',         true);
   ck('eu-floor',       true); // Chunk 7: was eu-floor-slab
@@ -15728,25 +15756,27 @@ function refreshGrantChips() {
     return n.toLocaleString('en-IE', { maximumFractionDigits: 0 });
   };
 
-  // Helper: write or grey out a chip element
+  // Helper: write or grey out a chip element — writes to both eu-grant-* and ref-eu-grant-* if they exist
   var writeChip = function(key, amount, disqualified, reason) {
-    var el = document.getElementById('eu-grant-' + key);
-    if (!el) return;
-    if (disqualified) {
-      el.classList.add('disqualified');
-      el.textContent = reason || 'Not grant-eligible';
-    } else if (amount > 0) {
-      el.classList.remove('disqualified');
-      var schemeLabel = scheme === 'oss' ? 'OSS' : 'Better Energy Homes';
-      el.textContent = 'Grant: up to €' + fmtEur(Math.round(amount)) + ' (' + schemeLabel + ')';
-    } else if (reason) {
-      // amount=0, not disqualified, but has a specific message (e.g. "Covered under...")
-      el.classList.remove('disqualified');
-      el.textContent = reason;
-    } else {
-      el.classList.add('disqualified');
-      el.textContent = 'Not grant-eligible';
-    }
+    ['eu-grant-' + key, 'ref-eu-grant-' + key].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (disqualified) {
+        el.classList.add('disqualified');
+        el.textContent = reason || 'Not grant-eligible';
+      } else if (amount > 0) {
+        el.classList.remove('disqualified');
+        var schemeLabel = scheme === 'oss' ? 'OSS' : 'Better Energy Homes';
+        el.textContent = 'Grant: up to €' + fmtEur(Math.round(amount)) + ' (' + schemeLabel + ')';
+      } else if (reason) {
+        // amount=0, not disqualified, but has a specific message (e.g. "Covered under...")
+        el.classList.remove('disqualified');
+        el.textContent = reason;
+      } else {
+        el.classList.add('disqualified');
+        el.textContent = 'Not grant-eligible';
+      }
+    });
   };
 
   // Apply table to every bundle
@@ -15766,7 +15796,7 @@ function refreshGrantChips() {
 
   // Special case: smart controls — grant covered by heat pump grant when HP is selected
   (function() {
-    var hpOn = ['eu-ashp','eu-gshp','eu-hybrid-hp'].some(function(id) {
+    var hpOn = ['eu-ashp','eu-gshp','eu-hybrid-hp','ref-eu-ashp','ref-eu-gshp','ref-eu-hybrid-hp'].some(function(id) {
       var el = document.getElementById(id); return el && el.checked;
     });
     if (hpOn) {
@@ -15775,9 +15805,10 @@ function refreshGrantChips() {
   })();
 
   // Special case: PV — add battery grant (€600/kWh, max €1,200) when battery selected
+  // Checks both eu-battery (Energy Upgrade mode) and ref-eu-battery (Refurb mode)
   (function() {
     var pvBase = (GRANT_TABLE['pv'] || {})[dwellingKey] || 1800;
-    var battEl = document.getElementById('eu-battery');
+    var battEl = document.getElementById('eu-battery') || document.getElementById('ref-eu-battery');
     var batt   = battEl ? battEl.value : 'no';
     var battGrant = 0;
     if (batt && batt !== 'no') {
@@ -15806,12 +15837,15 @@ function refreshGrantChips() {
   }
   writeChip('anc-airtest', 0, true, 'No standalone SEAI grant');
 
-  // Auto-tick air pressure test when MVHR is selected
+  // Auto-tick air pressure test when MVHR is selected (either mode)
   (function() {
-    var mvhrOn = (document.getElementById('eu-mvhr') || {}).checked;
-    var airTestEl = document.getElementById('eu-anc-airtest');
-    if (airTestEl && mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = true;
-    if (airTestEl && !mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = false;
+    var mvhrOn = (document.getElementById('eu-mvhr') || {}).checked ||
+                 (document.getElementById('ref-eu-mvhr') || {}).checked;
+    ['eu-anc-airtest','ref-eu-anc-airtest'].forEach(function(id) {
+      var airTestEl = document.getElementById(id);
+      if (airTestEl && mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = true;
+      if (airTestEl && !mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = false;
+    });
   })();
 
   // Auto-suggest consumer unit ways from dedicated circuits required
