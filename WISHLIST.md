@@ -19,3 +19,17 @@ The current works selector shows generic roof strip-out and fit-out items. For V
 Rationale: roof works in a refurb are rarely a standard menu — filtering by roof type (pitched/flat) would still miss edge cases. Better to let the assessor pick specific interventions explicitly.
 
 ---
+
+## Energy Upgrade — BER-Driven Scope Validation
+
+### Current/Target BER gap → flag whether selected measures are sufficient
+Currently the Current BER and Target BER fields are report context only (they appear in the report header and are passed to the AI prompt). For V2, use the gap between current and target to:
+
+- Estimate the BER improvement each selected measure is likely to deliver (kWh/m²/yr reduction using DEAP lookup tables)
+- Sum the estimated improvement across all ticked measures
+- Flag if the total estimated improvement falls short of bridging the gap to the target rating
+- Show a "likely BER outcome" indicator in the works selector (e.g. "estimated outcome: C — target is B, add further measures")
+
+Rationale: a QS preparing a preliminary cost plan needs to know whether the scope they've priced is actually sufficient to hit the BER target the client needs (e.g. B2 for mortgage drawdown, A for SEAI grant top-up eligibility). This turns the tool from a cost estimator into a scope-adequacy checker as well.
+
+---

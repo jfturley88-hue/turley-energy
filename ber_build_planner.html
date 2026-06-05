@@ -2462,6 +2462,54 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
           <button onclick="switchTab(1)" style="background:rgba(46,61,82,0.7);border:1px solid #3d5268;color:#c8d0dc;font-size:11px;font-weight:600;padding:5px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.03em;">&#8593; Enter measurements &#8594;</button>
         </div>
 
+        <!-- BER + Age Band context strip -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;padding:8px 10px;background:rgba(46,61,82,0.4);border-radius:5px;border:1px solid rgba(45,122,79,0.2);">
+          <div class="tab-field">
+            <label>Current BER</label>
+            <select id="ref-eu-currentBER">
+              <option value="">&#8212;</option>
+              <option value="G">G</option>
+              <option value="F">F</option>
+              <option value="E">E</option>
+              <option value="D">D</option>
+              <option value="C">C</option>
+              <option value="B">B</option>
+              <option value="A">A</option>
+              <option value="A0">A0</option>
+            </select>
+          </div>
+          <div class="tab-field">
+            <label>Target BER</label>
+            <select id="ref-eu-targetBER">
+              <option value="">&#8212;</option>
+              <option value="A0">A0</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+          <div class="tab-field">
+            <label>Age Band</label>
+            <select id="ref-eu-ageBand">
+              <option value="">&#8212;</option>
+              <option value="Pre 1940">Pre 1940</option>
+              <option value="1941&#8211;1977">1941&#8211;77</option>
+              <option value="1978&#8211;1982">1978&#8211;82</option>
+              <option value="1983&#8211;1993">1983&#8211;93</option>
+              <option value="1994&#8211;1999">1994&#8211;99</option>
+              <option value="2000&#8211;2004">2000&#8211;04</option>
+              <option value="2005&#8211;2010">2005&#8211;10</option>
+              <option value="2011&#8211;2019">2011&#8211;19</option>
+              <option value="2020 onwards">2020+</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#8FA0B8;margin-bottom:10px;margin-top:-2px;">New Irish/European BER scale effective 24 May 2026 &mdash; old D1/D2 &asymp; D &nbsp;&middot;&nbsp; B1&#8211;B3 &asymp; B &nbsp;&middot;&nbsp; A1/A2 &asymp; A &nbsp;&middot;&nbsp; A3 &asymp; A0</div>
+
         <!-- INSULATION -->
         <div class="ws-group">
           <button type="button" class="ws-group-toggle"
@@ -2600,6 +2648,23 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
             <!-- /BUNDLE -->
             <div class="ws-subgroup-heading">Walls</div>
+            <!-- Wall type context — filters options below and wires into costing -->
+            <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
+              <div class="tab-field">
+                <label>Wall Construction Type</label>
+                <select id="ref-eu-wallType" onchange="refEuUpdateWallOptions()">
+                  <option value="">&#8212; select to filter options &#8212;</option>
+                  <option value="cavity-uninsulated">Cavity &#8212; uninsulated (most pre-1990)</option>
+                  <option value="cavity-partial">Cavity &#8212; partial fill</option>
+                  <option value="cavity-full-insu">Cavity &#8212; fully insulated</option>
+                  <option value="solid-stone">Solid stone masonry</option>
+                  <option value="solid-brick">Solid brick masonry</option>
+                  <option value="solid-concrete">Solid concrete block</option>
+                  <option value="timber-frame">Timber frame</option>
+                </select>
+                <div style="font-size:10px;color:#8FA0B8;margin-top:2px;">Disables inapplicable insulation options &amp; feeds into EWI/IWI costing</div>
+              </div>
+            </div>
             <!-- BUNDLE: cavity -->
             <div class="ws-item" id="ref-eu-bundle-cavity">
               <input type="checkbox" id="ref-eu-cavity" onchange="refUpdateBundleSub('cavity')"/>
@@ -2886,6 +2951,24 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             &#128293; Heating <span>&#9654;</span>
           </button>
           <div class="ws-group-body">
+            <!-- Existing heating context — drives decommission pricing -->
+            <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
+              <div class="tab-field">
+                <label>Existing Heating System</label>
+                <select id="ref-eu-existHeating">
+                  <option value="">&#8212; select &#8212;</option>
+                  <option value="Oil Boiler">Oil Boiler</option>
+                  <option value="Gas Boiler">Gas Boiler</option>
+                  <option value="LPG Boiler">LPG Boiler</option>
+                  <option value="Solid Fuel Range">Solid Fuel Range / Stove</option>
+                  <option value="Back Boiler">Back Boiler</option>
+                  <option value="Storage Heaters">Electric Storage Heaters</option>
+                  <option value="Direct Electric">Direct Electric Heating</option>
+                  <option value="Heat Pump">Existing Heat Pump</option>
+                </select>
+                <div style="font-size:10px;color:#8FA0B8;margin-top:2px;">Used to price decommission of the replaced system in the BOQ</div>
+              </div>
+            </div>
             <!-- BUNDLE: ashp -->
             <div class="ws-item" id="ref-eu-bundle-ashp">
               <input type="checkbox" id="ref-eu-ashp" onchange="refUpdateBundleSub('ashp')"/>
@@ -3651,87 +3734,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     <!-- ─── ENERGY UPGRADE: MODE FIELDS ──────────────────────────────────── -->
     <div class="mode-fields" id="mode-fields-upgrade">
 
-      <!-- ── EU PROPERTY INFO PANEL ── -->
-      <div style="margin-bottom:16px;padding:14px 16px;background:#1E2D42;border-radius:8px;border:1px solid rgba(45,122,79,0.35);">
-        <div style="font-size:11px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">&#9889; Energy Upgrade &#8212; Property Information</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="tab-field">
-            <label>Current BER Rating</label>
-            <select id="eu-currentBER">
-              <option value="">&#8212; Select &#8212;</option>
-              <option value="G">G &#8212; Extremely Poor</option>
-              <option value="F">F &#8212; Very Poor</option>
-              <option value="E">E &#8212; Poor</option>
-              <option value="D">D &#8212; Below Average</option>
-              <option value="C">C &#8212; Moderate</option>
-              <option value="B">B &#8212; Energy Efficient</option>
-              <option value="A">A &#8212; Very Energy Efficient</option>
-              <option value="A0">A0 &#8212; Near Zero Energy</option>
-            </select>
-          </div>
-          <div class="tab-field">
-            <label>Target BER Rating</label>
-            <select id="eu-targetBER">
-              <option value="">&#8212; Select &#8212;</option>
-              <option value="A0">A0 &#8212; Near Zero Energy</option>
-              <option value="A">A &#8212; Very Energy Efficient</option>
-              <option value="B">B &#8212; Energy Efficient</option>
-              <option value="C">C &#8212; Moderate</option>
-              <option value="D">D &#8212; Below Average</option>
-              <option value="E">E &#8212; Poor</option>
-              <option value="F">F &#8212; Very Poor</option>
-              <option value="G">G &#8212; Extremely Poor</option>
-            </select>
-          </div>
-          <div class="tab-field">
-            <label>Construction Age Band</label>
-            <select id="eu-ageBand">
-              <option value="">&#8212; Select &#8212;</option>
-              <option value="Pre 1940">Pre 1940</option>
-              <option value="1941&#8211;1977">1941&#8211;1977</option>
-              <option value="1978&#8211;1982">1978&#8211;1982</option>
-              <option value="1983&#8211;1993">1983&#8211;1993</option>
-              <option value="1994&#8211;1999">1994&#8211;1999</option>
-              <option value="2000&#8211;2004">2000&#8211;2004</option>
-              <option value="2005&#8211;2010">2005&#8211;2010</option>
-              <option value="2011&#8211;2019">2011&#8211;2019</option>
-              <option value="2020 onwards">2020 onwards</option>
-            </select>
-          </div>
-          <div class="tab-field">
-            <label>Existing Heating System</label>
-            <select id="eu-existHeating">
-              <option value="">&#8212; Select &#8212;</option>
-              <option value="Oil Boiler">Oil Boiler</option>
-              <option value="Gas Boiler">Gas Boiler</option>
-              <option value="LPG Boiler">LPG Boiler</option>
-              <option value="Solid Fuel Range">Solid Fuel Range / Stove</option>
-              <option value="Back Boiler">Back Boiler</option>
-              <option value="Storage Heaters">Electric Storage Heaters</option>
-              <option value="Direct Electric">Direct Electric Heating</option>
-              <option value="Heat Pump">Existing Heat Pump</option>
-              <option value="District Heating">District / Communal Heating</option>
-            </select>
-          </div>
-          <div class="tab-field" style="grid-column:1/-1;">
-            <label>Wall Construction</label>
-            <select id="eu-wallType" onchange="if(window.euUpdateWallOptions)euUpdateWallOptions();">
-              <option value="">&#8212; Select &#8212;</option>
-              <option value="cavity-uninsulated">Cavity Wall &#8212; uninsulated</option>
-              <option value="cavity-partial">Cavity Wall &#8212; partial fill</option>
-              <option value="cavity-full-insu">Cavity Wall &#8212; fully insulated</option>
-              <option value="solid-stone">Solid Stone Masonry</option>
-              <option value="solid-brick">Solid Brick Masonry</option>
-              <option value="solid-concrete">Solid Concrete Block</option>
-              <option value="timber-frame">Timber Frame</option>
-            </select>
-          </div>
-        </div>
-        <div style="margin-top:8px;font-size:10px;color:#8FA0B8;line-height:1.5;">
-          &#9432; BER ratings use the new Irish / European scale effective 24 May 2026. Old scale approximations: D1 / D2 &#8594; D &nbsp;&#183;&nbsp; B1 / B2 / B3 &#8594; B &nbsp;&#183;&nbsp; A1 / A2 &#8594; A &nbsp;&#183;&nbsp; A3 &#8594; A0.
-        </div>
-      </div>
-
 <div id="eu-works-shared">
       <!-- Indicative rates banner (Chunk 6) -->
       <div style="margin:0 0 16px 0;padding:12px 14px;background:rgba(232,160,32,0.07);border-left:3px solid #E8A020;border-radius:6px;font-size:11px;color:#c8d0dc;line-height:1.5;">
@@ -3753,6 +3755,54 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         <div style="text-align:right;margin-bottom:10px;">
           <button onclick="switchTab(1)" style="background:rgba(46,61,82,0.7);border:1px solid #3d5268;color:#c8d0dc;font-size:11px;font-weight:600;padding:5px 12px;border-radius:4px;cursor:pointer;letter-spacing:0.03em;">&#8593; Enter measurements &#8594;</button>
         </div>
+
+        <!-- BER + Age Band context strip -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;padding:8px 10px;background:rgba(46,61,82,0.4);border-radius:5px;border:1px solid rgba(45,122,79,0.2);">
+          <div class="tab-field">
+            <label>Current BER</label>
+            <select id="eu-currentBER">
+              <option value="">&#8212;</option>
+              <option value="G">G</option>
+              <option value="F">F</option>
+              <option value="E">E</option>
+              <option value="D">D</option>
+              <option value="C">C</option>
+              <option value="B">B</option>
+              <option value="A">A</option>
+              <option value="A0">A0</option>
+            </select>
+          </div>
+          <div class="tab-field">
+            <label>Target BER</label>
+            <select id="eu-targetBER">
+              <option value="">&#8212;</option>
+              <option value="A0">A0</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+          <div class="tab-field">
+            <label>Age Band</label>
+            <select id="eu-ageBand">
+              <option value="">&#8212;</option>
+              <option value="Pre 1940">Pre 1940</option>
+              <option value="1941&#8211;1977">1941&#8211;77</option>
+              <option value="1978&#8211;1982">1978&#8211;82</option>
+              <option value="1983&#8211;1993">1983&#8211;93</option>
+              <option value="1994&#8211;1999">1994&#8211;99</option>
+              <option value="2000&#8211;2004">2000&#8211;04</option>
+              <option value="2005&#8211;2010">2005&#8211;10</option>
+              <option value="2011&#8211;2019">2011&#8211;19</option>
+              <option value="2020 onwards">2020+</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#8FA0B8;margin-bottom:10px;margin-top:-2px;">New Irish/European BER scale effective 24 May 2026 &mdash; old D1/D2 &asymp; D &nbsp;&middot;&nbsp; B1&#8211;B3 &asymp; B &nbsp;&middot;&nbsp; A1/A2 &asymp; A &nbsp;&middot;&nbsp; A3 &asymp; A0</div>
 
         <!-- INSULATION -->
         <div class="ws-group">
@@ -3892,6 +3942,23 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
             <!-- /BUNDLE -->
             <div class="ws-subgroup-heading">Walls</div>
+            <!-- Wall type context — filters options below and wires into costing -->
+            <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
+              <div class="tab-field">
+                <label>Wall Construction Type</label>
+                <select id="eu-wallType" onchange="euUpdateWallOptions()">
+                  <option value="">&#8212; select to filter options &#8212;</option>
+                  <option value="cavity-uninsulated">Cavity &#8212; uninsulated (most pre-1990)</option>
+                  <option value="cavity-partial">Cavity &#8212; partial fill</option>
+                  <option value="cavity-full-insu">Cavity &#8212; fully insulated</option>
+                  <option value="solid-stone">Solid stone masonry</option>
+                  <option value="solid-brick">Solid brick masonry</option>
+                  <option value="solid-concrete">Solid concrete block</option>
+                  <option value="timber-frame">Timber frame</option>
+                </select>
+                <div style="font-size:10px;color:#8FA0B8;margin-top:2px;">Disables inapplicable insulation options &amp; feeds into EWI/IWI costing</div>
+              </div>
+            </div>
             <!-- BUNDLE: cavity -->
             <div class="ws-item" id="eu-bundle-cavity">
               <input type="checkbox" id="eu-cavity" onchange="updateBundleSub('cavity')"/>
@@ -4178,6 +4245,24 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             &#128293; Heating <span>&#9654;</span>
           </button>
           <div class="ws-group-body">
+            <!-- Existing heating context — drives decommission pricing -->
+            <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
+              <div class="tab-field">
+                <label>Existing Heating System</label>
+                <select id="eu-existHeating">
+                  <option value="">&#8212; select &#8212;</option>
+                  <option value="Oil Boiler">Oil Boiler</option>
+                  <option value="Gas Boiler">Gas Boiler</option>
+                  <option value="LPG Boiler">LPG Boiler</option>
+                  <option value="Solid Fuel Range">Solid Fuel Range / Stove</option>
+                  <option value="Back Boiler">Back Boiler</option>
+                  <option value="Storage Heaters">Electric Storage Heaters</option>
+                  <option value="Direct Electric">Direct Electric Heating</option>
+                  <option value="Heat Pump">Existing Heat Pump</option>
+                </select>
+                <div style="font-size:10px;color:#8FA0B8;margin-top:2px;">Used to price decommission of the replaced system in the BOQ</div>
+              </div>
+            </div>
             <!-- BUNDLE: ashp -->
             <div class="ws-item" id="eu-bundle-ashp">
               <input type="checkbox" id="eu-ashp" onchange="updateBundleSub('ashp')"/>
@@ -11366,10 +11451,11 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       roof_room_makegood:    inputs.eu_roof_room_makegood !== false,
       windowArea:   winAEU,
       doorCount:    inputs.doorCount || inputs.door_count || 2,
-      existWallType: inputs.eu_ewi ? 'Solid Masonry — uninsulated' : 'Cavity Wall — uninsulated',
+      existWallType: inputs.eu_wallType || (inputs.eu_ewi ? 'Solid Masonry — uninsulated' : 'Cavity Wall — uninsulated'),
+      existHeating: inputs.eu_existingHeating || 'Oil Boiler',
       newHeating:   inputs.eu_ashp ? 'ASHP' : inputs.gshp ? 'GSHP' : inputs.eu_boiler ? (inputs.eu_boiler_fuel || 'Gas Boiler') : 'none',
       boilerCombi:  inputs.eu_boiler_combi || 'system',
-      ashpRemove:   inputs.eu_remove_heat || 'oil',
+      ashpRemove:   inputs.eu_remove_heat || inputs.eu_existingHeating || 'oil',
       airAirZones:  inputs.eu_air_air_zones || 1,
       airAirTier:   inputs.eu_air_air_tier || 'standard',
       biomassStore: inputs.eu_biomass_store || 'integrated',
@@ -12031,6 +12117,11 @@ function readRefurbSelector(prefix) {
     eu_windows:       document.getElementById('ref-eu-windows')?.checked || false,
     eu_doors:         document.getElementById('ref-eu-doors')?.checked || false,
     eu_airtight:      document.getElementById('ref-eu-airtight')?.checked || false,
+    eu_wallType:      document.getElementById('ref-eu-wallType')?.value || '',
+    eu_existingHeating: document.getElementById('ref-eu-existHeating')?.value || '',
+    eu_ageBand:       document.getElementById('ref-eu-ageBand')?.value || '',
+    eu_currentBER:    document.getElementById('ref-eu-currentBER')?.value || '',
+    eu_targetBER:     document.getElementById('ref-eu-targetBER')?.value || '',
     windowArea:       winA,
     doorCount:        doors,
     // Strip-out expanded
@@ -12387,6 +12478,31 @@ function euUpdateWallOptions() {
   }
 }
 
+function refEuUpdateWallOptions() {
+  const wt       = document.getElementById('ref-eu-wallType')?.value || '';
+  const cavityEl = document.getElementById('ref-eu-cavity');
+  const ewiEl    = document.getElementById('ref-eu-ewi');
+  const iwiEl    = document.getElementById('ref-eu-iwi');
+  const isSolid  = wt.startsWith('solid');
+  const isTimber = wt.startsWith('timber');
+  const isFull   = wt.endsWith('full') || wt.endsWith('insu');
+  if (cavityEl) {
+    cavityEl.disabled = isSolid || isTimber || isFull;
+    const p = cavityEl.closest('.ws-item');
+    if (p) p.style.opacity = (isSolid || isTimber || isFull) ? '0.4' : '1';
+  }
+  if (ewiEl) {
+    ewiEl.disabled = isFull;
+    const p = ewiEl.closest('.ws-item');
+    if (p) p.style.opacity = isFull ? '0.4' : '1';
+  }
+  if (iwiEl) {
+    iwiEl.disabled = isFull;
+    const p = iwiEl.closest('.ws-item');
+    if (p) p.style.opacity = isFull ? '0.4' : '1';
+  }
+}
+
 async function generate() {
   try {
   const mode     = document.getElementById('t0-projType')?.value || 'New Build';
@@ -12440,6 +12556,9 @@ async function generate() {
     ]);
     var _rfAo = (typeof readAdvancedOptions === 'function') ? readAdvancedOptions('Refurbishment') : null;
     BOQ = buildBOQRefurbSelector(refInputs, projName || 'Refurbishment Project', county, dwelling, scheme, _rfAo);
+    BOQ.projectInfo.currentBER = document.getElementById('ref-eu-currentBER')?.value || '';
+    BOQ.projectInfo.targetBER  = document.getElementById('ref-eu-targetBER')?.value  || '';
+    BOQ.projectInfo.ageBand    = document.getElementById('ref-eu-ageBand')?.value    || '';
 
     // Build and append extension BOQs
     const extensions = readExtensions();
