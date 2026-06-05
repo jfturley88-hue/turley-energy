@@ -12584,9 +12584,11 @@ async function generate() {
     ]);
     var _rfAo = (typeof readAdvancedOptions === 'function') ? readAdvancedOptions('Refurbishment') : null;
     BOQ = buildBOQRefurbSelector(refInputs, projName || 'Refurbishment Project', county, dwelling, scheme, _rfAo);
-    BOQ.projectInfo.currentBER = document.getElementById('ref-eu-currentBER')?.value || '';
-    BOQ.projectInfo.targetBER  = document.getElementById('ref-eu-targetBER')?.value  || '';
-    BOQ.projectInfo.ageBand    = document.getElementById('ref-eu-ageBand')?.value    || '';
+    BOQ.projectInfo.currentBER    = document.getElementById('ref-eu-currentBER')?.value    || '';
+    BOQ.projectInfo.targetBER     = document.getElementById('ref-eu-targetBER')?.value     || '';
+    BOQ.projectInfo.ageBand       = document.getElementById('ref-eu-ageBand')?.value       || '';
+    BOQ.projectInfo.existWallType = document.getElementById('ref-eu-wallType')?.value      || '';
+    BOQ.projectInfo.existHeating  = document.getElementById('ref-eu-existHeating')?.value  || '';
 
     // Build and append extension BOQs
     const extensions = readExtensions();
@@ -12678,10 +12680,12 @@ async function generate() {
     ]);
     var _ao11 = (typeof readAdvancedOptions === 'function') ? readAdvancedOptions('Energy Upgrade') : null;
     BOQ = buildBOQRetrofit(euInputs, projName || 'Energy Upgrade Project', county, dwelling, scheme, undefined, _ao11);
-    BOQ.projectInfo.type       = 'Energy Upgrade';
-    BOQ.projectInfo.currentBER = document.getElementById('eu-currentBER')?.value || '';
-    BOQ.projectInfo.targetBER  = document.getElementById('eu-targetBER')?.value  || '';
-    BOQ.projectInfo.ageBand    = document.getElementById('eu-ageBand')?.value    || '';
+    BOQ.projectInfo.type          = 'Energy Upgrade';
+    BOQ.projectInfo.currentBER    = document.getElementById('eu-currentBER')?.value    || '';
+    BOQ.projectInfo.targetBER     = document.getElementById('eu-targetBER')?.value     || '';
+    BOQ.projectInfo.ageBand       = document.getElementById('eu-ageBand')?.value       || '';
+    BOQ.projectInfo.existWallType = document.getElementById('eu-wallType')?.value      || '';
+    BOQ.projectInfo.existHeating  = document.getElementById('eu-existHeating')?.value  || '';
 
     // Vacant Property Refurbishment Grant (stackable with SEAI grants)
     var _vpGEl2 = document.getElementById('t0-vpGrant');
@@ -12854,8 +12858,27 @@ function buildReport() {
     rptClient.textContent = parts.join(' \u00b7 ');
     rptClient.style.display = parts.length ? '' : 'none';
   })();
+  var _wallLbls = {
+    'cavity-uninsulated': 'Cavity wall',
+    'cavity-partial':     'Cavity wall (part-fill)',
+    'cavity-full-insu':   'Cavity wall (full fill)',
+    'solid-stone':        'Solid stone',
+    'solid-brick':        'Solid brick',
+    'solid-concrete':     'Solid concrete',
+    'timber-frame':       'Timber frame'
+  };
+  var _wallLbl = _wallLbls[pi.existWallType] || pi.existWallType || null;
+  var _metaSpan = function(x) { return '<span>' + x + '</span>'; };
   if (pi.type === 'Energy Upgrade') {
-    var euMeta = ['Energy Upgrade', pi.county?'Co. '+pi.county:null, pi.floorArea?pi.floorArea+'m\u00b2':null, (pi.currentBER&&pi.targetBER)?'BER '+pi.currentBER+' \u2192 '+pi.targetBER:null, pi.ageBand||null].filter(Boolean).map(function(x){return '<span>'+x+'</span>';}).join('');
+    var euMeta = [
+      'Energy Upgrade',
+      pi.county      ? 'Co. ' + pi.county                          : null,
+      pi.floorArea   ? pi.floorArea + 'm\u00b2'                    : null,
+      (pi.currentBER && pi.targetBER) ? 'BER ' + pi.currentBER + ' \u2192 ' + pi.targetBER : null,
+      pi.ageBand     || null,
+      _wallLbl,
+      pi.existHeating || null
+    ].filter(Boolean).map(_metaSpan).join('');
     document.getElementById('rpt-meta').innerHTML = euMeta;
     if (pi.scopeSummary) {
       var nameEl = document.getElementById('rpt-name');
@@ -12871,7 +12894,16 @@ function buildReport() {
       }
     }
   } else {
-    document.getElementById('rpt-meta').innerHTML = [pi.type, pi.floorArea?pi.floorArea+' m\u00b2':null, pi.county?'Co. '+pi.county:null].filter(Boolean).map(function(x){return '<span>'+x+'</span>';}).join('');
+    var rfMeta = [
+      pi.type,
+      pi.floorArea   ? pi.floorArea + ' m\u00b2'                  : null,
+      pi.county      ? 'Co. ' + pi.county                          : null,
+      (pi.currentBER && pi.targetBER) ? 'BER ' + pi.currentBER + ' \u2192 ' + pi.targetBER : null,
+      pi.ageBand     || null,
+      _wallLbl,
+      pi.existHeating || null
+    ].filter(Boolean).map(_metaSpan).join('');
+    document.getElementById('rpt-meta').innerHTML = rfMeta;
     var existingSummary = document.getElementById('rpt-scope-summary');
     if (existingSummary) existingSummary.remove();
   }
