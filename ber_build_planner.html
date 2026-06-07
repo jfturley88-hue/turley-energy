@@ -5832,6 +5832,9 @@ function getMaterialsFromUI() {
     floorTimber:  v('mat-floor-timber', 32),
     ufh:          v('mat-ufh',          30),
     rooflight:    v('mat-rooflight',    620),
+    // Plastering & finishes (material supply €/m²) — used by New Build internal finishes
+    screed:       v('mat-screed',       8.5),
+    plasterboard: v('mat-plasterboard', 5.5),
     spec:             getBuildSpecRates(),   // New Build element rates (Build Spec tab)
   };
 }
@@ -6371,12 +6374,12 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const intDoorMat = d.intDoorSpec === 'premium' ? SR.intdoor_premium : d.intDoorSpec === 'mid' ? SR.intdoor_mid : SR.intdoor_standard;
   const ifId = String(sid++);
   sections.push({ id: ifId, title: 'INTERNAL FINISHES', items: [
-    { ref:`${ifId}.1`, description:'Sand/cement screed to ground floor (65mm)', unit:'m²', quantity:sceedArea, matRate:12, labRate:lM(0.52, L.craft), note:`Ground floor area ${sceedArea}m² · Craft 0.52hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
+    { ref:`${ifId}.1`, description:'Sand/cement screed to ground floor (65mm)', unit:'m²', quantity:sceedArea, matRate:mat.screed, labRate:lM(0.52, L.craft), note:`Ground floor area ${sceedArea}m² · Craft 0.52hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
     { ref:`${ifId}.2`, description:'Floor tiling to kitchen, utility & bathrooms', unit:'m²', quantity:tileBathArea, matRate:Math.round(28*floorTileFactor), labRate:lM(0.6, L.craft), note:'Estimated tile areas in wet/utility rooms · Craft 0.6hr/m² × €44/hr', status:'assumed', deapSource:'derived' },
     ...(d.floorSpec !== 'screed-only' ? [    { ref:`${ifId}.3`, description:'Timber/laminate flooring to living & bedroom areas', unit:'m²', quantity:timberFlrArea, matRate:Math.round(32*floorTimberFactor), labRate:lM(0.58, L.catB), note:`~55% of total floor area (${timberFlrArea}m²) · Cat B 0.58hr/m² × €35/hr`, status:'assumed', deapSource:'derived' }] : []),
     { ref:`${ifId}.4`, description:dryLinMat > 0 ? 'Skim coat plaster finish to dry-lined walls (tape, joint fill & skim)' : 'Internal wall plaster (sand/cement base coat + skim finish)', unit:'m²', quantity:d.wallArea, matRate:dryLinMat > 0 ? 3 : 6, labRate:dryLinMat > 0 ? lM(0.28, L.craft) : lM(0.72, L.craft), note:dryLinMat > 0 ? `Net wall area ${d.wallArea}m² — skim coat over dry lining · Craft 0.28hr/m² × €44/hr` : `Net wall area ${d.wallArea}m² · Craft 0.72hr/m² × €44/hr`, status:'ok', deapSource:'DEAP wall area' },
     { ref:`${ifId}.5`, description:'Wet room wall tiling (bathrooms & en-suites)', unit:'m²', quantity:wetTilingArea, matRate:22, labRate:lM(0.92, L.craft), note:`${d.bathrooms+d.ensuites} wet rooms × 12m² = ${wetTilingArea}m² · Craft 0.92hr/m² × €44/hr`, status:'assumed', deapSource:'derived' },
-    { ref:`${ifId}.6`, description:'Plasterboard ceiling (taped & skimmed)', unit:'m²', quantity:ceilingArea, matRate:11, labRate:lM(1.05, L.craft), note:`Total ceiling area ${ceilingArea}m² · Craft 1.05hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
+    { ref:`${ifId}.6`, description:'Plasterboard ceiling (taped & skimmed)', unit:'m²', quantity:ceilingArea, matRate:mat.plasterboard, labRate:lM(1.05, L.craft), note:`Total ceiling area ${ceilingArea}m² · Craft 1.05hr/m² × €44/hr`, status:'ok', deapSource:'DEAP floor area' },
     { ref:`${ifId}.7`, description:'Stud partitions incl. plasterboard both faces', unit:'lm', quantity:partitionLm, matRate:d.partitionSpec==='blockwork'?SR.part_blockwork:d.partitionSpec==='metal-stud'?SR.part_metal:d.partitionSpec==='mixed'?SR.part_mixed:SR.part_timber, labRate:d.partitionSpec==='blockwork'?lM(1.6, L.craft):d.partitionSpec==='metal-stud'?lM(1.1, L.craft):d.partitionSpec==='mixed'?lM(1.35, L.craft):lM(1.32, L.craft), note:`${d.roomCount} rooms × 3.5lm = ${partitionLm}lm · ${d.partitionSpec||'timber-stud'} spec`, status:'assumed', deapSource:'derived' },
     { ref:`${ifId}.8`, description:'Skirting boards', unit:'lm', quantity:skirtingLm, matRate:d.skirtingSpec==='hardwood'?SR.skirt_hardwood:d.skirtingSpec==='softwood'?SR.skirt_softwood:SR.skirt_mdf, labRate:lM(0.35, L.craft), note:`√(${d.floorArea}) × 4 × 1.2 × ${d.storeys} storeys · ${d.skirtingSpec||'mdf'} spec · Craft 0.35hr/lm × €44/hr`, status:'assumed', deapSource:'derived' },
     { ref:`${ifId}.9`, description:'Internal door sets (door, frame, ironmongery)', unit:'nr', quantity:internalDoors, matRate:intDoorMat, labRate:lM(4.5, L.craft), note:`${d.roomCount} rooms + 1 = ${internalDoors} · Craft 4.5hr/nr × €44/hr`, status:'assumed', deapSource:'derived' },
@@ -7518,7 +7521,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   if (!ao || ao.includePrelimSection !== false) {
     const prelimItems = [
       mkItem('P.1','Protection of existing works & contents','item',1,600,lM(6,L.catB),'Dust sheets, boards, coverings'),
-      mkItem('P.2','Site insurance allowance','wks',8,0,450,'8-week programme'),
+      (function(){ var _wks=Math.max(6,Math.round(fa/15)); return mkItem('P.2','Site insurance allowance','wks',_wks,0,450,_wks+'-week programme — scaled to '+fa+'m² floor area'); })(),
     ];
     sections.push({id:String(sid++),title:'PRELIMINARIES',part:'A',items:prelimItems});
   }
@@ -8142,7 +8145,7 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
       mkItem('ST.1','Evacuated tube solar collectors \u2014 south-facing roof','m\u00b2',solarThermalArea,380,lM(1.5,L.craft),'Roof-mounted on angled brackets \u2014 SEAI approved system'),
       ...(stCyl === 'twin-coil' ? [mkItem('ST.2','Twin-coil solar thermal cylinder (300L)','nr',1,1450,lM(10,L.plumber),'Dedicated solar coil + backup immersion coil')] : [mkItem('ST.2','Connect to existing cylinder \u2014 solar coil adaptation','item',1,220,lM(4,L.plumber),'Pipe connections & thermostat \u2014 retain existing cylinder')]),
       mkItem('ST.3','Solar pump station & differential controller','nr',1,680,lM(6,L.plumber),'Grundfos Solar or Resol DeltaSol controller'),
-      mkItem('ST.4','Glycol pipework \u2014 flow & return (22mm copper, foam lagged)','m',18,12,lM(0.5,L.plumber),'25mm armaflex insulation throughout'),
+      mkItem('ST.4','Glycol pipework \u2014 flow & return (22mm copper, foam lagged)','m',Math.max(12,Math.round(Math.sqrt(fa)*1.8)),12,lM(0.5,L.plumber),'25mm armaflex insulation throughout \u2014 collector-to-cylinder run scaled to dwelling size'),
       mkItem('ST.5','Commissioning & SEAI grant registration','item',1,0,360,'SEAI registered solar thermal installer \u2014 sign-off'),
     ];
     sections.push({id:String(sid++), title:'SOLAR THERMAL \u2014 HOT WATER SYSTEM', part:'B', items:stItems});
