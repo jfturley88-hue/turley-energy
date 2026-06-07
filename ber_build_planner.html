@@ -10580,7 +10580,10 @@ function nbAutoFill() {
   sv('t6-sockets',       fa / 3.5);                        // ~1 per 3.5m²
   sv('t6-detectors',     Math.max(4, Math.round(N * 0.8)));// ~0.8 per room (TGD Part B)
   sv('t6-coAlarms',      Math.max(1, Math.ceil(fa / 60))); // ~1 per floor
-  sv('t8-pvArea',        Math.min(20, Math.round(ra * 0.35))); // ~35% of roof, max 20m²
+  // PV: floor-area-led sizing (0.05m²/m² floor ≈ 1kWp/20m²), cross-checked at 30% roof; cap 8–15m²
+  var pvByFloor = Math.round(fa * 0.05);
+  var pvByRoof  = ra > 0 ? Math.round(ra * 0.30) : pvByFloor;
+  sv('t8-pvArea', Math.max(8, Math.min(Math.min(pvByFloor, pvByRoof), 15)));
 }
 
 function setItemVisibility(itemContainerId, parentCheckIds) {
@@ -10789,13 +10792,12 @@ function applyEUSelectorFromMeasures(parsed) {
 async function runEnergyUpgradeGenerate(projName, county, dwelling, grantScheme) {
   var n = function(id) { return parseFloat(document.getElementById(id) && document.getElementById(id).value) || 0; };
   var v = function(id) { var el = document.getElementById(id); return el ? el.value : ''; };
-  var fa      = n('eu-floorArea')   || 100;
-  var wa      = n('eu-wallArea')    || Math.round(fa * 1.5);
-  var ra      = n('eu-roofArea')    || Math.round(fa * 0.55);
-  var gfa     = n('eu-groundFloor') || Math.round(fa * 0.5);
-  var winA    = n('eu-windowArea')  || Math.round(fa * 0.15);
-  var doorsEl = document.getElementById('eu-doorCount');
-  var doors   = doorsEl ? (parseInt(doorsEl.value) || 2) : 2;
+  var fa   = (typeof getCurrentFloorAreaSum       === 'function' ? getCurrentFloorAreaSum()       : 0) || 100;
+  var wa   = (typeof getCurrentWallAreaSum        === 'function' ? getCurrentWallAreaSum()        : 0) || Math.round(fa * 1.5);
+  var ra   = (typeof getCurrentRoofAreaSum        === 'function' ? getCurrentRoofAreaSum()        : 0) || Math.round(fa * 0.55);
+  var gfa  = (typeof getCurrentGroundFloorAreaSum === 'function' ? getCurrentGroundFloorAreaSum() : 0) || Math.round(fa * 0.5);
+  var winA = (typeof getCurrentWindowAreaSum      === 'function' ? getCurrentWindowAreaSum()      : 0) || Math.round(fa * 0.15);
+  var doors = parseFloat(document.getElementById('t4-doorCount')?.value) || 2;
   var wallType  = v('eu-wallType')    || 'Cavity Wall \u2014 uninsulated';
   var existHeat = v('eu-existHeating')|| 'Oil Boiler';
   var ageBand   = v('eu-ageBand')    || '1978\u20131982';
@@ -15725,26 +15727,45 @@ function autofillBundleAreas() {
     if (refHpwhEl && refHpwhEl.dataset.userEdited !== 'true') refHpwhEl.value = hpwhSz;
   }
 
-  // Auto-suggest PV array area and solar thermal collector area from Tab 3 roof area
-  var ra = parseFloat((document.getElementById('t3-roofArea') || {}).value) || 0;
-  if (ra > 0) {
-    // PV: up to ~40% of roof area, max 20m² (practical Irish retrofit limit)
+  // Auto-suggest PV array area and solar thermal collector area from geometry
+  var ra  = (typeof getCurrentRoofAreaSum  === 'function' ? getCurrentRoofAreaSum()  : 0) ||
+            parseFloat((document.getElementById('t3-roofArea') || {}).value) || 0;
+  var fa2 = (typeof getCurrentFloorAreaSum === 'function' ? getCurrentFloorAreaSum() : 0) || 0;
+
+  // PV sizing: Irish SEAI grant tops out at 6kWp (≈15m² at 400Wp/m²).
+  // Size by floor area (1kWp per 20m² → 0.05m² panel/m² floor) cross-checked against
+  // roof availability (max 30% of total roof area for PV).
+  // Clamp to 8–15m² (3.2–6kWp): covers all SEAI grant tiers without oversizing.
+  function _calcPv(roofA, floorA) {
+    var byRoof  = roofA  > 0 ? Math.round(roofA  * 0.30) : 0;
+    var byFloor = floorA > 0 ? Math.round(floorA * 0.05) : 0;
+    var sugg = (byRoof > 0 && byFloor > 0) ? Math.min(byRoof, byFloor)
+             : (byRoof || byFloor || 10);
+    return Math.max(8, Math.min(sugg, 15));
+  }
+
+  if (ra > 0 || fa2 > 0) {
     var pvEl = document.getElementById('eu-pv-area');
     if (pvEl && pvEl.dataset.userEdited !== 'true') {
-      pvEl.value = String(Math.min(Math.round(ra * 0.4), 20));
+      pvEl.value = String(_calcPv(ra, fa2));
     }
     var refPvEl = document.getElementById('ref-eu-pv-area');
     if (refPvEl && refPvEl.dataset.userEdited !== 'true') {
-      refPvEl.value = String(Math.min(Math.round(ra * 0.4), 20));
+      refPvEl.value = String(_calcPv(ra, fa2));
     }
-    // Solar thermal: ~15% of roof area, max 8m² (2–4 collectors)
+  }
+
+  if (ra > 0) {
+    // Solar thermal: 1–2 collectors (3–4m²) for typical Irish home; cap at 6m² (4 collectors)
+    var beds = parseInt((document.getElementById('t5-bedrooms') || {}).value) || 3;
+    var stSugg = beds <= 3 ? 3 : beds <= 5 ? 4 : 6;
     var stEl = document.getElementById('eu-solar-th-area');
     if (stEl && stEl.dataset.userEdited !== 'true') {
-      stEl.value = String(Math.max(2, Math.min(Math.round(ra * 0.15), 8)));
+      stEl.value = String(stSugg);
     }
     var refStEl = document.getElementById('ref-eu-solar-th-area');
     if (refStEl && refStEl.dataset.userEdited !== 'true') {
-      refStEl.value = String(Math.max(2, Math.min(Math.round(ra * 0.15), 8)));
+      refStEl.value = String(stSugg);
     }
   }
 }
