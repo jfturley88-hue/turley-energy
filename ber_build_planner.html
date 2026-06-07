@@ -2955,7 +2955,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
               <div class="tab-field">
                 <label>Existing Heating System</label>
-                <select id="ref-eu-existHeating">
+                <select id="ref-eu-existHeating" onchange="syncExistHeatingToAshpRemove('ref-eu')">
                   <option value="">&#8212; select &#8212;</option>
                   <option value="Oil Boiler">Oil Boiler</option>
                   <option value="Gas Boiler">Gas Boiler</option>
@@ -4249,7 +4249,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             <div style="padding:4px 0 10px;border-bottom:1px solid rgba(45,61,78,0.4);margin-bottom:6px;">
               <div class="tab-field">
                 <label>Existing Heating System</label>
-                <select id="eu-existHeating">
+                <select id="eu-existHeating" onchange="syncExistHeatingToAshpRemove('eu')">
                   <option value="">&#8212; select &#8212;</option>
                   <option value="Oil Boiler">Oil Boiler</option>
                   <option value="Gas Boiler">Gas Boiler</option>
@@ -9993,6 +9993,7 @@ function loadRefurbExample() {
   s('ref-eu-wallType',     'solid-brick');
   s('ref-eu-existHeating', 'Oil Boiler');
   if (typeof refEuUpdateWallOptions === 'function') refEuUpdateWallOptions();
+  if (typeof syncExistHeatingToAshpRemove === 'function') syncExistHeatingToAshpRemove('ref-eu');
   // Energy upgrade measures matching the spec
   ck('ref-eu-roof-ceiling', true);
   ck('ref-eu-iwi',          true);
@@ -10053,6 +10054,7 @@ function loadRefurbExample2() {
   s('ref-eu-wallType',     'cavity-uninsulated');
   s('ref-eu-existHeating', 'Oil Boiler');
   if (typeof refEuUpdateWallOptions === 'function') refEuUpdateWallOptions();
+  if (typeof syncExistHeatingToAshpRemove === 'function') syncExistHeatingToAshpRemove('ref-eu');
   // Energy Upgrade measures
   ck('ref-eu-roof-ceiling', true);
   ck('ref-eu-cavity',       true);
@@ -10161,6 +10163,7 @@ function loadEUExample1() {
   s('eu-wallType',     'cavity-uninsulated');
   s('eu-existHeating', 'Oil Boiler');
   if (window.euUpdateWallOptions) euUpdateWallOptions();
+  if (window.syncExistHeatingToAshpRemove) syncExistHeatingToAshpRemove('eu');
   // EU measurement panel
   s('eu-floorArea',    '88');
   s('eu-wallArea',     '105');
@@ -10255,6 +10258,7 @@ function loadEUExample2() {
   s('eu-wallType',     'solid-stone');
   s('eu-existHeating', 'Solid Fuel Range');
   if (window.euUpdateWallOptions) euUpdateWallOptions();
+  if (window.syncExistHeatingToAshpRemove) syncExistHeatingToAshpRemove('eu');
   // EU measurement panel
   s('eu-floorArea',    '112');
   s('eu-wallArea',     '145');
@@ -11191,6 +11195,9 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       'm²', winArea, Math.round(winBaseMat * frameMult), lM(1.2, L.craft), 'A-rated, like-for-like sizes'));
     fabricItems.push(mkItem('F.8', 'External composite insulated doors', 'nr', doorCount, 1100, lM(3.5, L.craft), 'Supply & hang, incl. ironmongery'));
     fabricItems.push(mkItem('F.9', 'Reveal liners & internal sills', 'nr', Math.round(winArea / 1.5) + doorCount, 110, lM(1.5, L.craft), 'uPVC liner sets'));
+  }
+  // Rooflights — priced whenever the windows section is open, regardless of EU windows
+  if (has('new_windows')) {
     const rlCount = n('rooflights') || 0;
     if (rlCount > 0) {
       const rlType = inputs.rooflight_type || 'centre-pivot';
@@ -12481,6 +12488,23 @@ function euDeriveAreas() {
   if (typeof autofillBundleAreas === 'function') autofillBundleAreas();
 }
 
+function syncExistHeatingToAshpRemove(prefix) {
+  var val = (document.getElementById(prefix + '-existHeating') || {}).value || '';
+  var removeEl = document.getElementById(prefix + '-ashp-remove');
+  if (!removeEl) return;
+  var map = {
+    'Oil Boiler':        'oil',
+    'Gas Boiler':        'gas',
+    'LPG Boiler':        'lpg-tank',
+    'Solid Fuel Range':  'solid',
+    'Back Boiler':       'back-boiler',
+    'Storage Heaters':   'storage',
+    'Direct Electric':   'none',
+    'Heat Pump':         'none'
+  };
+  if (map[val]) removeEl.value = map[val];
+}
+
 function euUpdateWallOptions() {
   const wt       = document.getElementById('eu-wallType')?.value || '';
   const cavityEl = document.getElementById('eu-cavity');
@@ -12489,18 +12513,22 @@ function euUpdateWallOptions() {
   const cavLbl   = document.getElementById('eu-cavity-label');
   const isSolid  = wt.startsWith('solid');
   const isTimber = wt.startsWith('timber');
-  const isFull   = wt.endsWith('full') || wt.endsWith('insu');
+  const isFull   = wt.endsWith('insu');
   if (cavityEl) {
-    cavityEl.disabled = isSolid || isTimber || isFull;
-    if (cavLbl) cavLbl.style.opacity = (isSolid || isTimber || isFull) ? '0.4' : '1';
+    const disable = isSolid || isTimber || isFull;
+    cavityEl.disabled = disable;
+    if (disable) cavityEl.checked = false;
+    if (cavLbl) cavLbl.style.opacity = disable ? '0.4' : '1';
   }
   if (ewiEl) {
     ewiEl.disabled = isFull;
+    if (isFull) ewiEl.checked = false;
     const p = ewiEl.closest('.ws-item');
     if (p) p.style.opacity = isFull ? '0.4' : '1';
   }
   if (iwiEl) {
     iwiEl.disabled = isFull;
+    if (isFull) iwiEl.checked = false;
     const p = iwiEl.closest('.ws-item');
     if (p) p.style.opacity = isFull ? '0.4' : '1';
   }
@@ -12513,19 +12541,23 @@ function refEuUpdateWallOptions() {
   const iwiEl    = document.getElementById('ref-eu-iwi');
   const isSolid  = wt.startsWith('solid');
   const isTimber = wt.startsWith('timber');
-  const isFull   = wt.endsWith('full') || wt.endsWith('insu');
+  const isFull   = wt.endsWith('insu');
   if (cavityEl) {
-    cavityEl.disabled = isSolid || isTimber || isFull;
+    const disable = isSolid || isTimber || isFull;
+    cavityEl.disabled = disable;
+    if (disable) cavityEl.checked = false;
     const p = cavityEl.closest('.ws-item');
-    if (p) p.style.opacity = (isSolid || isTimber || isFull) ? '0.4' : '1';
+    if (p) p.style.opacity = disable ? '0.4' : '1';
   }
   if (ewiEl) {
     ewiEl.disabled = isFull;
+    if (isFull) ewiEl.checked = false;
     const p = ewiEl.closest('.ws-item');
     if (p) p.style.opacity = isFull ? '0.4' : '1';
   }
   if (iwiEl) {
     iwiEl.disabled = isFull;
+    if (isFull) iwiEl.checked = false;
     const p = iwiEl.closest('.ws-item');
     if (p) p.style.opacity = isFull ? '0.4' : '1';
   }
@@ -15824,9 +15856,14 @@ function refreshGrantChips() {
     writeChip(key, amount, false);
   });
 
+  // Detect which panel is active — read from the active mode only to avoid cross-panel leakage
+  var _activeMode = (document.getElementById('t0-projType') || {}).value || '';
+  var _isRefurb   = _activeMode === 'Refurbishment';
+  var _pfx        = _isRefurb ? 'ref-eu' : 'eu';
+
   // Special case: smart controls — grant covered by heat pump grant when HP is selected
   (function() {
-    var hpOn = ['eu-ashp','eu-gshp','eu-hybrid-hp','ref-eu-ashp','ref-eu-gshp','ref-eu-hybrid-hp'].some(function(id) {
+    var hpOn = [_pfx + '-ashp', _pfx + '-gshp', _pfx + '-hybrid-hp'].some(function(id) {
       var el = document.getElementById(id); return el && el.checked;
     });
     if (hpOn) {
@@ -15835,10 +15872,9 @@ function refreshGrantChips() {
   })();
 
   // Special case: PV — add battery grant (€600/kWh, max €1,200) when battery selected
-  // Checks both eu-battery (Energy Upgrade mode) and ref-eu-battery (Refurb mode)
   (function() {
     var pvBase = (GRANT_TABLE['pv'] || {})[dwellingKey] || 1800;
-    var battEl = document.getElementById('eu-battery') || document.getElementById('ref-eu-battery');
+    var battEl = document.getElementById(_pfx + '-battery');
     var batt   = battEl ? battEl.value : 'no';
     var battGrant = 0;
     if (batt && batt !== 'no') {
@@ -15866,16 +15902,15 @@ function refreshGrantChips() {
     writeChip('airtight', 0, false, 'Covered under whole-house measures');
   }
   writeChip('anc-airtest', 0, true, 'No standalone SEAI grant');
+  // Biomass SEAI scheme is closed — override the generic zero-amount label
+  writeChip('biomass', 0, true, 'No SEAI grant available (scheme closed)');
 
-  // Auto-tick air pressure test when MVHR is selected (either mode)
+  // Auto-tick air pressure test when MVHR is selected (active panel only)
   (function() {
-    var mvhrOn = (document.getElementById('eu-mvhr') || {}).checked ||
-                 (document.getElementById('ref-eu-mvhr') || {}).checked;
-    ['eu-anc-airtest','ref-eu-anc-airtest'].forEach(function(id) {
-      var airTestEl = document.getElementById(id);
-      if (airTestEl && mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = true;
-      if (airTestEl && !mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = false;
-    });
+    var mvhrOn   = (document.getElementById(_pfx + '-mvhr') || {}).checked;
+    var airTestEl = document.getElementById(_pfx + '-anc-airtest');
+    if (airTestEl && mvhrOn  && !airTestEl.dataset.userTicked) airTestEl.checked = true;
+    if (airTestEl && !mvhrOn && !airTestEl.dataset.userTicked) airTestEl.checked = false;
   })();
 
   // Auto-suggest consumer unit ways from dedicated circuits required
