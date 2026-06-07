@@ -10551,6 +10551,12 @@ document.addEventListener('input', function(e) {
   if (!e.isTrusted) return;
   if (e.target && e.target.id && e.target.id.startsWith('ws-')) e.target.dataset.userEdited = 'true';
 }, true);
+// Same guard for New Build spec/PV fields auto-filled by nbAutoFill().
+document.addEventListener('input', function(e) {
+  if (!e.isTrusted) return;
+  var id = e.target && e.target.id;
+  if (id && (id.indexOf('t6-') === 0 || id === 't8-pvArea')) e.target.dataset.userEdited = 'true';
+}, true);
 
 // Re-run Works Selector auto-fill whenever geometry changes,
 // so quantities reflect the latest measurements the user
@@ -10558,6 +10564,7 @@ document.addEventListener('input', function(e) {
 (function() {
   var refresh = function() {
     if (typeof wsAutoPlaceholders === 'function') wsAutoPlaceholders();
+    if (typeof nbAutoFill === 'function') nbAutoFill();
   };
   ['input', 'change'].forEach(function(evt) {
     document.addEventListener(evt, function(e) {
@@ -10568,6 +10575,7 @@ document.addEventListener('input', function(e) {
         id.indexOf('fc-t2-') === 0 ||
         id.indexOf('fc-t3-') === 0 ||
         id.indexOf('fc-t4-') === 0 ||
+        id.indexOf('fc-t5r-') === 0 ||
         id.indexOf('t5-') === 0 ||
         id === 't4-doorCount' ||
         id === 't4-roofLights';
@@ -10592,7 +10600,7 @@ function nbAutoFill() {
 
   function sv(id, val) {
     var el = document.getElementById(id);
-    if (el && !el.value) el.value = String(Math.round(val));
+    if (el && el.dataset.userEdited !== 'true') el.value = String(Math.round(val));
   }
   sv('t6-lightFittings', fa / 5);                          // ~1 per 5m²
   sv('t6-sockets',       fa / 3.5);                        // ~1 per 3.5m²
@@ -16069,7 +16077,8 @@ window.refreshGrantChips = refreshGrantChips;
       if (e.target.id.indexOf('fc-t1-') === 0 ||
           e.target.id.indexOf('fc-t2-') === 0 ||
           e.target.id.indexOf('fc-t3-') === 0 ||
-          e.target.id.indexOf('fc-t4-') === 0) {
+          e.target.id.indexOf('fc-t4-') === 0 ||
+          e.target.id.indexOf('fc-t5r-') === 0) {
         refresh();
       }
     });
