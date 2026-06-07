@@ -17137,9 +17137,14 @@ function mdbRefresh() {
   var bCell = document.getElementById('mdb-live-block');
   var mCell = document.getElementById('mdb-live-mortar');
   var tCell = document.getElementById('mdb-live-tie');
-  if (bCell) bCell.textContent = '€' + (10.5 * block).toFixed(2) + '/m²';
-  if (mCell) mCell.textContent = '€' + (14   * mortar).toFixed(2)  + '/m²';
-  if (tCell) tCell.textContent = '€' + (2.5  * walltie).toFixed(2) + '/m²';
+  // Use the same blockwork geometry constants the cost engine uses, so these live
+  // cells match updateMatPreview() / computeBlockMatRatePerM2() exactly.
+  var blocksPerM2 = (typeof BLOCKS_PER_M2    === 'number') ? BLOCKS_PER_M2    : 10.5;
+  var mortarKgM2  = (typeof MORTAR_KG_PER_M2 === 'number') ? MORTAR_KG_PER_M2 : 28;
+  var tiePerM2    = (typeof WALLTIE_PER_M2   === 'number') ? WALLTIE_PER_M2   : 2.5;
+  if (bCell) bCell.textContent = '€' + (blocksPerM2 * block).toFixed(2)   + '/m²';
+  if (mCell) mCell.textContent = '€' + (mortarKgM2  * mortar).toFixed(2)  + '/m²';
+  if (tCell) tCell.textContent = '€' + (tiePerM2    * walltie).toFixed(2) + '/m²';
   // Persist edited rates so they survive a page refresh
   if (typeof window.matRatesSave === 'function') window.matRatesSave();
 }
