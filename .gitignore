@@ -5,6 +5,8 @@
 Thumbs.db
 .DS_Store
 
+node_modules/
+
 # Dev/test files
 test_path.pl
 serve.pl
