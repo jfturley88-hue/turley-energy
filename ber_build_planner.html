@@ -4891,6 +4891,105 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                 <span class="ws-auto-tag">if floor break-out / flue removal</span>
               </label>
             </div>
+            <!-- HAZARDOUS MATERIALS bundle -->
+            <div class="ws-item">
+              <input type="checkbox" id="eu-anc-hazmat" onchange="wsCheck(this,'eu-hazmat-sub')"/>
+              <div style="flex:1">
+                <label class="ws-item-label" for="eu-anc-hazmat">Hazardous materials &amp; remediation <span class="ws-auto-tag">pre-1980 properties</span></label>
+                <div class="ws-item-sub" id="eu-hazmat-sub">
+                  <div class="ws-sub-grid">
+                    <div class="ws-sub-field">
+                      <label>Asbestos scope</label>
+                      <select id="eu-hazmat-asb-scope">
+                        <option value="none">None</option>
+                        <option value="survey">Type 2 survey only</option>
+                        <option value="removal">Survey + identified removal</option>
+                        <option value="full-type3">Type 3 survey + full removal</option>
+                      </select>
+                    </div>
+                    <div class="ws-sub-field">
+                      <label>Radon scope</label>
+                      <select id="eu-hazmat-radon-scope">
+                        <option value="none">None</option>
+                        <option value="barrier">Membrane barrier only</option>
+                        <option value="sump">Membrane + passive sump</option>
+                        <option value="active">Membrane + active extraction</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="ws-sub-grid" style="margin-top:4px;">
+                    <div class="ws-sub-field">
+                      <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="eu-hazmat-lead"/> Lead paint (m&#178;)</label>
+                      <input type="number" id="eu-hazmat-lead-area" value="20" min="1"/>
+                    </div>
+                    <div class="ws-sub-field">
+                      <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="eu-hazmat-walltie"/> Wall tie replace (m&#178;)</label>
+                      <input type="number" id="eu-hazmat-walltie-area" value="" min="1" placeholder="wall area"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- DRAINAGE bundle -->
+            <div class="ws-item">
+              <input type="checkbox" id="eu-anc-drainage" onchange="wsCheck(this,'eu-drain-sub')"/>
+              <div style="flex:1">
+                <label class="ws-item-label" for="eu-anc-drainage">Drainage works</label>
+                <div class="ws-item-sub" id="eu-drain-sub">
+                  <div class="ws-sub-grid">
+                    <div class="ws-sub-field">
+                      <label>Scope</label>
+                      <select id="eu-drainage-scope">
+                        <option value="cctv" selected>CCTV survey + targeted repairs</option>
+                        <option value="internal">Internal soil stack relocation</option>
+                        <option value="external">External drains &amp; gullies</option>
+                        <option value="full">Full replacement to boundary</option>
+                      </select>
+                    </div>
+                    <div class="ws-sub-field">
+                      <label>Linear metres (m)</label>
+                      <input type="number" id="eu-drainage-lm" value="15" min="1"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- GAS SERVICES bundle -->
+            <div class="ws-item">
+              <input type="checkbox" id="eu-anc-gas" onchange="wsCheck(this,'eu-gas-sub')"/>
+              <div style="flex:1">
+                <label class="ws-item-label" for="eu-anc-gas">Gas connection / meter works</label>
+                <div class="ws-item-sub" id="eu-gas-sub">
+                  <div class="ws-sub-grid">
+                    <div class="ws-sub-field">
+                      <label>Scope</label>
+                      <select id="eu-gas-scope">
+                        <option value="capping">Existing supply capping &amp; removal</option>
+                        <option value="meter-relocate">Meter relocation</option>
+                        <option value="meter-upgrade">Meter upgrade for combi</option>
+                        <option value="new-connect">New mains connection (GNI)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- PROFESSIONAL FEES bundle -->
+            <div class="ws-item">
+              <input type="checkbox" id="eu-anc-prof-fees" onchange="wsCheck(this,'eu-prof-fees-sub')"/>
+              <div style="flex:1">
+                <label class="ws-item-label" for="eu-anc-prof-fees">Professional fees <span class="ws-auto-tag">tier auto-sized from works total</span></label>
+                <div class="ws-item-sub" id="eu-prof-fees-sub">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:4px 0;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;"><input type="checkbox" id="eu-prof-architect"/> Architect</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;"><input type="checkbox" id="eu-prof-qs"/> Quantity surveyor</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;"><input type="checkbox" id="eu-prof-supervisor"/> Project supervisor</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;"><input type="checkbox" id="eu-prof-fire"/> Fire safety cert</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;"><input type="checkbox" id="eu-prof-dac"/> Disability access cert</label>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div style="margin-top:8px;padding:8px 10px;background:rgba(168,180,200,0.07);border-radius:6px;font-size:10px;color:#a8b4c8;line-height:1.5;">
               &#x2139;&#xFE0F; <strong style="color:#c8d4e8;">Scaffolding</strong> appears as a line item within the EWI and pitched roof sections when those measures are ticked.
               <strong style="color:#c8d4e8;">Making good</strong> is bundled within each measure above.
@@ -8261,6 +8360,111 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     sections.push({id:String(sid++),title:'STRUCTURAL ENGINEER',part:'B',items:[
       mkItem('SE.1','Structural engineer — inspection & sign-off report','item',1,0,650,'Floor break-out / flue removal / beam design — SEAI compliant report'),
     ]});
+  }
+
+  // HAZARDOUS MATERIALS & REMEDIATION (optional specialist bundle)
+  if (inputs.includeHazmat) {
+    const hazItems = [];
+    var hmi = 1;
+    const asbScope = inputs.hazmat_asb_scope || 'none';
+    if (asbScope !== 'none') {
+      const surveyArea = Math.round(fa * 0.5);
+      if (asbScope === 'survey') {
+        hazItems.push(mkItem('HZ.' + hmi++, 'Asbestos Type 2 management survey — pre-1980 property', 'item', 1, mat.asbestosSurvey, 0, 'Includes lab analysis & report'));
+      } else if (asbScope === 'removal') {
+        hazItems.push(mkItem('HZ.' + hmi++, 'Asbestos Type 2 management survey', 'item', 1, mat.asbestosSurvey, 0, 'Lab analysis & report'));
+        hazItems.push(mkItem('HZ.' + hmi++, 'Asbestos identified-item removal & licensed disposal', 'm²', surveyArea, mat.asbestosRemoval, 0, 'Licensed contractor; HSA-compliant'));
+      } else {
+        hazItems.push(mkItem('HZ.' + hmi++, 'Asbestos Type 3 demolition survey + full removal', 'm²', Math.round(fa * 0.5), mat.asbestosFull, 0, 'Full RDAS scope — intrusive'));
+      }
+    }
+    if (inputs.hazmat_lead) {
+      hazItems.push(mkItem('HZ.' + hmi++, 'Lead paint stripping — HSA-compliant', 'm²', inputs.hazmat_lead_area || 20, mat.leadPaint, lM(0.5, L.catB), 'Pre-1980 windows & doors'));
+    }
+    const radonScope = inputs.hazmat_radon_scope || 'none';
+    if (radonScope !== 'none') {
+      const ra2 = inputs.hazmat_radon_area || gfa;
+      hazItems.push(mkItem('HZ.' + hmi++, 'Radon barrier membrane', 'm²', ra2, mat.radonMembrane, lM(0.25, L.catB), 'Under DPM'));
+      if (radonScope === 'sump') {
+        hazItems.push(mkItem('HZ.' + hmi++, 'Radon sump + passive stack', 'item', 1, mat.radonSump, lM(6, L.catA), 'Through roof termination'));
+      } else if (radonScope === 'active') {
+        hazItems.push(mkItem('HZ.' + hmi++, 'Radon active mechanical extraction system', 'item', 1, mat.radonActive, lM(8, L.catA), 'Includes fan & electrical connection'));
+      }
+    }
+    if (inputs.hazmat_walltie) {
+      hazItems.push(mkItem('HZ.' + hmi++, 'Cavity wall tie replacement — Helifix-style remedial', 'm²', inputs.hazmat_walltie_area || netWallArea, mat.wallTieReplace, lM(0.4, L.catA), 'Affected wall area'));
+    }
+    if (hazItems.length) {
+      sections.push({id: String(sid++), title: 'HAZARDOUS MATERIALS & REMEDIATION', part: 'B', items: hazItems});
+    }
+  }
+
+  // DRAINAGE & GAS SERVICES (optional specialist bundle)
+  if (inputs.includeDrainage || inputs.includeGas) {
+    const svcItems = [];
+    var dgi = 1;
+    if (inputs.includeDrainage) {
+      const dscope = inputs.eu_drain_scope || 'cctv';
+      const dlm = inputs.eu_drain_lm || 15;
+      if (dscope === 'cctv') {
+        svcItems.push(mkItem('DG.' + dgi++, 'Drainage CCTV survey + report', 'item', 1, mat.drainCCTV, 0, 'Targeted inspection — pre-works survey'));
+        svcItems.push(mkItem('DG.' + dgi++, 'Targeted drain repairs (provisional)', 'm', Math.max(2, Math.round(dlm * 0.3)), mat.drainExternal, lM(0.6, L.catA), 'PC sum until inspection complete'));
+      } else if (dscope === 'internal') {
+        svcItems.push(mkItem('DG.' + dgi++, 'Internal soil stack relocation', 'm', dlm, mat.drainInternal, lM(0.8, L.catA), 'Plumber + assistant'));
+      } else if (dscope === 'external') {
+        svcItems.push(mkItem('DG.' + dgi++, 'External drains & gullies', 'm', dlm, mat.drainExternal, lM(0.6, L.catA), 'Excavation + bedding'));
+      } else {
+        svcItems.push(mkItem('DG.' + dgi++, 'Full drainage replacement to boundary', 'm', dlm, Math.round(mat.drainExternal * 1.4), lM(0.9, L.catA), 'Includes inspection chambers'));
+      }
+    }
+    if (inputs.includeGas) {
+      const gscope = inputs.eu_gas_scope || 'capping';
+      if (gscope === 'capping') {
+        svcItems.push(mkItem('DG.' + dgi++, 'Gas supply capping & removal', 'item', 1, mat.gasCapping, lM(2, L.catA), 'When converting fuel away from gas'));
+      } else if (gscope === 'meter-relocate') {
+        svcItems.push(mkItem('DG.' + dgi++, 'Gas meter relocation', 'item', 1, mat.gasMeterRelocate, lM(2, L.catA), 'Includes RGI cert'));
+      } else if (gscope === 'meter-upgrade') {
+        svcItems.push(mkItem('DG.' + dgi++, 'Gas meter upgrade for combi boiler', 'item', 1, mat.gasMeterUpgrade, lM(1.5, L.catA), 'Higher flow capacity'));
+      } else {
+        svcItems.push(mkItem('DG.' + dgi++, 'Gas mains new connection (GNI)', 'item', 1, mat.gasNewConnect, 0, 'GNI standard connection charge'));
+      }
+    }
+    if (svcItems.length) {
+      sections.push({id: String(sid++), title: 'DRAINAGE & GAS SERVICES', part: 'B', items: svcItems});
+    }
+  }
+
+  // PROFESSIONAL FEES (optional bundle — tier auto-sized from works total)
+  if (inputs.includeProfFees && (inputs.prof_architect || inputs.prof_qs || inputs.prof_supervisor || inputs.prof_fire_cert || inputs.prof_dac)) {
+    var _euWorksTotal = 0;
+    sections.forEach(function(s) {
+      if (s.items) s.items.forEach(function(it) {
+        _euWorksTotal += (it.quantity || 0) * ((it.matRate || 0) + (it.labRate || 0));
+      });
+    });
+    var _euTier = _euWorksTotal < 30000 ? 's' : _euWorksTotal < 100000 ? 'm' : 'l';
+    const feeItems = [];
+    var pfi = 1;
+    if (inputs.prof_architect) {
+      var feeR = _euTier === 's' ? mat.feeArchitectS : _euTier === 'm' ? mat.feeArchitectM : mat.feeArchitectL;
+      feeItems.push(Object.assign(mkItem('PF.' + pfi++, 'Architect — design & contract admin', 'item', 1, feeR, 0, 'Tier: ' + _euTier.toUpperCase() + ' (works €' + Math.round(_euWorksTotal / 1000) + 'k)'), {feeType: 'architect'}));
+    }
+    if (inputs.prof_qs) {
+      var feeR2 = _euTier === 's' ? mat.feeQSs : _euTier === 'm' ? mat.feeQSm : mat.feeQSl;
+      feeItems.push(mkItem('PF.' + pfi++, 'Quantity surveyor — cost management', 'item', 1, feeR2, 0, 'Tier: ' + _euTier.toUpperCase()));
+    }
+    if (inputs.prof_supervisor) {
+      feeItems.push(mkItem('PF.' + pfi++, 'Project supervisor / clerk of works', 'item', 1, mat.feeSupervisor, 0, 'Programme allowance'));
+    }
+    if (inputs.prof_fire_cert) {
+      feeItems.push(mkItem('PF.' + pfi++, 'Fire safety certificate (incl. consultant)', 'item', 1, mat.feeFireCert, 0, 'Material change of use only'));
+    }
+    if (inputs.prof_dac) {
+      feeItems.push(mkItem('PF.' + pfi++, 'Disability access certificate', 'item', 1, mat.feeDAC, 0, 'LA fee + consultant'));
+    }
+    if (feeItems.length) {
+      sections.push({id: String(sid++), title: 'PROFESSIONAL FEES', part: 'B', items: feeItems});
+    }
   }
 
   // Skip hire — auto-scale from measures
@@ -12433,6 +12637,25 @@ function readEUSelector() {
     includeMakingGood: false,
     includeAirTest:    cb('eu-anc-airtest'),
     includeStructEng:  cb('eu-anc-struct-eng'),
+    includeHazmat:     cb('eu-anc-hazmat'),
+    hazmat_asb_scope:  sv('eu-hazmat-asb-scope') || 'none',
+    hazmat_lead:       cb('eu-hazmat-lead'),
+    hazmat_lead_area:  nv('eu-hazmat-lead-area') || 20,
+    hazmat_radon_scope: sv('eu-hazmat-radon-scope') || 'none',
+    hazmat_radon_area:  nv('eu-hazmat-radon-area') || 0,
+    hazmat_walltie:    cb('eu-hazmat-walltie'),
+    hazmat_walltie_area: nv('eu-hazmat-walltie-area') || 0,
+    includeDrainage:   cb('eu-anc-drainage'),
+    eu_drain_scope:    sv('eu-drainage-scope') || 'cctv',
+    eu_drain_lm:       nv('eu-drainage-lm') || 15,
+    includeGas:        cb('eu-anc-gas'),
+    eu_gas_scope:      sv('eu-gas-scope') || 'capping',
+    includeProfFees:   cb('eu-anc-prof-fees'),
+    prof_architect:    cb('eu-prof-architect'),
+    prof_qs:           cb('eu-prof-qs'),
+    prof_supervisor:   cb('eu-prof-supervisor'),
+    prof_fire_cert:    cb('eu-prof-fire'),
+    prof_dac:          cb('eu-prof-dac'),
     measures:          [...new Set(measures)],
     // Floor bundle fields (Chunk 7)
     floor_system:        sv('eu-floor-system') || 'solid-breakout',
