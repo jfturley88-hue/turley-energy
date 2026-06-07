@@ -163,6 +163,17 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .delete-item-btn{opacity:0.55;transition:opacity 0.15s;background:none;border:none;color:#EF4444;cursor:pointer;font-size:14px;padding:0 4px;}
 .delete-item-btn:hover{opacity:1;}
 .item-row:hover .delete-item-btn{opacity:1;}
+/* ── BOQ undo toast ───────────────────────────────── */
+#boq-undo-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:#1e2d3d;border:1px solid #3d5268;border-radius:8px;padding:10px 16px;
+  display:flex;align-items:center;gap:12px;font-size:12px;color:#c8d0dc;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);z-index:9999;
+  opacity:0;pointer-events:none;transition:opacity 0.2s,transform 0.2s;}
+#boq-undo-toast.visible{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+#boq-undo-toast button{background:#2D7A4F;border:none;border-radius:5px;color:#fff;
+  font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;letter-spacing:0.04em;}
+#boq-undo-toast button:hover{background:#3a9b65;}
+#boq-undo-badge{background:#E8A020;color:#111;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;}
 .add-item-btn{margin:8px 0 4px 12px;padding:5px 14px;border-radius:6px;border:1px solid #E8A020;background:transparent;color:#E8A020;font-size:11px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;font-weight:600;}
 .add-item-btn:hover{background:rgba(232,160,32,0.1);}
 
@@ -5464,6 +5475,10 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 </div>
 
 <!-- ═══ REPORT SCREEN ══════════════════════════════════════════════════════ -->
+<div id="boq-undo-toast" role="status" aria-live="polite">
+  <span>Item deleted <span id="boq-undo-badge">1</span></span>
+  <button onclick="boqUndoLast()">Undo</button>
+</div>
 <div id="screen-report">
   <div class="report-hdr">
     <div class="report-hdr-inner">
@@ -7407,9 +7422,9 @@ function buildBOQRenovation(inputs, projName, county, dwellingType, grantScheme,
     mkItem('13.3','Trickle vents to windows','nr',Math.round(totFA/16),28,lM(0.5,L.craft),'Background ventilation'),
   ]});
   const pvItems = pvA>0?[
-    mkItem('14.1','Solar PV panels','m²',pvA,210,lM(1.5,L.electrician),pvA+'m² PV array'),
-    mkItem('14.2','String inverter','nr',1,800,lM(4,L.electrician),''),
-    mkItem('14.3','Mounting system (pitched roof)','m²',pvA,28,lM(0.5,L.craft),'Integrated mounting kit'),
+    mkItem('14.1','Solar PV panels','m²',pvA,270,lM(1.5,L.electrician),pvA+'m² PV array (≈400Wp panels, ~1.7m²/panel)'),
+    mkItem('14.2','String inverter','nr',1,1100,lM(4,L.electrician),'Single-phase hybrid inverter'),
+    mkItem('14.3','Mounting, DC cabling, isolators & roof anchors','m²',pvA,42,lM(0.5,L.craft),'Aluminium mounting kit + DC/AC works'),
     ...(battery==='yes'?[mkItem('14.4','Battery storage (10kWh)','nr',1,4500,lM(6,L.electrician),'LiFePO4')]:[]),
   ]:[mkItem('14.1','No renewables — PC sum if required','item',1,0,0,'Allow if solar PV required','info_needed')];
   sections.push({ id:String(sid++), title:'RENEWABLES', part:'C', items:pvItems, zeroVat:true});
@@ -7733,7 +7748,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
   // EU rate overrides — read from localStorage (Rate Settings → EU Rates tab) each BOQ run
   var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000];
-  var _EU_PV=165,_EU_TRICKLE=28;
+  var _EU_PV=250,_EU_TRICKLE=28;
   (function(){
     var ov={},cat={};
     try{ov=JSON.parse(localStorage.getItem('eu_ov')||'{}');}catch(e){}
@@ -7769,7 +7784,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     _EU_MEV[0]=r('mev_unit',580,'vent');_EU_MEV[1]=r('mev_duct',8.5,'vent');_EU_MEV[2]=r('mev_term',55,'vent');
     _EU_DMEV[0]=r('dmev_fan',120,'vent');_EU_DMEV[1]=r('dmev_drill',38,'vent');_EU_DMEV[2]=r('dmev_spur',45,'vent');
     _EU_TRICKLE=r('mev_trickle',28,'vent');
-    _EU_PV=r('pv',165,'solar');
+    _EU_PV=r('pv',250,'solar');
     _EU_BAT[0]=r('bat_s',2300,'solar');_EU_BAT[1]=r('bat_m',4500,'solar');_EU_BAT[2]=r('bat_l',7000,'solar');_EU_BAT[3]=r('bat_xl',9000,'solar');
   })();
   var WINDOW_DISPOSE_RATE = 45;
@@ -8110,9 +8125,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const pvOriDesc  = inputs.pv_orientation === 'east-west' ? 'East/West split' : inputs.pv_orientation === 'south-east' ? 'South-East' : inputs.pv_orientation === 'south-west' ? 'South-West' : 'South-facing';
     const pvItems = [
       // Source: solarinfo.ie, goingsolar.ie, idealsolarandelectrical.ie 2025 (supply-only per panel).
-      mkItem('9.1','Solar PV panels (400Wp ' + pvPanDesc + ')','nr',pvPanels,_EU_PV,lM(2,L.electrician),pvPanels + ' panels — ' + pvA + 'm² ' + pvOriDesc + ' array'),
-      mkItem('9.2','String inverter (single-phase, ' + Math.round(pvPanels*0.4) + 'kWp)','nr',1,800,lM(4,L.electrician),'SolarEdge or Fronius — sized to array output'),
-      mkItem('9.3','Mounting system — pitched roof','m²',pvA,28,lM(0.5,L.craft),'Aluminium rail system (K2 or Schletter)'),
+      mkItem('9.1','Solar PV panels (400Wp ' + pvPanDesc + ')','nr',pvPanels,_EU_PV,lM(2.5,L.electrician),pvPanels + ' panels — ' + pvA + 'm² ' + pvOriDesc + ' array'),
+      mkItem('9.2','String inverter (single-phase, ' + Math.round(pvPanels*0.4) + 'kWp)','nr',1,1100,lM(4,L.electrician),'SolarEdge or Fronius hybrid — sized to array output'),
+      mkItem('9.3','Mounting, DC cabling, isolators & roof anchors','m²',pvA,42,lM(0.5,L.craft),'Aluminium rail system (K2 or Schletter) + DC/AC works'),
       mkItem('9.4','Generation & export meter','item',1,180,lM(1.5,L.electrician),'Smart meter — ESB Networks notification required'),
       ...(battery && battery !== 'no' && battery !== 'No' ? [(() => { const bKwh = parseFloat(battery) > 0 ? parseFloat(battery) : 10; // Source: partnergy.ie, spvenergy.ie, greentechreview.com 2025 (supply-only).
 const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU_BAT[2] : _EU_BAT[3]; return mkItem('9.5', bKwh + 'kWh LiFePO4 battery storage (supply & install)', 'nr', 1, bMat, lM(6, L.electrician), bKwh + 'kWh home battery — SEAI grant: €600/kWh up to €1,200'); })() ] : []),
@@ -12878,6 +12893,11 @@ async function generate() {
 
 // ── BUILD REPORT ──────────────────────────────────────────────────────────────
 function buildReport() {
+  // Clear undo history whenever a fresh BOQ is generated
+  _boqUndoStack = [];
+  clearTimeout(_boqUndoTimer);
+  var _t = document.getElementById('boq-undo-toast');
+  if (_t) _t.classList.remove('visible');
 
   const b=BOQ; if (!b) return;
   const pi=b.projectInfo, su=b.summary;
@@ -13260,13 +13280,53 @@ function toggleGrantRows(group) {
   if (icon) icon.innerHTML = shown ? '&#9654;' : '&#9660;';
 }
 
+// ── BOQ undo stack ────────────────────────────────────────────────────────────
+var _boqUndoStack = [];   // [{secId, itemIdx, item}, ...]  newest first
+var _boqUndoTimer = null;
+
+function _boqShowUndoToast() {
+  var toast = document.getElementById('boq-undo-toast');
+  var badge = document.getElementById('boq-undo-badge');
+  if (!toast) return;
+  if (badge) badge.textContent = _boqUndoStack.length;
+  clearTimeout(_boqUndoTimer);
+  toast.classList.add('visible');
+  _boqUndoTimer = setTimeout(function() {
+    toast.classList.remove('visible');
+  }, 8000);
+}
+
+function boqUndoLast() {
+  if (!BOQ || !_boqUndoStack.length) return;
+  var entry = _boqUndoStack.shift();
+  var sec = BOQ.sections.find(function(s) { return s.id === entry.secId; });
+  if (sec) {
+    // Re-insert at original position (clamp to current length)
+    var idx = Math.min(entry.itemIdx, sec.items.length);
+    sec.items.splice(idx, 0, entry.item);
+    recalcTotals();
+    renderAccordionReport();
+  }
+  if (_boqUndoStack.length > 0) {
+    _boqShowUndoToast(); // update badge
+  } else {
+    var toast = document.getElementById('boq-undo-toast');
+    if (toast) toast.classList.remove('visible');
+    clearTimeout(_boqUndoTimer);
+  }
+}
+window.boqUndoLast = boqUndoLast;
+
 function removeItemFromSection(secId, itemIdx) {
   if (!BOQ) return;
   const sec = BOQ.sections.find(s => s.id === secId);
-  if (!sec) return;
-  sec.items.splice(itemIdx, 1);
+  if (!sec || itemIdx < 0 || itemIdx >= sec.items.length) return;
+  var removed = sec.items.splice(itemIdx, 1)[0];
+  _boqUndoStack.unshift({ secId: secId, itemIdx: itemIdx, item: removed });
+  if (_boqUndoStack.length > 20) _boqUndoStack.length = 20; // cap history
   recalcTotals();
   renderAccordionReport();
+  _boqShowUndoToast();
 }
 
 function toggleSection(secId) {
@@ -16519,8 +16579,8 @@ function _ufType(t) {
           <tr><td>EU.13e</td><td>MVHR supply + extract terminals</td><td>nr</td><td>rooms &times; 2 (nr)</td><td>&#8364;55/nr</td><td>1hr/nr craft &times; &#8364;44 = &#8364;44/nr</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl.</td></tr>
           <!-- ═══ SOLAR PV ═══ -->
           <tr class="mdb-variant"><td colspan="8">&nbsp; Solar PV System (panel qty = pvArea &divide; 1.7; pvArea = south-facing roof area m&#178;)</td></tr>
-          <tr><td>EU.14a</td><td>PV panels 400W</td><td>nr</td><td>pvArea &divide; 1.7 (nr panels)</td><td>&#8364;165/nr</td><td>2hr/nr electrician &times; &#8364;55 = &#8364;110/nr</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;1,800 total</td></tr>
-          <tr><td>EU.14b</td><td>PV inverter</td><td>nr</td><td>1 nr</td><td>&#8364;800</td><td>4hr electrician &times; &#8364;55 = &#8364;220 fixed</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl. in panels grant</td></tr>
+          <tr><td>EU.14a</td><td>PV panels 400W</td><td>nr</td><td>pvArea &divide; 1.7 (nr panels)</td><td>&#8364;250/nr</td><td>2.5hr/nr electrician &times; &#8364;55 = &#8364;138/nr</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;1,800 total</td></tr>
+          <tr><td>EU.14b</td><td>PV inverter</td><td>nr</td><td>1 nr</td><td>&#8364;1,100</td><td>4hr electrician &times; &#8364;55 = &#8364;220 fixed</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl. in panels grant</td></tr>
           <tr><td>EU.14c</td><td>PV mounting system</td><td>m&#178;</td><td>pvArea (m&#178;)</td><td>&#8364;28/m&#178;</td><td>0.5hr/m&#178; craft &times; &#8364;44 = &#8364;22/m&#178;</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">&#8212;</td></tr>
           <tr><td>EU.14d</td><td>Smart export meter</td><td>nr</td><td>1 nr</td><td>&#8364;180</td><td>1.5hr electrician &times; &#8364;55 = &#8364;82.5 fixed</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">&#8212;</td></tr>
           <tr><td>EU.14e</td><td>Battery storage &le; 5kWh</td><td>nr</td><td>battery selected &rarr; 1 nr</td><td>&#8364;2,300</td><td>6hr electrician &times; &#8364;55 = &#8364;330 fixed</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">&#8212;</td></tr>
@@ -16744,7 +16804,7 @@ function _ufType(t) {
               <table class="mdb-tbl">
                 <thead><tr><th>Item</th><th style="width:85px;">Rate</th></tr></thead>
                 <tbody>
-                  <tr><td>PV panel 400W</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-pv" class="mdb-pi" type="number" min="10" step="5" value="165" oninput="euRatesSave()" style="width:62px;"><span style="color:#8090A8;font-size:10px;">/nr</span></td></tr>
+                  <tr><td>PV panel 400W</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-pv" class="mdb-pi" type="number" min="10" step="5" value="250" oninput="euRatesSave()" style="width:62px;"><span style="color:#8090A8;font-size:10px;">/nr</span></td></tr>
                   <tr><td>Battery &le; 5kWh</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-bat_s" class="mdb-pi" type="number" min="100" step="50" value="2300" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>Battery 5.1&ndash;10kWh</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-bat_m" class="mdb-pi" type="number" min="100" step="50" value="4500" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>Battery 10.1&ndash;15kWh</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-bat_l" class="mdb-pi" type="number" min="100" step="50" value="7000" oninput="euRatesSave()" style="width:62px;"></td></tr>
