@@ -290,6 +290,15 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
   .assumptions-inner{grid-template-columns:1fr;}
   .hdr-tags{display:none;}
 }
+@media(max-width:600px){
+  body{overflow-x:hidden;}
+  .hdr{flex-wrap:wrap;padding:8px 16px;min-height:auto;gap:6px;}
+  .hdr-divider{display:none;}
+  .hdr-sub{display:none;}
+  #preview-rail{display:none!important;}
+  body.pv-rail-open #screen-input{padding-right:0!important;}
+  body.pv-rail-open #generate-bar{right:0!important;}
+}
 
 /* ── EXPORT PDF BUTTON ───────────────────────────────────────────────────── */
 .export-pdf-btn{padding:5px 13px;border-radius:6px;background:rgba(232,160,32,0.15);border:1px solid rgba(232,160,32,0.4);color:#E8A020;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.15s;}
@@ -547,6 +556,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ptc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
 .project-type-card{padding:18px 14px 16px;border-radius:10px;border:2px solid #2e3d52;background:#1E2D42;cursor:pointer;text-align:center;transition:all 0.18s;user-select:none;}
 .project-type-card:hover{border-color:rgba(232,160,32,0.5);background:#243044;}
+.project-type-card:focus{outline:2px solid #E8A020;outline-offset:3px;}
 .project-type-card.active{border-color:#E8A020;background:rgba(232,160,32,0.06);}
 .ptc-icon{font-size:26px;margin-bottom:7px;line-height:1;}
 .ptc-title{font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:#C8D0DC;margin-bottom:5px;}
@@ -679,19 +689,19 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   <!-- PROJECT TYPE CARDS -->
   <div class="ptc-grid">
 
-    <div id="card-newbuild" class="project-type-card active" onclick="selectProjectType('New Build')">
+    <div id="card-newbuild" class="project-type-card active" role="button" tabindex="0" onclick="selectProjectType('New Build')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectProjectType('New Build')}">
       <div class="ptc-icon">&#x1F3D7;</div>
       <div class="ptc-title">New Build</div>
       <div class="ptc-desc">Full BOQ from survey data. All sections auto-generated.</div>
     </div>
 
-    <div id="card-refurb" class="project-type-card" onclick="selectProjectType('Refurbishment')">
+    <div id="card-refurb" class="project-type-card" role="button" tabindex="0" onclick="selectProjectType('Refurbishment')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectProjectType('Refurbishment')}">
       <div class="ptc-icon">&#x1F528;</div>
       <div class="ptc-title">Refurbishment</div>
       <div class="ptc-desc">Works Selector for existing house. Extensions priced as new build.</div>
     </div>
 
-    <div id="card-upgrade" class="project-type-card" onclick="selectProjectType('Energy Upgrade')">
+    <div id="card-upgrade" class="project-type-card" role="button" tabindex="0" onclick="selectProjectType('Energy Upgrade')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectProjectType('Energy Upgrade')}">
       <div class="ptc-icon">&#x26A1;</div>
       <div class="ptc-title">Energy Upgrade</div>
       <div class="ptc-desc">Energy measures only. SEAI grants auto-calculated.</div>
@@ -12627,6 +12637,9 @@ async function generate() {
       errEl.style.display = 'block';
       return;
     }
+    if (refInputs.floorArea > 1000) {
+      if (!confirm('Floor area is ' + Math.round(refInputs.floorArea) + ' m² — unusually large for a single dwelling. Proceed?')) return;
+    }
     const hasWorks = Object.values(refInputs).some(function(v) { return v === true; });
     if (!hasWorks) {
       errEl.textContent = 'Please tick at least one item in the Works Selector or Energy Upgrade Works section.';
@@ -12730,6 +12743,9 @@ async function generate() {
       errEl.style.display = 'block';
       return;
     }
+    if (euInputs.floorArea > 1000) {
+      if (!confirm('Floor area is ' + Math.round(euInputs.floorArea) + ' m² — unusually large for a single dwelling. Proceed?')) return;
+    }
     setGeneratingScreen('Energy Upgrade');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([
@@ -12780,6 +12796,9 @@ async function generate() {
   if (mode === 'New Build') {
     const fa = getCurrentFloorAreaSum();
     if (!fa||fa<10) { errEl.textContent='Please enter the floor area in the Floors tab (minimum 10m²).'; errEl.style.display='block'; return; }
+    if (fa > 1000) {
+      if (!confirm('Total floor area is ' + Math.round(fa) + ' m² — unusually large for a single dwelling. Proceed?')) return;
+    }
     setGeneratingScreen('New Build');
     show('screen-generating'); hide('screen-input'); hide('screen-report');
     await runProgress([[10,'Reading key figures...'],[25,'Deriving quantities...'],[45,'Applying material rates...'],[65,'Calculating labour costs...'],[80,'Applying SEAI grants...'],[95,'Assembling BOQ...']]);
