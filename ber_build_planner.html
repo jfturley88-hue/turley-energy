@@ -13053,6 +13053,67 @@ function estimateEnergySaving(b) {
   return null;
 }
 
+// Derive which SEAI contractor trades are needed from the BOQ sections and grants
+function buildTradeContractorList(b) {
+  var grants   = b.grants || [];
+  var sections = b.sections || [];
+  var gDesc = grants.map(function(g){ return (g.description||'').toLowerCase(); }).join(' ');
+  var sTitle = sections.map(function(s){ return (s.title||'').toLowerCase(); }).join(' ');
+  var combined = gDesc + ' ' + sTitle;
+
+  var trades = [];
+  var has = function(keywords) {
+    return keywords.some(function(k){ return combined.indexOf(k) >= 0; });
+  };
+
+  if (has(['attic','ceiling insulation','rafter','flat roof','roof insulation','roof room'])) {
+    trades.push({ icon:'🏠', trade:'Insulation Contractor — Roof', seai:true,
+      note:'Attic/rafter/flat roof insulation · Must be SEAI-registered for grant payment' });
+  }
+  if (has(['cavity wall','external wall insulation','ewi','iwi','internal wall insulation','wall insulation'])) {
+    trades.push({ icon:'🧱', trade:'Insulation Contractor — Walls', seai:true,
+      note:'Cavity fill, EWI or IWI · Must be SEAI-registered for grant payment' });
+  }
+  if (has(['floor insulation','floor slab','suspended floor'])) {
+    trades.push({ icon:'⬛', trade:'Insulation Contractor — Floor', seai:true,
+      note:'Floor insulation · Must be SEAI-registered for grant payment' });
+  }
+  if (has(['heat pump','ashp','gshp','ground source'])) {
+    trades.push({ icon:'♨️', trade:'Heat Pump Installer (Mechanical)', seai:true,
+      note:'ASHP/GSHP supply & install · Requires SEAI Heat Pump Survey and registered installer' });
+  }
+  if (has(['boiler','oil boiler','gas boiler','lpg','biomass'])) {
+    trades.push({ icon:'🔥', trade:'Heating & Plumbing Contractor', seai:true,
+      note:'Boiler replacement, cylinder, radiators/UFH · SEAI-registered for grant' });
+  }
+  if (has(['solar pv','photovoltaic','pv system','pv install'])) {
+    trades.push({ icon:'☀️', trade:'Electrical Contractor — Solar PV', seai:true,
+      note:'PV supply, install & grid connection · SEAI-registered; ESBN NC6 notification required' });
+  }
+  if (has(['electrical','rewire','consumer unit','ev charger','led lighting'])) {
+    trades.push({ icon:'⚡', trade:'Electrical Contractor', seai:false,
+      note:'Rewire, consumer unit, EV charger, LED — not grant-dependent but RECI/ECSSA registered recommended' });
+  }
+  if (has(['mvhr','mechanical ventilation','heat recovery','mev','mechanical extract'])) {
+    trades.push({ icon:'💨', trade:'Ventilation Contractor', seai:true,
+      note:'MVHR or MEV whole-house ventilation · Must be SEAI-registered for grant payment' });
+  }
+  if (has(['window','glazing','triple glaz','double glaz'])) {
+    trades.push({ icon:'🪟', trade:'Window & Door Supplier / Fitter', seai:true,
+      note:'Triple/double glazed units · Must be SEAI-registered from March 2026 for Windows & Doors grant' });
+  }
+  if (has(['airtight','air pressure','air tightness'])) {
+    trades.push({ icon:'🔒', trade:'Airtightness Specialist', seai:false,
+      note:'Air pressure test required for MVHR and A-rated homes' });
+  }
+  // BER always needed for EU/Refurb
+  if (b.projectInfo && b.projectInfo.type !== 'New Build') {
+    trades.push({ icon:'📋', trade:'BER Assessor (post-works)', seai:true,
+      note:'SEAI-registered BER assessor · Certificate required before grant payment is released' });
+  }
+  return trades;
+}
+
 function renderGrantsPanel() {
   if (BOQ && BOQ.projectInfo && BOQ.projectInfo.type === 'New Build') {
     // skip grants section entirely for New Build
@@ -13173,6 +13234,27 @@ function renderGrantsPanel() {
       <div style="font-size:11px;font-weight:700;color:#C8D0DC;margin-bottom:5px;">⚖️ Independent Estimate — For Bank &amp; Grant Applications</div>
       <div style="font-size:11px;color:#8090A8;line-height:1.7;">This BOQ was generated from DEAP survey geometry — it is <strong style="color:#C8D0DC;">not prepared by your contractor</strong>. Use it to verify that contractor quotes are reasonable before works begin. Contractors should quote on the <strong style="color:#C8D0DC;">gross costs</strong> shown above; SEAI grants reduce the amount you ultimately pay. If a contractor's quote is close to the <em>net</em> figure (i.e. suspiciously near the post-grant price), the grant may not be delivering real savings — always compare against the gross BOQ total.</div>
     </div>
+    ${(function(){
+      var trades = buildTradeContractorList(b);
+      if (!trades.length) return '';
+      var rows = trades.map(function(t) {
+        var badge = t.seai
+          ? '<span style="display:inline-block;margin-left:5px;padding:1px 6px;border-radius:10px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);font-size:9px;font-weight:700;color:#10B981;white-space:nowrap;">✓ SEAI REGISTERED</span>'
+          : '<span style="display:inline-block;margin-left:5px;padding:1px 6px;border-radius:10px;background:rgba(148,163,184,0.1);border:1px solid rgba(148,163,184,0.25);font-size:9px;color:#8090A8;white-space:nowrap;">Standard trade</span>';
+        return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(46,61,82,0.5);">' +
+          '<div style="font-size:18px;flex-shrink:0;width:26px;text-align:center;">' + t.icon + '</div>' +
+          '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:12px;font-weight:600;color:#E2E8F0;">' + t.trade + badge + '</div>' +
+          '<div style="font-size:10px;color:#8090A8;margin-top:2px;line-height:1.5;">' + t.note + '</div>' +
+          '</div></div>';
+      }).join('');
+      return '<div style="margin-top:10px;padding:12px 14px;border-radius:9px;background:rgba(36,48,68,0.6);border:1px solid rgba(46,61,82,0.7);">' +
+        '<div style="font-size:11px;font-weight:700;color:#E8A020;margin-bottom:6px;">🔧 Contractors You\'ll Need</div>' +
+        '<div style="font-size:10px;color:#8090A8;margin-bottom:8px;">Derived from the measures in this BOQ. Green badge = must be SEAI-registered for grant payment.</div>' +
+        rows +
+        '<div style="padding-top:8px;font-size:10px;color:#64748b;">Verify registration at <strong style="color:#C8D0DC;">seai.ie/find-contractor</strong> before signing any contract.</div>' +
+        '</div>';
+    })()}
     ${nextStepsNote}
     ${ossNote}
   `;
@@ -14178,6 +14260,31 @@ function exportPDF() {
   const flagsHTML = (b.flags||[]).length > 0
     ? `<div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:5px;padding:12px 14px;margin-top:10px;page-break-inside:avoid"><div style="font-size:8.5pt;font-weight:700;color:#DC2626;margin-bottom:5px;">⚠ Items That Would Improve Accuracy</div>${(b.flags||[]).map(function(f){return`<div style="font-size:8pt;color:#991B1B;padding:2px 0 2px 6px;border-left:2px solid #DC2626">${f}</div>`;}).join('')}</div>` : '';
 
+  // Who You'll Need — contractor list for Part A (only for EU/Refurb)
+  const tradeListHTML = (function() {
+    if (pi.type === 'New Build') return '';
+    var trades = buildTradeContractorList(b);
+    if (!trades.length) return '';
+    var rows = trades.map(function(t) {
+      return '<tr><td style="font-size:15pt;text-align:center;padding:5px 4px;">' + t.icon + '</td>' +
+        '<td style="font-size:8.5pt;font-weight:600;color:#1E293B;">' + t.trade + '</td>' +
+        '<td style="font-size:7.5pt;color:#475569;">' + t.note + '</td>' +
+        '<td style="text-align:center;font-size:7.5pt;font-weight:700;color:' + (t.seai ? '#059669' : '#94a3b8') + ';">' +
+        (t.seai ? '✓ SEAI REG.' : 'Standard') + '</td></tr>';
+    }).join('');
+    return '<div style="margin-top:14px;border:1px solid #E2E8F0;border-radius:5px;padding:12px 14px;page-break-inside:avoid">' +
+      '<div style="font-size:8.5pt;font-weight:700;color:#475569;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">🔧 Contractors You\'ll Need</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:8pt;">' +
+      '<thead><tr style="background:#F1F5F9;">' +
+      '<th style="width:30px;padding:4px;"></th>' +
+      '<th style="text-align:left;padding:4px;font-weight:700;color:#475569;font-size:7.5pt;">Trade</th>' +
+      '<th style="text-align:left;padding:4px;font-weight:700;color:#475569;font-size:7.5pt;">Scope &amp; Notes</th>' +
+      '<th style="text-align:center;padding:4px;font-weight:700;color:#475569;font-size:7.5pt;">SEAI Status</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<div style="font-size:7.5pt;color:#94a3b8;margin-top:6px;padding-top:6px;border-top:1px solid #E2E8F0;">Verify registration before signing contracts: <strong>seai.ie/find-contractor</strong></div>' +
+      '</div>';
+  })();
+
   const partAHTML = `
   <div class="pdf-part-page">
     <div class="pdf-part-header">A — Cost Plan Summary</div>
@@ -14195,6 +14302,7 @@ function exportPDF() {
     </table>
     ${flagsHTML}
     ${assumHTML}
+    ${tradeListHTML}
   </div>`;
 
   // ── PART B — DETAILED BOQ ──────────────────────────────────────────────────
