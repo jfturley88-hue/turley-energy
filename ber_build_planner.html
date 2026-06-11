@@ -5555,7 +5555,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       </div>
     </div>
   </div>
-  <div class="license-footer">BER Cost Planner &nbsp;·&nbsp; Indicative Bill of Quantities &nbsp;·&nbsp; Guide accuracy ±15–20% &nbsp;·&nbsp; Irish market rates 2026 &nbsp;·&nbsp; For preliminary cost planning purposes only — engage a SCSI-registered QS for procurement &nbsp;·&nbsp; SEAI grant data: seai.ie, effective 3 Feb / 4 Mar 2026</div>
+  <div class="license-footer">BER Cost Planner &nbsp;·&nbsp; Indicative Bill of Quantities &nbsp;·&nbsp; Independent indicative estimate ±15–20%  ·  SCSI Cost Plan format &nbsp;·&nbsp; Irish market rates 2026 &nbsp;·&nbsp; For preliminary cost planning purposes only — engage a SCSI-registered QS for procurement &nbsp;·&nbsp; SEAI grant data: seai.ie, effective 3 Feb / 4 Mar 2026</div>
 </div>
 <div id="toast"></div>
 
@@ -13103,6 +13103,16 @@ function renderGrantsPanel() {
         <div style="font-size:11px;color:#8090A8;line-height:1.6;">Individual grants are applied for separately through the SEAI online portal at <strong>seai.ie</strong>. You must use a <strong>SEAI-registered contractor</strong> for all works. Grant payment is made directly to you after works are complete and inspected. Windows &amp; Doors grant available as standalone from March 2026.</div>
       </div>`;
 
+  const nextStepsNote = `<div style="padding:11px 13px;border-radius:9px;background:rgba(36,48,68,0.6);border:1px solid rgba(46,61,82,0.7);margin-top:10px;">
+    <div style="font-size:11px;font-weight:700;color:#E8A020;margin-bottom:8px;">📋 What to Do With This Report</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div style="font-size:11px;color:#C8D0DC;padding-left:10px;border-left:2px solid #E8A020;line-height:1.5;"><strong style="color:#fff;">1. Share with contractors</strong><br>Send the PDF BOQ to at least 2–3 contractors for quotes. Ask them to price each section separately.</div>
+      <div style="font-size:11px;color:#C8D0DC;padding-left:10px;border-left:2px solid #2D7A4F;line-height:1.5;"><strong style="color:#fff;">2. Verify SEAI registration</strong><br>Check each contractor is listed at <strong>seai.ie/find-contractor</strong> before signing any contract.</div>
+      <div style="font-size:11px;color:#C8D0DC;padding-left:10px;border-left:2px solid #E8A020;line-height:1.5;"><strong style="color:#fff;">3. Apply for grants first</strong><br>Submit your SEAI grant application <em>before</em> works begin. Grant approval is required in advance for Individual Grants.</div>
+      <div style="font-size:11px;color:#C8D0DC;padding-left:10px;border-left:2px solid #2D7A4F;line-height:1.5;"><strong style="color:#fff;">4. Track actuals here</strong><br>Use the Quoted € and Actual € columns in the full BOQ to compare contractor quotes and final costs as work progresses.</div>
+    </div>
+  </div>`;
+
   const lastSecIdx = b.sections.length - 1;
   document.getElementById('main-panel').innerHTML = `
     <div class="sec-header" style="background:rgba(5,150,105,0.15);border:1px solid rgba(5,150,105,0.25);">
@@ -13163,6 +13173,7 @@ function renderGrantsPanel() {
       <div style="font-size:11px;font-weight:700;color:#C8D0DC;margin-bottom:5px;">⚖️ Independent Estimate — For Bank &amp; Grant Applications</div>
       <div style="font-size:11px;color:#8090A8;line-height:1.7;">This BOQ was generated from DEAP survey geometry — it is <strong style="color:#C8D0DC;">not prepared by your contractor</strong>. Use it to verify that contractor quotes are reasonable before works begin. Contractors should quote on the <strong style="color:#C8D0DC;">gross costs</strong> shown above; SEAI grants reduce the amount you ultimately pay. If a contractor's quote is close to the <em>net</em> figure (i.e. suspiciously near the post-grant price), the grant may not be delivering real savings — always compare against the gross BOQ total.</div>
     </div>
+    ${nextStepsNote}
     ${ossNote}
   `;
 }
@@ -14003,6 +14014,42 @@ function exportPDF() {
   const projIcon = pi.type === 'Energy Upgrade' ? '⚡' : pi.type === 'Refurbishment' ? '🔨' : '🏗';
   const dateStr = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
 
+  // Pre-compute green loan guide and energy savings for cover page
+  const _pdfNetLoan = su.netTotal || 0;
+  const _r = 0.04/12, _n = 120;
+  const _pdfMonthly = (hasGrants && _pdfNetLoan > 1000)
+    ? Math.round(_pdfNetLoan * _r * Math.pow(1+_r,_n) / (Math.pow(1+_r,_n)-1)) : 0;
+  const _pdfSaving = hasGrants ? estimateEnergySaving(b) : null;
+  const _pdfGrantBox = hasGrants ? (function(){
+    const savRow = _pdfSaving
+      ? '<div style="font-size:8pt;color:#059669;margin-top:8px;border-top:1px solid #BBF7D0;padding-top:7px;">' +
+        '⚡ Estimated annual energy saving (' + _pdfSaving.cur + ' → ' + _pdfSaving.tgt + '): ' +
+        '<strong>~€' + _pdfSaving.annual.toLocaleString('en-IE') + '/yr</strong>' +
+        (_pdfSaving.payback ? ' · payback ~' + _pdfSaving.payback + ' yrs' : '') + '</div>'
+      : '';
+    const cols = _pdfMonthly > 0 ? '1fr 1fr 1fr 1fr' : '1fr 1fr 1fr';
+    const loanCol = _pdfMonthly > 0
+      ? '<div><div style="font-size:7pt;color:#475569;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Green Loan Guide</div>' +
+        '<div style="font-size:11pt;font-weight:700;color:#1E293B;">~€' + _pdfMonthly.toLocaleString('en-IE') + '/mo</div>' +
+        '<div style="font-size:7pt;color:#94a3b8;">4% · 10 years</div></div>'
+      : '';
+    return '<div style="margin-top:12px;border:1px solid #BBF7D0;border-radius:5px;padding:12px 14px;background:#F0FDF4;">' +
+      '<div style="font-size:8pt;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px;">SEAI Grant Impact Summary</div>' +
+      '<div style="display:grid;grid-template-columns:' + cols + ';gap:8px;">' +
+      '<div><div style="font-size:7pt;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Gross Cost</div>' +
+      '<div style="font-size:11pt;font-weight:700;color:#1E293B;">' + fmt(su.gross||su.total||0) + '</div></div>' +
+      '<div><div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">SEAI Grants</div>' +
+      '<div style="font-size:11pt;font-weight:700;color:#059669;">−' + fmt(su.grantsTotal) + '</div></div>' +
+      '<div style="background:#DCFCE7;border-radius:4px;padding:6px;border:1px solid #BBF7D0;">' +
+      '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Net to Finance</div>' +
+      '<div style="font-size:13pt;font-weight:900;color:#059669;">' + fmt(su.netTotal) + '</div></div>' +
+      loanCol + '</div>' + savRow +
+      '<div style="font-size:7pt;color:#94a3b8;margin-top:8px;border-top:1px solid #BBF7D0;padding-top:6px;">' +
+      'This BOQ is an <strong>independent indicative estimate</strong> — not prepared by the contractor. ' +
+      'Contractors must quote on the <strong>gross cost</strong> above. SEAI grants should reduce your invoice, not justify inflated pricing. ' +
+      'Only SEAI-registered contractors qualify for grant payment.</div></div>';
+  })() : '';
+
   // ── COVER ──────────────────────────────────────────────────────────────────
   const coverHTML = `
   <div class="pdf-cover">
@@ -14033,6 +14080,7 @@ function exportPDF() {
       </div>
       <div class="pdf-cover-total-val">${fmt(hasGrants ? su.netTotal : (su.gross || su.total || 0))}</div>
     </div>
+    ${_pdfGrantBox}
     <div class="pdf-cover-meta">
       Generated: ${dateStr}  ·  Guide accuracy ±15–20%  ·  Irish market rates Q2 2026  ·  Not a substitute for a formal Quantity Surveyor’s report. Engage a SCSI-registered QS for procurement purposes.
     </div>
@@ -14241,7 +14289,7 @@ function exportPDF() {
     </div>`;
   });
 
-  const footerHTML = `<div class="pdf-footer"><span>PlanitBER — Approximate BOQ · ${pi.name||''} · ${pi.type}</span><span>Guide accuracy ±15–20% · Irish market rates · Not a substitute for a formal QS report</span></div>`;
+  const footerHTML = `<div class="pdf-footer"><span>PlanitBER — Approximate BOQ · ${pi.name||''} · ${pi.type}</span><span>Independent indicative estimate ±15–20% · Irish market rates Q2 2026 · SCSI Cost Plan format · Not a substitute for a formal QS report</span></div>`;
 
   let printDiv = document.getElementById('pdf-print-view');
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
