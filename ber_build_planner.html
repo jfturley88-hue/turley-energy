@@ -12994,6 +12994,22 @@ function buildReport() {
     ? `Prelims · Contingency · VAT 13.5% incl. · Net after SEAI grants: ${fmt(su.netTotal)}`
     : 'Contingency · Plant · VAT 13.5% incl.';
 
+  // Inject "independent estimate" badge into report meta for EU/Refurb
+  (function() {
+    var existing = document.getElementById('rpt-independent-badge');
+    if (existing) existing.remove();
+    if (pi.type !== 'New Build') {
+      var metaEl = document.getElementById('rpt-meta');
+      if (metaEl && metaEl.parentNode) {
+        var badge = document.createElement('div');
+        badge.id = 'rpt-independent-badge';
+        badge.style.cssText = 'margin-top:5px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);font-size:10px;font-weight:600;color:#10B981;letter-spacing:0.04em;';
+        badge.textContent = '⊕ Independent Indicative BOQ · SCSI Cost Plan Format · ±20%';
+        metaEl.parentNode.insertBefore(badge, metaEl.nextSibling);
+      }
+    }
+  })();
+
   // Part labels depend on project type
   const hasExt = pi.hasExtension;
   let partDesc;
@@ -13015,6 +13031,26 @@ function switchSection(id) {
   const btn = document.getElementById('sec-btn-' + id);
   if (btn) btn.classList.add('active');
   renderMainPanel();
+}
+
+// Estimate annual energy saving from BER improvement (kWh primary energy method)
+function estimateEnergySaving(b) {
+  var pi = b.projectInfo || {};
+  var fa = parseFloat(pi.floorArea) || 100;
+  var berMid = {
+    'A1':12,'A2':37,'A3':62,'B1':87,'B2':112,'B3':137,
+    'C1':162,'C2':187,'C3':230,'D1':280,'D2':340,'E1':415,'E2':485,'F':575,'G':700
+  };
+  var cur = (pi.currentBER || '').toUpperCase().replace(/\s/g,'');
+  var tgt = (pi.targetBER  || '').toUpperCase().replace(/\s/g,'');
+  if (cur && tgt && berMid[cur] && berMid[tgt] && berMid[cur] > berMid[tgt]) {
+    var savKwh = (berMid[cur] - berMid[tgt]) * fa;
+    var savEur  = Math.round(savKwh * 0.14 / 50) * 50;
+    var payback = (savEur > 0 && b.summary && b.summary.netTotal > 0)
+      ? Math.round(b.summary.netTotal / savEur * 10) / 10 : null;
+    return { annual: savEur, payback: payback, cur: cur, tgt: tgt };
+  }
+  return null;
 }
 
 function renderGrantsPanel() {
@@ -13098,13 +13134,34 @@ function renderGrantsPanel() {
       <button class="nav-prev" onclick="switchSection('${b.sections[lastSecIdx].id}')">← Prev</button>
       <button class="nav-next" disabled>Next →</button>
     </div>
-    <div style="padding:13px;border-radius:9px;background:#F0FDF4;border:1px solid #BBF7D0;margin-top:4px;">
-      <div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:5px;">📊 Cost Summary After SEAI Grants</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;">
-        <div style="text-align:center;"><div style="font-size:10px;color:#8090A8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Gross Total</div><div style="font-size:15px;font-weight:700;color:#1E293B;">${fmt(b.summary.total)}</div></div>
-        <div style="text-align:center;"><div style="font-size:10px;color:#059669;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">SEAI Grants</div><div style="font-size:15px;font-weight:700;color:#059669;">−${fmt(b.summary.grantsTotal)}</div></div>
-        <div style="text-align:center;background:rgba(16,185,129,0.08);border-radius:7px;padding:6px;border:1px solid rgba(16,185,129,0.2);"><div style="font-size:10px;color:#059669;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Net to Pay</div><div style="font-size:17px;font-weight:900;color:#059669;">${fmt(b.summary.netTotal)}</div></div>
-      </div>
+    ${(function(){
+      // ── Cost Summary ─────────────────────────────────────────────────────────
+      const saving = estimateEnergySaving(b);
+      const netLoan = b.summary.netTotal || 0;
+      const r = 0.04 / 12, n = 120;
+      const monthly = netLoan > 1000 ? Math.round(netLoan * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1)) : 0;
+      const savingRow = saving
+        ? '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid #BBF7D0;">' +
+          '<div style="font-size:11px;color:#059669;">⚡ Est. annual energy saving (' + saving.cur + ' → ' + saving.tgt + ')</div>' +
+          '<div style="font-size:13px;font-weight:700;color:#059669;">~€' + saving.annual.toLocaleString('en-IE') + '/yr' +
+          (saving.payback ? ' · payback ~' + saving.payback + ' yrs' : '') + '</div></div>'
+        : '';
+      const loanRow = monthly > 0
+        ? '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid #BBF7D0;">' +
+          '<div style="font-size:11px;color:#059669;">🏦 Green loan guide · ' + fmt(netLoan) + ' @ 4% over 10 yrs</div>' +
+          '<div style="font-size:13px;font-weight:700;color:#059669;">~€' + monthly.toLocaleString('en-IE') + '/mo</div></div>'
+        : '';
+      return '<div style="padding:13px;border-radius:9px;background:#F0FDF4;border:1px solid #BBF7D0;margin-top:4px;">' +
+        '<div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:5px;">📊 Cost Summary After SEAI Grants</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px;">' +
+        '<div style="text-align:center;"><div style="font-size:10px;color:#8090A8;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Gross Total</div><div style="font-size:15px;font-weight:700;color:#1E293B;">' + fmt(b.summary.total) + '</div></div>' +
+        '<div style="text-align:center;"><div style="font-size:10px;color:#059669;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">SEAI Grants</div><div style="font-size:15px;font-weight:700;color:#059669;">−' + fmt(b.summary.grantsTotal) + '</div></div>' +
+        '<div style="text-align:center;background:rgba(16,185,129,0.08);border-radius:7px;padding:6px;border:1px solid rgba(16,185,129,0.2);"><div style="font-size:10px;color:#059669;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;">Net to Pay</div><div style="font-size:17px;font-weight:900;color:#059669;">' + fmt(b.summary.netTotal) + '</div></div>' +
+        '</div>' + savingRow + loanRow + '</div>';
+    })()}
+    <div style="padding:11px 13px;border-radius:9px;background:rgba(46,61,82,0.35);border:1px solid rgba(46,61,82,0.7);margin-top:10px;">
+      <div style="font-size:11px;font-weight:700;color:#C8D0DC;margin-bottom:5px;">⚖️ Independent Estimate — For Bank &amp; Grant Applications</div>
+      <div style="font-size:11px;color:#8090A8;line-height:1.7;">This BOQ was generated from DEAP survey geometry — it is <strong style="color:#C8D0DC;">not prepared by your contractor</strong>. Use it to verify that contractor quotes are reasonable before works begin. Contractors should quote on the <strong style="color:#C8D0DC;">gross costs</strong> shown above; SEAI grants reduce the amount you ultimately pay. If a contractor's quote is close to the <em>net</em> figure (i.e. suspiciously near the post-grant price), the grant may not be delivering real savings — always compare against the gross BOQ total.</div>
     </div>
     ${ossNote}
   `;
