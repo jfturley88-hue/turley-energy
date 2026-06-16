@@ -13428,16 +13428,11 @@ function renderEUTable(b) {
 
   tbodyRows +=
     '<tr class="eu-total-row">' +
-      '<td colspan="3" class="eu-c-num" style="text-align:left;padding-left:14px;font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.04em;">TOTAL (VAT · O&amp;P · Contingency all included)</td>' +
+      '<td colspan="3" class="eu-c-num" style="text-align:left;padding-left:14px;font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.04em;">TOTAL</td>' +
       '<td class="eu-c-est" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
       '<td class="eu-c-act" id="eu-grand-act">—</td>' +
       '<td class="eu-c-grants" id="eu-grand-grants" style="color:#059669;font-weight:700;">−'+fmt(totalGrts)+'</td>' +
       '<td></td>' +
-    '</tr>' +
-    '<tr class="eu-net-row">' +
-      '<td colspan="3" style="padding:8px 14px;font-size:10px;color:#8090A8;">Net cost after SEAI grants <span style="font-size:9px;">· VAT 13.5% · O&amp;P 12% · Contingency 10% — all included above</span></td>' +
-      '<td colspan="2" id="eu-net-cost" style="padding:8px 6px;font-size:14px;font-weight:900;color:#4ade80;">'+fmt(netTotal)+'</td>' +
-      '<td colspan="2" style="padding:8px 6px;font-size:9px;color:#6B7280;">Independent estimate — not prepared by the contractor.<br>Contractors quote on gross figures above. SEAI grants reduce the invoice.</td>' +
     '</tr>';
 
   return '<div id="eu-table-container">' +
@@ -13454,10 +13449,10 @@ function renderEUTable(b) {
     '</tr></thead>' +
     '<tbody>'+tbodyRows+'</tbody>' +
     '</table>' +
-    '<div class="eu-disclaimer">⚠ Indicative estimate ±15–20%. All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
-    'This is an <strong>independent estimate</strong> — not prepared by a contractor. ' +
-    'Contractors must quote on the gross estimated spend shown above — SEAI grants should reduce your invoice, not justify inflated pricing. ' +
-    'Only SEAI-registered contractors qualify for grant payment.</div>' +
+    '<div class="eu-disclaimer">All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
+    'Independent estimate — not prepared by a contractor. ' +
+    'Contractors quote on gross figures above — SEAI grants should reduce your invoice, not justify inflated pricing. ' +
+    'Only SEAI-registered contractors qualify for grant payment. Indicative accuracy ±15–20%.</div>' +
     '</div>';
 }
 
