@@ -318,16 +318,16 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-pb-list{margin:0;padding-left:14px;list-style:disc;}
 .eu-pb-list li{margin-bottom:2px;color:#94a3b8;font-size:10px;line-height:1.3;}
 .eu-c-est{text-align:right;font-weight:700;color:#E8A020;white-space:nowrap;width:100px;}
-.eu-c-act{text-align:right;width:100px;}
-.eu-act-input{width:88px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#E2E8F0;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
-.eu-act-input:focus{outline:1px solid #4ade80;border-color:#4ade80;}
-.eu-c-grants{text-align:right;white-space:nowrap;width:110px;}
+.eu-c-act{text-align:right;width:100px;color:#38bdf8;}
+.eu-act-input{width:88px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#38bdf8;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
+.eu-act-input:focus{outline:1px solid #38bdf8;border-color:#38bdf8;}
+.eu-c-grants{text-align:right;white-space:nowrap;width:110px;color:#059669;}
 .eu-c-notes{min-width:110px;}
 .eu-note-input{width:100%;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
 .eu-note-input:focus{outline:1px solid rgba(74,222,128,.4);border-color:rgba(74,222,128,.4);}
 .eu-total-row td{border-top:2px solid rgba(74,222,128,.35)!important;background:rgba(74,222,128,.06);font-weight:700;padding:10px 6px;}
 .eu-total-row .eu-c-est{font-size:13px;color:#E8A020;}
-.eu-total-row .eu-c-act{font-size:13px;color:#E2E8F0;}
+.eu-total-row .eu-c-act{font-size:13px;color:#38bdf8;}
 .eu-total-row .eu-c-grants{font-size:13px;color:#059669;}
 .eu-net-row td{background:rgba(74,222,128,.03);padding:8px 6px;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
@@ -13442,9 +13442,9 @@ function renderEUTable(b) {
       '<th class="eu-r" style="width:30px;">#</th>' +
       '<th>Energy Upgrade</th>' +
       '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
-      '<th class="eu-r">Estimated Spend</th>' +
-      '<th class="eu-r">Actual Spend ✏</th>' +
-      '<th class="eu-r">Grants</th>' +
+      '<th class="eu-r" style="color:#E8A020;">Estimated Spend</th>' +
+      '<th class="eu-r" style="color:#38bdf8;">Actual Spend ✏</th>' +
+      '<th class="eu-r" style="color:#059669;">Grants</th>' +
       '<th>Build Notes</th>' +
     '</tr></thead>' +
     '<tbody>'+tbodyRows+'</tbody>' +
