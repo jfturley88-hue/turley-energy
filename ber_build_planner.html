@@ -303,6 +303,40 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 /* ── EXPORT PDF BUTTON ───────────────────────────────────────────────────── */
 .export-pdf-btn{padding:5px 13px;border-radius:6px;background:rgba(232,160,32,0.15);border:1px solid rgba(232,160,32,0.4);color:#E8A020;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background 0.15s;}
 .export-pdf-btn:hover{background:rgba(232,160,32,0.28);}
+/* ── EU Measure Table ────────────────────────────────────────────── */
+#eu-table-container{overflow-x:auto;}
+.eu-measure-table{width:100%;border-collapse:collapse;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;}
+.eu-measure-table thead th{background:#0d1e2a;color:#8090A8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:8px 6px;border-bottom:2px solid rgba(74,222,128,.4);text-align:left;white-space:nowrap;}
+.eu-measure-table thead th.eu-r{text-align:right;}
+.eu-row td{border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;padding:8px 6px;}
+.eu-row:nth-child(even) td{background:rgba(255,255,255,.015);}
+.eu-row:hover td{background:rgba(74,222,128,.04);}
+.eu-c-num{text-align:center;color:#6B7280;font-weight:600;font-size:10px;width:30px;}
+.eu-c-measure{font-weight:600;min-width:140px;}
+.eu-measure-name{font-size:11px;color:#E2E8F0;line-height:1.35;}
+.eu-c-basis{font-size:10px;color:#94a3b8;min-width:160px;}
+.eu-pb-list{margin:0;padding-left:14px;list-style:disc;}
+.eu-pb-list li{margin-bottom:2px;color:#94a3b8;font-size:10px;line-height:1.3;}
+.eu-c-est{text-align:right;font-weight:700;color:#E8A020;white-space:nowrap;width:100px;}
+.eu-c-act{text-align:right;width:100px;}
+.eu-act-input{width:88px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#E2E8F0;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
+.eu-act-input:focus{outline:1px solid #4ade80;border-color:#4ade80;}
+.eu-c-grants{text-align:right;white-space:nowrap;width:110px;}
+.eu-c-notes{min-width:110px;}
+.eu-note-input{width:100%;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
+.eu-note-input:focus{outline:1px solid rgba(74,222,128,.4);border-color:rgba(74,222,128,.4);}
+.eu-total-row td{border-top:2px solid rgba(74,222,128,.35)!important;background:rgba(74,222,128,.06);font-weight:700;padding:10px 6px;}
+.eu-total-row .eu-c-est{font-size:13px;color:#E8A020;}
+.eu-total-row .eu-c-act{font-size:13px;color:#E2E8F0;}
+.eu-total-row .eu-c-grants{font-size:13px;color:#059669;}
+.eu-net-row td{background:rgba(74,222,128,.03);padding:8px 6px;}
+.eu-oss-row td{background:rgba(99,102,241,.04);}
+.eu-ber-row td{background:rgba(16,185,129,.03);}
+.eu-disclaimer{font-size:9px;color:#4B5563;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.5;}
+@media(max-width:768px){
+  .eu-c-basis{display:none;}
+  .eu-c-notes{display:none;}
+}
 
 /* PDF UPLOAD ZONE */
 .pdf-upload-zone{border:2px dashed rgba(232,160,32,0.5);border-radius:12px;background:rgba(232,160,32,0.04);padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
@@ -5527,7 +5561,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
           <button class="new-project-btn" onclick="hide('screen-report');show('screen-input');" style="padding:6px 13px;font-size:12px;">&#8592; Back to Inputs</button>
           <button onclick="saveProject()" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#E8A020;color:#1a2332;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#cf8f1a'" onmouseout="this.style.background='#E8A020'">&#128190; Save Project</button>
-          <button onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128196; Download PDF</button>
+          <span id="pdf-btn-wrap"><button id="pdf-download-btn" onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128196; Download PDF</button></span>
         </div>
         <div>
           <div class="report-proj-name" id="rpt-name">BOQ Report</div>
@@ -5944,81 +5978,81 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
                    measures.includes('ashp') || measures.includes('hybrid-hp');
 
   if (hasMeasure('roof_insulation') || hasMeasure('rafter_insulation') || d.roofInsulation) {
-    items.push({ ref:'G'+gRef++, description:'Attic / Roof Insulation Grant',
+    items.push({ ref:'G'+gRef++, description:'Attic / Roof Insulation Grant', measureKey:'roof',
       note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
       amount: g.atticInsulation[dt] || g.atticInsulation.detached });
   }
   if (hasMeasure('wall_insulation') && !hasMeasure('iwi')) {
-    items.push({ ref:'G'+gRef++, description:'Cavity Wall Insulation Grant',
+    items.push({ ref:'G'+gRef++, description:'Cavity Wall Insulation Grant', measureKey:'wall_cavity',
       note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
       amount: g.cavityWall[dt] || g.cavityWall.detached });
   }
   if (hasMeasure('wall_insulation') && (d.existWallType||'').toLowerCase().includes('solid')) {
-    items.push({ ref:'G'+gRef++, description:'External Wall Insulation (EWI) Grant',
+    items.push({ ref:'G'+gRef++, description:'External Wall Insulation (EWI) Grant', measureKey:'wall_ewi',
       note:dt+' \u2014 SEAI Better Energy Homes 2026',
       amount: g.ewiWall[dt] || g.ewiWall.detached });
   }
   if (hasMeasure('iwi')) {
-    items.push({ ref:'G'+gRef++, description:'Internal Wall Insulation (IWI / Dry-lining) Grant',
+    items.push({ ref:'G'+gRef++, description:'Internal Wall Insulation (IWI / Dry-lining) Grant', measureKey:'wall_iwi',
       note:dt+' \u2014 SEAI Better Energy Homes 2026',
       amount: g.iwiWall[dt] || g.iwiWall.detached });
   }
   // Floor insulation \u2014 OSS only (not available under Better Energy Homes)
   if (isOSS && (hasMeasure('floor_insulation') || hasMeasure('suspended_floor_insulation'))) {
-    items.push({ ref:'G'+gRef++, description:'Floor Insulation Grant', ossExclusive: true,
+    items.push({ ref:'G'+gRef++, description:'Floor Insulation Grant', measureKey:'floor', ossExclusive: true,
       note:'OSS-exclusive \u2014 flat rate all dwelling types (SEAI National Upgrade Scheme)',
       amount: g.ossFloor });
   }
   if (hasMeasure('windows')) {
-    items.push({ ref:'G'+gRef++, description:'Windows Grant',
+    items.push({ ref:'G'+gRef++, description:'Windows Grant', measureKey:'windows',
       note:dt+' \u2014 NEW standalone grant from 2 March 2026 (SEAI BEH)',
       amount: g.windows[dt] || g.windows.detached });
   }
   var dCount = Math.min(d.doorCount || 2, 2);
   if (hasMeasure('windows') && dCount > 0) {
-    items.push({ ref:'G'+gRef++, description:'External Doors Grant ('+dCount+' \u00d7 \u20ac800)',
+    items.push({ ref:'G'+gRef++, description:'External Doors Grant ('+dCount+' \u00d7 \u20ac800)', measureKey:'windows',
       note:'Max 2 doors \u2014 NEW from 2 March 2026 (SEAI BEH)',
       amount: dCount * g.doorPerUnit });
   }
   if (hasHeating || hasMeasure('heating')) {
     var hpAmt = dt === 'apartment' ? g.heatPumpApartment : g.heatPump;
-    items.push({ ref:'G'+gRef++, description:'Heat Pump System Grant (unit + distribution + Renewable Heat Bonus)',
+    items.push({ ref:'G'+gRef++, description:'Heat Pump System Grant (unit + distribution + Renewable Heat Bonus)', measureKey:'heating',
       note:'Up to \u20ac'+hpAmt.toLocaleString('en-IE')+' \u2014 increased 3 Feb 2026 (SEAI BEH)',
       amount: hpAmt });
-    items.push({ ref:'G'+gRef++, description:'Heat Pump Technical Assessment',
+    items.push({ ref:'G'+gRef++, description:'Heat Pump Technical Assessment', measureKey:'heating',
       note:'Pre-installation survey \u2014 SEAI registered assessor',
       amount: g.hpTechnicalAssess });
   }
   if (hasMeasure('solar_pv') || d.pvArea > 0) {
-    items.push({ ref:'G'+gRef++, description:'Domestic Solar PV Grant',
+    items.push({ ref:'G'+gRef++, description:'Domestic Solar PV Grant', measureKey:'solar_pv',
       note:'\u20ac1,800 max (\u20ac900/kWp up to 2kWp) \u2014 0% VAT also applies \u2014 SEAI 2026',
       amount: g.solarPV });
   }
   if (hasMeasure('solar_thermal')) {
-    items.push({ ref:'G'+gRef++, description:'Solar Thermal (Water Heating) Grant',
+    items.push({ ref:'G'+gRef++, description:'Solar Thermal (Water Heating) Grant', measureKey:'solar_thermal',
       note:'\u20ac1,200 \u2014 SEAI Better Energy Homes 2026',
       amount: g.solarThermal });
   }
   if (hasMeasure('ventilation') || d.ventilation === 'MVHR' || d.ventilation === 'MEV') {
     var ventLabel = (d.ventilation === 'MVHR' || (measures.includes('ventilation') && d.ventilationType === 'MVHR'))
       ? 'MVHR Mechanical Ventilation Grant' : 'MEV Mechanical Extract Ventilation Grant';
-    items.push({ ref:'G'+gRef++, description:ventLabel,
+    items.push({ ref:'G'+gRef++, description:ventLabel, measureKey:'ventilation',
       note:'\u20ac1,500 \u2014 SEAI Better Energy Homes 2026',
       amount: g.ventilation });
   }
   if (hasMeasure('smart_controls') && !hasHeating) {
-    items.push({ ref:'G'+gRef++, description:'Heating Controls Upgrade Grant',
+    items.push({ ref:'G'+gRef++, description:'Heating Controls Upgrade Grant', measureKey:'smart_controls',
       note:'\u20ac700 \u2014 cannot combine with heat pump grant (SEAI BEH 2026)',
       amount: g.heatingControls });
   }
-  items.push({ ref:'G'+gRef++, description:'BER Assessment Grant (post-works)',
+  items.push({ ref:'G'+gRef++, description:'BER Assessment Grant (post-works)', measureKey:'ber',
     note:'\u20ac300 \u2014 SEAI registered BER assessor (2026)',
     amount: g.berAssessment });
 
   // OSS-exclusive additional grants
   if (isOSS) {
     if (hasMeasure('airtight')) {
-      items.push({ ref:'G'+gRef++, description:'Air Tightness Grant', ossExclusive: true,
+      items.push({ ref:'G'+gRef++, description:'Air Tightness Grant', ossExclusive: true, measureKey:'airtightness',
         note:'OSS-exclusive \u2014 \u20ac1,000 (SEAI National Upgrade Scheme)',
         amount: g.ossAirtight });
     }
@@ -8372,6 +8406,7 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     projectInfo:{name:projName,type:'Retrofit',floorArea:fa,county,labourMultiplier:labMult,dwellingType,grantScheme},
     sections, grants,
     summary: su,
+    euInputs: inputs,
     flags:ms.length>0?[]:['No recommended measures selected — all sections included by default'],
     assumptions:['Retrofit rates at 2026 Irish market levels','Existing building assessed for standard upgrades'],
     deapDataReceived:[`Total floor area: ${fa}m²`,`Wall area: ${wa}m²`,`Roof area: ${ra}m²`],
@@ -13114,6 +13149,559 @@ function buildTradeContractorList(b) {
   return trades;
 }
 
+// ── EU MEASURE TABLE ─────────────────────────────────────────────────────────
+// Derives a measureKey from a section title — used to match grants to rows
+function _euMeasureKey(s) {
+  var t = (s.title || '').toUpperCase();
+  if (t.indexOf('CAVITY FILL') >= 0) return 'wall_cavity';
+  if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) return 'wall_ewi';
+  if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0 || t.indexOf('DRY-LINING') >= 0) return 'wall_iwi';
+  if (t.indexOf('CEILING LEVEL') >= 0 || t.indexOf('RAFTER') >= 0 || t.indexOf('FLAT ROOF') >= 0 || t.indexOf('ROOM-IN-ROOF') >= 0 || t.indexOf('ATTIC') >= 0) return 'roof';
+  if (t.indexOf('FLOOR INSULATION') >= 0 && t.indexOf('UNDERFLOOR') < 0) return 'floor';
+  if ((t.indexOf('WINDOWS') >= 0 || t.indexOf('WINDOW') >= 0) && t.indexOf('SECONDARY') < 0) return 'windows';
+  if (t.indexOf('EXTERNAL DOOR') >= 0) return 'windows';
+  if (t.indexOf('AIRTIGHTNESS') >= 0 || t.indexOf('AIR TIGHTNESS') >= 0) return 'airtightness';
+  if (t.indexOf('HEAT PUMP') >= 0 || t.indexOf('ASHP') >= 0 || t.indexOf('GSHP') >= 0 ||
+      t.indexOf('GROUND SOURCE') >= 0 || t.indexOf('CONDENSING BOILER') >= 0 ||
+      t.indexOf('BIOMASS') >= 0 || t.indexOf('HYBRID') >= 0 || t.indexOf('AIR-TO-AIR') >= 0) return 'heating';
+  if (t.indexOf('SOLAR PV') >= 0 || t.indexOf('RENEWABLES') >= 0) return 'solar_pv';
+  if (t.indexOf('SOLAR THERMAL') >= 0) return 'solar_thermal';
+  if (t.indexOf('VENTILATION') >= 0 || t.indexOf('MVHR') >= 0 || t.indexOf('MEV') >= 0 || t.indexOf('DMEV') >= 0) return 'ventilation';
+  if (t.indexOf('SMART HEATING CONTROLS') >= 0 || t.indexOf('HEATING CONTROLS') >= 0) return 'smart_controls';
+  if (t.indexOf('BER ASSESSMENT') >= 0) return 'ber';
+  return null;
+}
+
+// Derives human-readable pricing basis bullets from section items + stored inputs
+function _euPricingBasis(s, inp) {
+  inp = inp || {};
+  var t = (s.title || '').toUpperCase();
+  var items = s.items || [];
+  var pb = [];
+  function firstItemQty(frag) {
+    var it = items.find(function(i){ return (i.description||'').toLowerCase().indexOf(frag.toLowerCase()) >= 0; });
+    return it ? Math.round(it.quantity || 0) : null;
+  }
+  if (t.indexOf('PRELIMINARIES') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    pb.push('Programme: ~'+Math.max(6,Math.round((inp.floorArea||100)/15))+' weeks');
+  } else if (t.indexOf('CAVITY FILL') >= 0) {
+    var cq = firstItemQty('cavity fill'); if (cq) pb.push('Wall area: '+cq+'m²');
+    var cNames={'eps-bead':'blown EPS bead','mineral-wool':'blown mineral wool','walltite':'Walltite spray foam'};
+    pb.push('Fill: '+(cNames[inp.cavity_type]||inp.cavity_type||'blown EPS bead'));
+    if (inp.cavity_makegood) pb.push('Making good: included');
+  } else if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) {
+    var eq = firstItemQty('external wall insulation') || firstItemQty('ewi'); if (eq) pb.push('Net wall area: '+eq+'m²');
+    pb.push('Insulation: '+(inp.ewi_insulation||'eps')+' '+(inp.ewi_thickness||'150')+'mm');
+    pb.push('Render: '+(inp.ewi_render||'silicone'));
+    if (inp.ewi_makegood) pb.push('Making good: included');
+    var sq = firstItemQty('scaffolding'); if (sq) pb.push('Scaffold: '+sq+'m² gross elevation');
+  } else if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0) {
+    var iq = firstItemQty('pir insulated board'); if (iq) pb.push('Wall area: '+iq+'m²');
+    pb.push('System: '+(inp.iwi_type||'pir-dab'));
+    if (inp.iwi_makegood) pb.push('Making good: included');
+  } else if (t.indexOf('CEILING LEVEL') >= 0) {
+    var rcq = firstItemQty('ceiling-level'); if (rcq) pb.push('Ceiling area: '+rcq+'m²');
+    if (inp.roof_ceiling_type) pb.push('Type: '+inp.roof_ceiling_type);
+    if (inp.roof_ceiling_makegood) pb.push('Making good: included');
+  } else if (t.indexOf('RAFTER') >= 0) {
+    var rrq = firstItemQty('rafter'); if (rrq) pb.push('Rafter area: '+rrq+'m²');
+    if (inp.roof_rafter_system) pb.push('System: '+inp.roof_rafter_system);
+    if (inp.roof_rafter_thick) pb.push('Thickness: '+inp.roof_rafter_thick+'mm');
+    if (inp.roof_rafter_makegood) pb.push('Making good: included');
+  } else if (t.indexOf('FLAT ROOF') >= 0) {
+    var rfq = firstItemQty('flat roof'); if (rfq) pb.push('Roof area: '+rfq+'m²');
+    if (inp.roof_flat_system) pb.push('System: '+inp.roof_flat_system);
+    if (inp.roof_flat_thick) pb.push('Thickness: '+inp.roof_flat_thick+'mm');
+  } else if (t.indexOf('ROOM-IN-ROOF') >= 0) {
+    var rroomq = firstItemQty('room-in-roof'); if (rroomq) pb.push('Area: '+rroomq+'m²');
+    if (inp.roof_room_type) pb.push('System: '+inp.roof_room_type);
+  } else if (t.indexOf('FLOOR INSULATION') >= 0 && t.indexOf('UNDERFLOOR') < 0) {
+    var fq = firstItemQty('ground floor'); if (fq) pb.push('Floor area: '+fq+'m²');
+    if (inp.floor_system) pb.push('System: '+inp.floor_system);
+    if (inp.floor_thick) pb.push('Thickness: '+inp.floor_thick+'mm');
+    if (inp.floor_makegood) pb.push('Making good: included');
+  } else if (t.indexOf('WINDOWS') >= 0 && t.indexOf('SECONDARY') < 0) {
+    var wq = firstItemQty('external windows'); if (wq) pb.push('Window area: '+wq+'m²');
+    if (inp.windows_count) pb.push('Count: '+inp.windows_count+' units');
+    pb.push('Glazing: '+(inp.windows_glazing==='double'?'Double glazed':'Triple glazed'));
+    if (inp.windows_frame) pb.push('Frame: '+inp.windows_frame);
+    if (inp.windows_style) pb.push('Style: '+inp.windows_style);
+    if (inp.windows_dispose) pb.push('Disposal: included');
+  } else if (t.indexOf('EXTERNAL DOOR') >= 0) {
+    var dq = firstItemQty('external doors'); if (dq) pb.push('Count: '+dq+' doors');
+    pb.push('Type: '+(inp.doors_type||'composite'));
+    if (inp.doors_dispose) pb.push('Disposal: included');
+  } else if (t.indexOf('AIRTIGHTNESS') >= 0) {
+    var aq = firstItemQty('membrane'); if (aq) pb.push('Ceiling area: '+aq+'m²');
+    if (inp.airtight_membrane) pb.push('Membrane: '+inp.airtight_membrane);
+    if (inp.airtight_tests) pb.push('Blower-door tests: '+inp.airtight_tests+' nr');
+  } else if (t.indexOf('DRAUGHT') >= 0) {
+    pb.push('Doors: '+(inp.doorCount||2)+' nr');
+    pb.push('Chimneys: '+(inp.chimneyCount||inp.chimney_count||1)+' nr');
+    pb.push('Attic hatch: 1 nr');
+  } else if (t.indexOf('AIR-TO-WATER') >= 0 || t.indexOf('ASHP') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    var hq = firstItemQty('air-to-water heat pump'); if (hq != null) { var hi = items.find(function(i){return (i.description||'').indexOf('air-to-water heat pump')>=0;}); if(hi) pb.push('Unit: '+hi.description.match(/\(\d+kW\)/)?.[0]||'size from heat loss'); }
+    var emitLabels={'ufh':'UFH ground floor (screed)','keep-rads':'retain existing radiators','ufh-rads':'UFH ground floor + rads upper floor','rads':'new low-temperature radiators'};
+    pb.push('Emitters: '+(emitLabels[inp.emitterType]||'new low-temperature radiators'));
+    pb.push('Remove: '+(inp.ashpRemove||inp.existHeating||'existing system'));
+  } else if (t.indexOf('CONDENSING BOILER') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    pb.push('Type: '+(inp.newHeating||'condensing boiler'));
+    pb.push('Combi: '+(inp.boilerCombi==='combi'?'Yes':'No'));
+  } else if (t.indexOf('GROUND SOURCE') >= 0 || t.indexOf('GSHP') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    pb.push('Array: '+(inp.gshp_type==='vertical'?'Vertical boreholes':'Horizontal slinky'));
+    if (inp.gshp_type==='horizontal' && inp.gshp_area) pb.push('Trench: '+inp.gshp_area+'m');
+  } else if (t.indexOf('BIOMASS') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    if (inp.biomassStore) pb.push('Storage: '+inp.biomassStore);
+  } else if (t.indexOf('AIR-TO-AIR') >= 0) {
+    if (inp.airAirZones) pb.push('Zones: '+inp.airAirZones+' nr');
+    if (inp.airAirTier) pb.push('Tier: '+inp.airAirTier);
+  } else if (t.indexOf('HYBRID') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    if (inp.hybrid_fuel) pb.push('Backup fuel: '+inp.hybrid_fuel);
+    if (inp.hybrid_emitter) pb.push('Emitters: '+inp.hybrid_emitter);
+  } else if (t.indexOf('MVHR') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    pb.push('System: MVHR (whole-house heat recovery)');
+    if (inp.mvhr_unit) pb.push('Unit tier: '+inp.mvhr_unit);
+    pb.push('Rooms: '+((inp.roomsDown||4)+(inp.roomsUp||4))+' ('+((inp.roomsDown||4)+(inp.roomsUp||4))*2+' terminals)');
+  } else if (t.indexOf('DMEV') >= 0) {
+    pb.push('System: DMEV (decentralised extract)');
+    pb.push('Wet rooms: '+((inp.bathrooms||1)+(inp.ensuites||0)+(inp.wc||0))+' + kitchen');
+  } else if (t.indexOf('MECHANICAL EXTRACT') >= 0 || t.indexOf('MEV') >= 0) {
+    pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
+    pb.push('System: MEV (centralised whole-house extract)');
+    pb.push('Extract terminals: '+Math.max(3,(inp.bathrooms||1)+(inp.ensuites||0)+1)+' nr');
+    if (inp.mev_trickle) pb.push('Trickle vents: '+(inp.windowCount||Math.round((inp.floorArea||100)*0.15/1.5))+' nr');
+  } else if (t.indexOf('SOLAR PV') >= 0 || t.indexOf('RENEWABLES') >= 0) {
+    var pva = inp.pvArea||0; if (pva) pb.push('PV area: '+pva+'m²');
+    var pvp = Math.max(1,Math.floor(pva/1.7)); pb.push('Panels: ~'+pvp+' nr (400Wp)');
+    if (inp.pv_orientation) pb.push('Orientation: '+inp.pv_orientation);
+    if (inp.pv_panel) pb.push('Panel type: '+inp.pv_panel);
+    if (inp.battery && inp.battery!=='no' && inp.battery!=='No') pb.push('Battery: '+inp.battery+'kWh'); else pb.push('No battery storage');
+  } else if (t.indexOf('SOLAR THERMAL') >= 0) {
+    if (inp.solarThermalArea) pb.push('Collector area: '+inp.solarThermalArea+'m²');
+    pb.push('Cylinder: '+(inp.solar_th_cyl==='twin-coil'?'new 300L twin-coil':'connect to existing'));
+  } else if (t.indexOf('HEAT PUMP WATER HEATER') >= 0) {
+    pb.push('Cylinder: '+(inp.hpwh_size||200)+'L integrated');
+  } else if (t.indexOf('UNDERFLOOR') >= 0) {
+    pb.push('Ground floor area: '+(inp.groundFloor||Math.round((inp.floorArea||100)*0.5))+'m²');
+    pb.push('Retrofit screed system');
+  } else if (t.indexOf('ELECTRICAL UPGRADES') >= 0) {
+    pb.push('Dedicated circuits for EU measures');
+    pb.push('ETCI certification');
+  } else if (t.indexOf('CONSUMER UNIT') >= 0) {
+    pb.push((inp.consumer_ways||18)+'-way consumer unit');
+    if (inp.consumer_type) pb.push('Type: '+inp.consumer_type);
+  } else if (t.indexOf('LED LIGHTING') >= 0) {
+    pb.push('~'+Math.round((inp.floorArea||100)/8)+' fittings throughout');
+    if (inp.led_type) pb.push('Type: '+inp.led_type);
+    if (inp.led_smart) pb.push('Smart controls: included');
+  } else if (t.indexOf('EV CHARGING') >= 0) {
+    if (inp.ev_brand) pb.push('Charger: '+inp.ev_brand);
+    if (inp.ev_cable) pb.push('Cable run: '+inp.ev_cable+'m');
+  } else if (t.indexOf('SMART HEATING CONTROLS') >= 0) {
+    pb.push('Smart thermostat: 1 nr');
+    pb.push('Smart TRV heads: ~'+Math.round((inp.floorArea||100)/16)+' nr');
+    pb.push('Cylinder control: 1 nr');
+  } else if (t.indexOf('HOT WATER CYLINDER') >= 0) {
+    var hwb=inp.roomsUp||3; pb.push('Cylinder: '+(hwb<=2?150:hwb<=3?210:hwb<=4?250:300)+'L unvented ('+hwb+' bed)');
+  } else if (t.indexOf('IMMERSION') >= 0) {
+    pb.push('Replace element & thermostat in existing cylinder');
+  } else if (t.indexOf('PIPE INSULATION') >= 0) {
+    pb.push('HW pipework + cylinder lagging jacket');
+  } else if (t.indexOf('MAKING GOOD') >= 0) {
+    pb.push('Patch repair to insulation areas');
+    pb.push('Decoration to affected areas');
+  } else if (t.indexOf('SECONDARY GLAZING') >= 0) {
+    var sgq = firstItemQty('secondary glazing'); if (sgq) pb.push('Window area: '+sgq+'m²');
+    pb.push('Internal magnetic or channel units');
+  } else if (t.indexOf('FINISHES') >= 0) {
+    var fp=[]; if(inp.fin_redecorate)fp.push('redecoration'); if(inp.fin_reveals)fp.push('window reveals');
+    if(inp.fin_skirtings)fp.push('skirtings'); if(inp.fin_tiling)fp.push('tiling');
+    if(inp.fin_floor)fp.push('floor finishes'); if(inp.fin_external)fp.push('external making good');
+    if(fp.length) pb.push('Includes: '+fp.join(', '));
+  } else if (t.indexOf('BER ASSESSMENT') >= 0) {
+    pb.push('Post-works BER assessment');
+    pb.push('SEAI registered assessor required');
+    pb.push('Certificate required before grant payment');
+  }
+  return pb.filter(Boolean);
+}
+
+// Renders the EU-specific measure table into #boq-accordion-wrap
+function renderEUTable(b) {
+  var pi = b.projectInfo || {};
+  var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
+  var grants   = b.grants || [];
+  var inp      = b.euInputs || {};
+
+  // Build grant map: measureKey → [grant objects] (non-OSS only)
+  var grantsByKey = {};
+  grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
+    if (!grantsByKey[g.measureKey]) grantsByKey[g.measureKey] = [];
+    grantsByKey[g.measureKey].push(g);
+  });
+
+  var LOAD_STD = 1.22 * 1.135; // prelims 12% + contingency 10% + VAT 13.5%
+  var LOAD_PV  = 1.22;          // solar PV: 0% VAT
+
+  var usedKeys = {};
+  var rowNum = 0, totalEst = 0, totalGrts = 0;
+  var tbodyRows = '';
+
+  sections.forEach(function(s) {
+    var load = s.zeroVat ? LOAD_PV : LOAD_STD;
+    var est  = Math.round((s.subtotal || 0) * load);
+    totalEst += est;
+
+    var mk = _euMeasureKey(s);
+    var secGrants = (mk && grantsByKey[mk] && !usedKeys[mk]) ? grantsByKey[mk] : [];
+    if (secGrants.length) usedKeys[mk] = true;
+    var gAmt = secGrants.reduce(function(a, g){ return a + (g.amount||0); }, 0);
+    totalGrts += gAmt;
+
+    var grantCell = gAmt > 0
+      ? '<span style="color:#059669;font-weight:700;">−'+fmt(gAmt)+'</span>'
+        + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description; }).join('<br>') + '</div>'
+      : '<span style="color:#475569;">—</span>';
+
+    var pb = _euPricingBasis(s, inp);
+    var pbHtml = pb.length
+      ? '<ul class="eu-pb-list">' + pb.map(function(t){ return '<li>'+t+'</li>'; }).join('') + '</ul>'
+      : '<em style="color:#4B5563;font-size:10px;">—</em>';
+
+    rowNum++;
+    var rid = 'eu-act-' + rowNum, nid = 'eu-note-' + rowNum;
+    tbodyRows +=
+      '<tr class="eu-row">' +
+        '<td class="eu-c-num">'+rowNum+'</td>' +
+        '<td class="eu-c-measure"><span class="eu-measure-name">'+s.title+'</span></td>' +
+        '<td class="eu-c-basis">'+pbHtml+'</td>' +
+        '<td class="eu-c-est">'+(est>0?fmt(est):'—')+'</td>' +
+        '<td class="eu-c-act"><input type="number" id="'+rid+'" class="eu-act-input" min="0" step="100" placeholder="—" oninput="updateEUActuals()"></td>' +
+        '<td class="eu-c-grants">'+grantCell+'</td>' +
+        '<td class="eu-c-notes"><textarea id="'+nid+'" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
+      '</tr>';
+  });
+
+  // BER assessment grant standalone row (if not already used by a BER section)
+  var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
+  if (berGrant) {
+    totalGrts += berGrant.amount||0;
+    tbodyRows +=
+      '<tr class="eu-row eu-ber-row">' +
+        '<td class="eu-c-num" style="color:#059669;">☑</td>' +
+        '<td class="eu-c-measure"><span class="eu-measure-name" style="color:#059669;">BER Assessment (post-works)</span></td>' +
+        '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate required before grant released</li></ul></td>' +
+        '<td class="eu-c-est">—</td>' +
+        '<td class="eu-c-act">—</td>' +
+        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</span><div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div></td>' +
+        '<td class="eu-c-notes">—</td>' +
+      '</tr>';
+  }
+
+  // OSS extra grant rows
+  var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
+  if (ossGrants.length) {
+    tbodyRows += '<tr class="eu-oss-header-row"><td colspan="7" style="padding:6px 14px;font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.07em;background:rgba(99,102,241,.07);border-top:1px solid rgba(99,102,241,.25);">⊕ One Stop Shop Additional Grants</td></tr>';
+    ossGrants.forEach(function(g) {
+      var oa = g.amount||0; totalGrts += oa;
+      tbodyRows +=
+        '<tr class="eu-row eu-oss-row">' +
+          '<td class="eu-c-num" style="color:#6366f1;">★</td>' +
+          '<td class="eu-c-measure"><span class="eu-measure-name" style="color:#6366f1;">'+g.description+'</span></td>' +
+          '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">OSS-exclusive — '+(g.note||'')+'</em></td>' +
+          '<td class="eu-c-est" style="color:#475569;">—</td>' +
+          '<td class="eu-c-act">—</td>' +
+          '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">−'+fmt(oa)+'</span></td>' +
+          '<td class="eu-c-notes">—</td>' +
+        '</tr>';
+    });
+  }
+
+  var netTotal = Math.max(0, totalEst - totalGrts);
+
+  tbodyRows +=
+    '<tr class="eu-total-row">' +
+      '<td colspan="3" class="eu-c-num" style="text-align:left;padding-left:14px;font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;letter-spacing:.04em;">TOTAL (VAT · O&amp;P · Contingency all included)</td>' +
+      '<td class="eu-c-est" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
+      '<td class="eu-c-act" id="eu-grand-act">—</td>' +
+      '<td class="eu-c-grants" id="eu-grand-grants" style="color:#059669;font-weight:700;">−'+fmt(totalGrts)+'</td>' +
+      '<td></td>' +
+    '</tr>' +
+    '<tr class="eu-net-row">' +
+      '<td colspan="3" style="padding:8px 14px;font-size:10px;color:#8090A8;">Net cost after SEAI grants <span style="font-size:9px;">· VAT 13.5% · O&amp;P 12% · Contingency 10% — all included above</span></td>' +
+      '<td colspan="2" id="eu-net-cost" style="padding:8px 6px;font-size:14px;font-weight:900;color:#4ade80;">'+fmt(netTotal)+'</td>' +
+      '<td colspan="2" style="padding:8px 6px;font-size:9px;color:#6B7280;">Independent estimate — not prepared by the contractor.<br>Contractors quote on gross figures above. SEAI grants reduce the invoice.</td>' +
+    '</tr>';
+
+  return '<div id="eu-table-container">' +
+    '<table class="eu-measure-table">' +
+    '<colgroup><col style="width:30px"/><col style="width:165px"/><col style="min-width:160px"/><col style="width:100px"/><col style="width:100px"/><col style="width:120px"/><col style="min-width:100px"/></colgroup>' +
+    '<thead><tr>' +
+      '<th class="eu-r" style="width:30px;">#</th>' +
+      '<th>Energy Upgrade</th>' +
+      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
+      '<th class="eu-r">Estimated Spend</th>' +
+      '<th class="eu-r">Actual Spend ✏</th>' +
+      '<th class="eu-r">Grants</th>' +
+      '<th>Build Notes</th>' +
+    '</tr></thead>' +
+    '<tbody>'+tbodyRows+'</tbody>' +
+    '</table>' +
+    '<div class="eu-disclaimer">⚠ Indicative estimate ±15–20%. All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
+    'This is an <strong>independent estimate</strong> — not prepared by a contractor. ' +
+    'Contractors must quote on the gross estimated spend shown above — SEAI grants should reduce your invoice, not justify inflated pricing. ' +
+    'Only SEAI-registered contractors qualify for grant payment.</div>' +
+    '</div>';
+}
+
+// Updates the actual spend total row when the user fills in actuals
+function updateEUActuals() {
+  var total = 0, anyFilled = false;
+  document.querySelectorAll('.eu-act-input').forEach(function(inp) {
+    var v = parseFloat(inp.value) || 0;
+    if (v > 0) { anyFilled = true; total += v; }
+  });
+  var ga = document.getElementById('eu-grand-act');
+  if (ga) ga.textContent = anyFilled ? fmt(total) : '—';
+  var nc = document.getElementById('eu-net-cost');
+  var gg = document.getElementById('eu-grand-grants');
+  if (nc && gg) {
+    var gAmt = parseFloat((gg.textContent||'').replace(/[^0-9.]/g,'')) || 0;
+    var base  = anyFilled ? total : (parseFloat((document.getElementById('eu-grand-est')||{textContent:''}).textContent.replace(/[^0-9.]/g,''))||0);
+    nc.textContent = fmt(Math.max(0, base - gAmt));
+  }
+}
+
+// Update the PDF button area depending on project type
+function _updateEUPDFBtns(isEU) {
+  var wrap = document.getElementById('pdf-btn-wrap');
+  if (!wrap) return;
+  if (isEU) {
+    wrap.innerHTML =
+      '<button onclick="exportPDF()" title="Simple customer-facing PDF" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
+      '<button onclick="exportEUPDF(\'detailed\')" title="Detailed PDF with methodology and pricing breakdown" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Detailed PDF</button>';
+  } else {
+    wrap.innerHTML =
+      '<button id="pdf-download-btn" onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Download PDF</button>';
+  }
+}
+
+// Export the EU measure table as a PDF (mode: 'customer' | 'detailed')
+function exportEUPDF(mode) {
+  if (!BOQ) return;
+  var b   = BOQ;
+  var pi  = b.projectInfo || {};
+  var su  = b.summary || {};
+  var inp = b.euInputs || {};
+  var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
+  var grants   = b.grants || [];
+  var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
+  var isDetailed = (mode === 'detailed');
+
+  var grantsByKey = {};
+  grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
+    if (!grantsByKey[g.measureKey]) grantsByKey[g.measureKey] = [];
+    grantsByKey[g.measureKey].push(g);
+  });
+
+  // Collect actuals and notes from web table
+  var actuals = [], noteVals = [];
+  document.querySelectorAll('.eu-act-input').forEach(function(el){ actuals.push(parseFloat(el.value)||0); });
+  document.querySelectorAll('.eu-note-input').forEach(function(el){ noteVals.push(el.value||''); });
+
+  var LOAD_STD = 1.22 * 1.135, LOAD_PV = 1.22;
+  var usedKeys = {}, rowNum = 0, totalEst = 0, totalGrts = 0, totalAct = 0;
+  var pdfRows = '';
+
+  sections.forEach(function(s, si) {
+    var load = s.zeroVat ? LOAD_PV : LOAD_STD;
+    var est  = Math.round((s.subtotal||0) * load);
+    totalEst += est;
+
+    var mk = _euMeasureKey(s);
+    var secGrants = (mk && grantsByKey[mk] && !usedKeys[mk]) ? grantsByKey[mk] : [];
+    if (secGrants.length) usedKeys[mk] = true;
+    var gAmt = secGrants.reduce(function(a,g){ return a+(g.amount||0); },0);
+    totalGrts += gAmt;
+
+    var actAmt = actuals[rowNum] || 0; totalAct += actAmt;
+    var note   = noteVals[rowNum] || '';
+    rowNum++;
+
+    var pb = _euPricingBasis(s, inp);
+    var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
+
+    var grantStr = gAmt > 0
+      ? '<span style="color:#059669;font-weight:700;">−'+fmt(gAmt)+'</span><br><span style="font-size:7pt;color:#6B7280;">'+secGrants.map(function(g){return g.description;}).join('<br>')+'</span>'
+      : '—';
+
+    pdfRows +=
+      '<tr style="border-bottom:1px solid #E2E8F0;page-break-inside:avoid;">' +
+        '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:1px solid #E2E8F0;">'+rowNum+'</td>' +
+        '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:1px solid #E2E8F0;">'+s.title+'</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:1px solid #E2E8F0;white-space:normal;">'+pbStr+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#1E293B;white-space:nowrap;vertical-align:top;border:1px solid #E2E8F0;">'+(est>0?fmt(est):'—')+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#1E293B;vertical-align:top;border:1px solid #E2E8F0;">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:1px solid #E2E8F0;">'+grantStr+'</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:1px solid #E2E8F0;">'+note+'</td>' +
+      '</tr>';
+  });
+
+  // BER standalone
+  var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
+  if (berGrant) {
+    totalGrts += berGrant.amount||0;
+    pdfRows +=
+      '<tr style="border-bottom:1px solid #E2E8F0;background:#F0FDF4;">' +
+        '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:1px solid #E2E8F0;">☑</td>' +
+        '<td style="padding:5px 6px;font-size:9pt;color:#059669;font-style:italic;border:1px solid #E2E8F0;">BER Assessment (post-works)</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate required before grant released</td>' +
+        '<td style="border:1px solid #E2E8F0;text-align:right;">—</td>' +
+        '<td style="border:1px solid #E2E8F0;"></td>' +
+        '<td style="border:1px solid #E2E8F0;text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
+        '<td style="border:1px solid #E2E8F0;"></td>' +
+      '</tr>';
+  }
+
+  // OSS rows
+  var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
+  if (ossGrants.length) {
+    pdfRows += '<tr><td colspan="7" style="padding:5px 6px;font-size:8pt;font-weight:700;color:#6366f1;text-transform:uppercase;background:#F5F3FF;border:1px solid #E2E8F0;">⊕ One Stop Shop Additional Grants</td></tr>';
+    ossGrants.forEach(function(g) {
+      var oa=g.amount||0; totalGrts+=oa;
+      pdfRows +=
+        '<tr style="background:#F5F3FF;border-bottom:1px solid #E2E8F0;">' +
+          '<td style="padding:4px;text-align:center;color:#6366f1;border:1px solid #E2E8F0;">★</td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#6366f1;border:1px solid #E2E8F0;">'+g.description+'</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#6366f1;font-style:italic;border:1px solid #E2E8F0;">OSS-exclusive</td>' +
+          '<td style="border:1px solid #E2E8F0;text-align:right;font-size:9pt;">—</td>' +
+          '<td style="border:1px solid #E2E8F0;"></td>' +
+          '<td style="border:1px solid #E2E8F0;text-align:right;color:#6366f1;font-weight:700;">−'+fmt(oa)+'</td>' +
+          '<td style="border:1px solid #E2E8F0;"></td>' +
+        '</tr>';
+    });
+  }
+
+  var netTotal = Math.max(0, totalEst - totalGrts);
+  pdfRows +=
+    '<tr style="background:#F0FDF4;border-top:2px solid #059669;font-weight:700;">' +
+      '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#059669;text-transform:uppercase;border:1px solid #BBF7D0;">TOTAL</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#1E293B;border:1px solid #BBF7D0;">'+fmt(totalEst)+'</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#1E293B;border:1px solid #BBF7D0;">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:1px solid #BBF7D0;">−'+fmt(totalGrts)+'</td>' +
+      '<td style="border:1px solid #BBF7D0;"></td>' +
+    '</tr>' +
+    '<tr style="background:#DCFCE7;">' +
+      '<td colspan="3" style="padding:8px 6px;font-size:9pt;color:#059669;border:1px solid #BBF7D0;">Net Cost to Homeowner after SEAI Grants</td>' +
+      '<td colspan="2" style="padding:8px 6px;text-align:right;font-size:14pt;font-weight:900;color:#059669;border:1px solid #BBF7D0;">'+fmt(netTotal)+'</td>' +
+      '<td colspan="2" style="padding:8px 6px;font-size:7pt;color:#64748B;border:1px solid #BBF7D0;">VAT 13.5% · O&amp;P 12% · Contingency 10%<br>all included in Estimated Spend above</td>' +
+    '</tr>';
+
+  // Build methodology section for detailed PDF
+  var methodHTML = '';
+  if (isDetailed) {
+    var methRows = sections.map(function(s) {
+      var pb = _euPricingBasis(s, inp);
+      return '<tr style="border-bottom:1px solid #E2E8F0;">' +
+        '<td style="padding:5px 6px;font-weight:700;font-size:8pt;border:1px solid #E2E8F0;vertical-align:top;">'+s.title+'</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;white-space:pre-line;">'+pb.join('\n')+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(s.subtotal||0)+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*1.22))+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+(s.zeroVat?fmt(Math.round((s.subtotal||0)*1.22)):fmt(Math.round((s.subtotal||0)*1.22*1.135)))+'</td>' +
+      '</tr>';
+    }).join('');
+
+    methodHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
+      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:12px;">How Your Estimate Was Calculated</h2>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What\'s Included in Each Estimated Spend Figure</h3>' +
+      '<p style="font-size:9pt;color:#334155;margin-bottom:8px;">Every Estimated Spend figure in the table above is a fully-loaded cost that includes:</p>' +
+      '<ul style="font-size:9pt;color:#334155;margin-bottom:12px;">' +
+        '<li><strong>Materials</strong>: Irish merchant pricing Q1–Q2 2026 (SCSI Cost Supplement Aug 2025)</li>' +
+        '<li><strong>Labour</strong>: SEO National Wage Agreement 2024 rates, adjusted for Co. '+(pi.county||'—')+' (×'+(pi.labourMultiplier||1).toFixed(2)+')</li>' +
+        '<li><strong>Contractor\'s Overhead &amp; Profit</strong>: 12% on base cost</li>' +
+        '<li><strong>Contingency</strong>: 10% on base cost</li>' +
+        '<li><strong>VAT at 13.5%</strong>: All works except Solar PV (0% VAT — Revenue ruling May 2023)</li>' +
+      '</ul>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Measure-by-Measure Pricing Breakdown</h3>' +
+      '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;margin-bottom:12px;">' +
+        '<thead><tr style="background:#F1F5F9;">' +
+          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Measure</th>' +
+          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Inputs Used</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Base (mat+lab)</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">+O&amp;P+Cont</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Loaded (incl. VAT)</th>' +
+        '</tr></thead>' +
+        '<tbody>'+methRows+'</tbody>' +
+      '</table>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Data Sources</h3>' +
+      '<ul style="font-size:8pt;color:#475569;margin-bottom:12px;">' +
+        '<li>SEO National Wage Agreement 2024 (trade labour rates)</li>' +
+        '<li>SCSI Regional Cost Supplement August 2025 (county multipliers)</li>' +
+        '<li>SEAI Grant Rates effective February / March 2026</li>' +
+        '<li>Irish merchant pricing Q1–Q2 2026</li>' +
+        '<li>Floor area: '+pi.floorArea+'m² · County: '+(pi.county||'—')+' · Dwelling: '+(pi.dwellingType||'—')+'</li>' +
+      '</ul>' +
+      '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;">' +
+        'PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Assemble cover + table + (optional) methodology
+  var coverHTML = '<div style="font-family:sans-serif;padding:20mm 15mm 10mm;background:#0F172A;color:white;page-break-after:always;">' +
+    '<div style="font-size:10pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">PlanitBER — Energy Upgrade Cost Plan</div>' +
+    '<div style="font-size:22pt;font-weight:900;color:white;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
+    '<div style="font-size:11pt;color:#94a3b8;margin-bottom:16px;">⚡ Energy Upgrade · '+(pi.dwellingType||'')+'</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">' +
+      '<div><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Floor Area</div><div style="font-size:13pt;font-weight:700;">'+(pi.floorArea||'—')+' m²</div></div>' +
+      '<div><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">County</div><div style="font-size:13pt;font-weight:700;">'+(pi.county||'—')+'</div></div>' +
+      '<div><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Grant Scheme</div><div style="font-size:13pt;font-weight:700;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</div></div>' +
+    '</div>' +
+    '<div style="margin-top:12px;border:1px solid rgba(74,222,128,.4);border-radius:5px;padding:12px 14px;background:rgba(74,222,128,.06);">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">' +
+        '<div><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Gross Estimate</div><div style="font-size:12pt;font-weight:700;color:white;">'+fmt(su.gross||su.total||0)+'</div></div>' +
+        '<div><div style="font-size:7pt;color:#4ade80;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">SEAI Grants</div><div style="font-size:12pt;font-weight:700;color:#4ade80;">−'+fmt(su.grantsTotal||0)+'</div></div>' +
+        '<div style="background:rgba(74,222,128,.15);border-radius:4px;padding:6px;"><div style="font-size:7pt;color:#4ade80;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Net to Finance</div><div style="font-size:14pt;font-weight:900;color:#4ade80;">'+fmt(su.netTotal||0)+'</div></div>' +
+        '<div><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Green Loan Guide</div><div style="font-size:12pt;font-weight:700;color:white;">~€'+(su.netTotal>1000?Math.round(su.netTotal*0.04/12*Math.pow(1+0.04/12,120)/(Math.pow(1+0.04/12,120)-1)).toLocaleString('en-IE'):'—')+'/mo</div><div style="font-size:7pt;color:#64748B;">4% · 10 yrs</div></div>' +
+      '</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;margin-top:8px;border-top:1px solid rgba(74,222,128,.2);padding-top:6px;">Independent indicative estimate · not prepared by contractor · Contractors quote on gross cost above · SEAI grants reduce invoice, not justify inflated pricing</div>' +
+    '</div>' +
+    '<div style="font-size:8pt;color:#64748B;margin-top:12px;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed version with methodology':'')+'</div>' +
+  '</div>';
+
+  var tableHTML = '<div style="margin:0 10mm;font-family:sans-serif;">' +
+    '<h2 style="font-size:11pt;color:#1E293B;margin-bottom:8px;">Energy Upgrade — SEAI Measures Cost Plan</h2>' +
+    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;">' +
+      '<colgroup><col style="width:22px"/><col style="width:150px"/><col style="min-width:140px"/><col style="width:88px"/><col style="width:88px"/><col style="width:100px"/><col style="min-width:90px"/></colgroup>' +
+      '<thead><tr style="background:#0F172A;color:white;">' +
+        '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #1E293B;">#</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #1E293B;">Energy Upgrade</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #1E293B;">Pricing Basis</th>' +
+        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #1E293B;white-space:nowrap;">Est. Spend</th>' +
+        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #1E293B;white-space:nowrap;">Actual Spend</th>' +
+        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #1E293B;">Grants</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #1E293B;">Notes</th>' +
+      '</tr></thead>' +
+      '<tbody>'+pdfRows+'</tbody>' +
+    '</table>' +
+    '<div style="font-size:7pt;color:#94a3b8;margin-top:6px;border-top:1px solid #E2E8F0;padding-top:4px;">' +
+      '⚠ Indicative ±15–20%. Estimated Spend includes VAT 13.5%, O&amp;P 12%, contingency 10%. Independent estimate — not prepared by contractor. Only SEAI-registered contractors qualify for grant payment.' +
+    '</div>' +
+  '</div>';
+
+  var printDiv = document.getElementById('pdf-print-view');
+  if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
+  printDiv.innerHTML = coverHTML + tableHTML + methodHTML;
+  window.print();
+}
+
 function renderGrantsPanel() {
   if (BOQ && BOQ.projectInfo && BOQ.projectInfo.type === 'New Build') {
     // skip grants section entirely for New Build
@@ -13537,6 +14125,17 @@ function updateSectionNote(secId, val) {
 
 function renderAccordionReport() {
   if (!BOQ) return;
+
+  // For standalone Energy Upgrade: render clean measure table, not accordion
+  var _ptype = ((BOQ.projectInfo||{}).type||'').toString();
+  if (_ptype === 'Energy Upgrade') {
+    var _euWrap = document.getElementById('boq-accordion-wrap');
+    if (_euWrap) _euWrap.innerHTML = renderEUTable(BOQ);
+    _updateEUPDFBtns(true);
+    return;
+  }
+  _updateEUPDFBtns(false);
+
   const wrap = document.getElementById('boq-accordion-wrap');
   if (!wrap) return;
 
@@ -14089,6 +14688,11 @@ function showToast(msg) {
 // ── EXPORT PDF ────────────────────────────────────────────────────────────────
 function exportPDF() {
   if (!BOQ) return;
+  // Standalone Energy Upgrade uses the dedicated EU customer PDF
+  if (BOQ.projectInfo && BOQ.projectInfo.type === 'Energy Upgrade') {
+    exportEUPDF('customer');
+    return;
+  }
   const b  = BOQ;
   const pi = b.projectInfo;
   const su = b.summary;
