@@ -13644,25 +13644,23 @@ function exportEUPDF(mode) {
     '</div>';
   }
 
-  // Assemble cover + table + (optional) methodology
-  // page-break-after only in @media print — avoids Chrome reserving a full page height on screen
-  var styleInject = '<style>@media print{.eu-pdf-cover{page-break-after:always!important;}}</style>';
+  // Compact header band — no separate cover page, no page-break, no gap
+  var headerHTML =
+    '<div style="font-family:sans-serif;padding:8mm 10mm 5mm;border-bottom:3px solid #E8A020;background:#fff;">' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">PlanitBER — Energy Upgrade Cost Plan</div>' +
+      '<div style="font-size:20pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:5px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
+      '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:4px;">' +
+        '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
+        '<span>Floor Area: <strong style="color:#1E293B;">'+(pi.floorArea||'—')+' m²</strong></span>' +
+        '<span>County: <strong style="color:#1E293B;">'+(pi.county||'—')+'</strong></span>' +
+        '<span>Grant Scheme: <strong style="color:#1E293B;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</strong></span>' +
+      '</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed':'')+'</div>' +
+    '</div>';
 
-  var coverHTML = '<div class="eu-pdf-cover" style="font-family:sans-serif;padding:16mm 15mm 8mm;background:#ffffff;color:#1E293B;border-bottom:3px solid #E8A020;">' +
-    '<div style="font-size:10pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">PlanitBER — Energy Upgrade Cost Plan</div>' +
-    '<div style="font-size:22pt;font-weight:900;color:#1E293B;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
-    '<div style="font-size:11pt;color:#475569;margin-bottom:16px;">⚡ Energy Upgrade · '+(pi.dwellingType||'')+'</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">' +
-      '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px;"><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Floor Area</div><div style="font-size:14pt;font-weight:700;color:#1E293B;">'+(pi.floorArea||'—')+' m²</div></div>' +
-      '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px;"><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">County</div><div style="font-size:14pt;font-weight:700;color:#1E293B;">'+(pi.county||'—')+'</div></div>' +
-      '<div style="border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px;"><div style="font-size:7pt;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Grant Scheme</div><div style="font-size:14pt;font-weight:700;color:#1E293B;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</div></div>' +
-    '</div>' +
-    '<div style="font-size:8pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed version with methodology':'')+'</div>' +
-  '</div>';
-
-  var tableHTML = '<div style="margin:0 10mm;font-family:sans-serif;">' +
-    '<h2 style="font-size:11pt;color:#1E293B;margin-bottom:8px;">Energy Upgrade — SEAI Measures Cost Plan</h2>' +
-    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;">' +
+  var tableHTML =
+    '<div style="margin:0 10mm;font-family:sans-serif;">' +
+    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:6mm;">' +
       '<colgroup><col style="width:22px"/><col style="width:150px"/><col style="min-width:140px"/><col style="width:88px"/><col style="width:88px"/><col style="width:100px"/><col style="min-width:90px"/></colgroup>' +
       '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
         '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
@@ -13685,21 +13683,16 @@ function exportEUPDF(mode) {
     '</div>' +
   '</div>';
 
+  // Hide any stale backdrop from a previous PDF call
+  var staleBackdrop = document.getElementById('eu-pdf-backdrop');
+  if (staleBackdrop) staleBackdrop.style.display = 'none';
+
   var printDiv = document.getElementById('pdf-print-view');
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
-  // White backdrop covers dark app body on screen without affecting print layout
-  var backdrop = document.getElementById('eu-pdf-backdrop');
-  if (!backdrop) { backdrop = document.createElement('div'); backdrop.id='eu-pdf-backdrop'; document.body.appendChild(backdrop); }
-  backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99998;display:block;';
-  // printDiv stays in normal document flow so the browser paginates the full content
-  printDiv.style.cssText = 'position:relative;background:white;z-index:99999;display:block;';
-  printDiv.innerHTML = styleInject + coverHTML + tableHTML + methodHTML;
+  printDiv.style.cssText = 'display:block;background:white;';
+  printDiv.innerHTML = headerHTML + tableHTML + methodHTML;
   printDiv.scrollIntoView();
-  var _onAfterPrint = function() {
-    printDiv.style.display = 'none';
-    backdrop.style.display = 'none';
-    window.removeEventListener('afterprint', _onAfterPrint);
-  };
+  var _onAfterPrint = function() { printDiv.style.display='none'; window.removeEventListener('afterprint',_onAfterPrint); };
   window.addEventListener('afterprint', _onAfterPrint);
   window.print();
 }
