@@ -13542,8 +13542,8 @@ function exportEUPDF(mode) {
         '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:1px solid #E2E8F0;">'+rowNum+'</td>' +
         '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:1px solid #E2E8F0;">'+s.title+'</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:1px solid #E2E8F0;white-space:normal;">'+pbStr+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#1E293B;white-space:nowrap;vertical-align:top;border:1px solid #E2E8F0;">'+(est>0?fmt(est):'—')+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#1E293B;vertical-align:top;border:1px solid #E2E8F0;">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:1px solid #E2E8F0;">'+(est>0?fmt(est):'—')+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:1px solid #E2E8F0;">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:1px solid #E2E8F0;">'+grantStr+'</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:1px solid #E2E8F0;">'+note+'</td>' +
       '</tr>';
@@ -13554,11 +13554,11 @@ function exportEUPDF(mode) {
   if (berGrant) {
     totalGrts += berGrant.amount||0;
     pdfRows +=
-      '<tr style="border-bottom:1px solid #E2E8F0;background:#F0FDF4;">' +
-        '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:1px solid #E2E8F0;">☑</td>' +
-        '<td style="padding:5px 6px;font-size:9pt;color:#059669;font-style:italic;border:1px solid #E2E8F0;">BER Assessment (post-works)</td>' +
+      '<tr style="border-bottom:1px solid #E2E8F0;">' +
+        '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:1px solid #E2E8F0;color:#94a3b8;">☑</td>' +
+        '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:1px solid #E2E8F0;">BER Assessment (post-works)</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate required before grant released</td>' +
-        '<td style="border:1px solid #E2E8F0;text-align:right;">—</td>' +
+        '<td style="border:1px solid #E2E8F0;text-align:right;color:#E8A020;">—</td>' +
         '<td style="border:1px solid #E2E8F0;"></td>' +
         '<td style="border:1px solid #E2E8F0;text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
         '<td style="border:1px solid #E2E8F0;"></td>' +
@@ -13584,14 +13584,13 @@ function exportEUPDF(mode) {
     });
   }
 
-  var netTotal = Math.max(0, totalEst - totalGrts);
   pdfRows +=
-    '<tr style="background:#F0FDF4;border-top:2px solid #059669;font-weight:700;">' +
-      '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#059669;text-transform:uppercase;border:1px solid #BBF7D0;">TOTAL</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#1E293B;border:1px solid #BBF7D0;">'+fmt(totalEst)+'</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#1E293B;border:1px solid #BBF7D0;">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:1px solid #BBF7D0;">−'+fmt(totalGrts)+'</td>' +
-      '<td style="border:1px solid #BBF7D0;"></td>' +
+    '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
+      '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:1px solid #E2E8F0;">TOTAL</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:1px solid #E2E8F0;">'+fmt(totalEst)+'</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:1px solid #E2E8F0;">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
+      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:1px solid #E2E8F0;">−'+fmt(totalGrts)+'</td>' +
+      '<td style="border:1px solid #E2E8F0;"></td>' +
     '</tr>' +
     '';
 
