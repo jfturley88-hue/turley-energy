@@ -13691,8 +13691,14 @@ function exportEUPDF(mode) {
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
   printDiv.style.cssText = 'display:block;background:white;';
   printDiv.innerHTML = headerHTML + tableHTML + methodHTML;
+  var _prevBodyBg = document.body.style.background;
+  document.body.style.background = 'white';
   printDiv.scrollIntoView();
-  var _onAfterPrint = function() { printDiv.style.display='none'; window.removeEventListener('afterprint',_onAfterPrint); };
+  var _onAfterPrint = function() {
+    printDiv.style.display = 'none';
+    document.body.style.background = _prevBodyBg;
+    window.removeEventListener('afterprint', _onAfterPrint);
+  };
   window.addEventListener('afterprint', _onAfterPrint);
   window.print();
 }
