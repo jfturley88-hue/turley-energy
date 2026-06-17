@@ -380,7 +380,7 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
   @page { size: A4; margin: 12mm 16mm 22mm 16mm; }
 
   body > *:not(#pdf-print-view) { display: none !important; }
-  #pdf-print-view { display: block !important; position: static !important; overflow: visible !important; height: auto !important; font-family: 'DM Sans', Arial, sans-serif; font-size: 10pt; color: #1E293B; margin: 0; padding: 0; background: #fff; }
+  #pdf-print-view { display: block !important; font-family: 'DM Sans', Arial, sans-serif; font-size: 10pt; color: #1E293B; margin: 0; padding: 0; background: #fff; }
 
   /* COVER */
   .pdf-cover { padding: 32px 36px 24px; border-bottom: 5px solid #E8A020; page-break-after: always; background: #fff; }
@@ -13687,11 +13687,19 @@ function exportEUPDF(mode) {
 
   var printDiv = document.getElementById('pdf-print-view');
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
-  // Full-screen white overlay so dark app body never shows through
-  printDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;background:white;z-index:99999;';
+  // White backdrop covers dark app body on screen without affecting print layout
+  var backdrop = document.getElementById('eu-pdf-backdrop');
+  if (!backdrop) { backdrop = document.createElement('div'); backdrop.id='eu-pdf-backdrop'; document.body.appendChild(backdrop); }
+  backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:99998;display:block;';
+  // printDiv stays in normal document flow so the browser paginates the full content
+  printDiv.style.cssText = 'position:relative;background:white;z-index:99999;display:block;';
   printDiv.innerHTML = styleInject + coverHTML + tableHTML + methodHTML;
-  // Hide overlay once the print dialog closes
-  var _onAfterPrint = function() { printDiv.style.display='none'; window.removeEventListener('afterprint',_onAfterPrint); };
+  printDiv.scrollIntoView();
+  var _onAfterPrint = function() {
+    printDiv.style.display = 'none';
+    backdrop.style.display = 'none';
+    window.removeEventListener('afterprint', _onAfterPrint);
+  };
   window.addEventListener('afterprint', _onAfterPrint);
   window.print();
 }
