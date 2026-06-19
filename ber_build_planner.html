@@ -330,6 +330,7 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-total-row .eu-c-act{font-size:13px;color:#38bdf8;}
 .eu-total-row .eu-c-grants{font-size:13px;color:#059669;}
 .eu-net-row td{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.08);padding:8px 6px;}
+.eu-actgrants-row td{background:rgba(5,150,105,.04);border-top:1px solid rgba(5,150,105,.12);padding:6px 6px;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
 .eu-ber-row td{background:rgba(255,255,255,.015);}
 .eu-disclaimer{font-size:9px;color:#4B5563;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.5;}
@@ -13443,18 +13444,28 @@ function renderEUTable(b) {
         'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;" ' +
         'oninput="updateEUActuals(\'manual\')">' +
       '</td>' +
-      '<td class="eu-c-grants" style="vertical-align:top;">' +
-        '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;padding-bottom:4px;">−'+fmt(totalGrts)+'</div>' +
-        '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual grants rcvd…" ' +
-        'style="width:100%;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:10px;padding:3px 5px;border-radius:4px;text-align:right;font-family:inherit;" ' +
-        'oninput="updateEUActuals(\'grants\')">' +
+      '<td class="eu-c-grants">' +
+        '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">−'+fmt(totalGrts)+'</div>' +
+      '</td>' +
+      '<td></td>' +
+    '</tr>' +
+    '<tr class="eu-actgrants-row">' +
+      '<td colspan="3" style="padding:6px 14px;font-size:10px;color:#6B7280;font-style:italic;">Actual Grants Received</td>' +
+      '<td></td>' +
+      '<td></td>' +
+      '<td class="eu-c-grants">' +
+        '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Enter amount…" ' +
+        'style="width:100%;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
       '</td>' +
       '<td></td>' +
     '</tr>' +
     '<tr class="eu-net-row">' +
       '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
       '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#E8A020;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
-      '<td id="eu-net-act" style="padding:8px 6px;text-align:right;color:#38bdf8;font-size:13px;font-weight:700;">—</td>' +
+      '<td>' +
+        '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
+        'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
+      '</td>' +
       '<td colspan="2"></td>' +
     '</tr>';
 
@@ -13479,41 +13490,26 @@ function renderEUTable(b) {
     '</div>';
 }
 
-// Updates actual totals and net cost rows as the user fills in figures
+// Updates actual spend total when individual row actuals are filled
 function updateEUActuals(src) {
-  // Sum individual row actuals (exclude the grand total input itself)
+  // Sum individual row actuals
   var rowSum = 0, anyRows = false;
   document.querySelectorAll('.eu-act-input').forEach(function(inp) {
     var v = parseFloat(inp.value) || 0;
     if (v > 0) { anyRows = true; rowSum += v; }
   });
 
-  var grandActInput  = document.getElementById('eu-grand-act-input');
-  var grandGrantsAct = document.getElementById('eu-grand-grants-act');
-
-  // Auto-populate total from row sums when rows change (not when user edits total directly)
-  if (src !== 'manual' && src !== 'grants' && grandActInput) {
+  // Auto-populate grand total from row sums (not when user edits it directly)
+  var grandActInput = document.getElementById('eu-grand-act-input');
+  if (src !== 'manual' && grandActInput) {
     grandActInput.value = anyRows ? rowSum : '';
   }
 
-  var actTotal  = grandActInput  ? (parseFloat(grandActInput.value)  || 0) : 0;
-  var actGrants = grandGrantsAct ? (parseFloat(grandGrantsAct.value) || 0) : 0;
-
-  // Parse estimated totals from display
-  function parseAmt(el) {
-    return el ? (parseFloat((el.textContent||'').replace(/[^0-9.]/g,'')) || 0) : 0;
-  }
-  var estTotal  = parseAmt(document.getElementById('eu-grand-est'));
-  var estGrants = parseAmt(document.getElementById('eu-grand-grants'));
-
-  // Net after grants: use actual grants if entered, otherwise estimated grants
-  var grantsToUse = actGrants > 0 ? actGrants : estGrants;
-
+  // Update estimated net display only — actual grants and actual net are manual
+  var estTotal  = parseFloat((document.getElementById('eu-grand-est')||{textContent:''}).textContent.replace(/[^0-9.]/g,'')) || 0;
+  var estGrants = parseFloat((document.getElementById('eu-grand-grants')||{textContent:''}).textContent.replace(/[^0-9.]/g,'')) || 0;
   var netEst = document.getElementById('eu-net-est');
-  var netAct = document.getElementById('eu-net-act');
-
   if (netEst) netEst.textContent = fmt(Math.max(0, estTotal - estGrants));
-  if (netAct) netAct.textContent = actTotal > 0 ? fmt(Math.max(0, actTotal - grantsToUse)) : '—';
 }
 
 // Update the PDF button area depending on project type
@@ -13666,17 +13662,42 @@ function exportEUPDF(mode) {
     });
   }
 
-  // TOTAL + Net Cost rows
+  // Collect manually entered actual figures from the web table
+  var domActTotal  = parseFloat((document.getElementById('eu-grand-act-input')||{value:''}).value) || 0;
+  var domActGrants = parseFloat((document.getElementById('eu-grand-grants-act')||{value:''}).value) || 0;
+  var domActNet    = parseFloat((document.getElementById('eu-net-act-input')||{value:''}).value) || 0;
+
+  // TOTAL + actual rows
   var netCost = Math.max(0, totalEst - totalGrts);
   if (isDetailed) {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'—')+'</td>' +
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">−'+fmt(totalGrts)+'</td>' +
         '<td style="border:'+B+';"></td>' +
       '</tr>';
+    if (domActGrants > 0) {
+      pdfRows +=
+        '<tr style="background:#F0FDF4;">' +
+          '<td colspan="3" style="padding:6px 6px;font-size:8pt;color:#059669;font-style:italic;border:'+B+';">Actual Grants Received</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="padding:6px 6px;text-align:right;font-weight:700;color:#059669;border:'+B+';">−'+fmt(domActGrants)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
+    if (domActNet > 0) {
+      pdfRows +=
+        '<tr style="background:#EFF6FF;">' +
+          '<td colspan="3" style="padding:6px 6px;font-size:8pt;font-weight:700;color:#1E293B;border:'+B+';">Actual Net Cost</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="padding:6px 6px;text-align:right;font-weight:900;color:#38bdf8;font-size:11pt;border:'+B+';">'+fmt(domActNet)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
   } else {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
@@ -13685,10 +13706,27 @@ function exportEUPDF(mode) {
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">−'+fmt(totalGrts)+'</td>' +
         '<td style="border:'+B+';"></td>' +
       '</tr>' +
-      '<tr style="background:#F0FDF4;">' +
-        '<td colspan="2" style="padding:8px 6px;font-size:9pt;color:#059669;border:'+B+';">Net Cost to Homeowner after SEAI Grants</td>' +
-        '<td colspan="3" style="padding:8px 6px;text-align:right;font-size:14pt;font-weight:900;color:#059669;border:'+B+';">'+fmt(netCost)+'</td>' +
+      '<tr style="background:#FFFBEB;">' +
+        '<td colspan="2" style="padding:8px 6px;font-size:9pt;color:#1E293B;border:'+B+';">Est. Net Cost after SEAI Grants</td>' +
+        '<td colspan="3" style="padding:8px 6px;text-align:right;font-size:14pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netCost)+'</td>' +
       '</tr>';
+    if (domActGrants > 0) {
+      pdfRows +=
+        '<tr style="background:#F0FDF4;">' +
+          '<td colspan="2" style="padding:6px 6px;font-size:8pt;color:#059669;font-style:italic;border:'+B+';">Actual Grants Received</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="padding:6px 6px;text-align:right;font-weight:700;color:#059669;border:'+B+';">−'+fmt(domActGrants)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
+    if (domActNet > 0) {
+      pdfRows +=
+        '<tr style="background:#EFF6FF;">' +
+          '<td colspan="2" style="padding:6px 6px;font-size:8pt;font-weight:700;color:#1E293B;border:'+B+';">Actual Net Cost</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td colspan="2" style="padding:6px 6px;text-align:right;font-weight:900;color:#38bdf8;font-size:11pt;border:'+B+';">'+fmt(domActNet)+'</td>' +
+        '</tr>';
+    }
   }
 
   // Summary box (customer mode only) — shows above the table
