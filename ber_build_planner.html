@@ -13515,6 +13515,7 @@ function exportEUPDF(mode) {
   var LOAD_STD = 1.22 * 1.135, LOAD_PV = 1.22;
   var usedKeys = {}, rowNum = 0, totalEst = 0, totalGrts = 0, totalAct = 0;
   var pdfRows = '';
+  var B = '1px solid #E2E8F0'; // border shorthand
 
   sections.forEach(function(s, si) {
     var load = s.zeroVat ? LOAD_PV : LOAD_STD;
@@ -13538,62 +13539,133 @@ function exportEUPDF(mode) {
       ? '<span style="color:#059669;font-weight:700;">−'+fmt(gAmt)+'</span><br><span style="font-size:7pt;color:#6B7280;">'+secGrants.map(function(g){return g.description;}).join('<br>')+'</span>'
       : '—';
 
-    pdfRows +=
-      '<tr style="border-bottom:1px solid #E2E8F0;page-break-inside:avoid;">' +
-        '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:1px solid #E2E8F0;">'+rowNum+'</td>' +
-        '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:1px solid #E2E8F0;">'+s.title+'</td>' +
-        '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:1px solid #E2E8F0;white-space:normal;">'+pbStr+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:1px solid #E2E8F0;">'+(est>0?fmt(est):'—')+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:1px solid #E2E8F0;">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:1px solid #E2E8F0;">'+grantStr+'</td>' +
-        '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:1px solid #E2E8F0;">'+note+'</td>' +
-      '</tr>';
+    if (isDetailed) {
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+          '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
+          '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;">'+pbStr+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';">'+(est>0?fmt(est):'—')+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';">'+grantStr+'</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
+        '</tr>';
+    } else {
+      // Customer: 5 cols — no Pricing Basis, no Actual Spend
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+          '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
+          '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';">'+(est>0?fmt(est):'—')+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';">'+grantStr+'</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
+        '</tr>';
+    }
   });
 
   // BER standalone
   var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
   if (berGrant) {
     totalGrts += berGrant.amount||0;
-    pdfRows +=
-      '<tr style="border-bottom:1px solid #E2E8F0;">' +
-        '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:1px solid #E2E8F0;color:#94a3b8;">☑</td>' +
-        '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:1px solid #E2E8F0;">BER Assessment (post-works)</td>' +
-        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate required before grant released</td>' +
-        '<td style="border:1px solid #E2E8F0;text-align:right;color:#E8A020;">—</td>' +
-        '<td style="border:1px solid #E2E8F0;"></td>' +
-        '<td style="border:1px solid #E2E8F0;text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
-        '<td style="border:1px solid #E2E8F0;"></td>' +
-      '</tr>';
+    if (isDetailed) {
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';">' +
+          '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:'+B+';">BER Assessment (post-works)</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate required before grant released</td>' +
+          '<td style="border:'+B+';text-align:right;color:#E8A020;">—</td>' +
+          '<td style="border:'+B+';"></td>' +
+          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    } else {
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';">' +
+          '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:'+B+';">BER Assessment (post-works) <span style="font-size:7pt;color:#94a3b8;">— required to release all grants</span></td>' +
+          '<td style="border:'+B+';text-align:right;color:#E8A020;">—</td>' +
+          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
   }
 
   // OSS rows
   var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
+  var ossColspan = isDetailed ? '7' : '5';
   if (ossGrants.length) {
-    pdfRows += '<tr><td colspan="7" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.07em;background:#F5F3FF;border:1px solid #E2E8F0;border-top:2px solid #a5b4fc;">⊕ One Stop Shop Additional Grants</td></tr>';
+    pdfRows += '<tr><td colspan="'+ossColspan+'" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.07em;background:#F5F3FF;border:'+B+';border-top:2px solid #a5b4fc;">⊕ One Stop Shop Additional Grants — only available when works coordinated through an OSS provider</td></tr>';
     ossGrants.forEach(function(g) {
       var oa=g.amount||0; totalGrts+=oa;
-      pdfRows +=
-        '<tr style="background:#F5F3FF;">' +
-          '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:1px solid #E2E8F0;vertical-align:middle;">★</td>' +
-          '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:1px solid #E2E8F0;vertical-align:middle;">'+g.description+'</td>' +
-          '<td style="border:1px solid #E2E8F0;"></td>' +
-          '<td style="border:1px solid #E2E8F0;text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
-          '<td style="border:1px solid #E2E8F0;"></td>' +
-          '<td style="border:1px solid #E2E8F0;text-align:right;color:#059669;font-weight:700;font-size:9pt;padding:3px 6px;">−'+fmt(oa)+'</td>' +
-          '<td style="border:1px solid #E2E8F0;"></td>' +
-        '</tr>';
+      if (isDetailed) {
+        pdfRows +=
+          '<tr style="background:#F5F3FF;">' +
+            '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';vertical-align:middle;">★</td>' +
+            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';vertical-align:middle;">'+g.description+'</td>' +
+            '<td style="border:'+B+';"></td>' +
+            '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
+            '<td style="border:'+B+';"></td>' +
+            '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;font-size:9pt;padding:3px 6px;">−'+fmt(oa)+'</td>' +
+            '<td style="border:'+B+';"></td>' +
+          '</tr>';
+      } else {
+        pdfRows +=
+          '<tr style="background:#F5F3FF;">' +
+            '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';vertical-align:middle;">★</td>' +
+            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';vertical-align:middle;">'+g.description+'</td>' +
+            '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
+            '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;font-size:9pt;padding:3px 6px;">−'+fmt(oa)+'</td>' +
+            '<td style="border:'+B+';"></td>' +
+          '</tr>';
+      }
     });
   }
 
-  pdfRows +=
-    '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
-      '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:1px solid #E2E8F0;">TOTAL</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:1px solid #E2E8F0;">'+fmt(totalEst)+'</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:1px solid #E2E8F0;">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
-      '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:1px solid #E2E8F0;">−'+fmt(totalGrts)+'</td>' +
-      '<td style="border:1px solid #E2E8F0;"></td>' +
-    '</tr>' +
-    '';
+  // TOTAL + Net Cost rows
+  var netCost = Math.max(0, totalEst - totalGrts);
+  if (isDetailed) {
+    pdfRows +=
+      '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
+        '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(totalAct>0?fmt(totalAct):'—')+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">−'+fmt(totalGrts)+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>';
+  } else {
+    pdfRows +=
+      '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
+        '<td colspan="2" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">−'+fmt(totalGrts)+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>' +
+      '<tr style="background:#F0FDF4;">' +
+        '<td colspan="2" style="padding:8px 6px;font-size:9pt;color:#059669;border:'+B+';">Net Cost to Homeowner after SEAI Grants</td>' +
+        '<td colspan="3" style="padding:8px 6px;text-align:right;font-size:14pt;font-weight:900;color:#059669;border:'+B+';">'+fmt(netCost)+'</td>' +
+      '</tr>';
+  }
+
+  // Summary box (customer mode only) — shows above the table
+  var summaryHTML = !isDetailed
+    ? '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:4mm 10mm 3mm;font-family:sans-serif;">' +
+        '<div style="border:1px solid #FDE68A;border-radius:5px;padding:9px 12px;background:#FFFBEB;">' +
+          '<div style="font-size:6.5pt;color:#92400E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:600;">Estimated Cost</div>' +
+          '<div style="font-size:15pt;font-weight:900;color:#E8A020;">'+fmt(totalEst)+'</div>' +
+          '<div style="font-size:6.5pt;color:#92400E;">incl. VAT, O&amp;P &amp; contingency</div>' +
+        '</div>' +
+        '<div style="border:1px solid #BBF7D0;border-radius:5px;padding:9px 12px;background:#F0FDF4;">' +
+          '<div style="font-size:6.5pt;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:600;">SEAI Grants Available</div>' +
+          '<div style="font-size:15pt;font-weight:900;color:#059669;">−'+fmt(totalGrts)+'</div>' +
+          '<div style="font-size:6.5pt;color:#166534;">subject to SEAI eligibility</div>' +
+        '</div>' +
+        '<div style="border:2px solid #059669;border-radius:5px;padding:9px 12px;background:#DCFCE7;">' +
+          '<div style="font-size:6.5pt;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:700;">Net Cost to You</div>' +
+          '<div style="font-size:17pt;font-weight:900;color:#059669;">'+fmt(netCost)+'</div>' +
+          '<div style="font-size:6.5pt;color:#166534;">after grants are applied</div>' +
+        '</div>' +
+      '</div>'
+    : '';
 
   // Build methodology section for detailed PDF
   var methodHTML = '';
@@ -13659,19 +13731,30 @@ function exportEUPDF(mode) {
       '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed':'')+'</div>' +
     '</div>';
 
+  var colgroup7 = '<colgroup><col style="width:22px"/><col style="width:150px"/><col style="min-width:140px"/><col style="width:88px"/><col style="width:88px"/><col style="width:100px"/><col style="min-width:90px"/></colgroup>';
+  var thead7 = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+    '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Pricing Basis</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Est. Spend</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual Spend</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">Grants</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
+    '</tr></thead>';
+  var colgroup5 = '<colgroup><col style="width:22px"/><col style="width:210px"/><col style="width:100px"/><col style="width:110px"/><col style="min-width:100px"/></colgroup>';
+  var thead5 = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+    '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade Measure</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Est. Spend</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">SEAI Grant</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
+    '</tr></thead>';
+
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:6mm;">' +
-      '<colgroup><col style="width:22px"/><col style="width:150px"/><col style="min-width:140px"/><col style="width:88px"/><col style="width:88px"/><col style="width:100px"/><col style="min-width:90px"/></colgroup>' +
-      '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
-        '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade</th>' +
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Pricing Basis</th>' +
-        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Est. Spend</th>' +
-        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual Spend</th>' +
-        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">Grants</th>' +
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
-      '</tr></thead>' +
+      (isDetailed ? colgroup7 : colgroup5) +
+      (isDetailed ? thead7 : thead5) +
       '<tbody>'+pdfRows+'</tbody>' +
     '</table>' +
     '<div style="font-size:6.5pt;color:#64748B;margin-top:8px;border-top:2px solid #E2E8F0;padding-top:6px;line-height:1.5;">' +
@@ -13691,7 +13774,7 @@ function exportEUPDF(mode) {
   var printDiv = document.getElementById('pdf-print-view');
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
   printDiv.style.cssText = 'display:block;background:white;';
-  printDiv.innerHTML = headerHTML + tableHTML + methodHTML;
+  printDiv.innerHTML = headerHTML + summaryHTML + tableHTML + methodHTML;
   var _prevBodyBg = document.body.style.background;
   document.body.style.background = 'white';
   printDiv.scrollIntoView();
