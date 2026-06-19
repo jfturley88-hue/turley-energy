@@ -308,7 +308,7 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-measure-table{width:100%;border-collapse:collapse;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;}
 .eu-measure-table thead th{background:#0d1e2a;color:#8090A8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:8px 6px;border-bottom:2px solid rgba(74,222,128,.4);text-align:left;white-space:nowrap;}
 .eu-measure-table thead th.eu-r{text-align:right;}
-.eu-row td{border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top;padding:8px 6px;}
+.eu-row td{border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle;padding:8px 6px;}
 .eu-row:nth-child(even) td{background:rgba(255,255,255,.015);}
 .eu-row:hover td{background:rgba(74,222,128,.04);}
 .eu-c-num{text-align:center;color:#6B7280;font-weight:600;font-size:10px;width:30px;}
@@ -329,9 +329,9 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-total-row .eu-c-est{font-size:13px;color:#E8A020;}
 .eu-total-row .eu-c-act{font-size:13px;color:#38bdf8;}
 .eu-total-row .eu-c-grants{font-size:13px;color:#059669;}
-.eu-net-row td{background:rgba(74,222,128,.03);padding:8px 6px;}
+.eu-net-row td{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.08);padding:8px 6px;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
-.eu-ber-row td{background:rgba(16,185,129,.03);}
+.eu-ber-row td{background:rgba(255,255,255,.015);}
 .eu-disclaimer{font-size:9px;color:#4B5563;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.5;}
 @media(max-width:768px){
   .eu-c-basis{display:none;}
@@ -13391,18 +13391,25 @@ function renderEUTable(b) {
   });
 
   // BER assessment grant standalone row (if not already used by a BER section)
+  var BER_ASSESS_COST = 250; // typical BER assessor fee
   var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
   if (berGrant) {
     totalGrts += berGrant.amount||0;
+    totalEst  += BER_ASSESS_COST;
+    rowNum++;
     tbodyRows +=
       '<tr class="eu-row eu-ber-row">' +
-        '<td class="eu-c-num" style="color:#059669;">☑</td>' +
-        '<td class="eu-c-measure"><span class="eu-measure-name" style="color:#059669;">BER Assessment (post-works)</span></td>' +
-        '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate required before grant released</li></ul></td>' +
-        '<td class="eu-c-est">—</td>' +
-        '<td class="eu-c-act">—</td>' +
-        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</span><div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div></td>' +
-        '<td class="eu-c-notes">—</td>' +
+        '<td class="eu-c-num">☑</td>' +
+        '<td class="eu-c-measure">' +
+          '<span class="eu-measure-name">BER Assessment (post-works)</span>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Required to release all SEAI grants</div>' +
+        '</td>' +
+        '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate issued before grants released</li></ul></td>' +
+        '<td class="eu-c-est">'+fmt(BER_ASSESS_COST)+'</td>' +
+        '<td class="eu-c-act"><input type="number" id="eu-act-ber" class="eu-act-input" min="0" step="10" placeholder="—" oninput="updateEUActuals()"></td>' +
+        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</span>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div></td>' +
+        '<td class="eu-c-notes"><textarea id="eu-note-ber" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
       '</tr>';
   }
 
@@ -13445,9 +13452,9 @@ function renderEUTable(b) {
       '<td></td>' +
     '</tr>' +
     '<tr class="eu-net-row">' +
-      '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#059669;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
-      '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#059669;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
-      '<td id="eu-net-act" style="padding:8px 6px;text-align:right;color:#059669;font-size:13px;font-weight:700;">—</td>' +
+      '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
+      '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#E8A020;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
+      '<td id="eu-net-act" style="padding:8px 6px;text-align:right;color:#38bdf8;font-size:13px;font-weight:700;">—</td>' +
       '<td colspan="2"></td>' +
     '</tr>';
 
@@ -13598,27 +13605,31 @@ function exportEUPDF(mode) {
   });
 
   // BER standalone
+  var PDF_BER_COST = 250;
+  var berActual = parseFloat((document.getElementById('eu-act-ber')||{value:''}).value) || 0;
   var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
   if (berGrant) {
     totalGrts += berGrant.amount||0;
+    totalEst  += PDF_BER_COST;
+    totalAct  += berActual;
     if (isDetailed) {
       pdfRows +=
         '<tr style="border-bottom:'+B+';">' +
           '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
-          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:'+B+';">BER Assessment (post-works)</td>' +
-          '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate required before grant released</td>' +
-          '<td style="border:'+B+';text-align:right;color:#E8A020;">—</td>' +
-          '<td style="border:'+B+';"></td>' +
-          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span></td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate issued before grants released</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';">'+fmt(PDF_BER_COST)+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
+          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;">−'+fmt(berGrant.amount||0)+'</td>' +
           '<td style="border:'+B+';"></td>' +
         '</tr>';
     } else {
       pdfRows +=
         '<tr style="border-bottom:'+B+';">' +
           '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
-          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;font-style:italic;border:'+B+';">BER Assessment (post-works) <span style="font-size:7pt;color:#94a3b8;">— required to release all grants</span></td>' +
-          '<td style="border:'+B+';text-align:right;color:#E8A020;">—</td>' +
-          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span></td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';">'+fmt(PDF_BER_COST)+'</td>' +
+          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;">−'+fmt(berGrant.amount||0)+'</td>' +
           '<td style="border:'+B+';"></td>' +
         '</tr>';
     }
