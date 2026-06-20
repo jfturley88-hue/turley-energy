@@ -7097,6 +7097,7 @@ function onModeChange() {
   if (window.showAdvancedOptionsForMode) window.showAdvancedOptionsForMode(mode);
   if (typeof applyGeometryConditionalVisibility === 'function') applyGeometryConditionalVisibility();
   if (typeof refurbDeriveAreas === 'function') refurbDeriveAreas();
+  if (mode === 'Energy Upgrade' && typeof euUpdateHeatLoad === 'function') euUpdateHeatLoad();
 }
 
 function renderSpecPanel() {
@@ -10292,6 +10293,7 @@ function loadEUExample1() {
   ck('eu-mev',         true);
   ck('eu-pv',          true); s('eu-pv-area', '8');
   euAutoFinish();
+  if (typeof euAutoHLI === 'function') euAutoHLI();
   const adv = document.getElementById('eu-advisory');
   if(adv) adv.value =
     'BER Rating: D2 (220 kWh/m²/yr) → Target B2 (≤90 kWh/m²/yr)\n' +
@@ -10389,6 +10391,7 @@ function loadEUExample2() {
   ck('eu-mvhr',        true);
   ck('eu-pv',          true); s('eu-pv-area', '12');
   euAutoFinish();
+  if (typeof euAutoHLI === 'function') euAutoHLI();
   const adv = document.getElementById('eu-advisory');
   if(adv) adv.value =
     'BER Rating: F (380 kWh/m²/yr) → Target A3 (≤75 kWh/m²/yr)\n' +
@@ -15920,6 +15923,8 @@ function newProject() {
     '#screen-home input, #screen-home select, #screen-input input, #screen-input select, #screen-input textarea'
   );
   fields.forEach(function(el) {
+    // Clear auto-fill locks so age-band/geometry can re-populate derived fields (e.g. eu-hli)
+    if (el.dataset && el.dataset.userEdited) delete el.dataset.userEdited;
     if (el.type === 'checkbox' || el.type === 'radio') { el.checked = el.defaultChecked; }
     else if (el.type === 'file') { /* skip */ }
     else if (el.tagName === 'SELECT') {
@@ -15927,6 +15932,7 @@ function newProject() {
       if (def) { el.value = def.value; } else if (el.options.length) { el.selectedIndex = 0; }
     } else { el.value = el.defaultValue || ''; }
   });
+  var hld = document.getElementById('eu-heat-load-display'); if (hld) hld.textContent = '—';
   ['t1-cards','t2-cards','t3-cards','t4-cards','t6-cards'].forEach(function(id) {
     const c = document.getElementById(id); if (c) c.innerHTML = '';
   });
