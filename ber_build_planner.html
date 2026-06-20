@@ -6012,12 +6012,18 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
       note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
       amount: g.atticInsulation[dt] || g.atticInsulation.detached });
   }
-  if (hasMeasure('wall_insulation') && !hasMeasure('iwi')) {
+  // Wall grants key off the SPECIFIC wall measure selected so the right grant is
+  // generated (cavity fill \u2192 cavity grant; EWI \u2192 EWI grant; IWI \u2192 IWI grant).
+  var ewiSelected = measures.includes('wall_ewi') || measures.includes('ewi');
+  var iwiSelected = measures.includes('wall_iwi') || measures.includes('iwi');
+  var cavitySelected = measures.includes('wall_cavity') || measures.includes('wall_insulation');
+  if ((cavitySelected || measures.length === 0) && !ewiSelected && !iwiSelected) {
     items.push({ ref:'G'+gRef++, description:'Cavity Wall Insulation Grant', measureKey:'wall_cavity',
       note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
       amount: g.cavityWall[dt] || g.cavityWall.detached });
   }
-  if (hasMeasure('wall_insulation') && (d.existWallType||'').toLowerCase().includes('solid')) {
+  // EWI grant applies to any wall construction (not solid-only) when EWI is chosen.
+  if (ewiSelected || (measures.length === 0 && (d.existWallType||'').toLowerCase().includes('solid'))) {
     items.push({ ref:'G'+gRef++, description:'External Wall Insulation (EWI) Grant', measureKey:'wall_ewi',
       note:dt+' \u2014 SEAI Better Energy Homes 2026',
       amount: g.ewiWall[dt] || g.ewiWall.detached });
@@ -10691,6 +10697,7 @@ document.addEventListener('input', function(e) {
   var refresh = function() {
     if (typeof wsAutoPlaceholders === 'function') wsAutoPlaceholders();
     if (typeof nbAutoFill === 'function') nbAutoFill();
+    if (typeof euUpdateHeatLoad === 'function') euUpdateHeatLoad();
   };
   ['input', 'change'].forEach(function(evt) {
     document.addEventListener(evt, function(e) {
@@ -13274,10 +13281,13 @@ function _euPricingBasis(s, inp) {
     pb.push('Fill: '+(cNames[inp.cavity_type]||inp.cavity_type||'blown EPS bead'));
     if (inp.cavity_makegood) pb.push('Making good: included');
   } else if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) {
-    var eq = firstItemQty('external wall insulation') || firstItemQty('ewi'); if (eq) pb.push('Net wall area: '+eq+'m²');
+    var ewiPk = inp.ewi_peaks || 0;
+    var eq = firstItemQty('external wall insulation') || firstItemQty('ewi');
+    if (eq) pb.push('Gross elevation: '+eq+'m² (wall + openings'+(ewiPk>0?' + '+ewiPk+' gable peak'+(ewiPk>1?'s':''):'')+')');
     pb.push('Insulation: '+(inp.ewi_insulation||'eps')+' '+(inp.ewi_thickness||'150')+'mm');
     pb.push('Render: '+(inp.ewi_render||'silicone'));
     if (inp.ewi_makegood) pb.push('Making good: included');
+    var fasciaq = firstItemQty('fascia'); if (fasciaq) pb.push('Fascia & soffit: '+fasciaq+'m (mandatory)');
     var sq = firstItemQty('scaffolding'); if (sq) pb.push('Scaffold: '+sq+'m² gross elevation');
   } else if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0) {
     var iq = firstItemQty('pir insulated board'); if (iq) pb.push('Wall area: '+iq+'m²');
@@ -13325,7 +13335,9 @@ function _euPricingBasis(s, inp) {
     pb.push('Attic hatch: 1 nr');
   } else if (t.indexOf('AIR-TO-WATER') >= 0 || t.indexOf('ASHP') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
-    var hq = firstItemQty('air-to-water heat pump'); if (hq != null) { var hi = items.find(function(i){return (i.description||'').indexOf('air-to-water heat pump')>=0;}); if(hi) pb.push('Unit: '+hi.description.match(/\(\d+kW\)/)?.[0]||'size from heat loss'); }
+    if ((inp.hli||0) > 0) pb.push('Heat Loss Indicator: '+inp.hli+' W/m²K');
+    var hi = items.find(function(i){return (i.description||'').toLowerCase().indexOf('air-to-water heat pump')>=0;});
+    if (hi) { var hkw = (hi.description||'').match(/\((\d+)kW\)/); if (hkw) pb.push('Design load: '+hkw[1]+'kW '+((inp.hli||0)>0?'(IS EN 12831 heat loss)':'(area-banded — add HLI)')); }
     var emitLabels={'ufh':'UFH ground floor (screed)','keep-rads':'retain existing radiators','ufh-rads':'UFH ground floor + rads upper floor','rads':'new low-temperature radiators'};
     pb.push('Emitters: '+(emitLabels[inp.emitterType]||'new low-temperature radiators'));
     pb.push('Remove: '+(inp.ashpRemove||inp.existHeating||'existing system'));
