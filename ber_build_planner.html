@@ -4087,6 +4087,15 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                   <div class="ws-sub-field" style="margin-top:6px;">
                     <label><input type="checkbox" id="eu-ewi-makegood" checked/> Include making good &#8212; sills, copings &amp; DPCs</label>
                   </div>
+                  <div class="ws-sub-field" style="margin-top:6px;">
+                    <label>Gable end peaks</label>
+                    <select id="eu-ewi-peaks">
+                      <option value="0" selected>None</option>
+                      <option value="1">1 peak (~5m² added)</option>
+                      <option value="2">2 peaks (~10m² added)</option>
+                    </select>
+                    <div style="font-size:10px;color:#8FA0B8;margin-top:2px;">Each gable peak adds ~5m² to gross EWI &amp; scaffold area</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -7622,11 +7631,13 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   }
 
   if (has('wall_ewi')) {
-    var grossElev = Math.round((inputs.ewi_area || netWallArea) + winA + (doors * 1.89));
+    var ewiPeaks  = inputs.ewi_peaks || 0;
+    var peakArea  = ewiPeaks * 5;
+    var grossElev = Math.round((inputs.ewi_area || netWallArea) + winA + (doors * 1.89) + peakArea);
     var ewiIns    = inputs.ewi_insulation || 'eps';
     var ewiRnd    = inputs.ewi_render     || 'silicone';
     var ewiThk    = inputs.ewi_thickness  || '150';
-    var ewiArea   = inputs.ewi_area       || netWallArea;
+    var ewiArea   = grossElev;
     var ewiBase   = WALL_BUNDLE_RATES.ewi_insulation_base[ewiIns]   || WALL_BUNDLE_RATES.ewi_insulation_base['eps'];
     var ewiRndAdd = WALL_BUNDLE_RATES.ewi_render_addon[ewiRnd]       || WALL_BUNDLE_RATES.ewi_render_addon['silicone'];
     var ewiThkAdj = WALL_BUNDLE_RATES.ewi_thickness_adj[ewiThk]     || 0;
@@ -7635,11 +7646,14 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var ewiLabR   = Math.round(ewiBase.lab * ewiRndAdd.labMult);
     var ewiDesc   = 'External wall insulation — ' + ewiIns + ' ' + ewiThk + 'mm + ' + ewiRnd + ' render' +
       ' (bundle: insulation, render system, reveal liners' +
-      (inputs.ewi_makegood ? ', making good' : '') + ')';
+      (inputs.ewi_makegood ? ', making good' : '') + ')' +
+      (ewiPeaks > 0 ? ' [incl. ' + ewiPeaks + ' gable peak' + (ewiPeaks > 1 ? 's' : '') + ']' : '');
+    var fasciaLen = Math.round(4 * Math.sqrt(gfa) * 1.1);
     sections.push({ id: String(sid++), title: 'EXTERNAL WALL INSULATION (EWI)', part: 'A',
       items: [
-        mkItem('EWI.SCAF', 'Scaffolding — external elevations (erect, 2–3 wk hire, dismantle)', 'm²', grossElev, 10, lM(0.1, L.craft), 'Gross elevation area incl. openings — scaffold contractor'),
-        mkItem('EWI.1', ewiDesc, 'm²', ewiArea, ewiMatR, lM(ewiLabR / 22, L.craft), 'Bundled EWI installation by approved contractor'),
+        mkItem('EWI.SCAF', 'Scaffolding — external elevations (erect, 2–3 wk hire, dismantle)', 'm²', grossElev, 10, lM(0.1, L.craft), 'Gross elevation area incl. openings & peaks — scaffold contractor'),
+        mkItem('EWI.1', ewiDesc, 'm²', ewiArea, ewiMatR, lM(ewiLabR / 22, L.craft), 'Gross elevation: net wall + openings + gable peaks'),
+        mkItem('EWI.F', 'Fascia & soffit replacement — UPVC (supply, fix, ventilation strip)', 'm', fasciaLen, 38, lM(0.35, L.craft), 'Mandatory with EWI — eave perimeter estimated from floor area'),
       ]
     });
   }
@@ -12513,6 +12527,7 @@ function readEUSelector() {
     ewi_thickness:        sv('eu-ewi-thickness') || '150',
     ewi_render:           sv('eu-ewi-render') || 'silicone',
     ewi_area:             nv('eu-ewi-area') || netWallArea,
+    ewi_peaks:            nv('eu-ewi-peaks') || 0,
     ewi_makegood:         cb('eu-ewi-makegood'),
     iwi_type:             sv('eu-iwi-type') || 'pir-dab',
     iwi_area:             nv('eu-iwi-area') || netWallArea,
