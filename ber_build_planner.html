@@ -13368,7 +13368,7 @@ function renderEUTable(b) {
     totalGrts += gAmt;
 
     var grantCell = gAmt > 0
-      ? '<span style="color:#059669;font-weight:700;">−'+fmt(gAmt)+'</span>'
+      ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span>'
         + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description; }).join('<br>') + '</div>'
       : '<span style="color:#475569;">—</span>';
 
@@ -13408,7 +13408,7 @@ function renderEUTable(b) {
         '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate issued before grants released</li></ul></td>' +
         '<td class="eu-c-est">'+fmt(BER_ASSESS_COST)+'</td>' +
         '<td class="eu-c-act"><input type="number" id="eu-act-ber" class="eu-act-input" min="0" step="10" placeholder="—" oninput="updateEUActuals()"></td>' +
-        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">−'+fmt(berGrant.amount||0)+'</span>' +
+        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">'+fmt(berGrant.amount||0)+'</span>' +
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div></td>' +
         '<td class="eu-c-notes"><textarea id="eu-note-ber" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
       '</tr>';
@@ -13427,7 +13427,7 @@ function renderEUTable(b) {
           '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">OSS-exclusive — '+(g.note||'')+'</em></td>' +
           '<td class="eu-c-est" style="color:#475569;">—</td>' +
           '<td class="eu-c-act">—</td>' +
-          '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">−'+fmt(oa)+'</span></td>' +
+          '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">'+fmt(oa)+'</span></td>' +
           '<td class="eu-c-notes">—</td>' +
         '</tr>';
     });
@@ -13445,7 +13445,7 @@ function renderEUTable(b) {
         'oninput="updateEUActuals(\'manual\')">' +
       '</td>' +
       '<td class="eu-c-grants">' +
-        '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">−'+fmt(totalGrts)+'</div>' +
+        '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">'+fmt(totalGrts)+'</div>' +
       '</td>' +
       '<td></td>' +
     '</tr>' +
@@ -13458,7 +13458,7 @@ function renderEUTable(b) {
       '</td>' +
       '<td class="eu-c-grants">' +
         '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual grants…" ' +
-        'style="width:100%;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
+        'style="width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
       '</td>' +
       '<td></td>' +
     '</tr>';
