@@ -3845,7 +3845,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
           </div>
           <div class="tab-field">
             <label>Age Band</label>
-            <select id="eu-ageBand">
+            <select id="eu-ageBand" onchange="euAutoHLI()">
               <option value="">&#8212;</option>
               <option value="Pre 1940">Pre 1940</option>
               <option value="1941&#8211;1977">1941&#8211;77</option>
@@ -3860,6 +3860,25 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
           </div>
         </div>
         <div style="font-size:10px;color:#8FA0B8;margin-bottom:10px;margin-top:-2px;">New Irish/European BER scale effective 24 May 2026 &mdash; old D1/D2 &asymp; D &nbsp;&middot;&nbsp; B1&#8211;B3 &asymp; B &nbsp;&middot;&nbsp; A1/A2 &asymp; A &nbsp;&middot;&nbsp; A3 &asymp; A0</div>
+
+        <!-- Heat Loss Indicator -->
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;padding:10px 12px;margin-bottom:10px;background:rgba(56,189,248,0.05);border-left:3px solid rgba(56,189,248,0.4);border-radius:5px;">
+          <div class="tab-field">
+            <label style="color:#38bdf8;">Heat Loss Indicator &mdash; post-upgrade (W/m&#178;K)</label>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input type="number" id="eu-hli" min="0.5" max="6" step="0.1" placeholder="e.g. 2.0"
+                style="width:80px;background:rgba(255,255,255,.08);border:1px solid rgba(56,189,248,.35);color:#38bdf8;border-radius:4px;padding:5px 8px;font-size:13px;font-family:inherit;text-align:center;"
+                oninput="this.dataset.userEdited='true';euUpdateHeatLoad()">
+              <span style="font-size:11px;color:#64748b;">W/m&#178;K</span>
+            </div>
+            <div style="font-size:10px;color:#8FA0B8;margin-top:3px;">Auto-filled from age band &mdash; enter post-upgrade value for accurate pump sizing. SEAI grants require HLI &#8804;1.4</div>
+          </div>
+          <div style="text-align:right;padding-bottom:2px;">
+            <div style="font-size:10px;color:#8FA0B8;margin-bottom:2px;letter-spacing:0.04em;text-transform:uppercase;">Est. design load</div>
+            <div id="eu-heat-load-display" style="font-size:22px;font-weight:700;color:#38bdf8;line-height:1;">&#8212;</div>
+            <div style="font-size:10px;color:#64748b;">kW @ &#8722;3&#8451; &mdash; sizes heat pump</div>
+          </div>
+        </div>
 
         <!-- INSULATION -->
         <div class="ws-group">
@@ -4334,8 +4353,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
               <input type="checkbox" id="eu-ashp" onchange="updateBundleSub('ashp')"/>
               <div class="ws-item-body">
                 <label class="ws-item-label" for="eu-ashp">
-                  <span class="ws-item-title">Air-to-Water Heat Pump (ASHP) <span class="ws-auto-tag">sized from floor area</span></span>
-                  <span class="ws-geo-note">banded · floor area m²</span>
+                  <span class="ws-item-title">Air-to-Water Heat Pump (ASHP) <span class="ws-auto-tag">sized from HLI</span></span>
+                  <span class="ws-geo-note">kW band &middot; heat loss calc</span>
                   <span class="ws-item-grant" id="eu-grant-ashp">Grant: up to &euro;12,500 full system (Better Energy Homes)</span>
                 </label>
                 <div class="ws-item-sub" id="eu-ashp-sub" style="display:none;">
@@ -7653,7 +7672,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       items: [
         mkItem('EWI.SCAF', 'Scaffolding — external elevations (erect, 2–3 wk hire, dismantle)', 'm²', grossElev, 10, lM(0.1, L.craft), 'Gross elevation area incl. openings & peaks — scaffold contractor'),
         mkItem('EWI.1', ewiDesc, 'm²', ewiArea, ewiMatR, lM(ewiLabR / 22, L.craft), 'Gross elevation: net wall + openings + gable peaks'),
-        mkItem('EWI.F', 'Fascia & soffit replacement — UPVC (supply, fix, ventilation strip)', 'm', fasciaLen, 38, lM(0.35, L.craft), 'Mandatory with EWI — eave perimeter estimated from floor area'),
+        mkItem('EWI.F', 'Fascia & soffit replacement — UPVC (supply, fix, ventilation strip)', 'm', fasciaLen, _EU_FASCIA, lM(0.35, L.craft), 'Mandatory with EWI — eave perimeter estimated from ground floor area'),
       ]
     });
   }
@@ -7810,7 +7829,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   // Source: compositedoor.ie, expertwindows.ie, buildersdublin.ie 2025.
   var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
   // EU rate overrides — read from localStorage (Rate Settings → EU Rates tab) each BOQ run
-  var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000];
+  var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
   var _EU_PV=250,_EU_TRICKLE=28;
   (function(){
     var ov={},cat={};
@@ -7843,6 +7862,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     DOOR_RATES.composite=r('door_comp',2800,'wind');DOOR_RATES.hardwood=r('door_hw',4300,'wind');
     DOOR_RATES.aluminium=r('door_alu',4800,'wind');DOOR_RATES.upvc=r('door_upvc',1200,'wind');DOOR_RATES['sliding-patio']=r('door_patio',2400,'wind');
     _EU_ASHP[0]=r('ashp_s',4000,'heat');_EU_ASHP[1]=r('ashp_m',5200,'heat');_EU_ASHP[2]=r('ashp_l',6700,'heat');_EU_ASHP[3]=r('ashp_xl',8500,'heat');
+    _EU_FASCIA=r('ewi_fascia',38,'wall');
     _EU_MVHR[0]=r('mvhr_s',2000,'vent');_EU_MVHR[1]=r('mvhr_m',2750,'vent');_EU_MVHR[2]=r('mvhr_l',4000,'vent');
     _EU_MEV[0]=r('mev_unit',580,'vent');_EU_MEV[1]=r('mev_duct',8.5,'vent');_EU_MEV[2]=r('mev_term',55,'vent');
     _EU_DMEV[0]=r('dmev_fan',120,'vent');_EU_DMEV[1]=r('dmev_drill',38,'vent');_EU_DMEV[2]=r('dmev_spur',45,'vent');
@@ -7922,9 +7942,17 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
 
   // 7. Heating System
   if (has('heating')) {
-    const ashpKw   = fa <= 80 ? '6kW' : fa <= 120 ? '8kW' : fa <= 160 ? '10kW' : '12kW';
+    // Size from HLI if provided (HLI × FA × ΔT23K ÷ 1000); fallback to floor area bands
+    const hli = inputs.hli || 0;
+    const ashpKwNum = hli > 0
+      ? Math.max(4, Math.ceil(hli * fa * 23 / 1000))
+      : (fa <= 80 ? 6 : fa <= 120 ? 8 : fa <= 160 ? 10 : 12);
+    const ashpKw  = ashpKwNum + 'kW';
+    const ashpSizeNote = hli > 0
+      ? 'HLI ' + hli + ' W/m²K × ' + fa + 'm² × 23K ÷ 1000 = ' + ashpKwNum + 'kW design load (IS EN 12831)'
+      : fa + 'm² floor area — enter HLI above for accurate sizing';
     // Source: irishheatpumps.com, heatpumppricesreviews.com, saveonheat.ie 2025 (supply-only unit).
-    const ashpMat  = fa <= 80 ? _EU_ASHP[0] : fa <= 120 ? _EU_ASHP[1] : fa <= 160 ? _EU_ASHP[2] : _EU_ASHP[3];
+    const ashpMat  = ashpKwNum <= 6 ? _EU_ASHP[0] : ashpKwNum <= 8 ? _EU_ASHP[1] : ashpKwNum <= 11 ? _EU_ASHP[2] : _EU_ASHP[3];
     const radsNr   = Math.round(fa / 14);
 
     // Removal items — driven by eu-ashp-remove (richer options than global existHeating)
@@ -7978,7 +8006,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const ashpItems = [
       ...removeItems,
       mkItem('7.TA','Heat pump technical assessment (IS EN 12831 heat loss calculation)','item',1,0,200,'SEAI-required pre-installation survey — €200 SEAI grant available — completed by registered installer'),
-      mkItem('7.1','Air-to-water heat pump ('+ashpKw+') — supply & commission','nr',1,ashpMat,lM(24,L.plumber),'kW size indicative — confirmed by technical assessment. Final sizing per IS EN 12831 heat loss calc'),
+      mkItem('7.1','Air-to-water heat pump ('+ashpKw+') — supply & commission','nr',1,ashpMat,lM(24,L.plumber), ashpSizeNote + ' — final sizing confirmed by technical assessment'),
       mkItem('7.2','Heat pump cylinder ('+cylL+'L indirect unvented)','nr',1,cylMat,lM(8,L.plumber),cylL+'L indicative — sized from '+fa+'m² floor area. Volume confirmed by installer post heat-loss calc — mains pressure, PED compliant'),
       ...emitterItems,
       mkItem('7.4','Existing pipework modifications & system flush','item',1,580,lM(12,L.plumber),'Connections, MagnaClean, pressure test'),
@@ -10605,6 +10633,43 @@ function wsAutoPlaceholders() {
   sv('ws-ensuite-count',    Math.max(1, ensuites),  false);             // new en-suites → from Rooms tab
   sv('ws-door-count',       doors,                  false);             // external doors → from t4-doorCount
 }
+
+// HLI helpers — EU heat loss indicator
+function euHLIFromAgeBand(ab) {
+  if (!ab) return 0;
+  if (ab.includes('2020') || ab.includes('2011')) return 1.5;
+  if (ab.includes('2005') || ab.includes('2000')) return 1.9;
+  if (ab.includes('1994')) return 2.2;
+  if (ab.includes('1983')) return 2.6;
+  if (ab.includes('1978')) return 2.9;
+  if (ab.includes('1941')) return 3.1;
+  return 3.3; // Pre 1940
+}
+function euAutoHLI() {
+  var hliEl = document.getElementById('eu-hli');
+  if (hliEl && hliEl.dataset.userEdited !== 'true') {
+    var ab = document.getElementById('eu-ageBand') && document.getElementById('eu-ageBand').value || '';
+    var def = euHLIFromAgeBand(ab);
+    if (def > 0) hliEl.value = def;
+  }
+  euUpdateHeatLoad();
+}
+function euUpdateHeatLoad() {
+  var hliEl = document.getElementById('eu-hli');
+  var display = document.getElementById('eu-heat-load-display');
+  if (!display) return;
+  var hli = parseFloat(hliEl && hliEl.value) || 0;
+  var fa  = (typeof getCurrentFloorAreaSum === 'function' ? getCurrentFloorAreaSum() : 0) || 100;
+  if (hli > 0) {
+    var kw = Math.max(4, Math.ceil(hli * fa * 23 / 1000));
+    display.textContent = kw + ' kW';
+    display.style.color = kw <= 8 ? '#4ade80' : kw <= 12 ? '#E8A020' : '#f87171';
+  } else {
+    display.textContent = '—';
+    display.style.color = '#38bdf8';
+  }
+}
+
 // Mark ws-* fields as user-edited when typed so geometry auto-fill won't overwrite them.
 // isTrusted guard: only real user keystrokes (isTrusted=true) set the flag; synthetic events
 // dispatched by restoreSnapshot() have isTrusted=false and must not lock auto-fill fields.
@@ -12442,6 +12507,7 @@ function readEUSelector() {
     roofArea:          ra,
     windowArea:        winA,
     doorCount:         doors,
+    hli:               nv('eu-hli') || 0,
     roomsDown:         rd,
     roomsUp:           ru,
     totalRooms:        totalRooms,
@@ -17496,10 +17562,10 @@ function _ufType(t) {
           <tr><td>EU.2c</td><td>Cavity &mdash; Walltite PU foam</td><td>m&#178;</td><td>DEAP net wall area (m&#178;)</td><td>&#8364;20/m&#178;</td><td>4 &divide; 22 = 0.18hr craft &times; &#8364;44 = &#8364;8.0/m&#178;</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;1,800</td></tr>
           <!-- ═══ EWI ═══ -->
           <tr class="mdb-variant"><td colspan="8">&nbsp; External Wall Insulation (EWI) &mdash; Base insulation + render finish; mat total = base_mat + render_mat &plusmn; thickness_adj</td></tr>
-          <tr><td>EU.3a</td><td>EWI base &mdash; EPS 150mm</td><td>m&#178;</td><td>DEAP wall area + reveals + soffits</td><td>&#8364;38/m&#178; base <span class="mdb-note">(100mm &minus;&#8364;8 / 120mm &minus;&#8364;4 / 200mm +&#8364;10)</span></td><td>14 &divide; 22 = 0.64hr craft &times; &#8364;44 = &#8364;28.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
-          <tr><td>EU.3b</td><td>EWI base &mdash; Mineral wool 150mm</td><td>m&#178;</td><td>DEAP wall area + reveals + soffits</td><td>&#8364;48/m&#178; base</td><td>24 &divide; 22 = 1.09hr craft &times; &#8364;44 = &#8364;48.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
-          <tr><td>EU.3c</td><td>EWI base &mdash; Phenolic board 150mm</td><td>m&#178;</td><td>DEAP wall area + reveals + soffits</td><td>&#8364;58/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
-          <tr><td>EU.3d</td><td>EWI base &mdash; PIR 150mm</td><td>m&#178;</td><td>DEAP wall area + reveals + soffits</td><td>&#8364;52/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
+          <tr><td>EU.3a</td><td>EWI base &mdash; EPS 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;38/m&#178; base <span class="mdb-note">(100mm &minus;&#8364;8 / 120mm &minus;&#8364;4 / 200mm +&#8364;10)</span></td><td>14 &divide; 22 = 0.64hr craft &times; &#8364;44 = &#8364;28.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
+          <tr><td>EU.3b</td><td>EWI base &mdash; Mineral wool 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;48/m&#178; base</td><td>24 &divide; 22 = 1.09hr craft &times; &#8364;44 = &#8364;48.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
+          <tr><td>EU.3c</td><td>EWI base &mdash; Phenolic board 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;58/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
+          <tr><td>EU.3d</td><td>EWI base &mdash; PIR 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;52/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
           <tr><td>EU.3r1</td><td><em>Render add-on &mdash; Silicone</em></td><td>m&#178;</td><td>same area as EWI base</td><td>+&#8364;18/m&#178;</td><td>base_lab &times; 1.00 (no change)</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl. in EWI grant</td></tr>
           <tr><td>EU.3r2</td><td><em>Render add-on &mdash; Acrylic</em></td><td>m&#178;</td><td>same area as EWI base</td><td>+&#8364;14/m&#178;</td><td>base_lab &times; 0.96</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl. in EWI grant</td></tr>
           <tr><td>EU.3r3</td><td><em>Render add-on &mdash; Mineral</em></td><td>m&#178;</td><td>same area as EWI base</td><td>+&#8364;22/m&#178;</td><td>base_lab &times; 1.10</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Incl. in EWI grant</td></tr>
@@ -17682,7 +17748,7 @@ function _ufType(t) {
               <tr><td>Roof (ceiling / rafter / flat / room)</td><td style="text-align:center;"><input id="eurcat-roof" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">roof / ceiling m²</td></tr>
               <tr><td>Floor insulation</td><td style="text-align:center;"><input id="eurcat-floor" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">floor area (fa) m²</td></tr>
               <tr><td>Windows &amp; Doors</td><td style="text-align:center;"><input id="eurcat-wind" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">win m² / doors nr</td></tr>
-              <tr><td>Heat Pump (ASHP)</td><td style="text-align:center;"><input id="eurcat-heat" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">1 unit, sized by fa</td></tr>
+              <tr><td>Heat Pump (ASHP)</td><td style="text-align:center;"><input id="eurcat-heat" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">1 unit, sized by HLI</td></tr>
               <tr><td>Ventilation (MVHR / MEV)</td><td style="text-align:center;"><input id="eurcat-vent" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">unit + fa×0.4/0.25 m duct</td></tr>
               <tr><td>Solar (PV &amp; Battery)</td><td style="text-align:center;"><input id="eurcat-solar" class="mdb-pi" type="number" step="0.5" value="0" oninput="euRatesSave()" style="width:46px;text-align:center;"></td><td style="font-size:9px;color:#64748b;">pvArea÷1.7 nr panels</td></tr>
             </tbody>
@@ -17721,6 +17787,14 @@ function _ufType(t) {
                 </tbody>
               </table>
               <div style="font-size:10px;color:#64748b;margin-top:5px;line-height:1.45;">Cavity: SEAI 2025 (47k upgrades), saveonheat.ie 2026<br>EWI: SEAI 2025 median, trade quotes, osber.ie<br>IWI: trade installer quotes 2025<br><span style="color:#f59e0b;">&#9888; Walltite: LOW CONFIDENCE (limited published contractor rates)</span></div>
+              <div style="font-size:10px;font-weight:600;color:#E8A020;margin:8px 0 5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">EWI Mandatory — Fascia &amp; Soffit (&#8364;/m linear)</div>
+              <table class="mdb-tbl" style="margin-bottom:4px;">
+                <thead><tr><th>Item</th><th style="width:85px;">Rate</th></tr></thead>
+                <tbody>
+                  <tr><td>UPVC fascia &amp; soffit (supply, fix, vent strip)</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_fascia" class="mdb-pi" type="number" min="10" step="1" value="38" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
+                </tbody>
+              </table>
+              <div style="font-size:10px;color:#64748b;margin-top:3px;">Always included with EWI &mdash; qty estimated from ground floor perimeter</div>
             </div>
 
             <!-- Heat + Vent -->
@@ -17729,10 +17803,10 @@ function _ufType(t) {
               <table class="mdb-tbl" style="margin-bottom:10px;">
                 <thead><tr><th>Size</th><th style="width:85px;">&#8364;/nr</th></tr></thead>
                 <tbody>
-                  <tr><td>6kW &mdash; fa &le; 80m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_s" class="mdb-pi" type="number" min="100" step="50" value="4000" oninput="euRatesSave()" style="width:68px;"></td></tr>
-                  <tr><td>8kW &mdash; fa &le; 120m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_m" class="mdb-pi" type="number" min="100" step="50" value="5200" oninput="euRatesSave()" style="width:68px;"></td></tr>
-                  <tr><td>10kW &mdash; fa &le; 160m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_l" class="mdb-pi" type="number" min="100" step="50" value="6700" oninput="euRatesSave()" style="width:68px;"></td></tr>
-                  <tr><td>12kW &mdash; fa &gt; 160m&#178;</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_xl" class="mdb-pi" type="number" min="100" step="50" value="8500" oninput="euRatesSave()" style="width:68px;"></td></tr>
+                  <tr><td>Small &mdash; &le;6kW</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_s" class="mdb-pi" type="number" min="100" step="50" value="4000" oninput="euRatesSave()" style="width:68px;"></td></tr>
+                  <tr><td>Medium &mdash; 7&ndash;8kW</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_m" class="mdb-pi" type="number" min="100" step="50" value="5200" oninput="euRatesSave()" style="width:68px;"></td></tr>
+                  <tr><td>Large &mdash; 9&ndash;11kW</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_l" class="mdb-pi" type="number" min="100" step="50" value="6700" oninput="euRatesSave()" style="width:68px;"></td></tr>
+                  <tr><td>XL &mdash; 12kW+</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ashp_xl" class="mdb-pi" type="number" min="100" step="50" value="8500" oninput="euRatesSave()" style="width:68px;"></td></tr>
                 </tbody>
               </table>
               <div style="font-size:10px;color:#64748b;margin-top:4px;margin-bottom:8px;">Source: irishheatpumps.com, heatpumppricesreviews.com, saveonheat.ie 2025</div>
@@ -17993,7 +18067,7 @@ function toggleMatOverlay() {
 <script>
 (function(){
   var D={cav_eps:6,cav_mw:8,cav_wt:20,ewi_eps:38,ewi_mw:48,ewi_phen:58,ewi_pir:52,
-    ewi_rend_sil:18,ewi_rend_acr:14,ewi_rend_min:22,ewi_rend_bsl:48,ewi_rend_stn:62,
+    ewi_rend_sil:18,ewi_rend_acr:14,ewi_rend_min:22,ewi_rend_bsl:48,ewi_rend_stn:62,ewi_fascia:38,
     door_alu:4800,door_upvc:1200,door_patio:2400,
     mev_unit:580,mev_duct:8.5,mev_term:55,mev_trickle:28,
     dmev_fan:120,dmev_drill:38,dmev_spur:45,
