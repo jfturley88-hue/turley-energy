@@ -13676,31 +13676,17 @@ function exportEUPDF(mode) {
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'—')+'</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">−'+fmt(totalGrts)+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'')+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">'+fmt(totalGrts)+'</td>' +
         '<td style="border:'+B+';"></td>' +
-      '</tr>';
-    if (domActGrants > 0) {
-      pdfRows +=
-        '<tr style="background:#F0FDF4;">' +
-          '<td colspan="3" style="padding:6px 6px;font-size:8pt;color:#059669;font-style:italic;border:'+B+';">Actual Grants Received</td>' +
-          '<td style="border:'+B+';"></td>' +
-          '<td style="border:'+B+';"></td>' +
-          '<td style="padding:6px 6px;text-align:right;font-weight:700;color:#059669;border:'+B+';">−'+fmt(domActGrants)+'</td>' +
-          '<td style="border:'+B+';"></td>' +
-        '</tr>';
-    }
-    if (domActNet > 0) {
-      pdfRows +=
-        '<tr style="background:#EFF6FF;">' +
-          '<td colspan="3" style="padding:6px 6px;font-size:8pt;font-weight:700;color:#1E293B;border:'+B+';">Actual Net Cost</td>' +
-          '<td style="border:'+B+';"></td>' +
-          '<td style="padding:6px 6px;text-align:right;font-weight:900;color:#38bdf8;font-size:11pt;border:'+B+';">'+fmt(domActNet)+'</td>' +
-          '<td style="border:'+B+';"></td>' +
-          '<td style="border:'+B+';"></td>' +
-        '</tr>';
-    }
-  } else {
+      '</tr>' +
+      '<tr>' +
+        '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netCost)+'</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>'; else {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="2" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
@@ -13785,7 +13771,7 @@ function exportEUPDF(mode) {
       '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed':'')+'</div>' +
     '</div>';
 
-  var colgroup7 = '<colgroup><col style="width:22px"/><col style="width:150px"/><col style="min-width:140px"/><col style="width:88px"/><col style="width:88px"/><col style="width:100px"/><col style="min-width:90px"/></colgroup>';
+  var colgroup7 = '<colgroup><col style="width:20px"/><col style="width:140px"/><col style="min-width:100px"/><col style="width:80px"/><col style="width:80px"/><col style="width:88px"/><col style="min-width:65px"/></colgroup>';
   var thead7 = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade</th>' +
