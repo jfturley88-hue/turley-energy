@@ -13414,23 +13414,25 @@ function renderEUTable(b) {
       '</tr>';
   }
 
-  // OSS extra grant rows
+  // OSS grants — single bundled row
   var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
   if (ossGrants.length) {
-    tbodyRows += '<tr class="eu-oss-header-row"><td colspan="7" style="padding:6px 14px;font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.07em;background:rgba(99,102,241,.07);border-top:1px solid rgba(99,102,241,.25);">⊕ One Stop Shop Additional Grants</td></tr>';
-    ossGrants.forEach(function(g) {
-      var oa = g.amount||0; totalGrts += oa;
-      tbodyRows +=
-        '<tr class="eu-row eu-oss-row">' +
-          '<td class="eu-c-num" style="color:#6366f1;">★</td>' +
-          '<td class="eu-c-measure"><span class="eu-measure-name" style="color:#6366f1;">'+g.description+'</span></td>' +
-          '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">OSS-exclusive — '+(g.note||'')+'</em></td>' +
-          '<td class="eu-c-est" style="color:#475569;">—</td>' +
-          '<td class="eu-c-act">—</td>' +
-          '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">'+fmt(oa)+'</span></td>' +
-          '<td class="eu-c-notes">—</td>' +
-        '</tr>';
-    });
+    var ossTotal = ossGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
+    totalGrts += ossTotal;
+    var ossItems = ossGrants.map(function(g){ return g.description; }).join(' · ');
+    tbodyRows +=
+      '<tr class="eu-row eu-oss-row">' +
+        '<td class="eu-c-num" style="color:#6366f1;">★</td>' +
+        '<td class="eu-c-measure">' +
+          '<span class="eu-measure-name" style="color:#6366f1;">One Stop Shop Grants</span>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+ossItems+'</div>' +
+        '</td>' +
+        '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">Additional grants — only available via an OSS provider</em></td>' +
+        '<td class="eu-c-est" style="color:#475569;">—</td>' +
+        '<td class="eu-c-act">—</td>' +
+        '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">'+fmt(ossTotal)+'</span></td>' +
+        '<td class="eu-c-notes">—</td>' +
+      '</tr>';
   }
 
   var netTotal = Math.max(0, totalEst - totalGrts);
@@ -13457,8 +13459,8 @@ function renderEUTable(b) {
         'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
       '</td>' +
       '<td class="eu-c-grants">' +
-        '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual grants…" ' +
-        'style="width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
+        '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual…" ' +
+        'style="width:110px;max-width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
       '</td>' +
       '<td></td>' +
     '</tr>';
@@ -13625,35 +13627,38 @@ function exportEUPDF(mode) {
     }
   }
 
-  // OSS rows
+  // OSS grants
   var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
-  var ossColspan = isDetailed ? '7' : '5';
   if (ossGrants.length) {
-    pdfRows += '<tr><td colspan="'+ossColspan+'" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:.07em;background:#F5F3FF;border:'+B+';border-top:2px solid #a5b4fc;">⊕ One Stop Shop Additional Grants — only available when works coordinated through an OSS provider</td></tr>';
-    ossGrants.forEach(function(g) {
-      var oa=g.amount||0; totalGrts+=oa;
-      if (isDetailed) {
+    var ossTotal = ossGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
+    totalGrts += ossTotal;
+    if (isDetailed) {
+      // Individual rows with subtle styling for detailed PDF
+      pdfRows += '<tr><td colspan="7" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;letter-spacing:.06em;border:'+B+';border-top:1px solid #c4b5fd;">⊕ One Stop Shop Additional Grants</td></tr>';
+      ossGrants.forEach(function(g) {
         pdfRows +=
-          '<tr style="background:#F5F3FF;">' +
-            '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';vertical-align:middle;">★</td>' +
-            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';vertical-align:middle;">'+g.description+'</td>' +
+          '<tr>' +
+            '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
+            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';">'+g.description+'</td>' +
             '<td style="border:'+B+';"></td>' +
             '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
             '<td style="border:'+B+';"></td>' +
-            '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;font-size:9pt;padding:3px 6px;">−'+fmt(oa)+'</td>' +
+            '<td style="border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:3px 6px;">'+fmt(g.amount||0)+'</td>' +
             '<td style="border:'+B+';"></td>' +
           '</tr>';
-      } else {
-        pdfRows +=
-          '<tr style="background:#F5F3FF;">' +
-            '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';vertical-align:middle;">★</td>' +
-            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';vertical-align:middle;">'+g.description+'</td>' +
-            '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
-            '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;font-size:9pt;padding:3px 6px;">−'+fmt(oa)+'</td>' +
-            '<td style="border:'+B+';"></td>' +
-          '</tr>';
-      }
-    });
+      });
+    } else {
+      // Single bundled row for customer PDF
+      var ossItems = ossGrants.map(function(g){ return g.description; }).join(' · ');
+      pdfRows +=
+        '<tr>' +
+          '<td style="padding:4px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
+          '<td style="padding:4px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">One Stop Shop Grants<br><span style="font-size:7pt;font-weight:400;color:#64748B;">'+ossItems+'</span></td>' +
+          '<td style="border:'+B+';text-align:right;color:#E8A020;padding:4px 6px;">—</td>' +
+          '<td style="border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:4px 6px;">'+fmt(ossTotal)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
   }
 
   // Collect manually entered actual figures from the web table
@@ -13723,26 +13728,8 @@ function exportEUPDF(mode) {
     }
   }
 
-  // Summary box (customer mode only) — shows above the table
-  var summaryHTML = !isDetailed
-    ? '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:4mm 10mm 3mm;font-family:sans-serif;">' +
-        '<div style="border:1px solid #FDE68A;border-radius:5px;padding:9px 12px;background:#FFFBEB;">' +
-          '<div style="font-size:6.5pt;color:#92400E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:600;">Estimated Cost</div>' +
-          '<div style="font-size:15pt;font-weight:900;color:#E8A020;">'+fmt(totalEst)+'</div>' +
-          '<div style="font-size:6.5pt;color:#92400E;">incl. VAT, O&amp;P &amp; contingency</div>' +
-        '</div>' +
-        '<div style="border:1px solid #BBF7D0;border-radius:5px;padding:9px 12px;background:#F0FDF4;">' +
-          '<div style="font-size:6.5pt;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:600;">SEAI Grants Available</div>' +
-          '<div style="font-size:15pt;font-weight:900;color:#059669;">−'+fmt(totalGrts)+'</div>' +
-          '<div style="font-size:6.5pt;color:#166534;">subject to SEAI eligibility</div>' +
-        '</div>' +
-        '<div style="border:2px solid #059669;border-radius:5px;padding:9px 12px;background:#DCFCE7;">' +
-          '<div style="font-size:6.5pt;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:700;">Net Cost to You</div>' +
-          '<div style="font-size:17pt;font-weight:900;color:#059669;">'+fmt(netCost)+'</div>' +
-          '<div style="font-size:6.5pt;color:#166534;">after grants are applied</div>' +
-        '</div>' +
-      '</div>'
-    : '';
+  // Summary box removed — table is self-contained
+  var summaryHTML = '';
 
   // Build methodology section for detailed PDF
   var methodHTML = '';
