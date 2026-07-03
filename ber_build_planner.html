@@ -13884,18 +13884,8 @@ function exportEUPDF(mode) {
       '</tr>';
   }
 
-  // Energy line only — BER pathway + heat pump sizing. No tiles, no finance figures.
-  var kfHli = parseFloat(inp.hli) || 0;
-  var kfFa  = parseFloat(pi.floorArea) || 0;
-  var kfKw  = (kfHli > 0 && kfFa > 0) ? Math.max(4, Math.ceil(kfHli * kfFa * 23 / 1000)) : 0;
-  var kfBits = [];
-  if (pi.currentBER && pi.targetBER) kfBits.push('BER <strong>'+pi.currentBER+' → '+pi.targetBER+'</strong>');
-  if (kfKw > 0) kfBits.push('Design heat load ~<strong>'+kfKw+' kW</strong> (HLI '+kfHli+' W/m²K — sizes heat pump)');
-  var summaryHTML = kfBits.length
-    ? '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
-        '<div style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ '+kfBits.join(' &nbsp;·&nbsp; ')+'</div>' +
-      '</div>'
-    : '';
+  // No summary strip — HLI & design load appear under the Heating System row; BER pathway is in the header
+  var summaryHTML = '';
 
   // Build methodology section for detailed PDF
   var methodHTML = '';
@@ -14158,12 +14148,8 @@ function exportCompactPDF() {
       '</tr>'
       : '');
 
-  // Energy line only — BER pathway (no tiles, no finance figures)
-  var stripHTML = (pi.currentBER && pi.targetBER)
-    ? '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
-        '<div style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ BER <strong>'+pi.currentBER+' → '+pi.targetBER+'</strong></div>' +
-      '</div>'
-    : '';
+  // No summary strip — the BER pathway is already in the header band
+  var stripHTML = '';
 
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
