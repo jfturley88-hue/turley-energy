@@ -10262,9 +10262,27 @@ function loadRefurbExample2() {
   if (typeof openProjectSections === 'function') openProjectSections();
 }
 
+// Reset every EU works-selector field to its markup default so loading an example
+// (including demo → demo chaining) never inherits stale measures or locked auto-fills
+function euResetSelectorFields() {
+  document.querySelectorAll('input[id^="eu-"], select[id^="eu-"], textarea[id^="eu-"]').forEach(function(el) {
+    if (el.dataset && el.dataset.userEdited) delete el.dataset.userEdited;
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      if (el.checked !== el.defaultChecked) { el.checked = el.defaultChecked; el.dispatchEvent(new Event('change')); }
+    } else if (el.tagName === 'SELECT') {
+      var def = el.querySelector('option[selected]');
+      if (def) { el.value = def.value; } else if (el.options.length) { el.selectedIndex = 0; }
+    } else if (el.type !== 'file') {
+      el.value = el.defaultValue || '';
+    }
+  });
+}
+
 function loadEUExample1() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
+  const lk = (id)          => { const el = document.getElementById(id); if(el) el.dataset.userEdited = 'true'; };
+  euResetSelectorFields();
   s('t0-projName',     '12 Sycamore Drive, Naas, Co. Kildare');
   s('t0-projType',     'Energy Upgrade');
   s('t0-dwellingType', 'Semi-Detached');
@@ -10291,7 +10309,7 @@ function loadEUExample1() {
   ck('eu-ashp',        true);
   ck('eu-hw-cyl',      true);
   ck('eu-mev',         true);
-  ck('eu-pv',          true); s('eu-pv-area', '8');
+  ck('eu-pv',          true); s('eu-pv-area', '8'); lk('eu-pv-area');
   euAutoFinish();
   if (typeof euAutoHLI === 'function') euAutoHLI();
   const adv = document.getElementById('eu-advisory');
@@ -10361,6 +10379,8 @@ function loadEUExample1() {
 function loadEUExample2() {
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
+  const lk = (id)          => { const el = document.getElementById(id); if(el) el.dataset.userEdited = 'true'; };
+  euResetSelectorFields();
   s('t0-projName',     '2 Church Street, Castleblayney, Co. Monaghan');
   s('t0-projType',     'Energy Upgrade');
   s('t0-dwellingType', 'Detached');
@@ -10389,7 +10409,7 @@ function loadEUExample2() {
   ck('eu-ashp',        true); s('eu-emitter-type', 'ufh-rads');
   ck('eu-hw-cyl',      true);
   ck('eu-mvhr',        true);
-  ck('eu-pv',          true); s('eu-pv-area', '12');
+  ck('eu-pv',          true); s('eu-pv-area', '12'); lk('eu-pv-area');
   euAutoFinish();
   if (typeof euAutoHLI === 'function') euAutoHLI();
   const adv = document.getElementById('eu-advisory');
@@ -10407,6 +10427,55 @@ function loadEUExample2() {
     '8. Install 300L unvented heat pump cylinder.\n' +
     '9. MVHR whole-house ventilation with 85% heat recovery efficiency.\n' +
     '10. Solar PV — 12m² south-facing array (est. 4.2kWp) + 10kWh battery.';
+  // Geometry cards — the BOQ engine reads these, not the legacy eu-* fields
+  ['t1','t2','t3','t4'].forEach(function(t) {
+    const c = document.getElementById(t + '-cards');
+    if (c) c.innerHTML = '';
+    if (typeof _dynCount === 'object' && _dynCount) _dynCount[t] = 0;
+    if (typeof _dynEmpty === 'function') _dynEmpty(t);
+  });
+  if (typeof addFloorCard === 'function') {
+    addFloorCard();
+    setTimeout(function() {
+      const l1 = document.getElementById('fc-t1-level-1');
+      const ar1 = document.getElementById('fc-t1-area-1');
+      const pe1 = document.getElementById('fc-t1-perim-1');
+      const ht1 = document.getElementById('fc-t1-height-1');
+      if (l1) l1.value = 'Ground Floor';
+      if (ar1) ar1.value = '112';
+      if (pe1) pe1.value = '43';
+      if (ht1) ht1.value = '2.4';
+    }, 30);
+  }
+  if (typeof addWallCard === 'function') {
+    addWallCard();
+    setTimeout(function() {
+      const ar1 = document.getElementById('fc-t2-area-1');
+      if (ar1) ar1.value = '145';
+    }, 30);
+  }
+  if (typeof addRoofCard === 'function') {
+    addRoofCard();
+    setTimeout(function() {
+      const ty1 = document.getElementById('fc-t3-type-1');
+      const ar1 = document.getElementById('fc-t3-area-1');
+      if (ty1) ty1.value = 'ceiling';
+      if (ar1) ar1.value = '60';
+    }, 30);
+  }
+  if (typeof addWindowCard === 'function') {
+    addWindowCard();
+    setTimeout(function() {
+      const co1 = document.getElementById('fc-t4-count-1');
+      const ar1 = document.getElementById('fc-t4-area-1');
+      if (co1) co1.value = '10';
+      if (ar1) ar1.value = '22';
+    }, 30);
+  }
+  setTimeout(function() {
+    if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
+    if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
+  }, 200);
   selectProjectType('Energy Upgrade');
   openProjectSections();
 }
@@ -13561,7 +13630,7 @@ function renderEUTable(b) {
     '</tr>' +
     '<tr class="eu-net-row">' +
       '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
-      '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#E8A020;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
+      '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
       '<td>' +
         '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
         'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
@@ -13792,7 +13861,7 @@ function exportEUPDF(mode) {
       '</tr>' +
       '<tr>' +
         '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
-        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netCost)+'</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
         '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
@@ -13808,54 +13877,25 @@ function exportEUPDF(mode) {
       '</tr>' +
       '<tr>' +
         '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
-        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netCost)+'</td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
         '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="padding:4px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
       '</tr>';
   }
 
-  // Key figures strip — the four numbers a lender, customer or contractor needs first
-  var kfLoanMo = 0;
-  if (netCost > 1000) {
-    var kfR = 0.04/12, kfN = 120;
-    kfLoanMo = Math.round(netCost * kfR * Math.pow(1+kfR,kfN) / (Math.pow(1+kfR,kfN)-1));
-  }
-  var kfSaving = estimateEnergySaving(b);
-  var kfPayback = (kfSaving && kfSaving.annual > 0 && netCost > 0)
-    ? Math.round(netCost / kfSaving.annual * 10) / 10 : null;
+  // Energy line only — BER pathway + heat pump sizing. No tiles, no finance figures.
   var kfHli = parseFloat(inp.hli) || 0;
   var kfFa  = parseFloat(pi.floorArea) || 0;
   var kfKw  = (kfHli > 0 && kfFa > 0) ? Math.max(4, Math.ceil(kfHli * kfFa * 23 / 1000)) : 0;
   var kfBits = [];
-  if (kfSaving) kfBits.push('BER '+kfSaving.cur+' → '+kfSaving.tgt+' · est. energy saving <strong>~€'+kfSaving.annual.toLocaleString('en-IE')+'/yr</strong>'+(kfPayback ? ' · payback ~'+kfPayback+' yrs' : ''));
+  if (pi.currentBER && pi.targetBER) kfBits.push('BER <strong>'+pi.currentBER+' → '+pi.targetBER+'</strong>');
   if (kfKw > 0) kfBits.push('Design heat load ~<strong>'+kfKw+' kW</strong> (HLI '+kfHli+' W/m²K — sizes heat pump)');
-  var summaryHTML =
-    '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
-      '<div style="display:grid;grid-template-columns:'+(kfLoanMo>0?'1fr 1fr 1.2fr 1fr':'1fr 1fr 1.2fr')+';gap:8px;">' +
-        '<div style="border:1px solid #E2E8F0;border-radius:5px;padding:6px 9px;background:#F8FAFC;">' +
-          '<div style="font-size:7pt;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Total Investment</div>' +
-          '<div style="font-size:12pt;font-weight:800;color:#1E293B;">'+fmt(totalEst)+'</div>' +
-          '<div style="font-size:6.5pt;color:#94a3b8;">incl. VAT · all works</div></div>' +
-        '<div style="border:1px solid #BBF7D0;border-radius:5px;padding:6px 9px;background:#F0FDF4;">' +
-          '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">SEAI Grants</div>' +
-          '<div style="font-size:12pt;font-weight:800;color:#059669;">−'+fmt(totalGrts)+'</div>' +
-          '<div style="font-size:6.5pt;color:#94a3b8;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</div></div>' +
-        '<div style="border:2px solid #E8A020;border-radius:5px;padding:6px 9px;background:#FFFBEB;">' +
-          '<div style="font-size:7pt;color:#92400E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Net Cost to Homeowner</div>' +
-          '<div style="font-size:14pt;font-weight:900;color:#1E293B;">'+fmt(netCost)+'</div>' +
-          '<div style="font-size:6.5pt;color:#94a3b8;">after SEAI grants — amount to finance</div></div>' +
-        (kfLoanMo > 0
-          ? '<div style="border:1px solid #E2E8F0;border-radius:5px;padding:6px 9px;background:#F8FAFC;">' +
-            '<div style="font-size:7pt;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Green Loan Guide</div>' +
-            '<div style="font-size:12pt;font-weight:800;color:#1E293B;">~€'+kfLoanMo.toLocaleString('en-IE')+'/mo</div>' +
-            '<div style="font-size:6.5pt;color:#94a3b8;">4% APR · 10 years · indicative</div></div>'
-          : '') +
-      '</div>' +
-      (kfBits.length
-        ? '<div style="margin-top:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ '+kfBits.join(' &nbsp;·&nbsp; ')+'</div>'
-        : '') +
-    '</div>';
+  var summaryHTML = kfBits.length
+    ? '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
+        '<div style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ '+kfBits.join(' &nbsp;·&nbsp; ')+'</div>' +
+      '</div>'
+    : '';
 
   // Build methodology section for detailed PDF
   var methodHTML = '';
@@ -14016,7 +14056,7 @@ function exportCompactPDF() {
     ? {A:'Part A — Existing Structure Upgrade', B:'Part B — Whole-House Services', C:'Part C — Additional Works', D:'Part D — Extension / Additional Works'}
     : {A:'Part A — Structure & Envelope', B:'Part B — Internal Works & Fit-Out', C:'Part C — Services & Renewables', D:'Part D — External Works'};
 
-  var nCols = hasGrants ? 5 : 4;
+  var nCols = hasGrants ? 6 : 5;
   // Stable-sort by part so each part header prints once even when sections were appended out of order
   var ordered = sections.map(function(s, i){ return { s: s, i: i }; }).sort(function(a, b) {
     var pa = a.s.part || 'Z', pb = b.s.part || 'Z';
@@ -14061,6 +14101,7 @@ function exportCompactPDF() {
         '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+
           (scope ? '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">'+scope+'</div>' : '')+'</td>' +
         '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';">'+fmt(est)+'</td>' +
+        '<td style="padding:3px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';"></td>' +
         gCell +
         '<td style="padding:3px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';"></td>' +
       '</tr>';
@@ -14075,6 +14116,7 @@ function exportCompactPDF() {
         '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;border:'+B+';">PROFESSIONAL FEES' +
           '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">Design, engineering, BER &amp; compliance · VAT 23% included</div></td>' +
         '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;border:'+B+';">'+fmt(feesIncVat)+'</td>' +
+        '<td style="padding:3px 6px;text-align:right;font-size:9pt;color:#38bdf8;border:'+B+';"></td>' +
         (hasGrants ? '<td style="padding:3px 6px;text-align:right;border:'+B+';">—</td>' : '') +
         '<td style="border:'+B+';"></td>' +
       '</tr>';
@@ -14092,6 +14134,7 @@ function exportCompactPDF() {
           '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
           '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">Additional SEAI Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+leftover.map(function(g){ return g.description; }).join(' · ')+'</span></td>' +
           '<td style="padding:3px 6px;text-align:right;color:#E8A020;border:'+B+';">—</td>' +
+          '<td style="border:'+B+';"></td>' +
           '<td style="padding:3px 6px;text-align:right;color:#6366f1;font-weight:700;font-size:9pt;border:'+B+';">'+fmt(loTotal)+'</td>' +
           '<td style="border:'+B+';"></td>' +
         '</tr>';
@@ -14103,54 +14146,24 @@ function exportCompactPDF() {
     '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
       '<td colspan="2" style="padding:5px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL PROJECT COST</td>' +
       '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalProject)+'</td>' +
+      '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';"></td>' +
       (hasGrants ? '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">'+fmt(su.grantsTotal)+'</td>' : '') +
       '<td style="border:'+B+';"></td>' +
     '</tr>' +
     (hasGrants
       ? '<tr>' +
         '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
-        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netProject)+'</td>' +
-        '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netProject)+'</td>' +
+        '<td style="border:'+B+';"></td><td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
       '</tr>'
       : '');
 
-  // Key figures strip
-  var tile = function(label, val, sub, hi) {
-    return '<div style="border:'+(hi?'2px solid #E8A020':'1px solid #E2E8F0')+';border-radius:5px;padding:6px 9px;background:'+(hi?'#FFFBEB':'#F8FAFC')+';">' +
-      '<div style="font-size:7pt;color:'+(hi?'#92400E':'#64748B')+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">'+label+'</div>' +
-      '<div style="font-size:'+(hi?'14pt':'12pt')+';font-weight:'+(hi?'900':'800')+';color:#1E293B;">'+val+'</div>' +
-      '<div style="font-size:6.5pt;color:#94a3b8;">'+sub+'</div></div>';
-  };
-  var tiles;
-  if (hasGrants) {
-    var loanMo = 0;
-    if (netProject > 1000) {
-      var r = 0.04/12, n = 120;
-      loanMo = Math.round(netProject * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1));
-    }
-    tiles = tile('Total Investment', fmt(totalProject), 'incl. fees &amp; VAT') +
-      '<div style="border:1px solid #BBF7D0;border-radius:5px;padding:6px 9px;background:#F0FDF4;">' +
-        '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">SEAI Grants</div>' +
-        '<div style="font-size:12pt;font-weight:800;color:#059669;">−'+fmt(su.grantsTotal)+'</div>' +
-        '<div style="font-size:6.5pt;color:#94a3b8;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</div></div>' +
-      tile('Net Cost to Homeowner', fmt(netProject), 'after SEAI grants — amount to finance', true) +
-      (loanMo > 0 ? tile('Green Loan Guide', '~€'+loanMo.toLocaleString('en-IE')+'/mo', '4% APR · 10 years · indicative') : '');
-  } else {
-    tiles = tile('Construction Cost', fmt(gross), 'incl. VAT 13.5% · contractor scope') +
-      tile('Professional Fees', fmt(feesIncVat), 'design, engineering, BER · VAT 23%') +
-      tile('Total Project Cost', fmt(totalProject), 'full budget figure — amount to finance', true) +
-      (fa > 0 ? tile('Cost per m²', '€'+Math.round(totalProject/fa).toLocaleString('en-IE'), fa+' m² gross floor area') : '');
-  }
-  var nTiles = 3 + ((hasGrants && netProject > 1000) || (!hasGrants && fa > 0) ? 1 : 0);
-  var sav = isRefurb ? estimateEnergySaving(b) : null;
-  var savPayback = (sav && sav.annual > 0 && netProject > 0) ? Math.round(netProject / sav.annual * 10) / 10 : null;
-  var stripHTML =
-    '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
-      '<div style="display:grid;grid-template-columns:repeat('+nTiles+',1fr);gap:8px;">'+tiles+'</div>' +
-      (sav
-        ? '<div style="margin-top:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ BER '+sav.cur+' → '+sav.tgt+' · est. energy saving <strong>~€'+sav.annual.toLocaleString('en-IE')+'/yr</strong>'+(savPayback ? ' · payback ~'+savPayback+' yrs' : '')+'</div>'
-        : '') +
-    '</div>';
+  // Energy line only — BER pathway (no tiles, no finance figures)
+  var stripHTML = (pi.currentBER && pi.targetBER)
+    ? '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
+        '<div style="padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ BER <strong>'+pi.currentBER+' → '+pi.targetBER+'</strong></div>' +
+      '</div>'
+    : '';
 
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
@@ -14170,12 +14183,13 @@ function exportCompactPDF() {
     '<th style="padding:4px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Works Section</th>' +
     '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Est. Spend</th>' +
+    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual Spend</th>' +
     (hasGrants ? '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">SEAI Grant</th>' : '') +
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
     '</tr></thead>';
   var colgroup = hasGrants
-    ? '<colgroup><col style="width:22px"/><col style="min-width:180px"/><col style="width:80px"/><col style="width:130px"/><col style="width:70px"/></colgroup>'
-    : '<colgroup><col style="width:22px"/><col style="min-width:220px"/><col style="width:90px"/><col style="width:110px"/></colgroup>';
+    ? '<colgroup><col style="width:22px"/><col style="min-width:180px"/><col style="width:80px"/><col style="width:76px"/><col style="width:130px"/><col style="width:70px"/></colgroup>'
+    : '<colgroup><col style="width:22px"/><col style="min-width:200px"/><col style="width:90px"/><col style="width:80px"/><col style="width:100px"/></colgroup>';
 
   var howTo = hasGrants
     ? '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
@@ -15218,36 +15232,25 @@ function exportPDF() {
   const projIcon = pi.type === 'Energy Upgrade' ? '⚡' : pi.type === 'Refurbishment' ? '🔨' : '🏗';
   const dateStr = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
 
-  // Pre-compute green loan guide and energy savings for cover page
-  const _pdfNetLoan = su.netTotal || 0;
-  const _r = 0.04/12, _n = 120;
-  const _pdfMonthly = (hasGrants && _pdfNetLoan > 1000)
-    ? Math.round(_pdfNetLoan * _r * Math.pow(1+_r,_n) / (Math.pow(1+_r,_n)-1)) : 0;
+  // Pre-compute energy savings for cover page (no loan/payback figures — we are not a bank)
   const _pdfSaving = hasGrants ? estimateEnergySaving(b) : null;
   const _pdfGrantBox = hasGrants ? (function(){
     const savRow = _pdfSaving
       ? '<div style="font-size:8pt;color:#059669;margin-top:8px;border-top:1px solid #BBF7D0;padding-top:7px;">' +
         '⚡ Estimated annual energy saving (' + _pdfSaving.cur + ' → ' + _pdfSaving.tgt + '): ' +
-        '<strong>~€' + _pdfSaving.annual.toLocaleString('en-IE') + '/yr</strong>' +
-        (_pdfSaving.payback ? ' · payback ~' + _pdfSaving.payback + ' yrs' : '') + '</div>'
-      : '';
-    const cols = _pdfMonthly > 0 ? '1fr 1fr 1fr 1fr' : '1fr 1fr 1fr';
-    const loanCol = _pdfMonthly > 0
-      ? '<div><div style="font-size:7pt;color:#475569;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Green Loan Guide</div>' +
-        '<div style="font-size:11pt;font-weight:700;color:#1E293B;">~€' + _pdfMonthly.toLocaleString('en-IE') + '/mo</div>' +
-        '<div style="font-size:7pt;color:#94a3b8;">4% · 10 years</div></div>'
+        '<strong>~€' + _pdfSaving.annual.toLocaleString('en-IE') + '/yr</strong></div>'
       : '';
     return '<div style="margin-top:12px;border:1px solid #BBF7D0;border-radius:5px;padding:12px 14px;background:#F0FDF4;">' +
       '<div style="font-size:8pt;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px;">SEAI Grant Impact Summary</div>' +
-      '<div style="display:grid;grid-template-columns:' + cols + ';gap:8px;">' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
       '<div><div style="font-size:7pt;color:#64748B;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Gross Cost</div>' +
       '<div style="font-size:11pt;font-weight:700;color:#1E293B;">' + fmt(su.gross||su.total||0) + '</div></div>' +
       '<div><div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">SEAI Grants</div>' +
       '<div style="font-size:11pt;font-weight:700;color:#059669;">−' + fmt(su.grantsTotal) + '</div></div>' +
       '<div style="background:#DCFCE7;border-radius:4px;padding:6px;border:1px solid #BBF7D0;">' +
-      '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Net to Finance</div>' +
-      '<div style="font-size:13pt;font-weight:900;color:#059669;">' + fmt(su.netTotal) + '</div></div>' +
-      loanCol + '</div>' + savRow +
+      '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Net Cost</div>' +
+      '<div style="font-size:13pt;font-weight:900;color:#769B44;">' + fmt(su.netTotal) + '</div></div>' +
+      '</div>' + savRow +
       '<div style="font-size:7pt;color:#94a3b8;margin-top:8px;border-top:1px solid #BBF7D0;padding-top:6px;">' +
       'This BOQ is an <strong>independent indicative estimate</strong> — not prepared by the contractor. ' +
       'Contractors must quote on the <strong>gross cost</strong> above. SEAI grants should reduce your invoice, not justify inflated pricing. ' +
