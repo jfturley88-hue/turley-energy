@@ -970,31 +970,54 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     }
     function doorCount(){ return (parseInt(val('t4-doorCount'))||0) || (parseInt(val('eu-doorCount'))||0); }
     function roomCounts(){ if (typeof getCurrentRoomCounts==='function'){ try{ return getCurrentRoomCounts()||{}; }catch(e){} } return {}; }
-    // Count checked MAIN selection toggles (the first checkbox in each .ws-item that is
-    // not inside a .ws-item-sub), grouped by their .ws-group heading.
+    // Collect checked MAIN selection toggles (the first checkbox in each .ws-item that is
+    // not inside a .ws-item-sub) with their titles, so the rail can list them by name.
     function selections(){
-      var groups=[], total=0;
-      document.querySelectorAll('.ws-group').forEach(function(g){
-        var btn=g.querySelector('.ws-group-toggle');
-        var name=btn ? btn.textContent.replace(/[▶▼►‣›]/g,'').trim() : 'Group';
-        var n=0;
-        g.querySelectorAll('.ws-item').forEach(function(item){
-          var cbs=item.querySelectorAll('input[type="checkbox"]');
-          for (var i=0;i<cbs.length;i++){
-            if (!cbs[i].closest('.ws-item-sub')){ if (cbs[i].checked) n++; break; }
+      var items=[], total=0;
+      document.querySelectorAll('.ws-group .ws-item').forEach(function(item){
+        var cbs=item.querySelectorAll('input[type="checkbox"]');
+        for (var i=0;i<cbs.length;i++){
+          if (!cbs[i].closest('.ws-item-sub')){
+            if (cbs[i].checked){
+              var t=item.querySelector('.ws-item-title'), name='';
+              if (t){ name=t.textContent.trim(); }
+              else {
+                // Plain-label items (no title span): label text minus tag/grant spans
+                var lbl=item.querySelector('.ws-item-label');
+                if (lbl){ var cl=lbl.cloneNode(true);
+                  cl.querySelectorAll('span').forEach(function(sp){ sp.parentNode.removeChild(sp); });
+                  name=cl.textContent.replace(/\s+/g,' ').trim(); }
+              }
+              items.push({ id: cbs[i].id||'', name: name||'Measure' });
+              total++;
+            }
+            break;
           }
-        });
-        if (n>0){ groups.push({name:name,n:n}); total+=n; }
+        }
       });
-      return { groups:groups, total:total };
+      return { items:items, total:total };
     }
     function completeness(m,gm,sel){
       var p=0, fa=gm.floor;
       if (m==='Energy Upgrade'){
-        if (hasCounty()) p+=15;
-        if (fa>=10) p+=25;
-        p += Math.min(45, sel.total*15);
-        if (val('eu-currentBER')||val('eu-targetBER')||val('eu-ageBand')) p+=15;
+        // Readiness = required inputs present for what's actually selected —
+        // requirements grow with the measures, so 100% means "everything this
+        // estimate needs has been entered", not "lots ticked".
+        var ids = sel.items.map(function(it){ return it.id; });
+        var any = function(prefixes){ return ids.some(function(id){
+          return prefixes.some(function(pre){ return id.indexOf(pre)===0; }); }); };
+        var req = [
+          hasCounty(),
+          fa>=10,
+          sel.total>0,
+          !!(val('eu-currentBER')||val('eu-targetBER')||val('eu-ageBand')),
+        ];
+        if (any(['eu-cavity','eu-ewi','eu-iwi'])) req.push(gm.wall>0);
+        if (any(['eu-roof-'])) req.push(gm.roof>0);
+        if (any(['eu-windows'])) req.push(gm.window>0);
+        if (any(['eu-ashp','eu-gshp','eu-hybrid-hp','eu-air-air'])) req.push((parseFloat(val('eu-hli'))||0)>0);
+        var got = req.filter(Boolean).length;
+        return req.length ? Math.round(100*got/req.length) : 0;
       } else if (m==='Refurbishment'){
         if (hasCounty()) p+=10;
         if (fa>=10) p+=15;
@@ -1071,7 +1094,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         h+=chip('Ventilation', (val('spec-ventilation')||'—'), 'pv-ok');
       } else {
         h+='<div class="pv-sec-title">'+(m==='Energy Upgrade'?'Measures':'Works')+' selected &mdash; '+sel.total+'</div>';
-        if (sel.groups.length){ sel.groups.forEach(function(gr){ h+=chip(gr.name, String(gr.n), 'pv-ok'); }); }
+        if (sel.items.length){ sel.items.forEach(function(it){ h+=chip(it.name, '✓', 'pv-ok'); }); }
         else { h+='<div style="font-size:11px;color:#64748b;padding:5px 0;">None selected yet</div>'; }
       }
       var body=el('preview-rail-body'); if(body) body.innerHTML=h;
