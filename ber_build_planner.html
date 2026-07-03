@@ -1349,6 +1349,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         <div style="display:none" aria-hidden="true">
           <select id="t4-glazingType"><option>Double uPVC</option><option>Triple uPVC</option><option>Triple Aluclad</option><option>Secondary Glazing</option></select>
           <input type="number" id="t4-windowArea" value="0">
+          <input type="hidden" id="t4-windowCount" value="0">
         </div>
         <div id="t4-cards"></div>
         <p id="t4-empty" class="dyn-empty">No window types added yet &mdash; click the button below to add one</p>
@@ -5442,7 +5443,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
           <div class="ao-bundle" data-pct="5" data-bundle="contingency">
             <input type="checkbox" id="ao-eu-contingency" checked>
             <div class="ao-bundle-main">
-              <label for="ao-eu-contingency">Contingency <span class="ao-pct">+5% of net works</span> <span class="ao-default-tag">recommended</span></label>
+              <label for="ao-eu-contingency">Contingency <span class="ao-pct">+10% of net works</span> <span class="ao-default-tag">recommended</span></label>
             </div>
           </div>
 
@@ -6007,7 +6008,8 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
   var hasHeating = measures.includes('heating') || measures.includes('gshp') ||
                    measures.includes('ashp') || measures.includes('hybrid-hp');
 
-  if (hasMeasure('roof_insulation') || hasMeasure('rafter_insulation') || d.roofInsulation) {
+  if (hasMeasure('roof_insulation') || hasMeasure('rafter_insulation') || hasMeasure('roof_ceiling') ||
+      hasMeasure('roof_rafter') || hasMeasure('roof_room') || d.roofInsulation) {
     items.push({ ref:'G'+gRef++, description:'Attic / Roof Insulation Grant', measureKey:'roof',
       note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
       amount: g.atticInsulation[dt] || g.atticInsulation.detached });
@@ -6069,7 +6071,8 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
       note:'\u20ac1,200 \u2014 SEAI Better Energy Homes 2026',
       amount: g.solarThermal });
   }
-  if (hasMeasure('ventilation') || d.ventilation === 'MVHR' || d.ventilation === 'MEV') {
+  // Grant requires the ventilation measure — d.ventilation alone only picks the label
+  if (hasMeasure('ventilation')) {
     var ventLabel = (d.ventilation === 'MVHR' || (measures.includes('ventilation') && d.ventilationType === 'MVHR'))
       ? 'MVHR Mechanical Ventilation Grant' : 'MEV Mechanical Extract Ventilation Grant';
     items.push({ ref:'G'+gRef++, description:ventLabel, measureKey:'ventilation',
@@ -6165,8 +6168,10 @@ function computeSummary(sections, projType, fa, grants, grantScheme, ao) {
   const externalsAllow   = (ao && ao.externals     != null) ? Math.round(el * ao.externals)     : 0;
 
   const subTotal = el + pre + con + plant + surveyAllowance + berAdminCost + siteInvAllow + substructureAllow + externalsAllow;
-  // VAT: 0% on solar PV supply-and-fit; 13.5% on everything else
-  const vatBase  = subTotal - pvElements;
+  // VAT: 0% on solar PV supply-and-fit; 13.5% on everything else.
+  // Exempt the PV share of the LOADED subtotal — the Revenue 0% ruling covers the
+  // full PV supply price including the contractor's overhead & contingency on it.
+  const vatBase  = subTotal - pvElements * (el > 0 ? subTotal / el : 1);
   const vat      = Math.round(vatBase * 0.135);
   const gross    = subTotal + vat;
 
@@ -10301,7 +10306,7 @@ function loadEUExample1() {
   s('eu-wallArea',     '105');
   s('eu-roofArea',     '44');
   s('eu-windowArea',   '18');
-  s('eu-doorCount',    '2');
+  s('t4-doorCount',    '2');
   // EU measures: D → B
   ck('eu-roof-ceiling',       true);
   ck('eu-cavity',      true);
@@ -10385,7 +10390,7 @@ function loadEUExample2() {
   s('t0-projType',     'Energy Upgrade');
   s('t0-dwellingType', 'Detached');
   s('t0-county',       'Monaghan');
-  s('t0-grantScheme',  'One Stop Shop');
+  s('t0-grantScheme',  'individual');
   // EU property context
   s('eu-currentBER',   'F');
   s('eu-targetBER',    'A');
@@ -10399,7 +10404,7 @@ function loadEUExample2() {
   s('eu-wallArea',     '145');
   s('eu-roofArea',     '60');
   s('eu-windowArea',   '22');
-  s('eu-doorCount',    '3');
+  s('t4-doorCount',    '3');
   // EU measures: F → A deep retrofit
   ck('eu-roof-ceiling',       true);
   ck('eu-ewi',         true);
@@ -12490,7 +12495,8 @@ function readAdvancedOptions(mode) {
   if (mode === 'Energy Upgrade') {
     return {
       prelims:             cb('ao-eu-prelims')     ? 0.12  : null,
-      contingency:         cb('ao-eu-contingency') ? 0.05  : 0,
+      // 10% matches the loading stated on every EU report (O&P 12% + contingency 10% + VAT)
+      contingency:         cb('ao-eu-contingency') ? 0.10  : 0,
       proFees:             cb('ao-eu-pro-fees')    ? 0.08  : null,
       includePrelimSection: false,
     };
@@ -12577,7 +12583,7 @@ function readEUSelector() {
     cb('eu-biomass') ? 'biomass' :
     sv('eu-boiler-fuel') || 'ASHP';
 
-  const ventType = cb('eu-mvhr') ? 'MVHR' : cb('eu-dmev') ? 'DMEV' : 'MEV';
+  const ventType = cb('eu-mvhr') ? 'MVHR' : cb('eu-dmev') ? 'DMEV' : cb('eu-mev') ? 'MEV' : '';
 
   return {
     floorArea:         fa,
