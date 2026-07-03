@@ -13225,9 +13225,17 @@ function buildReport() {
     var existingSummary = document.getElementById('rpt-scope-summary');
     if (existingSummary) existingSummary.remove();
   }
-  document.getElementById('rpt-total').textContent = fmt(su.total);
+  // Header must match the measure table below it — the table appends a €300 BER
+  // assessment row (engine berFee) whenever the standalone BER grant is present.
+  var _hdrTotal = su.total, _hdrNet = su.netTotal;
+  if (pi.type === 'Energy Upgrade' &&
+      (BOQ.grants || []).some(function(g){ return g.measureKey === 'ber' && !g.ossExclusive; })) {
+    _hdrTotal += 300;
+    _hdrNet = Math.max(0, _hdrTotal - (su.grantsTotal || 0));
+  }
+  document.getElementById('rpt-total').textContent = fmt(_hdrTotal);
   document.getElementById('rpt-total-sub').textContent = su.grantsTotal>0
-    ? `Prelims · Contingency · VAT 13.5% incl. · Net after SEAI grants: ${fmt(su.netTotal)}`
+    ? `Prelims · Contingency · VAT 13.5% incl. · Net after SEAI grants: ${fmt(_hdrNet)}`
     : 'Contingency · Plant · VAT 13.5% incl.';
 
   // Inject "independent estimate" badge into report meta for EU/Refurb
