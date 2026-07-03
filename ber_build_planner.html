@@ -12828,6 +12828,16 @@ async function generate() {
       BOQ.summary.netTotal      = BOQ.summary.total - (BOQ.summary.grantsTotal || 0);
     });
 
+    // Keep the bank figures in sync with the merged gross — totalProjectCost was
+    // computed before the extension sections were appended
+    if (extensions.length) {
+      var _mFees = BOQ.summary.profFees ? BOQ.summary.profFees.total : 0;
+      BOQ.summary.feesTotal        = _mFees;
+      BOQ.summary.feesVat          = Math.round(_mFees * 0.23);
+      BOQ.summary.totalProjectCost = BOQ.summary.gross + _mFees + BOQ.summary.feesVat;
+      BOQ.summary.netProjectCost   = Math.max(0, BOQ.summary.totalProjectCost - (BOQ.summary.grantsTotal || 0));
+    }
+
     // Vacant Property Refurbishment Grant
     var _vpGEl = document.getElementById('t0-vpGrant');
     var _vpGType = _vpGEl ? _vpGEl.value : 'none';
@@ -13616,7 +13626,8 @@ function _updateEUPDFBtns(isEU) {
       '<button onclick="exportEUPDF(\'detailed\')" title="Detailed PDF with methodology and pricing breakdown" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Detailed PDF</button>';
   } else {
     wrap.innerHTML =
-      '<button id="pdf-download-btn" onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Download PDF</button>';
+      '<button id="pdf-download-btn" onclick="exportCompactPDF()" title="1–2 page customer summary — same format as Energy Upgrade" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
+      '<button onclick="exportPDF()" title="Full BOQ with cover page and itemised sections" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Detailed PDF</button>';
   }
 }
 
@@ -13962,6 +13973,241 @@ function exportEUPDF(mode) {
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
   printDiv.style.cssText = 'display:block;background:white;';
   printDiv.innerHTML = headerHTML + summaryHTML + tableHTML + methodHTML;
+  var _prevBodyBg = document.body.style.background;
+  document.body.style.background = 'white';
+  printDiv.scrollIntoView();
+  var _onAfterPrint = function() {
+    printDiv.style.display = 'none';
+    document.body.style.background = _prevBodyBg;
+    window.removeEventListener('afterprint', _onAfterPrint);
+  };
+  window.addEventListener('afterprint', _onAfterPrint);
+  window.print();
+}
+
+// Compact 1–2 page customer report for New Build & Refurbishment — mirrors the EU format:
+// header band → key figures strip → single works table with scope lines → how-to → T&Cs.
+function exportCompactPDF() {
+  if (!BOQ) return;
+  var b = BOQ, pi = b.projectInfo || {}, su = b.summary || {};
+  if (pi.type === 'Energy Upgrade') { exportEUPDF('customer'); return; }
+  var sections = b.sections || [];
+  var grants   = b.grants || [];
+  var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
+  var isRefurb = pi.type === 'Refurbishment';
+  var hasGrants = (su.grantsTotal || 0) > 0;
+  var B = '1px solid #E2E8F0';
+  var fa = parseFloat(pi.floorArea) || 0;
+
+  // Distribute prelims/plant/contingency/VAT across sections so each row is fully loaded
+  var elBase = su.elementsCost || sections.reduce(function(a,s){ return a + (s.subtotal||0); }, 0);
+  var gross  = su.gross || su.total || 0;
+  var load   = elBase > 0 ? gross / elBase : 1;
+  var feesIncVat = (su.feesTotal || 0) + (su.feesVat || 0);
+  var totalProject = su.totalProjectCost || (gross + feesIncVat);
+  var netProject   = hasGrants ? (su.netProjectCost != null ? su.netProjectCost : Math.max(0, totalProject - su.grantsTotal)) : totalProject;
+
+  var grantsByKey = {}, usedKeys = {};
+  grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g){
+    (grantsByKey[g.measureKey] = grantsByKey[g.measureKey] || []).push(g);
+  });
+
+  var ptMap = isRefurb
+    ? {A:'Part A — Existing Structure Upgrade', B:'Part B — Whole-House Services', C:'Part C — Additional Works', D:'Part D — Extension / Additional Works'}
+    : {A:'Part A — Structure & Envelope', B:'Part B — Internal Works & Fit-Out', C:'Part C — Services & Renewables', D:'Part D — External Works'};
+
+  var nCols = hasGrants ? 5 : 4;
+  // Stable-sort by part so each part header prints once even when sections were appended out of order
+  var ordered = sections.map(function(s, i){ return { s: s, i: i }; }).sort(function(a, b) {
+    var pa = a.s.part || 'Z', pb = b.s.part || 'Z';
+    return pa < pb ? -1 : pa > pb ? 1 : a.i - b.i;
+  }).map(function(w){ return w.s; });
+  var rows = '', lastPart = null, rowNum = 0, tableGrants = 0;
+  ordered.forEach(function(s) {
+    var baseSub = s.isExtras
+      ? (s.extras||[]).reduce(function(a,e){ return a+(+e.cost||0); }, 0)
+      : (s.subtotal || 0);
+    if (!baseSub) return;
+    if (s.part && s.part !== lastPart) {
+      rows += '<tr><td colspan="'+nCols+'" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#475569;letter-spacing:.05em;text-transform:uppercase;background:#F1F5F9;border:'+B+';border-left:3px solid #E8A020;">'+(ptMap[s.part]||('Part '+s.part))+'</td></tr>';
+      lastPart = s.part;
+    }
+    rowNum++;
+    var est = Math.round(baseSub * load);
+    // Scope line: first three items so a contractor can see what's inside the figure
+    var items = s.isExtras
+      ? (s.extras||[]).filter(function(e){ return e.desc; }).map(function(e){ return {description: e.desc}; })
+      : (s.items || []);
+    var scope = items.slice(0,3).map(function(i){
+      var d = (i.description||'').split(' — ')[0].split(' (')[0];
+      return d.length > 72 ? d.slice(0,70)+'…' : d;
+    }).filter(Boolean).join(' · ');
+    if (items.length > 3) scope += ' · +'+(items.length-3)+' more';
+    var gCell = '';
+    if (hasGrants) {
+      var mk = _euMeasureKey(s);
+      var secGrants = (mk && grantsByKey[mk] && !usedKeys[mk]) ? grantsByKey[mk] : [];
+      if (secGrants.length) usedKeys[mk] = true;
+      var gAmt = secGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
+      tableGrants += gAmt;
+      gCell = '<td style="padding:3px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';">' +
+        (gAmt > 0
+          ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description;}).join('<br>')+'</span>'
+          : '—') + '</td>';
+    }
+    rows +=
+      '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+        '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
+        '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+
+          (scope ? '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">'+scope+'</div>' : '')+'</td>' +
+        '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';">'+fmt(est)+'</td>' +
+        gCell +
+        '<td style="padding:3px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';"></td>' +
+      '</tr>';
+  });
+
+  // Professional fees row — part of the bank figure, outside contractor pricing
+  if (feesIncVat > 0) {
+    rowNum++;
+    rows +=
+      '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+        '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
+        '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;border:'+B+';">PROFESSIONAL FEES' +
+          '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">Design, engineering, BER &amp; compliance · VAT 23% included</div></td>' +
+        '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;border:'+B+';">'+fmt(feesIncVat)+'</td>' +
+        (hasGrants ? '<td style="padding:3px 6px;text-align:right;border:'+B+';">—</td>' : '') +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>';
+  }
+
+  // Grants not matched to a works row (incl. OSS extras) — bundled so totals reconcile
+  if (hasGrants) {
+    var leftover = grants.filter(function(g){
+      return g.ossExclusive || !(g.measureKey && usedKeys[g.measureKey]);
+    });
+    var loTotal = leftover.reduce(function(a,g){ return a+(g.amount||0); }, 0);
+    if (loTotal > 0) {
+      rows +=
+        '<tr style="page-break-inside:avoid;">' +
+          '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
+          '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">Additional SEAI Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+leftover.map(function(g){ return g.description; }).join(' · ')+'</span></td>' +
+          '<td style="padding:3px 6px;text-align:right;color:#E8A020;border:'+B+';">—</td>' +
+          '<td style="padding:3px 6px;text-align:right;color:#6366f1;font-weight:700;font-size:9pt;border:'+B+';">'+fmt(loTotal)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
+  }
+
+  // TOTAL rows — taken from the engine summary, not re-summed, so they always reconcile
+  rows +=
+    '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
+      '<td colspan="2" style="padding:5px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL PROJECT COST</td>' +
+      '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalProject)+'</td>' +
+      (hasGrants ? '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">'+fmt(su.grantsTotal)+'</td>' : '') +
+      '<td style="border:'+B+';"></td>' +
+    '</tr>' +
+    (hasGrants
+      ? '<tr>' +
+        '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(netProject)+'</td>' +
+        '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
+      '</tr>'
+      : '');
+
+  // Key figures strip
+  var tile = function(label, val, sub, hi) {
+    return '<div style="border:'+(hi?'2px solid #E8A020':'1px solid #E2E8F0')+';border-radius:5px;padding:6px 9px;background:'+(hi?'#FFFBEB':'#F8FAFC')+';">' +
+      '<div style="font-size:7pt;color:'+(hi?'#92400E':'#64748B')+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">'+label+'</div>' +
+      '<div style="font-size:'+(hi?'14pt':'12pt')+';font-weight:'+(hi?'900':'800')+';color:#1E293B;">'+val+'</div>' +
+      '<div style="font-size:6.5pt;color:#94a3b8;">'+sub+'</div></div>';
+  };
+  var tiles;
+  if (hasGrants) {
+    var loanMo = 0;
+    if (netProject > 1000) {
+      var r = 0.04/12, n = 120;
+      loanMo = Math.round(netProject * r * Math.pow(1+r,n) / (Math.pow(1+r,n)-1));
+    }
+    tiles = tile('Total Investment', fmt(totalProject), 'incl. fees &amp; VAT') +
+      '<div style="border:1px solid #BBF7D0;border-radius:5px;padding:6px 9px;background:#F0FDF4;">' +
+        '<div style="font-size:7pt;color:#059669;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">SEAI Grants</div>' +
+        '<div style="font-size:12pt;font-weight:800;color:#059669;">−'+fmt(su.grantsTotal)+'</div>' +
+        '<div style="font-size:6.5pt;color:#94a3b8;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</div></div>' +
+      tile('Net Cost to Homeowner', fmt(netProject), 'after SEAI grants — amount to finance', true) +
+      (loanMo > 0 ? tile('Green Loan Guide', '~€'+loanMo.toLocaleString('en-IE')+'/mo', '4% APR · 10 years · indicative') : '');
+  } else {
+    tiles = tile('Construction Cost', fmt(gross), 'incl. VAT 13.5% · contractor scope') +
+      tile('Professional Fees', fmt(feesIncVat), 'design, engineering, BER · VAT 23%') +
+      tile('Total Project Cost', fmt(totalProject), 'full budget figure — amount to finance', true) +
+      (fa > 0 ? tile('Cost per m²', '€'+Math.round(totalProject/fa).toLocaleString('en-IE'), fa+' m² gross floor area') : '');
+  }
+  var nTiles = 3 + ((hasGrants && netProject > 1000) || (!hasGrants && fa > 0) ? 1 : 0);
+  var sav = isRefurb ? estimateEnergySaving(b) : null;
+  var savPayback = (sav && sav.annual > 0 && netProject > 0) ? Math.round(netProject / sav.annual * 10) / 10 : null;
+  var stripHTML =
+    '<div style="margin:4mm 10mm 0;font-family:sans-serif;">' +
+      '<div style="display:grid;grid-template-columns:repeat('+nTiles+',1fr);gap:8px;">'+tiles+'</div>' +
+      (sav
+        ? '<div style="margin-top:5px;padding:4px 10px;border:1px solid #E2E8F0;border-radius:5px;background:#F8FAFC;font-size:8pt;color:#334155;">⚡ BER '+sav.cur+' → '+sav.tgt+' · est. energy saving <strong>~€'+sav.annual.toLocaleString('en-IE')+'/yr</strong>'+(savPayback ? ' · payback ~'+savPayback+' yrs' : '')+'</div>'
+        : '') +
+    '</div>';
+
+  var headerHTML =
+    '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — '+(isRefurb?'Refurbishment':'New Build')+' Cost Plan</div>' +
+      '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||pi.type+' Project')+'</div>' +
+      '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:2px;">' +
+        '<span>'+(isRefurb?'🔨 Refurbishment':'🏗 New Build')+' &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
+        '<span>Floor Area: <strong style="color:#1E293B;">'+(pi.floorArea||'—')+' m²</strong></span>' +
+        '<span>County: <strong style="color:#1E293B;">'+(pi.county||'—')+'</strong></span>' +
+        (pi.storeys ? '<span>Storeys: <strong style="color:#1E293B;">'+pi.storeys+'</strong></span>' : '') +
+        (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
+      '</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%</div>' +
+    '</div>';
+
+  var thead = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+    '<th style="padding:4px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
+    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Works Section</th>' +
+    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Est. Spend</th>' +
+    (hasGrants ? '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">SEAI Grant</th>' : '') +
+    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
+    '</tr></thead>';
+  var colgroup = hasGrants
+    ? '<colgroup><col style="width:22px"/><col style="min-width:180px"/><col style="width:80px"/><col style="width:130px"/><col style="width:70px"/></colgroup>'
+    : '<colgroup><col style="width:22px"/><col style="min-width:220px"/><col style="width:90px"/><col style="width:110px"/></colgroup>';
+
+  var howTo = hasGrants
+    ? '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
+      '<strong>Lender:</strong> the Net Cost to Homeowner is the amount to finance; grants are paid by SEAI directly. ' +
+      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each section — grants reduce the homeowner\'s invoice, not your price.'
+    : '<strong>Homeowner:</strong> Total Project Cost is your full budget figure including professional fees and VAT. ' +
+      '<strong>Lender:</strong> Total Project Cost is the amount to finance. ' +
+      '<strong>Contractor:</strong> quote against the Construction Cost and the scope listed under each section — professional fees are outside your price.';
+
+  var tableHTML =
+    '<div style="margin:0 10mm;font-family:sans-serif;">' +
+    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
+      colgroup + thead + '<tbody>'+rows+'</tbody>' +
+    '</table>' +
+    '<div style="font-size:6.5pt;color:#475569;margin-top:6px;padding:4px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.5;">' +
+      '<strong style="color:#1E293B;">How to use this document</strong> — ' + howTo +
+    '</div>' +
+    '<div style="font-size:6pt;color:#64748B;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
+      '<strong style="color:#1E293B;">Terms &amp; Conditions — Indicative Estimate</strong><br>' +
+      'All Estimated Spend figures are fully loaded and include: <strong>VAT at 13.5%</strong> on construction works (Solar PV at 0% VAT per Revenue ruling, May 2023; professional fees at 23%); <strong>preliminaries, plant &amp; equipment</strong>; <strong>contingency</strong>. ' +
+      'This document is an indicative cost estimate with an accuracy of ±15–20% and does not constitute a binding quotation, contract, or guarantee of final cost. ' +
+      (hasGrants ? 'Grant figures shown are indicative SEAI rates current at time of issue and are subject to SEAI eligibility assessment, survey, and approval. Only SEAI-registered contractors qualify for grant payment. ' : '') +
+      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · Independent estimate — not prepared by any contractor.' +
+    '</div>' +
+  '</div>';
+
+  var staleBackdrop = document.getElementById('eu-pdf-backdrop');
+  if (staleBackdrop) staleBackdrop.style.display = 'none';
+  var printDiv = document.getElementById('pdf-print-view');
+  if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
+  printDiv.style.cssText = 'display:block;background:white;';
+  printDiv.innerHTML = headerHTML + stripHTML + tableHTML;
   var _prevBodyBg = document.body.style.background;
   document.body.style.background = 'white';
   printDiv.scrollIntoView();
