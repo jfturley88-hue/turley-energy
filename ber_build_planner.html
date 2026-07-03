@@ -2919,7 +2919,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                 <label class="ws-item-label" for="ref-eu-windows">
                   <span class="ws-item-title">External windows</span>
                   <span class="ws-geo-note">× window area m²</span>
-                  <span class="ws-item-grant" id="ref-eu-grant-windows">Grant: up to &euro;4,000 detached / &euro;3,000 semi (Better Energy Homes)</span>
+                  <span class="ws-item-grant" id="ref-eu-grant-windows">Grant: up to &euro;4,000 detached &amp; semi (Better Energy Homes)</span>
                 </label>
                 <div class="ws-item-sub" id="ref-eu-windows-sub" style="display:none;">
                   <div class="ws-sub-grid">
@@ -4241,7 +4241,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                 <label class="ws-item-label" for="eu-windows">
                   <span class="ws-item-title">External windows</span>
                   <span class="ws-geo-note">× window area m²</span>
-                  <span class="ws-item-grant" id="eu-grant-windows">Grant: up to &euro;4,000 detached / &euro;3,000 semi (Better Energy Homes)</span>
+                  <span class="ws-item-grant" id="eu-grant-windows">Grant: up to &euro;4,000 detached &amp; semi (Better Energy Homes)</span>
                 </label>
                 <div class="ws-item-sub" id="eu-windows-sub" style="display:none;">
                   <div class="ws-sub-grid">
@@ -5964,7 +5964,7 @@ const SEAI_GRANTS = {
   ewiWall:             { detached:8000, semi:6000, 'mid-terrace':3500, apartment:3000 },
   iwiWall:             { detached:4500, semi:3500, 'mid-terrace':2000, apartment:1500 },
   // Floor insulation — NOT available under BEH; use ossFloor below for OSS
-  windows:             { detached:4000, semi:3000, 'mid-terrace':1800, apartment:1500 },
+  windows:             { detached:4000, semi:4000, 'mid-terrace':1800, apartment:1500 },
   doorPerUnit:         800,
   heatPump:            12500,
   heatPumpApartment:   9500,
@@ -6087,7 +6087,7 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
 
   // OSS-exclusive additional grants
   if (isOSS) {
-    if (hasMeasure('airtight')) {
+    if (hasMeasure('airtight') || hasMeasure('airtightness')) {
       items.push({ ref:'G'+gRef++, description:'Air Tightness Grant', ossExclusive: true, measureKey:'airtightness',
         note:'OSS-exclusive \u2014 \u20ac1,000 (SEAI National Upgrade Scheme)',
         amount: g.ossAirtight });
