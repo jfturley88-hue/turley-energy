@@ -13829,7 +13829,7 @@ function exportEUPDF(mode) {
           '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate issued before grants released</td>' +
           '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';">'+fmt(PDF_BER_COST)+'</td>' +
           '<td style="padding:5px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
-          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;">−'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;">'+fmt(berGrant.amount||0)+'</td>' +
           '<td style="border:'+B+';"></td>' +
         '</tr>';
     } else {
@@ -13938,6 +13938,71 @@ function exportEUPDF(mode) {
       '</tr>';
     }).join('');
 
+    // Totals row — the Loaded column must tie out to the measure table's TOTAL
+    var mBase = 0, mOp = 0, mLoad = 0;
+    sections.forEach(function(s) {
+      var sub = s.subtotal || 0;
+      mBase += sub;
+      mOp   += Math.round(sub * 1.22);
+      mLoad += s.zeroVat ? Math.round(sub * 1.22) : Math.round(sub * 1.22 * 1.135);
+    });
+    var methBerRow = '';
+    if (berGrant) {
+      mLoad += PDF_BER_COST;
+      methBerRow = '<tr style="border-bottom:1px solid #E2E8F0;">' +
+        '<td style="padding:5px 6px;font-size:8pt;border:1px solid #E2E8F0;">BER Assessment (post-works)</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">Flat assessor fee — no loading applied</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;">'+fmt(PDF_BER_COST)+'</td>' +
+      '</tr>';
+    }
+    var methTotalRow = '<tr style="background:#F8FAFC;border-top:2px solid #CBD5E1;font-weight:700;">' +
+      '<td colspan="2" style="padding:6px;font-size:8pt;text-transform:uppercase;border:1px solid #E2E8F0;">TOTAL — ties to measure table above</td>' +
+      '<td style="padding:6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">'+fmt(mBase)+'</td>' +
+      '<td style="padding:6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">'+fmt(mOp)+'</td>' +
+      '<td style="padding:6px;text-align:right;font-size:9pt;font-weight:900;color:#E8A020;border:1px solid #E2E8F0;">'+fmt(mLoad)+'</td>' +
+    '</tr>';
+    methRows += methBerRow + methTotalRow;
+
+    // Appendix — the itemised evidence behind every bundled figure
+    var labMultNote = 'Labour rates include the Co. ' + (pi.county||'—') + ' multiplier (×' + (pi.labourMultiplier||1).toFixed(2) + ').';
+    var appxSections = sections.map(function(s) {
+      var items = (s.items || []).filter(function(i){ return (i.quantity||0) > 0; });
+      if (!items.length) return '';
+      var rows = items.map(function(i) {
+        var lineTotal = (i.quantity||0) * ((i.matRate||0) + (i.labRate||0));
+        return '<tr style="border-bottom:1px solid #EEF2F7;page-break-inside:avoid;">' +
+          '<td style="padding:3px 5px;font-size:7pt;color:#94a3b8;border:1px solid #E2E8F0;white-space:nowrap;">'+(i.code||'')+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;color:#334155;border:1px solid #E2E8F0;">'+(i.description||'')+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;text-align:right;border:1px solid #E2E8F0;white-space:nowrap;">'+(Math.round((i.quantity||0)*100)/100)+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;border:1px solid #E2E8F0;">'+(i.unit||'')+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;text-align:right;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(i.matRate||0)+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;text-align:right;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(i.labRate||0)+'</td>' +
+          '<td style="padding:3px 5px;font-size:7pt;text-align:right;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round(lineTotal))+'</td>' +
+        '</tr>';
+      }).join('');
+      return '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;margin-bottom:10px;">' +
+        '<thead>' +
+        '<tr><th colspan="7" style="padding:4px 6px;text-align:left;font-size:8pt;background:#F1F5F9;border:1px solid #CBD5E1;color:#1E293B;">'+s.title+
+          '<span style="float:right;font-weight:700;">Base sub-total: '+fmt(s.subtotal||0)+'</span></th></tr>' +
+        '<tr style="background:#F8FAFC;">' +
+          '<th style="padding:3px 5px;text-align:left;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Ref</th>' +
+          '<th style="padding:3px 5px;text-align:left;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Item</th>' +
+          '<th style="padding:3px 5px;text-align:right;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Qty</th>' +
+          '<th style="padding:3px 5px;text-align:left;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Unit</th>' +
+          '<th style="padding:3px 5px;text-align:right;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Material €/unit</th>' +
+          '<th style="padding:3px 5px;text-align:right;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Labour €/unit</th>' +
+          '<th style="padding:3px 5px;text-align:right;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Base total</th>' +
+        '</tr></thead><tbody>'+rows+'</tbody></table>';
+    }).join('');
+    var appendixHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
+      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:8px;">Appendix — Itemised Measurements &amp; Rates</h2>' +
+      '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
+        labMultNote + ' Contractor\'s O&amp;P (12%), contingency (10%) and VAT (13.5%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
+      appxSections +
+    '</div>';
+
     methodHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
       '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:12px;">How Your Estimate Was Calculated</h2>' +
       '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What\'s Included in Each Estimated Spend Figure</h3>' +
@@ -13971,7 +14036,8 @@ function exportEUPDF(mode) {
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;">' +
         'PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
       '</div>' +
-    '</div>';
+    '</div>' +
+    appendixHTML;
   }
 
   // Compact header band — no separate cover page, no page-break, no gap
