@@ -16,8 +16,8 @@ Ireland has committed to retrofitting **500,000 homes to B2 or better by 2030**.
 **Cost uncertainty stops homeowners acting.**
 A home energy assessment identifies what needs upgrading, but puts no price on it. Homeowners don't know whether the work in front of them means €8,000 or €80,000. Without a credible number they don't apply for grants, don't approach their bank, and don't proceed. The conversion from "interested" to "committed" breaks down at the budget question, and there is currently no trusted, independent answer to it.
 
-**Grant inflation erodes trust in the scheme.**
-A widespread perception — well-founded in some cases — that contractors price to the gross figure and absorb the grant, leaving the homeowner no better off. Homeowners who believe the grant is a contractor bonus rather than a real saving will not participate. Every euro of grant that leaks into margin is a euro of Exchequer spend that bought no retrofit.
+**With no reference point, a fair quote and an inflated one look identical.**
+Homeowners approaching a retrofit have nothing to measure a price against, so suspicion attaches to every quote — including the great majority that are entirely fair. That costs honest contractors twice over: they lose work to competitors who appear cheaper only because items were quietly left out, and they spend unpaid hours pricing enquiries from homeowners whose budget expectations were never realistic. It costs the scheme too, because homeowners who suspect the grant simply becomes someone else's margin walk away, and the retrofit never happens at all. What is missing is not policing — it is a common reference point both sides can work from.
 
 **No bridge between assessment and action.**
 An assessor visits, surveys the home, and advises on the improvements that would raise its rating. The homeowner is left with a list of recommendations and no way to act on them. The window in which they are most motivated closes before they have the one number they need.
@@ -27,7 +27,7 @@ An assessor visits, surveys the home, and advises on the improvements that would
 PlanitBER builds an itemised, independent cost plan from survey geometry the assessor has already measured — floor, wall, roof and window areas, age band and heat loss indicator — against a measure list that mirrors SEAI's grant structure:
 
 - **Cost certainty.** An instant indicative budget, measure by measure, using county-adjusted labour rates and current Irish material pricing, with heat pump sizing derived from the Heat Loss Indicator (IS EN 12831). Every figure is fully loaded: contractor's overhead and profit at 12%, contingency at 10%, VAT at 13.5% (Solar PV at 0% per Revenue ruling).
-- **Grant transparency.** Gross costs are shown independently of any contractor, with SEAI grants deducted line by line and the net cost to the homeowner stated plainly. The document itself carries the message: *contractors quote on the gross figures — grants reduce the homeowner's invoice, they do not justify inflated pricing.* A homeowner holding an independent benchmark is in a fundamentally stronger position.
+- **A common reference point.** Gross costs are set out independently of anyone selling the works, with SEAI grants deducted line by line and the net cost to the homeowner stated plainly. Both sides gain from that. The homeowner can see whether a quote is reasonable and what the grant is genuinely worth to them. The contractor prices a defined scope instead of a vague brief, competes against others pricing that same scope, and has a published rate basis to point to when a figure is queried. Comparable quotes reward the contractor who priced the job properly rather than the one who left most out.
 - **Assessment to action.** The assessor can produce the cost plan during the same visit and hand it over with the certificate, as the practical companion to the improvement advice they already give. The gap between recommendation and budget closes to zero.
 
 ### What it produces
@@ -39,15 +39,19 @@ Two documents from one set of inputs, **reconciling to the euro at every level**
 
 Alongside these: a per-measure grant breakdown for both Better Energy Homes and One Stop Shop at current rates, the SEAI-registered trades the project requires, and estimated-versus-actual cost tracking.
 
-### Who benefits, and how
+### Who uses it, and who benefits
+
+The cost plan is **created by the BER assessor or One Stop Shop** — the professionals who have already surveyed the home and hold the measurements. Everyone else receives and works from the document they produce.
 
 | User | How they use it |
 |---|---|
-| **Homeowners** | Understand the real cost before engaging anyone. Compare contractor quotes against an independent estimate. Track spend during works. |
+| **CREATES THE COST PLAN** | |
 | **BER Assessors** | Add a costed plan to the improvement advice they already provide, within the same visit — turning an assessment into a complete, actionable conversation. Built by assessors, so it asks only for measurements they already take. |
+| **One Stop Shops** | Produce fast feasibility costs and pre-qualify projects before committing to a full survey, then use the same document to set client expectations. |
+| **BENEFITS FROM IT** | |
+| **Homeowners** | Understand the real cost before engaging anyone. Compare quotes against an independent estimate. Track spend as works progress. |
+| **Contractors** | Quote a defined scope that every competitor is pricing too, with a published rate basis to stand over their price. Fewer wasted site visits, fewer scope disputes, and homeowners who arrive ready to proceed. |
 | **Banks & Credit Unions** | A consistent, contractor-independent cost document to support green loan and mortgage applications. |
-| **One Stop Shops** | Fast feasibility costing and project pre-qualification before committing to a full survey. |
-| **Contractors** | A structured scope of works to quote against, with a published, transparent rate basis. |
 | **Local Authorities & AHBs** | Rapid bulk estimation and budget forecasting for estate-wide retrofit programmes. |
 | **SEAI** | Real-market cost evidence to calibrate grant rates, plus a consistent way to show homeowners what an upgrade genuinely costs. |
 | **Estate Agents & Solicitors** | Retrofit cost disclosure on listings and during transactions. |
@@ -93,6 +97,9 @@ Ireland completes roughly 100,000 home energy assessments a year. Every one is a
 
 **A stronger advisory service from assessors.**
 Assessors are the profession best placed to deliver this — they are already in the home, already measuring, and already trusted to advise on improvements. PlanitBER extends that advisory role from *what to do* to *what it costs*, without requiring quantity surveying expertise. That makes the assessment visit more valuable to the homeowner and more commercially attractive to the assessor.
+
+**A better market for contractors.**
+Contractors are among the clearest beneficiaries, and the trial should demonstrate it. When every quote prices the same itemised scope, the lowest price is genuinely the best value rather than the one that omitted the most — which protects the contractor who prices the job properly. Site visits stop being wasted on enquiries that were never going to proceed, because homeowners arrive with realistic expectations and finance already considered. Mid-job disputes and variations fall, because what was included was written down and agreed before anyone started. And a homeowner who understands the cost and the grant is a homeowner who signs: better-informed customers convert, and the work that follows is work that would otherwise have stalled at the quote stage.
 
 **A national retrofit cost index.**
 At scale, the estimated-versus-actual dataset becomes a live index of retrofit costs by measure, dwelling type and county — the reference SEAI needs to calibrate grant rates, identify regional price anomalies, and demonstrate value for money. Nobody holds this data today, and the tool producing the estimates is the natural instrument to collect the outcomes.

@@ -13695,7 +13695,7 @@ function renderEUTable(b) {
     '</table>' +
     '<div class="eu-disclaimer">All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
     'Independent estimate — not prepared by a contractor. ' +
-    'Contractors quote on gross figures above — SEAI grants should reduce your invoice, not justify inflated pricing. ' +
+    'Contractors quote on the gross figures above, so every quote covers the same scope and can be compared like for like; SEAI grants are then applied to the homeowner\'s invoice. ' +
     'Only SEAI-registered contractors qualify for grant payment. Indicative accuracy ±15–20%.</div>' +
     '</div>';
 }
@@ -14086,7 +14086,7 @@ function exportEUPDF(mode) {
       '<strong style="color:#1E293B;">How to use this document</strong> — ' +
       '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
       '<strong>Lender:</strong> the Net Cost to Homeowner is the amount to finance; grants are paid by SEAI directly. ' +
-      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each measure — grants reduce the homeowner\'s invoice, not your price.' +
+      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each measure — every quote prices the same scope, so yours is compared like for like. Grants are applied to the homeowner\'s invoice separately.' +
     '</div>' +
     '<div style="font-size:6pt;color:#64748B;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       '<strong style="color:#1E293B;">Terms &amp; Conditions — Indicative Estimate</strong><br>' +
@@ -14283,7 +14283,7 @@ function exportCompactPDF() {
   var howTo = hasGrants
     ? '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
       '<strong>Lender:</strong> the Net Cost to Homeowner is the amount to finance; grants are paid by SEAI directly. ' +
-      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each section — grants reduce the homeowner\'s invoice, not your price.'
+      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each section — every quote prices the same scope, so yours is compared like for like. Grants are applied to the homeowner\'s invoice separately.'
     : '<strong>Homeowner:</strong> Total Project Cost is your full budget figure including professional fees and VAT. ' +
       '<strong>Lender:</strong> Total Project Cost is the amount to finance. ' +
       '<strong>Contractor:</strong> quote against the Construction Cost and the scope listed under each section — professional fees are outside your price.';
@@ -15342,7 +15342,7 @@ function exportPDF() {
       '</div>' + savRow +
       '<div style="font-size:7pt;color:#94a3b8;margin-top:8px;border-top:1px solid #BBF7D0;padding-top:6px;">' +
       'This BOQ is an <strong>independent indicative estimate</strong> — not prepared by the contractor. ' +
-      'Contractors must quote on the <strong>gross cost</strong> above. SEAI grants should reduce your invoice, not justify inflated pricing. ' +
+      'Contractors quote on the <strong>gross cost</strong> above, so every quote covers the same scope and can be compared like for like; SEAI grants are then applied to the homeowner\'s invoice. ' +
       'Only SEAI-registered contractors qualify for grant payment.</div></div>';
   })() : '';
 
