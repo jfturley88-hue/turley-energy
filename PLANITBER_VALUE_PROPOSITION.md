@@ -1,9 +1,9 @@
 # PlanitBER — Value Proposition
 
 **Independent, instant retrofit costing for Irish homes.**
-PlanitBER turns a completed home survey into a clear, grant-netted, finance-ready budget in under two minutes — itemised in the format a quantity surveyor would use, and independent of any contractor.
+PlanitBER turns a completed home survey into a clear, grant-netted, finance-ready budget in under two minutes — itemised in the format a quantity surveyor would use, and independent of any contractor. It is built by practising BER assessors, for the people who do this work every day.
 
-**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool for BER assessors, One Stop Shops and homeowners. PlanitBER is standalone software. It requires no integration with SEAI systems, no change to DEAP, and no development effort on SEAI's side.
+**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool, used by BER assessors, One Stop Shops and homeowners. PlanitBER is standalone software: it requires no integration with SEAI systems, no change to DEAP, and no development effort or expenditure on SEAI's side. Standalone does not mean unsupervised — we would welcome SEAI oversight of the costing methodology and rate book as a condition of that recognition (see *Commercial basis, governance and risk*).
 
 ---
 
@@ -44,7 +44,7 @@ Alongside these: a per-measure grant breakdown for both Better Energy Homes and 
 | User | How they use it |
 |---|---|
 | **Homeowners** | Understand the real cost before engaging anyone. Compare contractor quotes against an independent estimate. Track spend during works. |
-| **BER Assessors** | Add a costed plan to the improvement advice they already provide — turning an assessment into a complete, actionable conversation within the same visit. |
+| **BER Assessors** | Add a costed plan to the improvement advice they already provide, within the same visit — turning an assessment into a complete, actionable conversation. Built by assessors, so it asks only for measurements they already take. |
 | **Banks & Credit Unions** | A consistent, contractor-independent cost document to support green loan and mortgage applications. |
 | **One Stop Shops** | Fast feasibility costing and project pre-qualification before committing to a full survey. |
 | **Contractors** | A structured scope of works to quote against, with a published, transparent rate basis. |
@@ -71,6 +71,18 @@ Every trial project's estimated-versus-actual figures, per measure and per count
 The trial formalises the rate book: named sources (SEO National Wage Agreement, SCSI Regional Cost Supplement, Irish merchant pricing), a published review cycle aligned to SEAI's annual grant revisions, and a versioned change log. SEAI should be able to ask what the tool assumed on any given date and receive an exact answer.
 
 **Success criteria, stated in advance:** measured accuracy within the published band on at least 80% of projects; a cost plan issued same-day on at least 90% of assessments; a documented rate-correction cycle completed; and homeowner progression from assessment to grant application tracked against a comparison group.
+
+**Timeline.** Six months from approval: two months recruiting participating assessors and One Stop Shops, three months collecting projects with matched quotes and actual costs, and a final month for analysis and reporting to SEAI.
+
+### Commercial basis, governance and risk
+
+**Commercial model.** PlanitBER is free to homeowners. Assessors and One Stop Shops access it under an annual licence of €[fee]. No commission, referral fee, lead-generation payment or contractor advertising is taken from any party — independence from everyone selling the works is the point of the tool, and it will not be compromised.
+
+**SEAI oversight.** Standalone software does not have to mean unsupervised software. We would welcome a formal SEAI role in governing the methodology: the rate book, its sources and every revision made available for SEAI review, with all rate and loading changes published and dated. If SEAI would prefer to approve the rate book annually, or to set parameters the tool must apply, we would accept that as a condition of recognition. Oversight strengthens the tool's credibility and gives SEAI direct assurance over what is being published in its name.
+
+**Liability.** Every output is labelled an indicative estimate — not a quotation, contract or guarantee of final cost — with the accuracy band printed on the face of the document and the reminder that only SEAI-registered contractors qualify for grant payment. Professional indemnity insurance is carried by Turley Energy Consultants. Recognition by SEAI would carry no liability for costs incurred by homeowners or contractors.
+
+**Data protection.** Project data remains with the assessor who created it. The actual-cost dataset offered to SEAI is aggregated and anonymised — measure, dwelling type, county and cost only, with no address or personal data — and homeowner consent is obtained before any project's figures are included.
 
 ---
 
@@ -100,7 +112,7 @@ The same engine and report format already extend to refurbishment, extensions an
 ### The path we propose
 
 1. **Trial** — as set out above: accuracy report, actual-cost dataset and rate governance, delivered to SEAI.
-2. **Recognition** — PlanitBER approved and promoted as an indicative costing tool for assessors, One Stop Shops and homeowners, backed by our published rate-maintenance commitment.
+2. **Recognition** — PlanitBER approved and promoted as an indicative costing tool, used by assessors, One Stop Shops and homeowners, backed by our published rate-maintenance commitment and whatever oversight arrangement SEAI wishes to put in place.
 3. **Wider role** — subject to proven accuracy, use of the cost plan to support grant applications and retrofit lending.
 
 Each step gives SEAI something concrete — evidence, cost data, higher homeowner conversion — before anything further is asked. PlanitBER is developed, maintained and funded entirely by Turley Energy Consultants; SEAI's role is endorsement and promotion, not build or spend.
