@@ -1,7 +1,9 @@
 # PlanitBER — Value Proposition
 
-**The cost layer Ireland's retrofit programme is missing.**
-Every BER assessment already tells a homeowner *what to do* — the Advisory Report lists the recommended upgrade measures. None of them says *what it costs*. PlanitBER prices that recommendation: an independent, grant-netted, finance-ready budget in under two minutes, from the same data the assessor already holds, in the format a quantity surveyor would use.
+**Independent, instant retrofit costing for Irish homes.**
+PlanitBER turns a completed home survey into a clear, grant-netted, finance-ready budget in under two minutes — itemised in the format a quantity surveyor would use, and independent of any contractor.
+
+**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool for BER assessors, One Stop Shops and homeowners. PlanitBER is standalone software. It requires no integration with SEAI systems, no change to DEAP, and no development effort on SEAI's side.
 
 ---
 
@@ -12,100 +14,96 @@ Every BER assessment already tells a homeowner *what to do* — the Advisory Rep
 Ireland has committed to retrofitting **500,000 homes to B2 or better by 2030**. Current completion rates are well behind target. Three demand-side barriers explain why:
 
 **Cost uncertainty stops homeowners acting.**
-Every BER assessment issues a **BER Advisory Report** setting out the recommended upgrade measures for that specific home. It is the single most actionable document a homeowner receives — and it carries no costs. Homeowners don't know if the recommendation in front of them means €8,000 or €80,000. Without a credible number they don't apply for grants, don't approach banks, and don't proceed. The conversion from "interested" to "committed" breaks down at the budget question — DEAP answers *how the house performs*, the Advisory Report answers *what to do about it*; nothing answers *what it costs*.
+A home energy assessment identifies what needs upgrading, but puts no price on it. Homeowners don't know whether the work in front of them means €8,000 or €80,000. Without a credible number they don't apply for grants, don't approach their bank, and don't proceed. The conversion from "interested" to "committed" breaks down at the budget question, and there is currently no trusted, independent answer to it.
 
 **Grant inflation erodes trust in the scheme.**
-A widespread perception — well-founded in some cases — that contractors price to the gross figure and absorb the grant, leaving the homeowner no better off. Homeowners who feel the grant is a contractor bonus rather than a real saving will not participate. Every euro of grant that leaks into margin is a euro of Exchequer spend that bought no retrofit.
+A widespread perception — well-founded in some cases — that contractors price to the gross figure and absorb the grant, leaving the homeowner no better off. Homeowners who believe the grant is a contractor bonus rather than a real saving will not participate. Every euro of grant that leaks into margin is a euro of Exchequer spend that bought no retrofit.
 
 **No bridge between assessment and action.**
-A BER assessor visits, rates the home, issues the certificate and Advisory Report, and leaves. The homeowner is handed a list of recommended measures and no way to act on it. The window where they are most motivated closes before they have the one number they need.
+An assessor visits, surveys the home, and advises on the improvements that would raise its rating. The homeowner is left with a list of recommendations and no way to act on them. The window in which they are most motivated closes before they have the one number they need.
 
 ### How it answers them
 
-PlanitBER generates an itemised, independent cost plan from the assessor's own survey geometry (floor, wall, roof and window areas, age band, heat loss indicator) and a measure selector built around the same measures an Advisory Report recommends and SEAI grant-aids:
+PlanitBER builds an itemised, independent cost plan from survey geometry the assessor has already measured — floor, wall, roof and window areas, age band and heat loss indicator — against a measure list that mirrors SEAI's grant structure:
 
-- **Cost certainty** — an instant indicative budget, measure by measure, using county-adjusted labour rates and current Irish material pricing, with heat pump sizing from the Heat Loss Indicator (IS EN 12831), fully loaded (O&P 12%, contingency 10%, VAT 13.5%; Solar PV at 0%).
-- **Grant trust** — gross costs shown independently of any contractor, SEAI grants deducted line by line, and the document states it plainly: *contractors quote on the gross figures — grants reduce the homeowner's invoice, not justify inflated pricing.* A homeowner holding an independent benchmark is in a fundamentally stronger negotiating position.
-- **Assessment to action** — the cost plan is handed over alongside the BER certificate and Advisory Report, as the page that prices what the Advisory Report recommends. The gap between recommendation and budget closes to zero.
+- **Cost certainty.** An instant indicative budget, measure by measure, using county-adjusted labour rates and current Irish material pricing, with heat pump sizing derived from the Heat Loss Indicator (IS EN 12831). Every figure is fully loaded: contractor's overhead and profit at 12%, contingency at 10%, VAT at 13.5% (Solar PV at 0% per Revenue ruling).
+- **Grant transparency.** Gross costs are shown independently of any contractor, with SEAI grants deducted line by line and the net cost to the homeowner stated plainly. The document itself carries the message: *contractors quote on the gross figures — grants reduce the homeowner's invoice, they do not justify inflated pricing.* A homeowner holding an independent benchmark is in a fundamentally stronger position.
+- **Assessment to action.** The assessor can produce the cost plan during the same visit and hand it over with the certificate, as the practical companion to the improvement advice they already give. The gap between recommendation and budget closes to zero.
 
 ### What it produces
 
 Two documents from one set of inputs, **reconciling to the euro at every level**:
 
-1. **Customer Cost Plan (1–2 pages)** — one row per measure with scope, estimated spend, SEAI grant, and net cost to the homeowner; an actual-spend column for tracking works; a "how to use this document" line for homeowner, lender and contractor. Suitable for bank and grant applications.
-2. **Detailed Cost Plan** — the same table plus the pricing basis per measure, the full loading methodology (base → O&P + contingency → VAT) with a total that ties exactly to the customer headline, and an itemised appendix: every line item with quantity, unit, material rate and labour rate. Any figure a lender or SEAI questions can be traced from the headline down to a unit rate.
+1. **Customer Cost Plan (1–2 pages)** — one row per measure showing scope, estimated spend, SEAI grant and net cost to the homeowner, plus an actual-spend column for tracking works as they progress, and a short "how to use this document" note for homeowner, lender and contractor. Written to be readable by all three.
+2. **Detailed Cost Plan** — the same table with the pricing basis for each measure, the full loading methodology (base cost → overhead, profit and contingency → VAT) totalling to exactly the customer headline figure, and an itemised appendix giving every line item with its quantity, unit, material rate and labour rate. Any figure questioned can be traced from the headline down to a unit rate.
 
-Plus: per-measure grant breakdown (Better Energy Homes and One Stop Shop, current rates), the SEAI-registered trades required, and estimated-vs-actual cost tracking as works progress.
+Alongside these: a per-measure grant breakdown for both Better Energy Homes and One Stop Shop at current rates, the SEAI-registered trades the project requires, and estimated-versus-actual cost tracking.
 
-### Who uses it
+### Who benefits, and how
 
 | User | How they use it |
 |---|---|
-| **Homeowners** | Understand costs before engaging contractors. Compare quotes against an independent estimate. Track budget during works. |
-| **BER Assessors** | Turn a certificate into a complete budget conversation during the assessment visit. |
-| **Banks & Credit Unions** | A credible, contractor-independent cost document for green loan and mortgage applications. |
-| **One Stop Shops** | Fast feasibility costing and project pre-qualification before full survey. |
-| **Contractors** | A structured scope-of-works to quote from, with a published rate basis. |
-| **Local Authorities & AHBs** | Rapid bulk estimation and budget forecasting for estate retrofit programmes. |
-| **SEAI** | Real-market cost data to calibrate grant rates and monitor programme value for money. |
-| **Estate Agents & Solicitors** | Retrofit cost disclosure on listings and in transactions. |
+| **Homeowners** | Understand the real cost before engaging anyone. Compare contractor quotes against an independent estimate. Track spend during works. |
+| **BER Assessors** | Add a costed plan to the improvement advice they already provide — turning an assessment into a complete, actionable conversation within the same visit. |
+| **Banks & Credit Unions** | A consistent, contractor-independent cost document to support green loan and mortgage applications. |
+| **One Stop Shops** | Fast feasibility costing and project pre-qualification before committing to a full survey. |
+| **Contractors** | A structured scope of works to quote against, with a published, transparent rate basis. |
+| **Local Authorities & AHBs** | Rapid bulk estimation and budget forecasting for estate-wide retrofit programmes. |
+| **SEAI** | Real-market cost evidence to calibrate grant rates, plus a consistent way to show homeowners what an upgrade genuinely costs. |
+| **Estate Agents & Solicitors** | Retrofit cost disclosure on listings and during transactions. |
 
 ---
 
 ## 2. The Trial — What It Will Be Used For
 
-The trial exists to convert PlanitBER's stated accuracy (±15–20%) from a claim into evidence, and to prove the tool fits SEAI's real workflows. Four objectives:
+The trial exists to convert PlanitBER's stated accuracy (±15–20%) from a claim into published evidence, and to prove the tool works in the field before SEAI puts its name near it. Four objectives:
 
 **Validate accuracy against real prices.**
-Run 50–100 live projects through PlanitBER alongside actual contractor quotes and One Stop Shop pricing, across dwelling types (detached, semi-D, terrace, bungalow, apartment), age bands, counties and both grant schemes. Publish the error distribution per measure — not just an average. Where a measure runs hot or cold, the rate book is corrected and the correction is dated and versioned.
+Run 50–100 live projects through PlanitBER alongside actual contractor quotes and One Stop Shop pricing, spanning dwelling types (detached, semi-detached, terrace, bungalow, apartment), age bands, counties and both grant schemes. Publish the error distribution per measure, not merely an average. Where a measure prices consistently high or low, the rate book is corrected and the correction is dated and recorded.
 
 **Prove the assessor workflow.**
-Measure the time from completed BER survey to issued cost plan, and whether assessors can produce it during the visit. Success is a cost plan in the homeowner's hand in the same appointment as the certificate.
+Measure the time from completed survey to issued cost plan, and confirm assessors can produce it within the visit without specialist QS knowledge. Success is a cost plan in the homeowner's hand at the same appointment.
 
-**Capture the first actuals dataset.**
-Every trial project's estimated-vs-actual figures, per measure per county, become the seed of a retrofit out-turn cost dataset that currently does not exist anywhere in the programme. Aggregated and anonymised, this is offered back to SEAI as trial output — evidence of what retrofits *actually cost*, independent of what anyone quoted.
+**Capture the first actual-cost dataset.**
+Every trial project's estimated-versus-actual figures, per measure and per county, seed a retrofit out-turn cost dataset that does not currently exist anywhere in the programme. Aggregated and anonymised, this is offered to SEAI as a direct output of the trial — evidence of what retrofits actually cost, independent of what anyone quoted.
 
 **Establish rate governance.**
-The trial period formalises the rate book: named sources (SEO Wage Agreement, SCSI Regional Cost Supplement, merchant pricing), a published review cadence aligned to SEAI's February/March grant revisions, and a versioned change log. SEAI should be able to ask "what did the tool assume on any given date?" and get an exact answer.
+The trial formalises the rate book: named sources (SEO National Wage Agreement, SCSI Regional Cost Supplement, Irish merchant pricing), a published review cycle aligned to SEAI's annual grant revisions, and a versioned change log. SEAI should be able to ask what the tool assumed on any given date and receive an exact answer.
 
-**Trial success criteria, stated up front:** measured accuracy within the published band for ≥80% of projects; cost plan issued same-day for ≥90% of assessments; a documented rate-correction cycle completed; homeowner conversion (assessment → grant application) tracked against a control group.
+**Success criteria, stated in advance:** measured accuracy within the published band on at least 80% of projects; a cost plan issued same-day on at least 90% of assessments; a documented rate-correction cycle completed; and homeowner progression from assessment to grant application tracked against a comparison group.
 
 ---
 
 ## 3. What It Can Become
 
-**The costed Advisory Report — the default next step after every BER.**
-Ireland publishes roughly 100,000 BERs a year, and every one produces two things PlanitBER needs: a DEAP file holding the geometry (floor, wall, roof and window areas, age band, heat loss data) and an **Advisory Report holding the recommended measures**. Between them they are a complete PlanitBER input — the survey has already been done, by a registered assessor, under SEAI's own quality regime.
+**A recognised standard for indicative retrofit costs.**
+Ireland completes roughly 100,000 home energy assessments a year. Every one is an opportunity to give a homeowner a credible number — and today almost none of them do. With SEAI recognition, PlanitBER becomes the consistent, independent format in which that number is given: the same methodology, the same loading basis, and the same grant treatment nationwide, whether the homeowner is in Dublin or Ballymote.
 
-With SEAI's cooperation on the file format, the workflow becomes: *upload the BER export and Advisory Report → costed, grant-netted plan in sixty seconds.* No re-surveying, no re-keying, no transcription error. This is the "add-on to DEAP" in its practical form, and it completes a natural set of three documents:
-
-| Document | Answers | Issued by |
-|---|---|---|
-| BER Certificate | How does this home perform? | SEAI / assessor |
-| BER Advisory Report | What should be done about it? | SEAI / assessor |
-| **PlanitBER Cost Plan** | **What will that cost, net of grants?** | **PlanitBER** |
-
-The first two are mandatory and already national. The third is the one the homeowner cannot get today.
+**A stronger advisory service from assessors.**
+Assessors are the profession best placed to deliver this — they are already in the home, already measuring, and already trusted to advise on improvements. PlanitBER extends that advisory role from *what to do* to *what it costs*, without requiring quantity surveying expertise. That makes the assessment visit more valuable to the homeowner and more commercially attractive to the assessor.
 
 **A national retrofit cost index.**
-At scale, the estimated-vs-actual dataset becomes a live index of retrofit costs per measure, per dwelling type, per county — the reference SEAI needs to calibrate grant rates annually, detect regional price anomalies, and demonstrate value for money to the Exchequer. Nobody holds this data today. The tool that produces the estimates is the natural instrument to collect the outcomes.
+At scale, the estimated-versus-actual dataset becomes a live index of retrofit costs by measure, dwelling type and county — the reference SEAI needs to calibrate grant rates, identify regional price anomalies, and demonstrate value for money. Nobody holds this data today, and the tool producing the estimates is the natural instrument to collect the outcomes.
 
-**A compliance-aware eligibility engine.**
-The next build step is encoding SEAI's eligibility gates directly into the tool — year-built rules for insulation and heat pump grants, the post-works HLI ≤ 2.3 W/m²K technical assessment threshold, measure-combination rules — so a plan that prices a grant is a plan that qualifies for it. Assessors stop making eligibility mistakes; SEAI stops processing applications that were never eligible.
+**Grant-application support.**
+As accuracy is proven, a PlanitBER cost plan could serve as a standard supporting document in grant applications — giving SEAI a consistent, itemised statement of intended works and expected cost at the point of application, and a benchmark against which final invoices can be sense-checked. This is a longer-term possibility rather than a near-term proposal, but the format is already built for it.
 
-**The standard document for retrofit finance.**
-Banks and credit unions writing green loans need a consistent, contractor-independent cost basis. A recognised PlanitBER cost plan — one format, reconcilable, grant-aware — is the missing standard attachment for the Home Energy Upgrade Loan Scheme.
+**Eligibility awareness.**
+The next development step is encoding SEAI's eligibility rules directly into the tool — year-of-construction thresholds, the post-works Heat Loss Indicator requirement for heat pump grants, and measure-combination rules — so a plan that prices a grant is a plan that qualifies for it. Fewer ineligible applications reach SEAI, and fewer homeowners are disappointed late.
+
+**The standard cost document for retrofit finance.**
+Banks and credit unions writing green loans need a consistent, contractor-independent cost basis. A recognised PlanitBER cost plan — one format, fully reconcilable, grant-aware — is the missing standard attachment for retrofit lending.
 
 **Whole-project coverage.**
-The same engine and report format already extend to refurbishment-plus-extension and new build, so deep retrofits that grow into bigger projects stay inside one consistent costing framework.
+The same engine and report format already extend to refurbishment, extensions and new build, so a deep retrofit that grows into a larger project stays within one consistent costing framework.
 
-### The partnership path
+### The path we propose
 
-1. **Pilot** — the trial above: accuracy report, actuals dataset, rate governance, delivered to SEAI.
-2. **Recognition** — PlanitBER as a recognised indicative costing tool for assessors and One Stop Shops, with the rate-book maintenance commitment.
-3. **Integration** — the BER file and Advisory Report handshake, making the costed plan the standard companion to every Advisory Report issued in the country.
+1. **Trial** — as set out above: accuracy report, actual-cost dataset and rate governance, delivered to SEAI.
+2. **Recognition** — PlanitBER approved and promoted as an indicative costing tool for assessors, One Stop Shops and homeowners, backed by our published rate-maintenance commitment.
+3. **Wider role** — subject to proven accuracy, use of the cost plan to support grant applications and retrofit lending.
 
-Each step gives SEAI something concrete — evidence, data, homeowner conversion — before asking for the next. The only thing PlanitBER asks of SEAI is access to the file formats for consenting homeowners; everything else is built and maintained on our side.
+Each step gives SEAI something concrete — evidence, cost data, higher homeowner conversion — before anything further is asked. PlanitBER is developed, maintained and funded entirely by Turley Energy Consultants; SEAI's role is endorsement and promotion, not build or spend.
 
 ---
 
