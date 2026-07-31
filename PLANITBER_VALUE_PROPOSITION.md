@@ -4,7 +4,7 @@
 
 Retrofit stalls at the point where the parties stop speaking the same language. The assessor recommends measures, the homeowner guesses at the cost, the contractor quotes against an undefined scope, the lender asks for evidence nobody can supply, and SEAI pays grants against figures that were never reconciled to anything.
 
-PlanitBER gives all of them one document, built on one published method, that each can read from their own side. It turns a completed home survey into a clear, itemised, grant-netted budget — produced during the assessment visit, set out in the format a quantity surveyor would use, and independent of anyone selling the works. It is built by practising BER assessors, for the people who do this work every day.
+PlanitBER gives all of them one document, built on one published method, that each can read from their own side. It turns a completed home survey into a clear, itemised, grant-netted budget — produced from measurements the assessor has already taken, set out in the format a quantity surveyor would use, and independent of anyone selling the works. It is built by practising BER assessors, for the people who do this work every day.
 
 **What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool for the retrofit sector — created by BER assessors and One Stop Shops, and relied upon by homeowners, contractors, lenders, local authorities and SEAI itself. PlanitBER is standalone software: it requires no integration with SEAI systems, no change to DEAP, and no development effort or expenditure on SEAI's side. Standalone does not mean unsupervised — we would welcome SEAI oversight of the costing methodology and rate book as a condition of recognition.
 
@@ -50,7 +50,7 @@ The cost plan is **created by the BER assessor or One Stop Shop** — the profes
 | User | How they use it |
 |---|---|
 | **CREATES THE COST PLAN** | |
-| **BER Assessors** | Add a costed plan to the improvement advice they already provide, within the same visit — turning an assessment into a complete, actionable conversation. Built by assessors, so it asks only for measurements they already take. |
+| **BER Assessors** | Add a costed plan to the improvement advice they already provide, issued with the BER documentation — turning an assessment into a complete, actionable conversation. Built by assessors, so it uses the survey already carried out and asks for no return visit. |
 | **One Stop Shops** | Produce feasibility costs and pre-qualify projects before committing to a full survey, then use the same document to set client expectations from the outset. |
 | **BENEFITS FROM IT** | |
 | **Homeowners** | Understand the real cost before engaging anyone. Compare quotes against an independent estimate. Track spend as works progress. |
@@ -70,7 +70,7 @@ The trial converts PlanitBER's stated accuracy (±15–20%) from a claim into pu
 Run 50–100 live projects through PlanitBER alongside actual contractor quotes and One Stop Shop pricing, spanning dwelling types, age bands, counties and both grant schemes. Publish the error distribution per measure, not merely an average. Where a measure prices consistently high or low, the rate book is corrected and the correction dated and recorded.
 
 **Prove the assessor workflow.**
-Confirm assessors can produce a cost plan within the visit, without specialist quantity surveying knowledge. Success is a cost plan in the homeowner's hand at the same appointment.
+Confirm assessors can produce a cost plan from a survey they have already carried out — without returning to the property, taking additional measurements, or applying specialist quantity surveying knowledge. Success is the cost plan issued to the homeowner alongside the BER documentation, as part of the same job rather than a separate exercise.
 
 **Capture the first actual-cost dataset.**
 Estimated-versus-actual figures, per measure and per county, seed a retrofit out-turn cost dataset that does not currently exist anywhere in the programme. Aggregated and anonymised, it is offered to SEAI as a direct output of the trial.
@@ -78,7 +78,7 @@ Estimated-versus-actual figures, per measure and per county, seed a retrofit out
 **Establish rate governance.**
 Formalise the rate book: named sources (SEO National Wage Agreement, SCSI Regional Cost Supplement, Irish merchant pricing), a published review cycle aligned to SEAI's annual grant revisions, and a versioned change log. SEAI should be able to ask what the tool assumed on any given date and receive an exact answer.
 
-**Success criteria, stated in advance:** measured accuracy within the published band on at least 80% of projects; a cost plan issued same-day on at least 90% of assessments; a documented rate-correction cycle completed; and homeowner progression from assessment to grant application tracked against a comparison group.
+**Success criteria, stated in advance:** measured accuracy within the published band on at least 80% of projects; a cost plan issued with the BER documentation on at least 90% of assessments, with no return visit required; a documented rate-correction cycle completed; and homeowner progression from assessment to grant application tracked against a comparison group.
 
 **Timeline.** Six months from approval: two months recruiting participating assessors and One Stop Shops, three months collecting projects with matched quotes and actual costs, and a final month for analysis and reporting to SEAI.
 
@@ -104,7 +104,7 @@ Ireland completes roughly 100,000 home energy assessments a year, and almost non
 The wider prize is alignment. Retrofit is delivered by professions that rarely share a document: assessors, contractors, One Stop Shops, lenders and SEAI each hold a different part of the picture, and none of it reconciles. A single recognised cost format changes that. The assessor's advice, the contractor's quote, the homeowner's budget, the lender's file and SEAI's grant all reference the same itemised scope and the same published rates. Disputes fall because there is something agreed to point at, and trust rises because everyone can see the same working. That is a sectoral benefit rather than a product feature, and it is why SEAI's endorsement matters more than any amount of marketing on our side.
 
 **A better deal for the people delivering retrofit.**
-Assessors are best placed to produce this — already in the home, already measuring, already trusted to advise on improvements. PlanitBER extends that advice from *what to do* to *what it costs*, making the visit more valuable to the homeowner and more commercially attractive to the assessor. Contractors gain from the same document: when every quote prices the same itemised scope, the lowest price is genuinely the best value rather than the one that omitted the most. Site visits stop being wasted on enquiries that were never going to proceed, mid-job disputes and variations fall because the scope was agreed in writing beforehand, and better-informed homeowners convert into work that would otherwise have stalled at the quote stage.
+Assessors are best placed to produce this — they have already surveyed the home, already hold the measurements, and are already trusted to advise on improvements. PlanitBER extends that advice from *what to do* to *what it costs*, using the survey already completed, making the assessment more valuable to the homeowner and more commercially attractive to the assessor. Contractors gain from the same document: when every quote prices the same itemised scope, the lowest price is genuinely the best value rather than the one that omitted the most. Site visits stop being wasted on enquiries that were never going to proceed, mid-job disputes and variations fall because the scope was agreed in writing beforehand, and better-informed homeowners convert into work that would otherwise have stalled at the quote stage.
 
 **A national retrofit cost index.**
 At scale, the estimated-versus-actual dataset becomes a live index of retrofit costs by measure, dwelling type and county — the reference SEAI needs to calibrate grant rates, identify regional price anomalies and demonstrate value for money. Nobody holds this data today, and the tool producing the estimates is the natural instrument to collect the outcomes.
