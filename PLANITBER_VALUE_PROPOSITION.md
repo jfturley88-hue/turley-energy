@@ -88,6 +88,8 @@ Formalise the rate book: named sources (SEO National Wage Agreement, SCSI Region
 
 **SEAI oversight.** Standalone software does not have to mean unsupervised software. We would welcome a formal SEAI role in governing the methodology: the rate book, its sources and every revision made available for review, with all rate and loading changes published and dated. If SEAI would prefer to approve the rate book annually, or set parameters the tool must apply, we would accept that as a condition of recognition.
 
+**Partnership and support for the trial.** Recognition itself costs SEAI nothing, and we are not asking for funding to obtain it. The trial is a different proposition: it produces something that outlives any one tool — the first structured record of what Irish retrofits actually cost. We are prepared to fund and run it ourselves. If SEAI would prefer to co-fund it, or to run it under an existing research, pilot or demonstration programme, we would welcome that, and the resulting dataset would be SEAI's to publish as it sees fit. A trial conducted jointly would also carry considerably more weight with assessors, contractors and lenders than one we conduct alone.
+
 **Liability.** Every output is labelled an indicative estimate — not a quotation, contract or guarantee of final cost — with the accuracy band printed on the face of the document. Professional indemnity insurance is carried by Turley Energy Consultants. Recognition by SEAI would carry no liability for costs incurred by homeowners or contractors.
 
 **Data protection.** Project data remains with the assessor who created it. The dataset offered to SEAI is aggregated and anonymised — measure, dwelling type, county and cost only, with no address or personal data — and homeowner consent is obtained before any project's figures are included.
@@ -116,7 +118,9 @@ Three developments follow naturally once accuracy is evidenced. SEAI's eligibili
 2. **Recognition** — PlanitBER approved and promoted as an indicative costing tool, backed by our published rate-maintenance commitment and whatever oversight arrangement SEAI wishes to put in place.
 3. **Wider role** — subject to proven accuracy, use of the cost plan to support retrofit lending and, in time, grant applications.
 
-Each step gives SEAI something concrete — evidence, cost data, higher homeowner conversion — before anything further is asked. PlanitBER is developed, maintained and funded entirely by Turley Energy Consultants; SEAI's role is endorsement and promotion, not build or spend.
+Each step gives SEAI something concrete — evidence, cost data, higher homeowner conversion — before anything further is asked. PlanitBER is developed and maintained at our own cost, and recognition alone requires no expenditure by SEAI.
+
+What we are seeking, though, is not a customer but a partner. The retrofit sector needs a cost standard it can trust, and a tool the industry trusts is one SEAI stands over: shared oversight of the method, a trial whose findings belong to the sector rather than to us, and a common document that assessors, contractors, lenders and homeowners all recognise. We would rather build that with SEAI than alongside it.
 
 ---
 
