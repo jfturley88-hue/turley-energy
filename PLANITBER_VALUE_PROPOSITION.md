@@ -1,9 +1,11 @@
 # PlanitBER — Value Proposition
 
-**Independent, instant retrofit costing for Irish homes.**
-PlanitBER turns a completed home survey into a clear, grant-netted, finance-ready budget in under two minutes — itemised in the format a quantity surveyor would use, and independent of any contractor. It is built by practising BER assessors, for the people who do this work every day.
+**One cost language for Ireland's retrofit industry.**
+PlanitBER turns a completed home survey into a clear, itemised, grant-netted budget — produced during the assessment visit, set out in the format a quantity surveyor would use, and independent of anyone selling the works. It is built by practising BER assessors, for the people who do this work every day.
 
-**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool, used by BER assessors, One Stop Shops and homeowners. PlanitBER is standalone software: it requires no integration with SEAI systems, no change to DEAP, and no development effort or expenditure on SEAI's side. Standalone does not mean unsupervised — we would welcome SEAI oversight of the costing methodology and rate book as a condition of that recognition (see *Commercial basis, governance and risk*).
+Retrofit stalls at the point where the parties stop speaking the same language. The assessor recommends measures, the homeowner guesses at the cost, the contractor quotes against an undefined scope, the lender asks for evidence nobody can supply, and SEAI pays grants against figures that were never reconciled to anything. PlanitBER gives all of them one document, built on one published method, that each can read from their own side — the assessor and One Stop Shop create it, and the homeowner, contractor, lender and SEAI all work from the same numbers.
+
+**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool for the retrofit sector — created by BER assessors and One Stop Shops, and relied upon by homeowners, contractors, lenders, local authorities and SEAI itself. PlanitBER is standalone software: it requires no integration with SEAI systems, no change to DEAP, and no development effort or expenditure on SEAI's side. Standalone does not mean unsupervised — we would welcome SEAI oversight of the costing methodology and rate book as a condition of that recognition (see *Commercial basis, governance and risk*).
 
 ---
 
@@ -26,7 +28,7 @@ An assessor visits, surveys the home, and advises on the improvements that would
 
 PlanitBER builds an itemised, independent cost plan from survey geometry the assessor has already measured — floor, wall, roof and window areas, age band and heat loss indicator — against a measure list that mirrors SEAI's grant structure:
 
-- **Cost certainty.** An instant indicative budget, measure by measure, using county-adjusted labour rates and current Irish material pricing, with heat pump sizing derived from the Heat Loss Indicator (IS EN 12831). Every figure is fully loaded: contractor's overhead and profit at 12%, contingency at 10%, VAT at 13.5% (Solar PV at 0% per Revenue ruling).
+- **Cost certainty.** An indicative budget measure by measure, using county-adjusted labour rates and current Irish material pricing, with heat pump sizing derived from the Heat Loss Indicator (IS EN 12831). Every figure is fully loaded: contractor's overhead and profit at 12%, contingency at 10%, VAT at 13.5% (Solar PV at 0% per Revenue ruling).
 - **A common reference point.** Gross costs are set out independently of anyone selling the works, with SEAI grants deducted line by line and the net cost to the homeowner stated plainly. Both sides gain from that. The homeowner can see whether a quote is reasonable and what the grant is genuinely worth to them. The contractor prices a defined scope instead of a vague brief, competes against others pricing that same scope, and has a published rate basis to point to when a figure is queried. Comparable quotes reward the contractor who priced the job properly rather than the one who left most out.
 - **Assessment to action.** The assessor can produce the cost plan during the same visit and hand it over with the certificate, as the practical companion to the improvement advice they already give. The gap between recommendation and budget closes to zero.
 
@@ -47,7 +49,7 @@ The cost plan is **created by the BER assessor or One Stop Shop** — the profes
 |---|---|
 | **CREATES THE COST PLAN** | |
 | **BER Assessors** | Add a costed plan to the improvement advice they already provide, within the same visit — turning an assessment into a complete, actionable conversation. Built by assessors, so it asks only for measurements they already take. |
-| **One Stop Shops** | Produce fast feasibility costs and pre-qualify projects before committing to a full survey, then use the same document to set client expectations. |
+| **One Stop Shops** | Produce feasibility costs and pre-qualify projects before committing to a full survey, then use the same document to set client expectations from the outset. |
 | **BENEFITS FROM IT** | |
 | **Homeowners** | Understand the real cost before engaging anyone. Compare quotes against an independent estimate. Track spend as works progress. |
 | **Contractors** | Quote a defined scope that every competitor is pricing too, with a published rate basis to stand over their price. Fewer wasted site visits, fewer scope disputes, and homeowners who arrive ready to proceed. |
@@ -92,8 +94,10 @@ The trial formalises the rate book: named sources (SEO National Wage Agreement, 
 
 ## 3. What It Can Become
 
-**A recognised standard for indicative retrofit costs.**
-Ireland completes roughly 100,000 home energy assessments a year. Every one is an opportunity to give a homeowner a credible number — and today almost none of them do. With SEAI recognition, PlanitBER becomes the consistent, independent format in which that number is given: the same methodology, the same loading basis, and the same grant treatment nationwide, whether the homeowner is in Dublin or Ballymote.
+**A recognised standard that brings the sector onto common ground.**
+Ireland completes roughly 100,000 home energy assessments a year. Every one is an opportunity to give a homeowner a credible number, and today almost none of them do. With SEAI recognition, PlanitBER becomes the consistent, independent format in which that number is given: the same methodology, the same loading basis and the same grant treatment nationwide, whether the homeowner is in Dublin or Ballymote.
+
+The wider prize is alignment. Retrofit is delivered by professions that rarely share a common document — assessors, contractors, One Stop Shops, lenders and SEAI each hold a different part of the picture and none of it reconciles. A single recognised cost format changes that: the assessor's advice, the contractor's quote, the homeowner's budget, the lender's file and SEAI's grant all reference the same itemised scope and the same published rates. Disputes fall because there is something agreed to point at. Trust rises because everyone can see the same working. That is a sectoral benefit rather than a product feature, and it is the reason SEAI's endorsement matters more than any amount of marketing on our side.
 
 **A stronger advisory service from assessors.**
 Assessors are the profession best placed to deliver this — they are already in the home, already measuring, and already trusted to advise on improvements. PlanitBER extends that advisory role from *what to do* to *what it costs*, without requiring quantity surveying expertise. That makes the assessment visit more valuable to the homeowner and more commercially attractive to the assessor.
