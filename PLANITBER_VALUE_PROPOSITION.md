@@ -6,7 +6,9 @@ Retrofit stalls at the point where the parties stop speaking the same language. 
 
 PlanitBER gives all of them one document, built on one published method, that each can read from their own side. It turns a completed home survey into a clear, itemised, grant-netted budget — produced from measurements the assessor has already taken, set out in the format a quantity surveyor would use, and independent of anyone selling the works. It is built by practising BER assessors, for the people who do this work every day.
 
-**What we are asking of SEAI:** recognition and promotion of PlanitBER as an approved indicative costing tool for the retrofit sector — created by BER assessors and One Stop Shops, and relied upon by homeowners, contractors, lenders, local authorities and SEAI itself. PlanitBER is standalone software: it requires no integration with SEAI systems, no change to DEAP, and no development effort or expenditure on SEAI's side. Standalone does not mean unsupervised — we would welcome SEAI oversight of the costing methodology and rate book as a condition of recognition.
+**What we are asking of SEAI:** a funded pilot partnership, leading to recognition and promotion of PlanitBER as an approved indicative costing tool for the retrofit sector — created by BER assessors and One Stop Shops, and relied upon by homeowners, contractors, lenders, local authorities and SEAI itself.
+
+The software is built and paid for. It is standalone: it requires no integration with SEAI systems and no change to DEAP. What we are seeking is a partner rather than a customer — SEAI support to run the pilot set out in Part 2, oversight of the costing methodology and rate book, and, if the evidence holds, endorsement of the result. SEAI should not put its name to a costing tool whose accuracy has not been independently evidenced; the pilot is what produces that evidence, and it produces a public asset in the process.
 
 ---
 
@@ -88,7 +90,9 @@ Formalise the rate book: named sources (SEO National Wage Agreement, SCSI Region
 
 **SEAI oversight.** Standalone software does not have to mean unsupervised software. We would welcome a formal SEAI role in governing the methodology: the rate book, its sources and every revision made available for review, with all rate and loading changes published and dated. If SEAI would prefer to approve the rate book annually, or set parameters the tool must apply, we would accept that as a condition of recognition.
 
-**Partnership and support for the trial.** Recognition itself costs SEAI nothing, and we are not asking for funding to obtain it. The trial is a different proposition: it produces something that outlives any one tool — the first structured record of what Irish retrofits actually cost. We are prepared to fund and run it ourselves. If SEAI would prefer to co-fund it, or to run it under an existing research, pilot or demonstration programme, we would welcome that, and the resulting dataset would be SEAI's to publish as it sees fit. A trial conducted jointly would also carry considerably more weight with assessors, contractors and lenders than one we conduct alone.
+**Pilot funding and partnership.** We are asking SEAI to partner in and part-fund the pilot programme set out above. We are not asking SEAI to fund the development of PlanitBER — that is complete and paid for. The ask is support for the pilot itself: recruiting and supporting participating assessors and One Stop Shops, collecting and verifying matched quotes and out-turn costs across 50–100 homes, and independent analysis of the results.
+
+Three reasons this is worth SEAI's investment. It produces the evidence that would justify endorsement, which no responsible body should give without it. It produces a public asset — the first structured record of what Irish retrofits actually cost, which becomes SEAI's to hold and publish. And a pilot delivered jointly carries far more weight with assessors, contractors and lenders than one conducted by a private firm alone, which materially affects whether the sector adopts a common standard at all. We would welcome delivery under an existing pilot, research or demonstration programme, on whatever terms SEAI's procedures require.
 
 **Liability.** Every output is labelled an indicative estimate — not a quotation, contract or guarantee of final cost — with the accuracy band printed on the face of the document. Professional indemnity insurance is carried by Turley Energy Consultants. Recognition by SEAI would carry no liability for costs incurred by homeowners or contractors.
 
@@ -114,13 +118,13 @@ Three developments follow naturally once accuracy is evidenced. SEAI's eligibili
 
 ### The path we propose
 
-1. **Trial** — accuracy report, actual-cost dataset and rate governance, delivered to SEAI.
+1. **Funded pilot** — delivered in partnership with SEAI: accuracy report, actual-cost dataset and rate governance.
 2. **Recognition** — PlanitBER approved and promoted as an indicative costing tool, backed by our published rate-maintenance commitment and whatever oversight arrangement SEAI wishes to put in place.
 3. **Wider role** — subject to proven accuracy, use of the cost plan to support retrofit lending and, in time, grant applications.
 
-Each step gives SEAI something concrete — evidence, cost data, higher homeowner conversion — before anything further is asked. PlanitBER is developed and maintained at our own cost, and recognition alone requires no expenditure by SEAI.
+Each step produces something concrete — evidence, cost data, higher homeowner conversion — before the next is asked for. PlanitBER itself is developed and maintained at our own cost; we are not asking SEAI to fund a product.
 
-What we are seeking, though, is not a customer but a partner. The retrofit sector needs a cost standard it can trust, and a tool the industry trusts is one SEAI stands over: shared oversight of the method, a trial whose findings belong to the sector rather than to us, and a common document that assessors, contractors, lenders and homeowners all recognise. We would rather build that with SEAI than alongside it.
+What we are seeking is a partner rather than a customer: joint delivery of the pilot, shared oversight of the method, findings that belong to the sector rather than to us, and a common cost document that assessors, contractors, lenders and homeowners all recognise. The retrofit sector needs a cost standard it can trust, and a standard the industry trusts is one SEAI stands over. We would rather build that with SEAI than alongside it.
 
 ---
 
