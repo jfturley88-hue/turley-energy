@@ -7038,6 +7038,19 @@ function selectProjectType(mode) {
   const ac = document.getElementById('card-' + (map[mode] || 'newbuild'));
   if (ac) ac.classList.add('active');
 
+  // Name the deliverable for the mode: Energy Upgrade produces a Retrofit Cost Plan;
+  // New Build / Refurbishment produce a Bill of Quantities.
+  (function() {
+    var isEU = (mode === 'Energy Upgrade');
+    var outLabel = isEU ? 'Retrofit Cost Plan' : 'Indicative BOQ';
+    var genLabel = isEU ? 'Generate Cost Plan →' : 'Generate BOQ →';
+    document.querySelectorAll('.hs-out').forEach(function(el) { el.textContent = outLabel; });
+    var gb = document.getElementById('generate-boq-btn');
+    if (gb) gb.textContent = genLabel;
+    var gw = document.querySelector('#generate-btn-wrapper .generate-btn');
+    if (gw) gw.innerHTML = '⚡ ' + (isEU ? 'Generate Retrofit Cost Plan' : 'Generate BOQ Report');
+  })();
+
   const gf = document.getElementById('grant-scheme-field');
   if (gf) gf.style.display = mode === 'New Build' ? 'none' : '';
 
@@ -13248,7 +13261,8 @@ function buildReport() {
         var badge = document.createElement('div');
         badge.id = 'rpt-independent-badge';
         badge.style.cssText = 'margin-top:5px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);font-size:10px;font-weight:600;color:#10B981;letter-spacing:0.04em;';
-        badge.textContent = '⊕ Independent Indicative BOQ · SCSI Cost Plan Format · ±20%';
+        badge.textContent = '⊕ Independent ' + (pi.type === 'Energy Upgrade' ? 'Retrofit Cost Plan' : 'Cost Plan')
+          + ' · SCSI Cost Plan Format · ±20%';
         metaEl.parentNode.insertBefore(badge, metaEl.nextSibling);
       }
     }
