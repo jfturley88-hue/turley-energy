@@ -13738,7 +13738,7 @@ function renderEUTable(b) {
 
     var grantCell = gAmt > 0
       ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span>'
-        + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description; }).join('<br>') + '</div>'
+        + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description+' &mdash; '+fmt(g.amount||0); }).join('<br>') + '</div>'
       : '<span style="color:#475569;">—</span>';
 
     var pb = _euPricingBasis(s, inp);
@@ -13969,7 +13969,7 @@ function exportEUPDF(mode) {
     var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
 
     var grantStr = gAmt > 0
-      ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description;}).join('<br>')+'</span>'
+      ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description+' &mdash; '+fmt(g.amount||0);}).join('<br>')+'</span>'
       : '—';
 
     if (isDetailed) {
@@ -14450,7 +14450,7 @@ function exportCompactPDF() {
       tableGrants += gAmt;
       gCell = '<td style="padding:3px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';">' +
         (gAmt > 0
-          ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description;}).join('<br>')+'</span>'
+          ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description+' &mdash; '+fmt(g.amount||0);}).join('<br>')+'</span>'
           : '—') + '</td>';
     }
     rows +=
