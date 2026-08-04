@@ -90,11 +90,14 @@ A homeowner reaches the same works through one of three routes, and the Cost Pla
 | | One Stop Shop | Community Energy Grant | Better Energy Homes |
 |---|---|---|---|
 | Who applies | Registered One Stop Shop | Registered Project Coordinator | Homeowner |
-| Who does the work | One company end to end | Several contractors within an approved project | Contractors the homeowner appoints |
+| Who does the work | One company, start to finish | Several contractors within an approved project | Contractors the homeowner appoints |
 | Grant values | SEAI published table | Project-specific — set within the approved project | SEAI published table |
 | When the grant lands | Deducted from the price | Project-specific | Paid after completion, so the homeowner funds the gross first |
+| Management charge | Included in the provider's single price | Itemised by the coordinator — a fixed charge plus an amount per grant measure | None; the homeowner does the administration |
 
-The managed routes carry a service premium: someone else is running the project, handling the grant application and standing behind the result. PlanitBER prices the **works** identically across all three routes, so the homeowner can compare grant support like for like; the provider's own fee sits on top of that. How large that premium typically is, and whether it is justified by the service, is one of the things the pilot would measure.
+The managed routes carry a real cost that is easy to miss. Someone else runs the project, handles the grant claim and stands behind the result, and they charge for it. The Cost Plan prices that charge as its own line — VAT included, with no contractor's overhead or contingency applied, because it is a professional fee and not works — and shows the project management grant offsetting part of it.
+
+On a typical Community Energy Grant project that is a **€4,600 administration charge against a €2,000 project management grant**: a net cost of €2,600 that a homeowner comparing routes on grant totals alone would never see. Making that visible, rather than showing the grant and hiding the fee, is the whole point of an independent cost document.
 
 ---
 

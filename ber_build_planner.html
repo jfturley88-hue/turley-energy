@@ -821,9 +821,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <div class="tab-field" id="grant-scheme-field" style="display:none">
         <label>SEAI Grant Scheme</label>
         <select id="t0-grantScheme">
-          <option value="oss">One Stop Shop &#8212; single provider, grants deducted</option>
-          <option value="ceg">Community Energy Grant (CEG) &#8212; project coordinator</option>
-          <option value="beh" selected>Better Energy Homes &#8212; homeowner applies</option>
+          <option value="oss">One Stop Shop &#8212; one provider, start to finish</option>
+          <option value="ceg">Community Energy Grant &#8212; via a Project Coordinator, several contractors</option>
+          <option value="beh" selected>Better Energy Homes &#8212; you apply, you appoint the contractors</option>
           <option value="none">No SEAI Grants</option>
         </select>
       </div>
@@ -1280,9 +1280,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     <div class="tab-field" id="t0info-grantScheme-field" style="display:none">
       <label>SEAI Grant Scheme</label>
       <select id="t0info-grantScheme">
-        <option value="oss">One Stop Shop &mdash; single provider, grants deducted</option>
-        <option value="ceg">Community Energy Grant (CEG) &mdash; project coordinator</option>
-        <option value="beh" selected>Better Energy Homes &mdash; homeowner applies</option>
+        <option value="oss">One Stop Shop &mdash; one provider, start to finish</option>
+        <option value="ceg">Community Energy Grant &mdash; via a Project Coordinator, several contractors</option>
+        <option value="beh" selected>Better Energy Homes &mdash; you apply, you appoint the contractors</option>
         <option value="none">No SEAI Grants</option>
       </select>
     </div>
@@ -6085,6 +6085,46 @@ function cegRatesConfirmed() {
   } catch (e) { return false; }
 }
 
+// ── SCHEME MANAGEMENT & GRANT ADMINISTRATION FEE ─────────────────────────────
+// Managed routes charge the homeowner for running the project and handling the grant
+// claim. A CEG Project Coordinator itemises this as a grant administration fee — a
+// fixed charge plus a charge per grant measure, capped at a number of measures.
+// Figures are quoted VAT-inclusive, as coordinators quote them, and are NOT subject to
+// contractor's overhead, profit or contingency: this is a professional fee, not works.
+// One Stop Shops quote a single all-in price with management embedded, so the default
+// is nil and the plan says so. Editable in Rate Settings → SEAI Grants.
+var SCHEME_FEE_DEFAULTS = {
+  oss: { fixed: 0,    perMeasure: 0,   cap: 6 },
+  ceg: { fixed: 2500, perMeasure: 350, cap: 6 },
+  beh: { fixed: 0,    perMeasure: 0,   cap: 6 },
+};
+
+function schemeFeeSettings(scheme) {
+  var k = seaiScheme(scheme);
+  var d = SCHEME_FEE_DEFAULTS[k] || SCHEME_FEE_DEFAULTS.beh;
+  var ov = {};
+  try { ov = JSON.parse(localStorage.getItem('planit_scheme_fees') || '{}'); } catch (e) {}
+  return Object.assign({}, d, ov[k] || {});
+}
+
+// Number of grant-bearing measures on the plan (scheme items such as project
+// management and the home energy assessment don't count towards the per-measure charge).
+function schemeFeeMeasureCount(grants) {
+  var keys = {};
+  (grants || []).forEach(function(g) { if (g.measureKey && g.measureKey !== 'ber') keys[g.measureKey] = 1; });
+  return Object.keys(keys).length;
+}
+
+// Returns { amount, fixed, perMeasure, measures, capped } — amount is VAT-inclusive.
+function euSchemeFee(scheme, grants) {
+  var f = schemeFeeSettings(scheme);
+  var n = schemeFeeMeasureCount(grants);
+  var billable = Math.min(n, f.cap != null ? f.cap : n);
+  var amount = (f.fixed || 0) + billable * (f.perMeasure || 0);
+  return { amount: Math.round(amount), fixed: f.fixed || 0, perMeasure: f.perMeasure || 0,
+           measures: billable, total: n, capped: n > billable };
+}
+
 function seaiPVGrant(kwp) {
   kwp = parseFloat(kwp) || 0;
   var a = Math.min(kwp, GRANT_PV.kwp1) * GRANT_PV.rate1;
@@ -10414,7 +10454,7 @@ function loadEUExample1() {
   s('t0-grantScheme',  'oss');
   // EU property context
   s('eu-currentBER',   'D');
-  s('eu-targetBER',    'B');
+  s('eu-targetBER',    'A');
   s('eu-ageBand',      '1983–1993');
   s('eu-wallType',     'cavity-uninsulated');
   s('eu-existHeating', 'Oil Boiler');
@@ -13324,9 +13364,9 @@ function buildReport() {
   // Header must match the measure table below it — the table appends a €300 BER
   // assessment row (engine berFee) whenever the standalone BER grant is present.
   var _hdrTotal = su.total, _hdrNet = su.netTotal;
-  if (pi.type === 'Energy Upgrade' &&
-      (BOQ.grants || []).some(function(g){ return g.measureKey === 'ber' && !g.ossExclusive; })) {
-    _hdrTotal += 300;
+  if (pi.type === 'Energy Upgrade') {
+    if ((BOQ.grants || []).some(function(g){ return g.measureKey === 'ber' && !g.ossExclusive; })) _hdrTotal += 300;
+    _hdrTotal += euSchemeFee(pi.grantScheme, BOQ.grants).amount;
     _hdrNet = Math.max(0, _hdrTotal - (su.grantsTotal || 0));
   }
   document.getElementById('rpt-total').textContent = fmt(_hdrTotal);
@@ -13726,6 +13766,31 @@ function renderEUTable(b) {
       '</tr>';
   }
 
+  // Scheme management & grant administration fee (managed routes)
+  var _fee = euSchemeFee(BOQ.projectInfo.grantScheme, grants);
+  if (_fee.amount > 0) {
+    totalEst += _fee.amount;
+    rowNum++;
+    tbodyRows +=
+      '<tr class="eu-row">' +
+        '<td class="eu-c-num">'+rowNum+'</td>' +
+        '<td class="eu-c-measure">' +
+          '<span class="eu-measure-name">SCHEME MANAGEMENT &amp; GRANT ADMINISTRATION</span>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Charged by the '+
+            (seaiScheme(BOQ.projectInfo.grantScheme)==='ceg'?'Project Coordinator':'scheme provider')+'</div>' +
+        '</td>' +
+        '<td class="eu-c-basis"><ul class="eu-pb-list">' +
+          '<li>Fixed charge: '+fmt(_fee.fixed)+'</li>' +
+          '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
+          '<li>VAT included &mdash; professional fee, not works</li>' +
+        '</ul></td>' +
+        '<td class="eu-c-est">'+fmt(_fee.amount)+'</td>' +
+        '<td class="eu-c-act"><input type="number" class="eu-act-input" min="0" step="50" placeholder="—" oninput="updateEUActuals()"></td>' +
+        '<td class="eu-c-grants">—</td>' +
+        '<td class="eu-c-notes"><textarea class="eu-note-input" placeholder="Add note…"></textarea></td>' +
+      '</tr>';
+  }
+
   // OSS grants — single bundled row
   var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
   if (ossGrants.length) {
@@ -13943,6 +14008,38 @@ function exportEUPDF(mode) {
     }
   }
 
+  // Scheme management & grant administration fee (managed routes)
+  var pdfFee = euSchemeFee(pi.grantScheme, grants);
+  if (pdfFee.amount > 0) {
+    totalEst += pdfFee.amount;
+    rowNum++;
+    var feeBasis = '&bull; Fixed charge: '+fmt(pdfFee.fixed)+'<br>&bull; '+pdfFee.measures+
+      ' grant measures &times; '+fmt(pdfFee.perMeasure)+(pdfFee.capped?' (capped)':'')+
+      '<br>&bull; VAT included — professional fee, not works';
+    var feeName = 'SCHEME MANAGEMENT &amp; GRANT ADMINISTRATION' +
+      '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">Charged by the '+
+      (seaiScheme(pi.grantScheme)==='ceg'?'Project Coordinator':'scheme provider')+
+      ' for running the project and claiming the grants; partly offset by the Project Management grant.</div>';
+    if (isDetailed) {
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+          '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
+          '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
+          '<td style="padding:3px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';">'+feeBasis+'</td>' +
+          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';">'+fmt(pdfFee.amount)+'</td>' +
+          '<td style="border:'+B+';"></td><td style="border:'+B+';text-align:right;">—</td><td style="border:'+B+';"></td>' +
+        '</tr>';
+    } else {
+      pdfRows +=
+        '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
+          '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
+          '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
+          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';">'+fmt(pdfFee.amount)+'</td>' +
+          '<td style="border:'+B+';"></td><td style="border:'+B+';text-align:right;">—</td><td style="border:'+B+';"></td>' +
+        '</tr>';
+    }
+  }
+
   // OSS grants
   var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
   if (ossGrants.length) {
@@ -14044,6 +14141,17 @@ function exportEUPDF(mode) {
       mOp   += Math.round(sub * 1.22);
       mLoad += s.zeroVat ? Math.round(sub * 1.22) : Math.round(sub * 1.22 * 1.135);
     });
+    var methFeeRow = '';
+    if (pdfFee.amount > 0) {
+      mLoad += pdfFee.amount;
+      methFeeRow = '<tr style="border-bottom:1px solid #E2E8F0;">' +
+        '<td style="padding:5px 6px;font-size:8pt;border:1px solid #E2E8F0;">Scheme management &amp; grant administration</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">Professional fee, VAT included — no O&amp;P or contingency applied</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;">'+fmt(pdfFee.amount)+'</td>' +
+      '</tr>';
+    }
     var methBerRow = '';
     if (berGrant) {
       mLoad += PDF_BER_COST;
@@ -14061,7 +14169,7 @@ function exportEUPDF(mode) {
       '<td style="padding:6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">'+fmt(mOp)+'</td>' +
       '<td style="padding:6px;text-align:right;font-size:9pt;font-weight:900;color:#E8A020;border:1px solid #E2E8F0;">'+fmt(mLoad)+'</td>' +
     '</tr>';
-    methRows += methBerRow + methTotalRow;
+    methRows += methFeeRow + methBerRow + methTotalRow;
 
     // Appendix — the itemised evidence behind every bundled figure
     var labMultNote = 'Labour rates include the Co. ' + (pi.county||'—') + ' multiplier (×' + (pi.labourMultiplier||1).toFixed(2) + ').';
@@ -17780,6 +17888,24 @@ function _ufType(t) {
         <button class="mdb-tab-btn gr-scheme-btn" data-gs="beh" onclick="grantsScheme('beh',this)">Better Energy Homes</button>
       </div>
       <div id="grants-note" style="font-size:11px;margin-bottom:10px;"></div>
+      <div style="background:#1a2534;border:1px solid #2e3d52;border-radius:8px;padding:11px 13px;margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Scheme management &amp; grant administration fee</div>
+        <div style="font-size:10px;color:#8FA0B8;margin-bottom:9px;line-height:1.55;">
+          What the provider charges the homeowner for running the project and claiming the grants. Quoted VAT-inclusive,
+          and not subject to contractor's overhead, profit or contingency. A CEG Project Coordinator itemises this as a
+          fixed charge plus a charge per grant measure. One Stop Shops normally quote a single all-in price with
+          management embedded, so this defaults to nil for that route.
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+          <div><div style="font-size:10px;color:#8FA0B8;margin-bottom:3px;">Fixed charge</div>
+            <span style="color:#c8d0dc;">&euro;</span><input type="number" id="gf-fixed" min="0" step="50" onchange="schemeFeeSave()" style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"></div>
+          <div><div style="font-size:10px;color:#8FA0B8;margin-bottom:3px;">Per grant measure</div>
+            <span style="color:#c8d0dc;">&euro;</span><input type="number" id="gf-per" min="0" step="10" onchange="schemeFeeSave()" style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"></div>
+          <div><div style="font-size:10px;color:#8FA0B8;margin-bottom:3px;">Charged for up to</div>
+            <input type="number" id="gf-cap" min="0" step="1" onchange="schemeFeeSave()" style="width:70px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"><span style="color:#8FA0B8;font-size:11px;"> measures</span></div>
+          <div id="gf-example" style="font-size:11px;color:#4ade80;padding-bottom:6px;"></div>
+        </div>
+      </div>
       <div id="grants-table"></div>
       <div style="font-size:10px;color:#64748B;margin-top:12px;line-height:1.6;">
         Solar PV is banded, not a flat rate: &euro;700/kWp to 2&nbsp;kWp, then &euro;200/kWp to 4&nbsp;kWp, capped at &euro;1,800.
@@ -18684,7 +18810,32 @@ function toggleMatOverlay() {
     grantsRender();
   };
 
+  function feeOverrides(){ try { return JSON.parse(localStorage.getItem('planit_scheme_fees')||'{}'); } catch(e){ return {}; } }
+
+  window.schemeFeeSave = function(){
+    var all = feeOverrides();
+    var v = id => { var e = document.getElementById(id); var n = parseFloat(e && e.value); return isNaN(n) ? null : n; };
+    all[cur] = { fixed: v('gf-fixed')||0, perMeasure: v('gf-per')||0, cap: v('gf-cap')||0 };
+    localStorage.setItem('planit_scheme_fees', JSON.stringify(all));
+    grantsRender();
+  };
+
+  function feeRender(){
+    var d = SCHEME_FEE_DEFAULTS[cur] || SCHEME_FEE_DEFAULTS.beh;
+    var f = Object.assign({}, d, feeOverrides()[cur] || {});
+    var set = (id, val) => { var e = document.getElementById(id); if (e) e.value = val; };
+    set('gf-fixed', f.fixed); set('gf-per', f.perMeasure); set('gf-cap', f.cap);
+    var ex = document.getElementById('gf-example');
+    if (ex) {
+      var max = (f.fixed||0) + (f.cap||0)*(f.perMeasure||0);
+      ex.textContent = max > 0
+        ? 'Maximum fee: €' + max.toLocaleString('en-IE') + ' (VAT incl.)'
+        : 'No separate fee — provider price includes management';
+    }
+  }
+
   window.grantsRender = function(){
+    feeRender();
     var base = (cur === 'beh') ? 'beh' : 'oss';
     var def = GRANT_DEFAULTS[base], ov = overrides()[cur] || {};
     var note = document.getElementById('grants-note');
@@ -18742,6 +18893,8 @@ function toggleMatOverlay() {
     if (!confirm('Reset ' + cur.toUpperCase() + ' grant values to the SEAI published defaults?')) return;
     var all = overrides(); delete all[cur];
     localStorage.setItem('planit_grants', JSON.stringify(all));
+    var fees = feeOverrides(); delete fees[cur];
+    localStorage.setItem('planit_scheme_fees', JSON.stringify(fees));
     grantsRender();
   };
 })();
