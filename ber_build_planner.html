@@ -6019,13 +6019,15 @@ var GRANT_DEFAULTS = {
     solarThermal:     { detached:1200,  semi:1200,  'mid-terrace':1200,  apartment:1200 },
     attic:            { detached:2000,  semi:1500,  'mid-terrace':1400,  apartment:1100 },
     atticFTB:         { detached:2500,  semi:1900,  'mid-terrace':1800,  apartment:1400 },
-    rafter:           { detached:3000,  semi:3000,  'mid-terrace':2000,  apartment:1500 },
+    atticWelfare:     { detached:2500,  semi:1900,  'mid-terrace':1800,  apartment:1400 },
     cavity:           { detached:1800,  semi:1300,  'mid-terrace':850,   apartment:700  },
+    cavityWelfare:    { detached:2300,  semi:1700,  'mid-terrace':1100,  apartment:900  },
     iwi:              { detached:4500,  semi:3500,  'mid-terrace':2000,  apartment:1500 },
     ewi:              { detached:8000,  semi:6000,  'mid-terrace':3500,  apartment:3000 },
     windows:          { detached:4000,  semi:3000,  'mid-terrace':1800,  apartment:1500 },
     doorPerUnit:      { detached:800,   semi:800,   'mid-terrace':800,   apartment:800  },
     postWorksBER:     { detached:50,    semi:50,    'mid-terrace':50,    apartment:50   },
+    postWorksBERWelfare:{ detached:280,  semi:280,   'mid-terrace':280,   apartment:280  },
   },
 };
 // Solar PV is banded, not flat: €700/kWp to 2 kWp, then €200/kWp to 4 kWp, capped €1,800.
@@ -6135,8 +6137,12 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
                    measures.includes('rafter_insulation');
   var atticSel   = measures.includes('roof_ceiling') || measures.includes('roof_flat') ||
                    measures.includes('roof_insulation') || d.roofInsulation;
-  if (rafterSel) add('Rafter Insulation Grant', val('rafter'), 'roof');
-  else if (atticSel || measures.length === 0) add('Attic / Roof Insulation Grant', val('attic'), 'roof');
+  // Only one roof grant is payable. Rafter level is a managed-scheme rate (One Stop Shop /
+  // CEG); Better Energy Homes has no rafter grant, so a rafter job claims the attic rate.
+  var atticKey = (measures.includes('roof_ceiling') || measures.includes('roof_flat') ||
+                  measures.length === 0) ? 'roof' : 'roof_rafter';
+  if (rafterSel && managed) add('Rafter Insulation Grant', val('rafter'), 'roof_rafter');
+  else if (rafterSel || atticSel || measures.length === 0) add('Attic / Roof Insulation Grant', val('attic'), atticKey);
 
   var ewiSel    = measures.includes('wall_ewi') || measures.includes('ewi');
   var iwiSel    = measures.includes('wall_iwi') || measures.includes('iwi');
@@ -13458,7 +13464,8 @@ function _euMeasureKey(s) {
   if (t.indexOf('CAVITY FILL') >= 0) return 'wall_cavity';
   if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) return 'wall_ewi';
   if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0 || t.indexOf('DRY-LINING') >= 0) return 'wall_iwi';
-  if (t.indexOf('CEILING LEVEL') >= 0 || t.indexOf('RAFTER') >= 0 || t.indexOf('FLAT ROOF') >= 0 || t.indexOf('ROOM-IN-ROOF') >= 0 || t.indexOf('ATTIC') >= 0) return 'roof';
+  if (t.indexOf('RAFTER') >= 0 || t.indexOf('ROOM-IN-ROOF') >= 0) return 'roof_rafter';
+  if (t.indexOf('CEILING LEVEL') >= 0 || t.indexOf('FLAT ROOF') >= 0 || t.indexOf('ATTIC') >= 0) return 'roof';
   if (t.indexOf('FLOOR INSULATION') >= 0 && t.indexOf('UNDERFLOOR') < 0) return 'floor';
   if ((t.indexOf('WINDOWS') >= 0 || t.indexOf('WINDOW') >= 0) && t.indexOf('SECONDARY') < 0) return 'windows';
   if (t.indexOf('EXTERNAL DOOR') >= 0) return 'windows';
@@ -14191,7 +14198,7 @@ function exportEUPDF(mode) {
     schemeNoteHTML =
       '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:#F8FAFC;border:1px solid #E2E8F0;color:#475569;">' +
       '<strong>One Stop Shop — grants are deducted up front.</strong> ' +
-      'The One Stop Shop claims the grants and bills you the net figure. The home must reach at least BER B and install a heat pump, or achieve a primary-energy improvement of at least 100 kWh/m²/year.' +
+      'The One Stop Shop claims the grants and bills you the net figure, and manages the works end to end. From 4 March 2026 the minimum 100 kWh/m²/yr uplift requirement no longer applies where a heat pump is installed, and there is no pre-works BER B3-or-worse requirement.' +
       '</div>';
   }
 
