@@ -821,9 +821,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <div class="tab-field" id="grant-scheme-field" style="display:none">
         <label>SEAI Grant Scheme</label>
         <select id="t0-grantScheme">
-          <option value="individual">Individual &#8212; Better Energy Homes</option>
-          <option value="oss">One Stop Shop</option>
-          <option value="cero">CERO</option>
+          <option value="oss">One Stop Shop &#8212; single provider, grants deducted</option>
+          <option value="ceg">Community Energy Grant (CEG) &#8212; project coordinator</option>
+          <option value="beh" selected>Better Energy Homes &#8212; homeowner applies</option>
           <option value="none">No SEAI Grants</option>
         </select>
       </div>
@@ -1280,9 +1280,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     <div class="tab-field" id="t0info-grantScheme-field" style="display:none">
       <label>SEAI Grant Scheme</label>
       <select id="t0info-grantScheme">
-        <option value="individual">Individual &mdash; Better Energy Homes</option>
-        <option value="oss">One Stop Shop</option>
-        <option value="cero">CERO</option>
+        <option value="oss">One Stop Shop &mdash; single provider, grants deducted</option>
+        <option value="ceg">Community Energy Grant (CEG) &mdash; project coordinator</option>
+        <option value="beh" selected>Better Energy Homes &mdash; homeowner applies</option>
         <option value="none">No SEAI Grants</option>
       </select>
     </div>
@@ -5977,38 +5977,122 @@ function updateMatPreview() {
   }
 }
 
-// ── SEAI GRANT DATA (2026 — Better Energy Homes / National Upgrade Scheme) ─────
-// Source: SEAI.ie — rates effective Feb/Mar 2026 | seai.ie/grants/home-energy-grants
-const SEAI_GRANTS = {
-  // Better Energy Homes (BEH) individual grant rates — effective 3 Feb / 4 Mar 2026
-  atticInsulation:     { detached:2000, semi:1500, 'mid-terrace':1400, apartment:1100 },
-  atticInsulationFTB:  { detached:2500, semi:2500, 'mid-terrace':2500, apartment:2500 },
-  cavityWall:          { detached:1800, semi:1300, 'mid-terrace': 850, apartment: 700 },
-  cavityWallWelfare:   { detached:2300, semi:2300, 'mid-terrace':2300, apartment:2300 },
-  ewiWall:             { detached:8000, semi:6000, 'mid-terrace':3500, apartment:3000 },
-  iwiWall:             { detached:4500, semi:3500, 'mid-terrace':2000, apartment:1500 },
-  // Floor insulation — NOT available under BEH; use ossFloor below for OSS
-  windows:             { detached:4000, semi:4000, 'mid-terrace':1800, apartment:1500 },
-  doorPerUnit:         800,
-  heatPump:            12500,
-  heatPumpApartment:   9500,
-  heatPumpAirToAir:    7500,
-  solarPV:             1800,
-  solarThermal:        1200,
-  ventilation:         1500,   // MVHR / MEV — available under both BEH and OSS
-  heatingControls:     700,
-  berAssessment:       300,
-  hpTechnicalAssess:   200,
-  // OSS-exclusive grants (One Stop Shop / National Home Energy Upgrade Scheme)
-  ossFloor:            3500,
-  ossAirtight:         1000,
-  ossProjMgmt:         { detached:2000, semi:1600, 'mid-terrace':1200, apartment: 800 },
-  ossHEA:              350,
-  ossB2Bonus:          2000,
+// ── SEAI GRANT TABLES ────────────────────────────────────────────────────────
+// Source: SEAI Domestic Energy Grant Listings, August 2026.
+// Two SEAI-published domestic tables:
+//   • oss — National Home Energy Upgrade Scheme (One Stop Shop). Managed end-to-end by
+//     one registered company; grants deducted from the price up front.
+//   • beh — Better Energy Homes. Homeowner applies and manages contractors; grant paid
+//     after compliant completion, so the homeowner funds the gross cost first.
+// The Community Energy Grant (CEG) publishes NO universal domestic table — it is a
+// project-based, competitive programme run by a registered Project Coordinator, who may
+// use several contractors. CEG therefore starts from the OSS values and is overridden by
+// the coordinator's own approved project rates (Rate Settings → Grants → CEG column).
+// CEG figures are always flagged project-specific until those rates are entered.
+var GRANT_DEFAULTS = {
+  oss: {
+    heatPumpSystem:   { detached:6500,  semi:6500,  'mid-terrace':6500,  apartment:4500 },
+    heatPumpCentral:  { detached:2000,  semi:2000,  'mid-terrace':2000,  apartment:1000 },
+    heatPumpBonus:    { detached:4000,  semi:4000,  'mid-terrace':4000,  apartment:4000 },
+    heatPumpAirToAir: { detached:3500,  semi:3500,  'mid-terrace':3500,  apartment:3500 },
+    heatingControls:  { detached:700,   semi:700,   'mid-terrace':700,   apartment:700  },
+    solarThermal:     { detached:1200,  semi:1200,  'mid-terrace':1200,  apartment:1200 },
+    attic:            { detached:2000,  semi:1500,  'mid-terrace':1400,  apartment:1100 },
+    atticFTB:         { detached:2500,  semi:1900,  'mid-terrace':1800,  apartment:1400 },
+    rafter:           { detached:3000,  semi:3000,  'mid-terrace':2000,  apartment:1500 },
+    cavity:           { detached:1800,  semi:1300,  'mid-terrace':850,   apartment:700  },
+    iwi:              { detached:4500,  semi:3500,  'mid-terrace':2000,  apartment:1500 },
+    ewi:              { detached:8000,  semi:6000,  'mid-terrace':3500,  apartment:3000 },
+    windows:          { detached:4000,  semi:3000,  'mid-terrace':1800,  apartment:1500 },
+    doorPerUnit:      { detached:800,   semi:800,   'mid-terrace':800,   apartment:800  },
+    floor:            { detached:3500,  semi:3500,  'mid-terrace':3500,  apartment:3500 },
+    mechVent:         { detached:1500,  semi:1500,  'mid-terrace':1500,  apartment:1500 },
+    airtightness:     { detached:1000,  semi:1000,  'mid-terrace':1000,  apartment:1000 },
+    hea:              { detached:350,   semi:350,   'mid-terrace':350,   apartment:350  },
+    projectMgmt:      { detached:2000,  semi:1600,  'mid-terrace':1200,  apartment:800  },
+  },
+  beh: {
+    heatPump:         { detached:12500, semi:12500, 'mid-terrace':12500, apartment:9500 },
+    heatPumpAirToAir: { detached:7500,  semi:7500,  'mid-terrace':7500,  apartment:7500 },
+    hpTechAssess:     { detached:200,   semi:200,   'mid-terrace':200,   apartment:200  },
+    heatingControls:  { detached:700,   semi:700,   'mid-terrace':700,   apartment:700  },
+    solarThermal:     { detached:1200,  semi:1200,  'mid-terrace':1200,  apartment:1200 },
+    attic:            { detached:2000,  semi:1500,  'mid-terrace':1400,  apartment:1100 },
+    atticFTB:         { detached:2500,  semi:1900,  'mid-terrace':1800,  apartment:1400 },
+    rafter:           { detached:3000,  semi:3000,  'mid-terrace':2000,  apartment:1500 },
+    cavity:           { detached:1800,  semi:1300,  'mid-terrace':850,   apartment:700  },
+    iwi:              { detached:4500,  semi:3500,  'mid-terrace':2000,  apartment:1500 },
+    ewi:              { detached:8000,  semi:6000,  'mid-terrace':3500,  apartment:3000 },
+    windows:          { detached:4000,  semi:3000,  'mid-terrace':1800,  apartment:1500 },
+    doorPerUnit:      { detached:800,   semi:800,   'mid-terrace':800,   apartment:800  },
+    postWorksBER:     { detached:50,    semi:50,    'mid-terrace':50,    apartment:50   },
+  },
 };
+// Solar PV is banded, not flat: €700/kWp to 2 kWp, then €200/kWp to 4 kWp, capped €1,800.
+var GRANT_PV = { rate1:700, kwp1:2, rate2:200, kwp2:4, cap:1800 };
+
+// Normalise whatever the selector / a saved project holds to oss | ceg | beh | none
+function seaiScheme(scheme) {
+  var s = String(scheme || '').toLowerCase();
+  if (s === 'none' || s.indexOf('no seai') >= 0) return 'none';
+  if (s.indexOf('oss') >= 0 || s.indexOf('one stop') >= 0) return 'oss';
+  if (s.indexOf('ceg') >= 0 || s.indexOf('cero') >= 0 || s.indexOf('community') >= 0) return 'ceg';
+  return 'beh';   // 'individual', 'beh', 'better energy homes', or anything unrecognised
+}
+
+// Display name for a scheme, used across the report screen and both PDFs.
+function seaiSchemeLabel(scheme, long) {
+  var k = seaiScheme(scheme);
+  if (k === 'oss')  return long ? 'One Stop Shop (National Home Energy Upgrade Scheme)' : 'One Stop Shop';
+  if (k === 'ceg')  return long ? 'Community Energy Grant (project coordinator)' : 'Community Energy Grant';
+  if (k === 'none') return 'No SEAI Grants';
+  return long ? 'Better Energy Homes (individual grants)' : 'Better Energy Homes';
+}
+
+// Compact scheme name for table row labels (avoids 'Community Energy Grant Grants')
+function seaiSchemeShort(scheme) {
+  var k = seaiScheme(scheme);
+  return k === 'oss' ? 'One Stop Shop' : k === 'ceg' ? 'CEG' : k === 'none' ? '' : 'Better Energy Homes';
+}
+
+// Grant table for a scheme, with any Rate Settings overrides applied.
+// CEG draws from the OSS table; its overrides are stored separately under 'ceg'.
+function seaiGrantTable(schemeKey) {
+  var baseKey = (schemeKey === 'beh') ? 'beh' : 'oss';
+  var t = {};
+  Object.keys(GRANT_DEFAULTS[baseKey]).forEach(function(m) {
+    t[m] = Object.assign({}, GRANT_DEFAULTS[baseKey][m]);
+  });
+  var ov = {};
+  try { ov = JSON.parse(localStorage.getItem('planit_grants') || '{}'); } catch (e) {}
+  var mine = ov[schemeKey] || {};
+  Object.keys(mine).forEach(function(m) {
+    if (t[m]) Object.keys(mine[m]).forEach(function(dt) {
+      var v = parseFloat(mine[m][dt]);
+      if (!isNaN(v)) t[m][dt] = v;
+    });
+  });
+  return t;
+}
+
+// Has a coordinator supplied CEG rates? Until they do, CEG figures stay indicative.
+function cegRatesConfirmed() {
+  try {
+    var ov = JSON.parse(localStorage.getItem('planit_grants') || '{}');
+    return !!(ov.ceg && Object.keys(ov.ceg).length);
+  } catch (e) { return false; }
+}
+
+function seaiPVGrant(kwp) {
+  kwp = parseFloat(kwp) || 0;
+  var a = Math.min(kwp, GRANT_PV.kwp1) * GRANT_PV.rate1;
+  var b = Math.max(0, Math.min(kwp, GRANT_PV.kwp2) - GRANT_PV.kwp1) * GRANT_PV.rate2;
+  return Math.min(GRANT_PV.cap, Math.round(a + b));
+}
 
 function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
   if (projType === 'New Build') return [];
+  d = d || {};
   measures = measures || [];
   const rawDT = (dwellingType || 'detached').toLowerCase();
   let dt = 'detached';
@@ -6017,122 +6101,114 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
   else if (rawDT.includes('apartment') || rawDT.includes('flat') || rawDT.includes('duplex')) dt = 'apartment';
   else if (rawDT.includes('bungalow') || rawDT.includes('detached')) dt = 'detached';
 
-  if (scheme === 'none') return [];
+  const sk = seaiScheme(scheme);
+  if (sk === 'none') return [];
   const projTypeStr = projType || '';
-  const isRetrofit = projTypeStr.includes('Retrofit') || projTypeStr.includes('Renovation') || projTypeStr.includes('Extension') || projTypeStr.includes('Energy Upgrade');
-  const isOSS = scheme && (scheme.toLowerCase().includes('oss') || scheme.toLowerCase().includes('one stop'));
-  const g = SEAI_GRANTS;
-  var items = [];
-  var gRef = 1;
+  const isRetrofit = projTypeStr.includes('Retrofit') || projTypeStr.includes('Renovation') ||
+                     projTypeStr.includes('Extension') || projTypeStr.includes('Energy Upgrade');
+  if (!isRetrofit) return [];
 
-  // BEH and OSS share the same base grant list; OSS adds exclusive items at end
-  if (isRetrofit) {
-  var hasMeasure = function(key) { return measures.length === 0 || measures.includes(key); };
+  const managed = (sk === 'oss' || sk === 'ceg');   // coordinator-run: full measure menu
+  const isCEG   = (sk === 'ceg');
+  const g = seaiGrantTable(sk);
+  const val = function(m) { return (g[m] && (g[m][dt] != null ? g[m][dt] : g[m].detached)) || 0; };
+  const schemeName = sk === 'oss' ? 'One Stop Shop' : isCEG ? 'Community Energy Grant' : 'Better Energy Homes';
+  const cegNote = isCEG && !cegRatesConfirmed()
+    ? ' — indicative only, to be confirmed in writing by the Project Coordinator' : '';
+
+  var items = [], gRef = 1;
+  var add = function(desc, amount, measureKey, note, extra) {
+    if (!(amount > 0)) return;
+    var it = { ref:'G'+gRef++, description:desc, measureKey:measureKey,
+               note:(note || (dt + ' — ' + schemeName)) + cegNote, amount:Math.round(amount) };
+    if (isCEG && !cegRatesConfirmed()) it.projectSpecific = true;
+    if (extra) Object.assign(it, extra);
+    items.push(it);
+  };
+  var has = function(key) { return measures.length === 0 || measures.includes(key); };
   var hasHeating = measures.includes('heating') || measures.includes('gshp') ||
                    measures.includes('ashp') || measures.includes('hybrid-hp');
 
-  if (hasMeasure('roof_insulation') || hasMeasure('rafter_insulation') || hasMeasure('roof_ceiling') ||
-      hasMeasure('roof_rafter') || hasMeasure('roof_room') || d.roofInsulation) {
-    items.push({ ref:'G'+gRef++, description:'Attic / Roof Insulation Grant', measureKey:'roof',
-      note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
-      amount: g.atticInsulation[dt] || g.atticInsulation.detached });
+  // ── Fabric ────────────────────────────────────────────────────────────────
+  // Rafter/room-in-roof pay the rafter rate; ceiling and flat pay the attic rate.
+  var rafterSel  = measures.includes('roof_rafter') || measures.includes('roof_room') ||
+                   measures.includes('rafter_insulation');
+  var atticSel   = measures.includes('roof_ceiling') || measures.includes('roof_flat') ||
+                   measures.includes('roof_insulation') || d.roofInsulation;
+  if (rafterSel) add('Rafter Insulation Grant', val('rafter'), 'roof');
+  else if (atticSel || measures.length === 0) add('Attic / Roof Insulation Grant', val('attic'), 'roof');
+
+  var ewiSel    = measures.includes('wall_ewi') || measures.includes('ewi');
+  var iwiSel    = measures.includes('wall_iwi') || measures.includes('iwi');
+  var cavitySel = measures.includes('wall_cavity') || measures.includes('wall_insulation');
+  if ((cavitySel || measures.length === 0) && !ewiSel && !iwiSel) add('Cavity Wall Insulation Grant', val('cavity'), 'wall_cavity');
+  if (ewiSel || (measures.length === 0 && (d.existWallType||'').toLowerCase().includes('solid'))) add('External Wall Insulation (EWI) Grant', val('ewi'), 'wall_ewi');
+  if (iwiSel) add('Internal Wall Insulation (IWI / Dry-lining) Grant', val('iwi'), 'wall_iwi');
+
+  // Floor insulation is on the managed-scheme menu only (not a standalone BEH grant)
+  if (managed && (has('floor_insulation') || has('suspended_floor_insulation'))) {
+    add('Floor Insulation Grant', val('floor'), 'floor', schemeName + ' — flat rate, all dwelling types', { ossExclusive:true });
   }
-  // Wall grants key off the SPECIFIC wall measure selected so the right grant is
-  // generated (cavity fill \u2192 cavity grant; EWI \u2192 EWI grant; IWI \u2192 IWI grant).
-  var ewiSelected = measures.includes('wall_ewi') || measures.includes('ewi');
-  var iwiSelected = measures.includes('wall_iwi') || measures.includes('iwi');
-  var cavitySelected = measures.includes('wall_cavity') || measures.includes('wall_insulation');
-  if ((cavitySelected || measures.length === 0) && !ewiSelected && !iwiSelected) {
-    items.push({ ref:'G'+gRef++, description:'Cavity Wall Insulation Grant', measureKey:'wall_cavity',
-      note:dt+' \u2014 SEAI Better Energy Homes 2026 (increased 3 Feb 2026)',
-      amount: g.cavityWall[dt] || g.cavityWall.detached });
-  }
-  // EWI grant applies to any wall construction (not solid-only) when EWI is chosen.
-  if (ewiSelected || (measures.length === 0 && (d.existWallType||'').toLowerCase().includes('solid'))) {
-    items.push({ ref:'G'+gRef++, description:'External Wall Insulation (EWI) Grant', measureKey:'wall_ewi',
-      note:dt+' \u2014 SEAI Better Energy Homes 2026',
-      amount: g.ewiWall[dt] || g.ewiWall.detached });
-  }
-  if (hasMeasure('iwi')) {
-    items.push({ ref:'G'+gRef++, description:'Internal Wall Insulation (IWI / Dry-lining) Grant', measureKey:'wall_iwi',
-      note:dt+' \u2014 SEAI Better Energy Homes 2026',
-      amount: g.iwiWall[dt] || g.iwiWall.detached });
-  }
-  // Floor insulation \u2014 OSS only (not available under Better Energy Homes)
-  if (isOSS && (hasMeasure('floor_insulation') || hasMeasure('suspended_floor_insulation'))) {
-    items.push({ ref:'G'+gRef++, description:'Floor Insulation Grant', measureKey:'floor', ossExclusive: true,
-      note:'OSS-exclusive \u2014 flat rate all dwelling types (SEAI National Upgrade Scheme)',
-      amount: g.ossFloor });
-  }
-  if (hasMeasure('windows')) {
-    items.push({ ref:'G'+gRef++, description:'Windows Grant', measureKey:'windows',
-      note:dt+' \u2014 NEW standalone grant from 2 March 2026 (SEAI BEH)',
-      amount: g.windows[dt] || g.windows.detached });
-  }
+
+  // ── Openings ──────────────────────────────────────────────────────────────
+  if (has('windows')) add('Windows Grant', val('windows'), 'windows');
   var dCount = Math.min(d.doorCount || 2, 2);
-  if (hasMeasure('windows') && dCount > 0) {
-    items.push({ ref:'G'+gRef++, description:'External Doors Grant ('+dCount+' \u00d7 \u20ac800)', measureKey:'windows',
-      note:'Max 2 doors \u2014 NEW from 2 March 2026 (SEAI BEH)',
-      amount: dCount * g.doorPerUnit });
-  }
-  if (hasHeating || hasMeasure('heating')) {
-    var hpAmt = dt === 'apartment' ? g.heatPumpApartment : g.heatPump;
-    items.push({ ref:'G'+gRef++, description:'Heat Pump System Grant (unit + distribution + Renewable Heat Bonus)', measureKey:'heating',
-      note:'Up to \u20ac'+hpAmt.toLocaleString('en-IE')+' \u2014 increased 3 Feb 2026 (SEAI BEH)',
-      amount: hpAmt });
-    items.push({ ref:'G'+gRef++, description:'Heat Pump Technical Assessment', measureKey:'heating',
-      note:'Pre-installation survey \u2014 SEAI registered assessor',
-      amount: g.hpTechnicalAssess });
-  }
-  if (hasMeasure('solar_pv') || d.pvArea > 0) {
-    items.push({ ref:'G'+gRef++, description:'Domestic Solar PV Grant', measureKey:'solar_pv',
-      note:'\u20ac1,800 max (\u20ac900/kWp up to 2kWp) \u2014 0% VAT also applies \u2014 SEAI 2026',
-      amount: g.solarPV });
-  }
-  if (hasMeasure('solar_thermal')) {
-    items.push({ ref:'G'+gRef++, description:'Solar Thermal (Water Heating) Grant', measureKey:'solar_thermal',
-      note:'\u20ac1,200 \u2014 SEAI Better Energy Homes 2026',
-      amount: g.solarThermal });
-  }
-  // Grant requires the ventilation measure — d.ventilation alone only picks the label
-  if (hasMeasure('ventilation')) {
-    var ventLabel = (d.ventilation === 'MVHR' || (measures.includes('ventilation') && d.ventilationType === 'MVHR'))
-      ? 'MVHR Mechanical Ventilation Grant' : 'MEV Mechanical Extract Ventilation Grant';
-    items.push({ ref:'G'+gRef++, description:ventLabel, measureKey:'ventilation',
-      note:'\u20ac1,500 \u2014 SEAI Better Energy Homes 2026',
-      amount: g.ventilation });
-  }
-  if (hasMeasure('smart_controls') && !hasHeating) {
-    items.push({ ref:'G'+gRef++, description:'Heating Controls Upgrade Grant', measureKey:'smart_controls',
-      note:'\u20ac700 \u2014 cannot combine with heat pump grant (SEAI BEH 2026)',
-      amount: g.heatingControls });
-  }
-  items.push({ ref:'G'+gRef++, description:'BER Assessment Grant (post-works)', measureKey:'ber',
-    note:'\u20ac300 \u2014 SEAI registered BER assessor (2026)',
-    amount: g.berAssessment });
-
-  // OSS-exclusive additional grants
-  if (isOSS) {
-    if (hasMeasure('airtight') || hasMeasure('airtightness')) {
-      items.push({ ref:'G'+gRef++, description:'Air Tightness Grant', ossExclusive: true, measureKey:'airtightness',
-        note:'OSS-exclusive \u2014 \u20ac1,000 (SEAI National Upgrade Scheme)',
-        amount: g.ossAirtight });
-    }
-    var pmAmt = g.ossProjMgmt[dt] || g.ossProjMgmt.detached;
-    items.push({ ref:'G'+gRef++, description:'Project Management Grant', ossExclusive: true,
-      note:'OSS-exclusive \u2014 \u20ac'+pmAmt.toLocaleString('en-IE')+' for '+dt+' (SEAI National Upgrade Scheme)',
-      amount: pmAmt });
-    items.push({ ref:'G'+gRef++, description:'Home Energy Assessment (HEA) Grant', ossExclusive: true,
-      note:'OSS-exclusive \u2014 \u20ac350 (SEAI National Upgrade Scheme)',
-      amount: g.ossHEA });
-    if (hasHeating || hasMeasure('heating')) {
-      items.push({ ref:'G'+gRef++, description:'B2 BER Achievement Bonus', ossExclusive: true,
-        note:'OSS-exclusive \u2014 \u20ac2,000 when BER B2 or better achieved with heat pump (SEAI National Upgrade Scheme)',
-        amount: g.ossB2Bonus });
-    }
+  if (has('windows') && dCount > 0) {
+    add('External Doors Grant (' + dCount + ' × €' + val('doorPerUnit').toLocaleString('en-IE') + ')',
+        dCount * val('doorPerUnit'), 'windows', 'Maximum 2 doors — ' + schemeName);
   }
 
-  return items;
+  // ── Heating ───────────────────────────────────────────────────────────────
+  if (hasHeating || has('heating')) {
+    // A replacement heat pump does not attract the central-heating grant or the
+    // renewable-heating bonus; a fossil-fuel conversion does.
+    var eh = String(d.existHeating || '').toLowerCase();
+    var replacingHP = eh.indexOf('heat pump') >= 0 || eh.indexOf('ashp') >= 0 || eh.indexOf('gshp') >= 0;
+    if (managed) {
+      add('Heat Pump System Grant', val('heatPumpSystem'), 'heating');
+      if (!replacingHP) {
+        add('Central Heating System Grant (heat-pump ready)', val('heatPumpCentral'), 'heating');
+        add('Renewable Heating System Bonus', val('heatPumpBonus'), 'heating');
+      }
+    } else {
+      add('Heat Pump System Grant', val('heatPump'), 'heating',
+          'Up to €' + val('heatPump').toLocaleString('en-IE') + ' — ' + schemeName);
+      // Technical assessment is a Better Energy Homes grant for pre-2007 homes
+      var ab = String(d.ageBand || '');
+      var pre2007 = !ab || /Pre 19|194|197|198|199|200[0-4]|2005|2006/.test(ab);
+      if (pre2007) add('Heat Pump Technical Assessment', val('hpTechAssess'), 'heating',
+                       'Pre-2007 dwelling — ' + schemeName);
+    }
+  }
+  if (has('smart_controls') && !hasHeating) {
+    add('Heating Controls Upgrade Grant', val('heatingControls'), 'smart_controls',
+        'Cannot be combined with the heat pump grant — ' + schemeName);
+  }
+
+  // ── Renewables ────────────────────────────────────────────────────────────
+  if (has('solar_pv') || d.pvArea > 0) {
+    // kWp from the same panel basis the BOQ uses: ~1.7m² per 400Wp panel
+    var kwp = d.pvKwp || (d.pvArea ? Math.max(1, Math.floor(d.pvArea / 1.7)) * 0.4 : 0);
+    add('Domestic Solar PV Grant', seaiPVGrant(kwp), 'solar_pv',
+        '≈' + (Math.round(kwp * 10) / 10) + ' kWp — €700/kWp to 2 kWp, then €200/kWp to 4 kWp, capped €1,800');
+  }
+  if (has('solar_thermal')) add('Solar Thermal (Water Heating) Grant', val('solarThermal'), 'solar_thermal');
+
+  // ── Managed-scheme menu (One Stop Shop / CEG only) ────────────────────────
+  if (managed) {
+    if (has('ventilation')) {
+      var ventLabel = (d.ventilation === 'MVHR') ? 'MVHR Mechanical Ventilation Grant'
+                                                 : 'Mechanical Ventilation Grant';
+      add(ventLabel, val('mechVent'), 'ventilation', schemeName + ' menu');
+    }
+    if (has('airtight') || has('airtightness')) {
+      add('Air Tightness Grant', val('airtightness'), 'airtightness', schemeName + ' menu', { ossExclusive:true });
+    }
+    add('Project Management Grant', val('projectMgmt'), null, schemeName + ' menu', { ossExclusive:true });
+    add('Home Energy Assessment (HEA) Grant', val('hea'), null, schemeName + ' menu', { ossExclusive:true });
+  } else {
+    // Better Energy Homes contributes to the post-works BER only
+    add('Post-Works BER Contribution', val('postWorksBER'), 'ber', schemeName);
   }
 
   return items;
@@ -8491,7 +8567,8 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     s.subtotal = s.isExtras ? 0 : (s.items||[]).reduce(function(a,i) { return a+(i.quantity||0)*((i.matRate||0)+(i.labRate||0)); }, 0);
   });
   const grants = calculateSEAIGrants(
-    {existWallType:inputs.existWallType||'',pvArea:inputs.pvArea||0,ventilation:inputs.ventilation||'',doorCount:inputs.doorCount||2},
+    {existWallType:inputs.existWallType||'',pvArea:inputs.pvArea||0,ventilation:inputs.ventilation||'',doorCount:inputs.doorCount||2,
+     existHeating:inputs.existHeating||'',ageBand:inputs.ageBand||''},
     'Energy Upgrade', dwellingType || 'detached', grantScheme || 'individual', measuresOverride || ms);
   const su = computeSummary(sections, 'Energy Upgrade', fa || inputs.floorArea || 0, grants, grantScheme, ao);
   return {
@@ -13652,7 +13729,7 @@ function renderEUTable(b) {
       '<tr class="eu-row eu-oss-row">' +
         '<td class="eu-c-num" style="color:#6366f1;">★</td>' +
         '<td class="eu-c-measure">' +
-          '<span class="eu-measure-name" style="color:#6366f1;">One Stop Shop Grants</span>' +
+          '<span class="eu-measure-name" style="color:#6366f1;">'+seaiSchemeShort(BOQ.projectInfo.grantScheme)+' Grants</span>' +
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+ossItems+'</div>' +
         '</td>' +
         '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">Additional grants — only available via an OSS provider</em></td>' +
@@ -13866,7 +13943,7 @@ function exportEUPDF(mode) {
     totalGrts += ossTotal;
     if (isDetailed) {
       // Individual rows with subtle styling for detailed PDF
-      pdfRows += '<tr><td colspan="7" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;letter-spacing:.06em;border:'+B+';border-top:1px solid #c4b5fd;">⊕ One Stop Shop Additional Grants</td></tr>';
+      pdfRows += '<tr><td colspan="7" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;letter-spacing:.06em;border:'+B+';border-top:1px solid #c4b5fd;">⊕ '+seaiSchemeShort(pi.grantScheme)+' Additional Grants</td></tr>';
       ossGrants.forEach(function(g) {
         pdfRows +=
           '<tr>' +
@@ -13885,7 +13962,7 @@ function exportEUPDF(mode) {
       pdfRows +=
         '<tr>' +
           '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
-          '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">One Stop Shop Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+ossItems+'</span></td>' +
+          '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">'+seaiSchemeShort(pi.grantScheme)+' Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+ossItems+'</span></td>' +
           '<td style="border:'+B+';text-align:right;color:#E8A020;padding:4px 6px;">—</td>' +
           '<td style="border:'+B+';"></td>' +
           '<td style="border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:4px 6px;">'+fmt(ossTotal)+'</td>' +
@@ -14063,7 +14140,7 @@ function exportEUPDF(mode) {
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
         '<span>Floor Area: <strong style="color:#1E293B;">'+(pi.floorArea||'—')+' m²</strong></span>' +
         '<span>County: <strong style="color:#1E293B;">'+(pi.county||'—')+'</strong></span>' +
-        '<span>Grant Scheme: <strong style="color:#1E293B;">'+(pi.grantScheme==='oss'?'One Stop Shop':'Better Energy Homes')+'</strong></span>' +
+        '<span>Grant Scheme: <strong style="color:#1E293B;">'+seaiSchemeLabel(pi.grantScheme)+'</strong></span>' +
         (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
       '</div>' +
       '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed':'')+'</div>' +
@@ -14089,6 +14166,35 @@ function exportEUPDF(mode) {
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Notes</th>' +
     '</tr></thead>';
 
+  // Scheme note — how grants reach the homeowner differs materially by route,
+  // and CEG figures are not fixed until the Project Coordinator confirms them.
+  var _sk = seaiScheme(pi.grantScheme);
+  var schemeNoteHTML = '';
+  if (_sk === 'ceg') {
+    var _conf = (typeof cegRatesConfirmed === 'function') && cegRatesConfirmed();
+    schemeNoteHTML =
+      '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:' +
+      (_conf ? '#F0FDF4;border:1px solid #BBF7D0;color:#166534;' : '#FFFBEB;border:1px solid #FDE68A;color:#92400E;') + '">' +
+      '<strong>Community Energy Grant — grant figures are project-specific.</strong> ' +
+      (_conf
+        ? 'The amounts shown use the rates supplied by your Project Coordinator. Final grant support remains subject to the approved project and written confirmation.'
+        : 'CEG does not publish a fixed grant table. The amounts shown are indicative, based on One Stop Shop values, and will be confirmed in writing by the Project Coordinator once the dwelling, measures, BER uplift and eligible costs have been assessed.') +
+      '</div>';
+  } else if (_sk === 'beh') {
+    schemeNoteHTML =
+      '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:#F8FAFC;border:1px solid #E2E8F0;color:#475569;">' +
+      '<strong>Better Energy Homes — grants are paid after the works.</strong> ' +
+      'You pay the contractor the full Est. Spend and claim the grant back once the work is complete and compliant, so the gross figure is what you need available. ' +
+      'Grant approval must be in place before work starts.' +
+      '</div>';
+  } else if (_sk === 'oss') {
+    schemeNoteHTML =
+      '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:#F8FAFC;border:1px solid #E2E8F0;color:#475569;">' +
+      '<strong>One Stop Shop — grants are deducted up front.</strong> ' +
+      'The One Stop Shop claims the grants and bills you the net figure. The home must reach at least BER B and install a heat pump, or achieve a primary-energy improvement of at least 100 kWh/m²/year.' +
+      '</div>';
+  }
+
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
@@ -14096,6 +14202,7 @@ function exportEUPDF(mode) {
       (isDetailed ? thead7 : thead6) +
       '<tbody>'+pdfRows+'</tbody>' +
     '</table>' +
+    schemeNoteHTML +
     '<div style="font-size:6.5pt;color:#475569;margin-top:6px;padding:4px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.5;">' +
       '<strong style="color:#1E293B;">How to use this document</strong> — ' +
       '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
@@ -14351,7 +14458,7 @@ function renderGrantsPanel() {
   const firstOSSIdx = grants.findIndex(g => g.ossExclusive);
   const grantRows = grants.map((g, i) => {
     const divider = (i === firstOSSIdx)
-      ? `<div style="grid-column:1/-1;padding:7px 12px 5px;background:rgba(99,102,241,0.07);border-top:1px solid rgba(99,102,241,0.25);border-bottom:1px solid rgba(99,102,241,0.15);font-size:10px;font-weight:700;color:#6366f1;letter-spacing:0.07em;text-transform:uppercase;">⊕ One Stop Shop Additional Grants</div>`
+      ? `<div style="grid-column:1/-1;padding:7px 12px 5px;background:rgba(99,102,241,0.07);border-top:1px solid rgba(99,102,241,0.25);border-bottom:1px solid rgba(99,102,241,0.15);font-size:10px;font-weight:700;color:#6366f1;letter-spacing:0.07em;text-transform:uppercase;">⊕ ${seaiSchemeShort(b.projectInfo.grantScheme)} Additional Grants</div>`
       : '';
     const isOSS = g.ossExclusive;
     const borderCol = isOSS ? '#6366f1' : '#10B981';
@@ -14376,7 +14483,7 @@ function renderGrantsPanel() {
     </div>`;
   }).join('');
 
-  const schemeLabel = b.projectInfo.grantScheme === 'oss' ? 'One Stop Shop (National Home Energy Upgrade Scheme)' : 'Better Energy Homes (Individual Grants)';
+  const schemeLabel = seaiSchemeLabel(b.projectInfo.grantScheme, true);
   const ossNote = b.projectInfo.grantScheme === 'oss'
     ? `<div style="padding:13px;border-radius:9px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);margin-top:14px;">
         <div style="font-size:11px;font-weight:700;color:#059669;margin-bottom:7px;">ℹ One Stop Shop — How Grants Are Applied</div>
@@ -16157,7 +16264,7 @@ function exportExcel() {
   if (hasGrants) {
     const grantsAOA = [
       ['SEAI Grants Applied'],
-      [`Scheme: ${pi.grantScheme==='oss'?'One Stop Shop (National Home Energy Upgrade Scheme)':'Better Energy Homes (Individual Grants)'}`],
+      [`Scheme: ${seaiSchemeLabel(pi.grantScheme, true)}`],
       [],
       ['Ref','Grant / Measure','Note','Amount (\u20ac)'],
       ...(b.grants||[]).map(g=>[g.ref,g.description,g.note||'',Math.round(g.amount)]),
@@ -17383,7 +17490,7 @@ function refreshGrantChips() {
         el.textContent = reason || 'Not grant-eligible';
       } else if (amount > 0) {
         el.classList.remove('disqualified');
-        var schemeLabel = scheme === 'oss' ? 'OSS' : 'Better Energy Homes';
+        var schemeLabel = seaiSchemeLabel(scheme);
         el.textContent = 'Grant: up to €' + fmtEur(Math.round(amount)) + ' (' + schemeLabel + ')';
       } else if (reason) {
         // amount=0, not disqualified, but has a specific message (e.g. "Covered under...")
@@ -17641,8 +17748,39 @@ function _ufType(t) {
       <button class="mdb-tab-btn" onclick="mdbTab('labour',this)">Labour Rates</button>
       <button class="mdb-tab-btn" onclick="mdbTab('regional',this)">Regional Multipliers</button>
       <button class="mdb-tab-btn" onclick="mdbTab('eurates',this);euRatesLoad()">EU Rates</button>
+      <button class="mdb-tab-btn" onclick="mdbTab('grants',this);grantsRender()">SEAI Grants</button>
       <button class="mdb-tab-btn" onclick="mdbTab('buildspec',this);buildSpecLoad()">Build Spec</button>
       <button class="mdb-tab-btn" onclick="mdbTab('refrates',this);refRatesLoad()">Refurb Works</button>
+    </div>
+
+    <!-- TAB: SEAI GRANTS -->
+    <div id="mdb-grants" class="mdb-tab-panel" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="font-size:11px;color:#8090A8;max-width:760px;line-height:1.6;">
+          <strong style="color:#E8A020;">SEAI grant values by scheme and dwelling type.</strong>
+          Source: SEAI Domestic Energy Grant Listings, August 2026. <strong>One Stop Shop</strong> and
+          <strong>Better Energy Homes</strong> are SEAI-published fixed tables. The
+          <strong>Community Energy Grant</strong> has no universal published domestic table &mdash; it is
+          project-based and competitive, so CEG starts from the One Stop Shop values and must be
+          overridden with the rates your Project Coordinator has supplied in writing. Until CEG rates are
+          entered here, CEG figures are labelled indicative on every Retrofit Cost Plan.
+        </div>
+        <button onclick="grantsReset()" style="padding:6px 14px;border-radius:8px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;cursor:pointer;flex-shrink:0;">&#8635; Reset to SEAI defaults</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="mdb-tab-btn gr-scheme-btn active" data-gs="oss" onclick="grantsScheme('oss',this)">One Stop Shop</button>
+        <button class="mdb-tab-btn gr-scheme-btn" data-gs="ceg" onclick="grantsScheme('ceg',this)">CEG</button>
+        <button class="mdb-tab-btn gr-scheme-btn" data-gs="beh" onclick="grantsScheme('beh',this)">Better Energy Homes</button>
+      </div>
+      <div id="grants-note" style="font-size:11px;margin-bottom:10px;"></div>
+      <div id="grants-table"></div>
+      <div style="font-size:10px;color:#64748B;margin-top:12px;line-height:1.6;">
+        Solar PV is banded, not a flat rate: &euro;700/kWp to 2&nbsp;kWp, then &euro;200/kWp to 4&nbsp;kWp, capped at &euro;1,800.
+        External doors are &euro;800 each, maximum two. Under One Stop Shop and CEG a replacement heat pump receives the
+        system grant only &mdash; the central-heating grant and renewable-heating bonus apply to fossil-fuel conversions.
+        Floor insulation, mechanical ventilation, air tightness, project management and the home energy assessment are on the
+        managed-scheme menu only and are not standalone Better Energy Homes grants.
+      </div>
     </div>
 
     <!-- TAB 1: UNIT PRICES -->
@@ -18510,6 +18648,95 @@ function toggleMatOverlay() {
     localStorage.setItem('eu_ov',JSON.stringify(ov));localStorage.setItem('eu_cat',JSON.stringify(cat));
   };
   window.euRatesReset=function(){localStorage.removeItem('eu_ov');localStorage.removeItem('eu_cat');euRatesLoad();};
+})();
+
+// ── RATE SETTINGS → SEAI GRANTS ───────────────────────────────────────────────
+(function(){
+  var LABELS = {
+    heatPumpSystem:'Heat pump system', heatPumpCentral:'Central heating system for heat pump',
+    heatPumpBonus:'Renewable heating system bonus', heatPumpAirToAir:'Air-to-air heat pump',
+    heatPump:'Heat pump (air-to-water / ground / exhaust-air)', hpTechAssess:'Heat pump technical assessment (pre-2007)',
+    heatingControls:'Heating controls', solarThermal:'Solar hot water',
+    attic:'Attic insulation — standard', atticFTB:'Attic insulation — first-time buyer',
+    rafter:'Rafter insulation', cavity:'Cavity wall insulation',
+    iwi:'Internal wall insulation / dry lining', ewi:'External wall insulation / wrap',
+    windows:'Windows — complete upgrade', doorPerUnit:'External doors (each, max 2)',
+    floor:'Floor insulation', mechVent:'Mechanical ventilation', airtightness:'Air tightness',
+    hea:'Home energy assessment', projectMgmt:'Project management',
+    postWorksBER:'Post-works BER contribution'
+  };
+  var DTS = [['detached','Detached'],['semi','Semi-D / End Terrace'],['mid-terrace','Mid-Terrace'],['apartment','Apartment']];
+  var cur = 'oss';
+
+  function overrides(){ try { return JSON.parse(localStorage.getItem('planit_grants')||'{}'); } catch(e){ return {}; } }
+
+  window.grantsScheme = function(k, btn){
+    cur = k;
+    document.querySelectorAll('.gr-scheme-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    grantsRender();
+  };
+
+  window.grantsRender = function(){
+    var base = (cur === 'beh') ? 'beh' : 'oss';
+    var def = GRANT_DEFAULTS[base], ov = overrides()[cur] || {};
+    var note = document.getElementById('grants-note');
+    if (note) {
+      if (cur === 'ceg') {
+        var confirmed = Object.keys(ov).length > 0;
+        note.innerHTML = confirmed
+          ? '<span style="color:#4ade80;">&#10003; Project Coordinator rates entered — CEG cost plans will use these figures.</span>'
+          : '<span style="color:#E8A020;">&#9888; No coordinator rates entered. CEG plans currently show One Stop Shop values, labelled indicative and subject to written confirmation.</span>';
+      } else {
+        note.innerHTML = '<span style="color:#64748B;">SEAI-published fixed table. Edit only to reflect a rate change SEAI has announced.</span>';
+      }
+    }
+    var h = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
+      '<thead><tr style="background:#1E2D42;color:#8FA0B8;">' +
+      '<th style="text-align:left;padding:7px 9px;font-size:11px;">Measure</th>' +
+      DTS.map(function(d){ return '<th style="text-align:right;padding:7px 9px;font-size:11px;">'+d[1]+'</th>'; }).join('') +
+      '</tr></thead><tbody>';
+    Object.keys(def).forEach(function(m, i){
+      h += '<tr style="background:'+(i%2?'#1a2534':'transparent')+';">' +
+        '<td style="padding:5px 9px;color:#c8d0dc;">'+(LABELS[m]||m)+'</td>';
+      DTS.forEach(function(d){
+        var v = (ov[m] && ov[m][d[0]] != null) ? ov[m][d[0]] : def[m][d[0]];
+        h += '<td style="padding:3px 6px;text-align:right;">&euro;<input type="number" min="0" step="50" ' +
+             'id="gr-'+m+'-'+d[0]+'" value="'+v+'" onchange="grantsSave()" ' +
+             'style="width:78px;padding:4px 6px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;font-size:12px;"></td>';
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+    var t = document.getElementById('grants-table');
+    if (t) t.innerHTML = h;
+  };
+
+  window.grantsSave = function(){
+    var base = (cur === 'beh') ? 'beh' : 'oss';
+    var def = GRANT_DEFAULTS[base], all = overrides(), mine = {};
+    Object.keys(def).forEach(function(m){
+      DTS.forEach(function(d){
+        var el = document.getElementById('gr-'+m+'-'+d[0]);
+        if (!el) return;
+        var v = parseFloat(el.value);
+        if (isNaN(v)) return;
+        // store only genuine departures from the SEAI default (CEG stores everything,
+        // because entering rates at all is what marks them coordinator-confirmed)
+        if (cur === 'ceg' || v !== def[m][d[0]]) { mine[m] = mine[m] || {}; mine[m][d[0]] = v; }
+      });
+    });
+    if (Object.keys(mine).length) all[cur] = mine; else delete all[cur];
+    localStorage.setItem('planit_grants', JSON.stringify(all));
+    grantsRender();
+  };
+
+  window.grantsReset = function(){
+    if (!confirm('Reset ' + cur.toUpperCase() + ' grant values to the SEAI published defaults?')) return;
+    var all = overrides(); delete all[cur];
+    localStorage.setItem('planit_grants', JSON.stringify(all));
+    grantsRender();
+  };
 })();
 
 (function(){
