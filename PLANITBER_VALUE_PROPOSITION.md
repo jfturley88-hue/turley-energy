@@ -99,6 +99,8 @@ The managed routes carry a real cost that is easy to miss. Someone else runs the
 
 On a typical Community Energy Grant project that is a **€4,600 administration charge against a €2,000 project management grant**: a net cost of €2,600 that a homeowner comparing routes on grant totals alone would never see. Making that visible, rather than showing the grant and hiding the fee, is the whole point of an independent cost document.
 
+A One Stop Shop does not itemise it at all — it sits inside their single price — but a route that cannot be compared is a route the homeowner cannot judge. The Cost Plan therefore carries an allowance for it, set above the coordinator basis to reflect one provider running everything where a coordinator model still has contractors competing on price. **That uplift is a working assumption, clearly labelled as provisional on every plan, and replacing it with measured evidence is one of the specific jobs of the pilot.** The worked examples order as you would expect — One Stop Shop highest, then Community Energy Grant, then Better Energy Homes where the homeowner does the administration themselves — but the size of the gap is exactly what needs proving.
+
 ---
 
 ## 2. The Pilot

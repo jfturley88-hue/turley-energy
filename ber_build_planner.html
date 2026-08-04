@@ -6093,8 +6093,13 @@ function cegRatesConfirmed() {
 // contractor's overhead, profit or contingency: this is a professional fee, not works.
 // One Stop Shops quote a single all-in price with management embedded, so the default
 // is nil and the plan says so. Editable in Rate Settings → SEAI Grants.
+// A One Stop Shop does not itemise this — it is inside their single all-in price — but the
+// route has to be comparable, so it is carried as an allowance derived from the coordinator
+// fee basis plus an uplift, reflecting that a single provider running everything prices above
+// a coordinator model where contractors are still competing. The uplift is provisional and
+// is one of the things the pilot is intended to evidence.
 var SCHEME_FEE_DEFAULTS = {
-  oss: { fixed: 0,    perMeasure: 0,   cap: 6 },
+  oss: { fixed: 0,    perMeasure: 0,   cap: 6, derived: true, upliftPct: 15 },
   ceg: { fixed: 2500, perMeasure: 350, cap: 6 },
   beh: { fixed: 0,    perMeasure: 0,   cap: 6 },
 };
@@ -6115,14 +6120,26 @@ function schemeFeeMeasureCount(grants) {
   return Object.keys(keys).length;
 }
 
-// Returns { amount, fixed, perMeasure, measures, capped } — amount is VAT-inclusive.
+// Returns { amount, fixed, perMeasure, measures, capped, derived, upliftPct, base }.
+// Amount is VAT-inclusive.
 function euSchemeFee(scheme, grants) {
+  var k = seaiScheme(scheme);
   var f = schemeFeeSettings(scheme);
   var n = schemeFeeMeasureCount(grants);
+  if (f.derived) {
+    // Allowance for a route that prices all-in: coordinator fee basis plus an uplift.
+    var c  = schemeFeeSettings('ceg');
+    var cn = Math.min(n, c.cap != null ? c.cap : n);
+    var base = (c.fixed || 0) + cn * (c.perMeasure || 0);
+    var up = f.upliftPct != null ? f.upliftPct : 0;
+    return { amount: Math.round(base * (1 + up / 100)), base: Math.round(base), upliftPct: up,
+             measures: cn, total: n, capped: n > cn, derived: true,
+             fixed: c.fixed || 0, perMeasure: c.perMeasure || 0 };
+  }
   var billable = Math.min(n, f.cap != null ? f.cap : n);
   var amount = (f.fixed || 0) + billable * (f.perMeasure || 0);
   return { amount: Math.round(amount), fixed: f.fixed || 0, perMeasure: f.perMeasure || 0,
-           measures: billable, total: n, capped: n > billable };
+           measures: billable, total: n, capped: n > billable, derived: false };
 }
 
 function seaiPVGrant(kwp) {
@@ -13776,13 +13793,18 @@ function renderEUTable(b) {
         '<td class="eu-c-num">'+rowNum+'</td>' +
         '<td class="eu-c-measure">' +
           '<span class="eu-measure-name">SCHEME MANAGEMENT &amp; GRANT ADMINISTRATION</span>' +
-          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Charged by the '+
-            (seaiScheme(BOQ.projectInfo.grantScheme)==='ceg'?'Project Coordinator':'scheme provider')+'</div>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+
+            (_fee.derived ? 'Within the One Stop Shop\'s single price'
+                          : 'Charged by the Project Coordinator')+'</div>' +
         '</td>' +
         '<td class="eu-c-basis"><ul class="eu-pb-list">' +
-          '<li>Fixed charge: '+fmt(_fee.fixed)+'</li>' +
-          '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
-          '<li>VAT included &mdash; professional fee, not works</li>' +
+          (_fee.derived
+            ? '<li>Included in the provider\'s all-in price</li>' +
+              '<li>Allowance: coordinator basis '+fmt(_fee.base)+' + '+_fee.upliftPct+'%</li>' +
+              '<li>Provisional &mdash; to be evidenced in pilot</li>'
+            : '<li>Fixed charge: '+fmt(_fee.fixed)+'</li>' +
+              '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
+              '<li>VAT included &mdash; professional fee, not works</li>') +
         '</ul></td>' +
         '<td class="eu-c-est">'+fmt(_fee.amount)+'</td>' +
         '<td class="eu-c-act"><input type="number" class="eu-act-input" min="0" step="50" placeholder="—" oninput="updateEUActuals()"></td>' +
@@ -14013,13 +14035,18 @@ function exportEUPDF(mode) {
   if (pdfFee.amount > 0) {
     totalEst += pdfFee.amount;
     rowNum++;
-    var feeBasis = '&bull; Fixed charge: '+fmt(pdfFee.fixed)+'<br>&bull; '+pdfFee.measures+
-      ' grant measures &times; '+fmt(pdfFee.perMeasure)+(pdfFee.capped?' (capped)':'')+
-      '<br>&bull; VAT included — professional fee, not works';
+    var feeBasis = pdfFee.derived
+      ? '&bull; Included in the provider\'s all-in price<br>&bull; Allowance: coordinator basis '+fmt(pdfFee.base)+
+        ' + '+pdfFee.upliftPct+'%<br>&bull; Provisional — to be evidenced in pilot'
+      : '&bull; Fixed charge: '+fmt(pdfFee.fixed)+'<br>&bull; '+pdfFee.measures+
+        ' grant measures &times; '+fmt(pdfFee.perMeasure)+(pdfFee.capped?' (capped)':'')+
+        '<br>&bull; VAT included — professional fee, not works';
     var feeName = 'SCHEME MANAGEMENT &amp; GRANT ADMINISTRATION' +
-      '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">Charged by the '+
-      (seaiScheme(pi.grantScheme)==='ceg'?'Project Coordinator':'scheme provider')+
-      ' for running the project and claiming the grants; partly offset by the Project Management grant.</div>';
+      '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">' +
+      (pdfFee.derived
+        ? 'A One Stop Shop quotes one all-in price with management inside it. Carried here as an allowance so the routes compare like for like; partly offset by the Project Management grant.'
+        : 'Charged by the Project Coordinator for running the project and claiming the grants; partly offset by the Project Management grant.') +
+      '</div>';
     if (isDetailed) {
       pdfRows +=
         '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
@@ -14146,7 +14173,9 @@ function exportEUPDF(mode) {
       mLoad += pdfFee.amount;
       methFeeRow = '<tr style="border-bottom:1px solid #E2E8F0;">' +
         '<td style="padding:5px 6px;font-size:8pt;border:1px solid #E2E8F0;">Scheme management &amp; grant administration</td>' +
-        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">Professional fee, VAT included — no O&amp;P or contingency applied</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">'+
+          (pdfFee.derived ? 'Allowance within the provider\'s all-in price — provisional, no O&amp;P or contingency applied'
+                          : 'Professional fee, VAT included — no O&amp;P or contingency applied')+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;">'+fmt(pdfFee.amount)+'</td>' +
@@ -17903,6 +17932,8 @@ function _ufType(t) {
             <span style="color:#c8d0dc;">&euro;</span><input type="number" id="gf-per" min="0" step="10" onchange="schemeFeeSave()" style="width:90px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"></div>
           <div><div style="font-size:10px;color:#8FA0B8;margin-bottom:3px;">Charged for up to</div>
             <input type="number" id="gf-cap" min="0" step="1" onchange="schemeFeeSave()" style="width:70px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"><span style="color:#8FA0B8;font-size:11px;"> measures</span></div>
+          <div id="gf-uplift-wrap" style="display:none;"><div style="font-size:10px;color:#8FA0B8;margin-bottom:3px;">Uplift on coordinator basis</div>
+            <input type="number" id="gf-uplift" min="0" step="1" onchange="schemeFeeSave()" style="width:70px;padding:5px 7px;border-radius:5px;border:1px solid #2e3d52;background:#141d2b;color:#e6edf5;text-align:right;"><span style="color:#8FA0B8;font-size:11px;"> %</span></div>
           <div id="gf-example" style="font-size:11px;color:#4ade80;padding-bottom:6px;"></div>
         </div>
       </div>
@@ -18815,7 +18846,9 @@ function toggleMatOverlay() {
   window.schemeFeeSave = function(){
     var all = feeOverrides();
     var v = id => { var e = document.getElementById(id); var n = parseFloat(e && e.value); return isNaN(n) ? null : n; };
+    var d = SCHEME_FEE_DEFAULTS[cur] || {};
     all[cur] = { fixed: v('gf-fixed')||0, perMeasure: v('gf-per')||0, cap: v('gf-cap')||0 };
+    if (d.derived) { all[cur].derived = true; all[cur].upliftPct = v('gf-uplift')||0; }
     localStorage.setItem('planit_scheme_fees', JSON.stringify(all));
     grantsRender();
   };
@@ -18825,12 +18858,27 @@ function toggleMatOverlay() {
     var f = Object.assign({}, d, feeOverrides()[cur] || {});
     var set = (id, val) => { var e = document.getElementById(id); if (e) e.value = val; };
     set('gf-fixed', f.fixed); set('gf-per', f.perMeasure); set('gf-cap', f.cap);
+    var upWrap = document.getElementById('gf-uplift-wrap');
+    var fixedInputs = ['gf-fixed','gf-per','gf-cap'];
+    if (upWrap) upWrap.style.display = f.derived ? '' : 'none';
+    fixedInputs.forEach(function(id){
+      var el = document.getElementById(id); if (!el) return;
+      el.disabled = !!f.derived; el.style.opacity = f.derived ? 0.4 : 1;
+    });
+    set('gf-uplift', f.upliftPct != null ? f.upliftPct : 0);
     var ex = document.getElementById('gf-example');
     if (ex) {
-      var max = (f.fixed||0) + (f.cap||0)*(f.perMeasure||0);
-      ex.textContent = max > 0
-        ? 'Maximum fee: €' + max.toLocaleString('en-IE') + ' (VAT incl.)'
-        : 'No separate fee — provider price includes management';
+      if (f.derived) {
+        var c = Object.assign({}, SCHEME_FEE_DEFAULTS.ceg, feeOverrides().ceg || {});
+        var cmax = (c.fixed||0) + (c.cap||0)*(c.perMeasure||0);
+        ex.textContent = 'Maximum allowance: €' + Math.round(cmax*(1+(f.upliftPct||0)/100)).toLocaleString('en-IE') +
+                         ' (coordinator basis €' + cmax.toLocaleString('en-IE') + ' + ' + (f.upliftPct||0) + '%)';
+      } else {
+        var max = (f.fixed||0) + (f.cap||0)*(f.perMeasure||0);
+        ex.textContent = max > 0
+          ? 'Maximum fee: €' + max.toLocaleString('en-IE') + ' (VAT incl.)'
+          : 'No separate fee for this route';
+      }
     }
   }
 
