@@ -13925,9 +13925,11 @@ function _updateEUPDFBtns(isEU) {
   var wrap = document.getElementById('pdf-btn-wrap');
   if (!wrap) return;
   if (isEU) {
+    // One deliverable only. Page 1 is the customer summary and the evidence sits behind it,
+    // so a separate customer PDF would just be page 1 issued on its own — two versions of
+    // the same figures that can drift apart.
     wrap.innerHTML =
-      '<button onclick="exportPDF()" title="Simple customer-facing PDF" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
-      '<button onclick="exportEUPDF(\'detailed\')" title="Detailed PDF with methodology and pricing breakdown" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Detailed PDF</button>';
+      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Retrofit Cost Plan (PDF)</button>';
   } else {
     wrap.innerHTML =
       '<button id="pdf-download-btn" onclick="exportCompactPDF()" title="1–2 page customer summary — same format as Energy Upgrade" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
@@ -14402,7 +14404,7 @@ function exportEUPDF(mode) {
 function exportCompactPDF() {
   if (!BOQ) return;
   var b = BOQ, pi = b.projectInfo || {}, su = b.summary || {};
-  if (pi.type === 'Energy Upgrade') { exportEUPDF('customer'); return; }
+  if (pi.type === 'Energy Upgrade') { exportEUPDF('detailed'); return; }
   var sections = b.sections || [];
   var grants   = b.grants || [];
   var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
@@ -15597,9 +15599,9 @@ function showToast(msg) {
 // ── EXPORT PDF ────────────────────────────────────────────────────────────────
 function exportPDF() {
   if (!BOQ) return;
-  // Standalone Energy Upgrade uses the dedicated EU customer PDF
+  // Standalone Energy Upgrade has one deliverable — the Retrofit Cost Plan
   if (BOQ.projectInfo && BOQ.projectInfo.type === 'Energy Upgrade') {
-    exportEUPDF('customer');
+    exportEUPDF('detailed');
     return;
   }
   const b  = BOQ;
