@@ -54,7 +54,11 @@ The result is alignment. The assessor's advice, the contractor's quote, the home
 | When the grant lands | Deducted from the price | Project-specific | After completion — the homeowner funds the gross first |
 | Management charge | Inside the provider's single price | Itemised by the coordinator | None; the homeowner does the administration |
 
-Running a retrofit and claiming the grants costs money, and the plan prices it rather than hiding it. On a typical CEG project that is a **€4,600 administration charge against a €2,000 project management grant** — a €2,600 net cost a homeowner comparing grant totals alone would never see. A One Stop Shop does not itemise it, so the plan carries an allowance above the coordinator basis; that uplift is a working assumption, labelled provisional on every plan, and evidencing it is a specific job of the pilot.
+CEG and Better Energy Homes price the same works identically. CEG then covers what Better Energy Homes does not — ventilation, rafter-level roof insulation, airtightness and a project management grant — against a requirement that every home improves by at least 100 kWh/m²/year, which is why it suits larger coordinated projects rather than one-off measures.
+
+Running a retrofit and claiming the grants costs money, and the plan prices it rather than hiding it. On a typical CEG project that is a **€4,600 administration charge against a €2,000 project management grant** — a €2,600 net cost a homeowner comparing grant totals alone would never see. A One Stop Shop does not itemise that charge at all; it sits inside a single all-in price.
+
+**A note on the One Stop Shop uplift.** A One Stop Shop carries the same management cost a coordinator would, and claims the same grants against it. What differs is the works: one provider carrying the whole job prices above a coordinated project where contractors are still competing against each other. The plan therefore adds an uplift to the works — currently **12.5%, the midpoint of an expected 10–15% range** — before the management cost, which puts the route roughly 11–12% above CEG on a typical whole-house upgrade. That is a working assumption, not a finding: it is labelled provisional on every plan, adjustable in the rate settings, and establishing the real figure — whether it is one figure at all, or moves with measure mix and project size — is a named job of the pilot. Better to show the assumption and have it corrected than to leave the comparison out and let homeowners assume the routes cost the same.
 
 ---
 

@@ -6091,15 +6091,18 @@ function cegRatesConfirmed() {
 // fixed charge plus a charge per grant measure, capped at a number of measures.
 // Figures are quoted VAT-inclusive, as coordinators quote them, and are NOT subject to
 // contractor's overhead, profit or contingency: this is a professional fee, not works.
-// One Stop Shops quote a single all-in price with management embedded, so the default
-// is nil and the plan says so. Editable in Rate Settings → SEAI Grants.
-// A One Stop Shop does not itemise this — it is inside their single all-in price — but the
-// route has to be comparable, so it is carried as an allowance derived from the coordinator
-// fee basis plus an uplift, reflecting that a single provider running everything prices above
-// a coordinator model where contractors are still competing. The uplift is provisional and
-// is one of the things the pilot is intended to evidence.
+// Running a retrofit and claiming the grants costs money. A Project Coordinator itemises it;
+// a One Stop Shop does not, because it sits inside their single all-in price. The routes still
+// have to be comparable, so the One Stop Shop allowance is built from the coordinator basis
+// plus an uplift on the coordinated total — a single provider carrying the whole job prices
+// above a coordinator model where contractors are still competing against each other.
+// The uplift is provisional and evidencing it is one of the jobs of the pilot.
 var SCHEME_FEE_DEFAULTS = {
-  oss: { fixed: 0,    perMeasure: 0,   cap: 6, derived: true, upliftPct: 15 },
+  // 12.5% is the midpoint of the 10–15% range this is expected to fall in, applied to the
+  // coordinated (CEG) total so the One Stop Shop lands that far above the CEG route on the
+  // same works. Against Better Energy Homes the gap is wider, because under BEH nobody is
+  // paid to manage the job at all — the homeowner does it.
+  oss: { upliftPct: 12.5, derived: true },
   ceg: { fixed: 2500, perMeasure: 350, cap: 6 },
   beh: { fixed: 0,    perMeasure: 0,   cap: 6 },
 };
@@ -6122,19 +6125,24 @@ function schemeFeeMeasureCount(grants) {
 
 // Returns { amount, fixed, perMeasure, measures, capped, derived, upliftPct, base }.
 // Amount is VAT-inclusive.
-function euSchemeFee(scheme, grants) {
+function euSchemeFee(scheme, grants, worksTotal) {
   var k = seaiScheme(scheme);
   var f = schemeFeeSettings(scheme);
   var n = schemeFeeMeasureCount(grants);
   if (f.derived) {
-    // Allowance for a route that prices all-in: coordinator fee basis plus an uplift.
-    var c  = schemeFeeSettings('ceg');
-    var cn = Math.min(n, c.cap != null ? c.cap : n);
-    var base = (c.fixed || 0) + cn * (c.perMeasure || 0);
-    var up = f.upliftPct != null ? f.upliftPct : 0;
-    return { amount: Math.round(base * (1 + up / 100)), base: Math.round(base), upliftPct: up,
-             measures: cn, total: n, capped: n > cn, derived: true,
-             fixed: c.fixed || 0, perMeasure: c.perMeasure || 0 };
+    // Priced all-in by a single provider. A One Stop Shop still carries the same management
+    // cost a coordinator would charge — and claims the same grants against it — so the
+    // allowance is that coordinator basis plus the uplift. The uplift is taken on the works
+    // themselves, i.e. the CEG figure before the management cost is added.
+    var c     = schemeFeeSettings('ceg');
+    var cn    = Math.min(n, c.cap != null ? c.cap : n);
+    var cFee  = (c.fixed || 0) + cn * (c.perMeasure || 0);
+    var pct   = f.upliftPct != null ? f.upliftPct : 0;
+    var works = worksTotal || 0;
+    return { amount: Math.round(cFee + works * pct / 100), upliftPct: pct,
+             base: Math.round(works), coordFee: Math.round(cFee),
+             measures: cn, total: n, capped: n > cn,
+             derived: true, fixed: c.fixed || 0, perMeasure: c.perMeasure || 0 };
   }
   var billable = Math.min(n, f.cap != null ? f.cap : n);
   var amount = (f.fixed || 0) + billable * (f.perMeasure || 0);
@@ -13383,7 +13391,7 @@ function buildReport() {
   var _hdrTotal = su.total, _hdrNet = su.netTotal;
   if (pi.type === 'Energy Upgrade') {
     if ((BOQ.grants || []).some(function(g){ return g.measureKey === 'ber' && !g.ossExclusive; })) _hdrTotal += 300;
-    _hdrTotal += euSchemeFee(pi.grantScheme, BOQ.grants).amount;
+    _hdrTotal += euSchemeFee(pi.grantScheme, BOQ.grants, _hdrTotal).amount;
     _hdrNet = Math.max(0, _hdrTotal - (su.grantsTotal || 0));
   }
   document.getElementById('rpt-total').textContent = fmt(_hdrTotal);
@@ -13784,7 +13792,7 @@ function renderEUTable(b) {
   }
 
   // Scheme management & grant administration fee (managed routes)
-  var _fee = euSchemeFee(BOQ.projectInfo.grantScheme, grants);
+  var _fee = euSchemeFee(BOQ.projectInfo.grantScheme, grants, totalEst);
   if (_fee.amount > 0) {
     totalEst += _fee.amount;
     rowNum++;
@@ -13800,7 +13808,7 @@ function renderEUTable(b) {
         '<td class="eu-c-basis"><ul class="eu-pb-list">' +
           (_fee.derived
             ? '<li>Included in the provider\'s all-in price</li>' +
-              '<li>Allowance: coordinator basis '+fmt(_fee.base)+' + '+_fee.upliftPct+'%</li>' +
+              '<li>Coordinator basis '+fmt(_fee.coordFee)+' + '+_fee.upliftPct+'% of works ('+fmt(_fee.base)+')</li>' +
               '<li>Provisional &mdash; to be evidenced in pilot</li>'
             : '<li>Fixed charge: '+fmt(_fee.fixed)+'</li>' +
               '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
@@ -13835,6 +13843,11 @@ function renderEUTable(b) {
   }
 
   var netTotal = Math.max(0, totalEst - totalGrts);
+  // The table adds up rounded row figures; the header adds up before rounding, which can
+  // leave the two a euro or two apart. The table is what the customer reads line by line,
+  // so it is the authority — publish it and let the header resync to it.
+  BOQ._euTableTotal = totalEst;
+  BOQ._euTableNet   = netTotal;
 
   tbodyRows +=
     '<tr class="eu-total-row">' +
@@ -14031,13 +14044,13 @@ function exportEUPDF(mode) {
   }
 
   // Scheme management & grant administration fee (managed routes)
-  var pdfFee = euSchemeFee(pi.grantScheme, grants);
+  var pdfFee = euSchemeFee(pi.grantScheme, grants, totalEst);
   if (pdfFee.amount > 0) {
     totalEst += pdfFee.amount;
     rowNum++;
     var feeBasis = pdfFee.derived
-      ? '&bull; Included in the provider\'s all-in price<br>&bull; Allowance: coordinator basis '+fmt(pdfFee.base)+
-        ' + '+pdfFee.upliftPct+'%<br>&bull; Provisional — to be evidenced in pilot'
+      ? '&bull; Included in the provider\'s all-in price<br>&bull; Coordinator basis '+fmt(pdfFee.coordFee)+
+        ' + '+pdfFee.upliftPct+'% of works ('+fmt(pdfFee.base)+')<br>&bull; Provisional — to be evidenced in pilot'
       : '&bull; Fixed charge: '+fmt(pdfFee.fixed)+'<br>&bull; '+pdfFee.measures+
         ' grant measures &times; '+fmt(pdfFee.perMeasure)+(pdfFee.capped?' (capped)':'')+
         '<br>&bull; VAT included — professional fee, not works';
@@ -14320,6 +14333,7 @@ function exportEUPDF(mode) {
       '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:' +
       (_conf ? '#F0FDF4;border:1px solid #BBF7D0;color:#166534;' : '#FFFBEB;border:1px solid #FDE68A;color:#92400E;') + '">' +
       '<strong>Community Energy Grant — grant figures are project-specific.</strong> ' +
+      'Every home in a CEG project must achieve a primary-energy improvement of at least 100 kWh/m²/year. ' +
       (_conf
         ? 'The amounts shown use the rates supplied by your Project Coordinator. Final grant support remains subject to the approved project and written confirmation.'
         : 'CEG does not publish a fixed grant table. The amounts shown are indicative, based on One Stop Shop values, and will be confirmed in writing by the Project Coordinator once the dwelling, measures, BER uplift and eligible costs have been assessed.') +
@@ -15017,6 +15031,15 @@ function renderAccordionReport() {
   if (_ptype === 'Energy Upgrade') {
     var _euWrap = document.getElementById('boq-accordion-wrap');
     if (_euWrap) _euWrap.innerHTML = renderEUTable(BOQ);
+    // Header follows the table exactly — see BOQ._euTableTotal in renderEUTable()
+    if (BOQ._euTableTotal != null) {
+      var _tEl = document.getElementById('rpt-total');
+      if (_tEl) _tEl.textContent = fmt(BOQ._euTableTotal);
+      var _sEl = document.getElementById('rpt-total-sub');
+      if (_sEl && (BOQ.grants || []).length) {
+        _sEl.textContent = 'Prelims · Contingency · VAT 13.5% incl. · Net after SEAI grants: ' + fmt(BOQ._euTableNet);
+      }
+    }
     _updateEUPDFBtns(true);
     return;
   }
@@ -18871,8 +18894,9 @@ function toggleMatOverlay() {
       if (f.derived) {
         var c = Object.assign({}, SCHEME_FEE_DEFAULTS.ceg, feeOverrides().ceg || {});
         var cmax = (c.fixed||0) + (c.cap||0)*(c.perMeasure||0);
-        ex.textContent = 'Maximum allowance: €' + Math.round(cmax*(1+(f.upliftPct||0)/100)).toLocaleString('en-IE') +
-                         ' (coordinator basis €' + cmax.toLocaleString('en-IE') + ' + ' + (f.upliftPct||0) + '%)';
+        ex.textContent = 'Coordinator basis up to €' + cmax.toLocaleString('en-IE') +
+                         ', plus ' + (f.upliftPct||0) + '% of the works — the same management cost ' +
+                         'as CEG, with the uplift taken on the works before that cost is added.';
       } else {
         var max = (f.fixed||0) + (f.cap||0)*(f.perMeasure||0);
         ex.textContent = max > 0
