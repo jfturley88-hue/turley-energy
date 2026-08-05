@@ -24,11 +24,11 @@ Ireland has committed to retrofitting **500,000 homes to B2 or better by 2030** 
 
 **1. It gives a credible number.** An itemised budget built from the geometry the assessor already measured, using county-adjusted labour and current Irish material pricing, fully loaded (overhead and profit 12%, contingency 10%, VAT 13.5%; Solar PV 0%). Heat pumps are sized from the Heat Loss Indicator to IS EN 12831, not estimated from floor area.
 
-**2. It gives everyone the same reference point.** Costs are set out independently of anyone selling the works, with grants deducted line by line. The homeowner can judge a quote; the contractor prices a defined scope that every competitor is pricing too, with a published rate basis to stand over their figure.
+**2. It gives everyone the same reference point.** Costs are set out independently of anyone selling the works, with grants deducted line by line, on a rate basis that is published rather than asserted.
 
 **3. It closes the gap between advice and action.** Produced from the survey already done — no return visit, no re-measuring — and issued with the BER documentation as part of the same job.
 
-The result is alignment. The assessor's advice, the contractor's quote, the homeowner's budget, the lender's file and SEAI's grant all reference the same scope and the same published rates. Disputes fall because there is something agreed to point at. That is a benefit to the sector, not a feature of a product, and it is why SEAI's endorsement matters more than any marketing on our side.
+The result is alignment: advice, quote, budget, loan file and grant all referencing the same scope and the same rates, so disputes fall because there is something agreed to point at. That is a benefit to the sector rather than a feature of a product, and it is why SEAI's endorsement matters more than any marketing on our side.
 
 **The document.** Page 1 is the homeowner's summary — one row per measure with scope, cost, grant and net, plus an actual-spend column for tracking works. The pages behind it are the evidence: the loading methodology totalling exactly to the headline, and an itemised appendix down to unit rates. Both stay in one document so they can never drift apart.
 
@@ -37,28 +37,20 @@ The result is alignment. The assessor's advice, the contractor's quote, the home
 | **PRODUCES THE COST PLAN** | |
 | **BER Assessors** | Add a costed plan to the advice they already give, issued with the BER documentation. Uses the survey already carried out; no return visit. |
 | **RELIES ON IT** | |
-| **Homeowners** | Understand the real cost before engaging anyone; compare quotes against an independent benchmark. |
-| **Contractors** | Quote a defined scope every competitor is pricing too. Fewer wasted site visits, fewer scope disputes. |
-| **One Stop Shops & CEG Coordinators** | Price and pre-qualify projects on a common basis. Under CEG, where several contractors price one project, a shared scope is what makes them comparable. |
+| **Homeowners and Project Coordinators** | Homeowners see the real cost before engaging anyone and can judge a quote against an independent benchmark. Coordinators price and pre-qualify projects on that same basis — under CEG, where several contractors price one project, a shared scope is what makes them comparable. |
+| **Contractors quoting for Better Energy Homes, CEG and One Stop Shop** | The same defined scope in front of every competitor pricing the job. Fewer wasted site visits, fewer scope disputes, and no losing work to a quote that only looks cheaper. |
+| **Better Energy Homes, CEG and One Stop Shop** | One scope and one set of rates sitting behind an application, whichever route the homeowner takes. |
 | **Banks & Credit Unions** | A consistent, contractor-independent cost document for green loan applications. |
 | **Local Authorities & AHBs** | Bulk estimation and budget forecasting for estate programmes. |
 | **SEAI** | Real-market cost evidence to calibrate grant rates, and a consistent way to show homeowners what an upgrade costs. |
 
-**The three routes.** A homeowner reaches the same works one of three ways, and the Cost Plan prices all three so the choice can be made on evidence.
-
-| | One Stop Shop | Community Energy Grant | Better Energy Homes |
-|---|---|---|---|
-| Who applies | One Stop Shop | Project Coordinator | Homeowner |
-| Who does the work | One company, start to finish | Several contractors in an approved project | Contractors the homeowner appoints |
-| Grant values | SEAI published table | Project-specific | SEAI published table |
-| When the grant lands | Deducted from the price | Project-specific | After completion — the homeowner funds the gross first |
-| Management charge | Inside the provider's single price | Itemised by the coordinator | None; the homeowner does the administration |
+**The three routes.** A homeowner reaches the same works one of three ways — a One Stop Shop delivering everything through one company, a CEG project where a coordinator runs several contractors, or Better Energy Homes where the homeowner appoints contractors and does the administration themselves. The Cost Plan prices all three, so the choice can be made on evidence rather than on which grant total looks largest.
 
 CEG and Better Energy Homes price the same works identically. CEG then covers what Better Energy Homes does not — ventilation, rafter-level roof insulation, airtightness and a project management grant — against a requirement that every home improves by at least 100 kWh/m²/year, which is why it suits larger coordinated projects rather than one-off measures.
 
 Running a retrofit and claiming the grants costs money, and the plan prices it rather than hiding it. On a typical CEG project that is a **€4,600 administration charge against a €2,000 project management grant** — a €2,600 net cost a homeowner comparing grant totals alone would never see. A One Stop Shop does not itemise that charge at all; it sits inside a single all-in price.
 
-**A note on the One Stop Shop uplift.** A One Stop Shop carries the same management cost a coordinator would, and claims the same grants against it. What differs is the works: one provider carrying the whole job prices above a coordinated project where contractors are still competing against each other. The plan therefore adds an uplift to the works — currently **12.5%, the midpoint of an expected 10–15% range** — before the management cost, which puts the route roughly 11–12% above CEG on a typical whole-house upgrade. That is a working assumption, not a finding: it is labelled provisional on every plan, adjustable in the rate settings, and establishing the real figure — whether it is one figure at all, or moves with measure mix and project size — is a named job of the pilot. Better to show the assumption and have it corrected than to leave the comparison out and let homeowners assume the routes cost the same.
+**A note on the One Stop Shop uplift.** A One Stop Shop carries the same management cost a coordinator would and claims the same grants against it. What differs is the works: one provider carrying the whole job prices above a coordinated project where contractors are still competing. The plan adds an uplift to the works before that management cost — currently **12.5%, the midpoint of an expected 10–15% range** — which puts the route roughly 11–12% above CEG on a whole-house upgrade. That figure is a working assumption, not a finding. It is labelled provisional on every plan and adjustable in the rate settings, and establishing the real one is a named job of the pilot. We would rather show the assumption and have it corrected than leave the comparison out and let homeowners assume the routes cost the same.
 
 ---
 
@@ -67,7 +59,7 @@ Running a retrofit and claiming the grants costs money, and the plan prices it r
 It turns the stated accuracy (±15–20%) into published evidence, tunes the rates and grant tables against real prices, and completes the remaining development — so what SEAI is asked to recognise has been proven first.
 
 - **Validate accuracy.** 50–100 live projects against real contractor quotes, across dwelling types, age bands, counties and all three routes. Publish the error distribution per measure, not an average.
-- **Tune the rate book and grant tables.** Correct what prices high or low, dated and recorded. Test CEG with real coordinator rates rather than assumed ones.
+- **Tune the rate book and grant tables.** Correct what prices high or low, dated and recorded. Test CEG against real coordinator rates rather than assumed ones, and establish what a One Stop Shop actually charges over a coordinated project — the two figures currently carried as working assumptions.
 - **Prove the assessor workflow.** A Cost Plan produced from the existing survey, without a return visit or specialist QS knowledge, issued with the BER documentation.
 - **Capture the first actual-cost dataset.** Estimated-versus-actual per measure and per county — a record that exists nowhere in the programme today.
 - **Complete the development.** Energy Upgrade is ready now; Refurbishment and New Build share the same engine and follow behind it.
@@ -82,9 +74,9 @@ It turns the stated accuracy (±15–20%) into published evidence, tunes the rat
 
 ## 4. What it can become
 
-Ireland completes roughly 100,000 assessments a year and almost none leave the homeowner with a credible number. Recognition would make the Retrofit Cost Plan the consistent format in which that number is given nationwide — the examples in this pack are drawn from two counties at opposite ends of the labour-cost range to show the same specification correctly regionalised.
+Ireland completes roughly 100,000 assessments a year and almost none leave the homeowner with a credible number. Recognition would make the Retrofit Cost Plan the consistent format in which that number is given nationwide — the examples in this pack come from two counties at opposite ends of the labour-cost range, to show the same specification correctly regionalised.
 
-At scale the estimated-versus-actual dataset becomes a live index of retrofit costs by measure, dwelling type and county: the reference SEAI needs to calibrate grant rates and demonstrate value for money. Beyond that, SEAI's eligibility rules can be built into the method so a plan that prices a grant is a plan that qualifies for it; and the Cost Plan becomes the standard cost document for retrofit lending, which banks currently lack.
+At scale the estimated-versus-actual dataset becomes a live index of retrofit costs by measure, dwelling type and county: the reference SEAI needs to calibrate grant rates and demonstrate value for money. Beyond that, SEAI's eligibility rules can be built into the method, so a plan that prices a grant is a plan that qualifies for it — and the Cost Plan becomes the standard cost document for retrofit lending that banks currently lack.
 
 **The path we propose:**
 
