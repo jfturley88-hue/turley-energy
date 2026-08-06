@@ -7834,8 +7834,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   if (has('wall_cavity')) {
     var cavR    = WALL_BUNDLE_RATES.cavity[inputs.cavity_type] || WALL_BUNDLE_RATES.cavity['eps-bead'];
     var cavArea = inputs.cavity_area || netWallArea;
-    var cavNames = { 'eps-bead':'blown EPS bead', 'mineral-wool':'blown mineral wool (fire-rated)', 'walltite':'Walltite spray foam' };
-    var cavDesc = 'Cavity fill — ' + (cavNames[inputs.cavity_type || 'eps-bead'] || 'blown EPS bead');
+    var cavDesc = 'Cavity fill — ' + euLabel(inputs.cavity_type || 'eps-bead', 'cavity_type');
     if (inputs.cavity_type === 'walltite') cavDesc += ' — NOTE: confirm mortgage lender acceptance';
     var cavItems = [mkItem('2.1', cavDesc, 'm²', cavArea, cavR.mat, lM(cavR.lab / 22, L.craft), 'BBA-certified, holes made good')];
     if (inputs.cavity_makegood) {
@@ -7858,7 +7857,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var ewiMg     = inputs.ewi_makegood ? MAKE_GOOD_WALL_RATE * 1.5 : 0;
     var ewiMatR   = ewiBase.mat + ewiThkAdj + ewiRndAdd.mat + ewiMg;
     var ewiLabR   = Math.round(ewiBase.lab * ewiRndAdd.labMult);
-    var ewiDesc   = 'External wall insulation — ' + ewiIns + ' ' + ewiThk + 'mm + ' + ewiRnd + ' render' +
+    var ewiDesc   = 'External wall insulation — ' + euLabel(ewiIns, 'ewi_insulation') + ' ' + ewiThk + 'mm + ' + euLabel(ewiRnd, 'ewi_render') +
       ' (bundle: insulation, render system, reveal liners' +
       (inputs.ewi_makegood ? ', making good' : '') + ')' +
       (ewiPeaks > 0 ? ' [incl. ' + ewiPeaks + ' gable peak' + (ewiPeaks > 1 ? 's' : '') + ']' : '');
@@ -7876,7 +7875,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var iwiR    = WALL_BUNDLE_RATES.iwi[inputs.iwi_type] || WALL_BUNDLE_RATES.iwi['pir-dab'];
     var iwiArea = inputs.iwi_area || netWallArea;
     var iwiItems = [
-      mkItem('IWI.1', 'PIR insulated board \u2014 ' + (inputs.iwi_type || 'pir-dab'), 'm\u00b2', iwiArea, iwiR.mat, lM(iwiR.lab / 22, L.craft), 'Knauf or Xtratherm: PIR + 12.5mm plasterboard facing'),
+      mkItem('IWI.1', 'PIR insulated board \u2014 ' + euLabel(inputs.iwi_type || 'pir-dab', 'iwi_type'), 'm\u00b2', iwiArea, iwiR.mat, lM(iwiR.lab / 22, L.craft), 'Knauf or Xtratherm: PIR + 12.5mm plasterboard facing'),
       mkItem('IWI.2', 'Perimeter airtightness tape at floor & ceiling junctions', 'm', iwiArea * 0.5, 3.5, lM(0.15, L.craft), 'Pro Clima Tescon or equivalent \u2014 critical for airtightness'),
     ];
     if (inputs.iwi_makegood) {
@@ -7922,7 +7921,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rcTier = inputs.roof_ceiling_type || 'mw-300';
     var rcR = ROOF_BUNDLE_RATES.ceiling[rcTier] || ROOF_BUNDLE_RATES.ceiling['mw-300'];
     var rcMg = inputs.roof_ceiling_makegood ? MAKE_GOOD_ROOF_RATE : 0;
-    var rcDesc = 'Ceiling-level insulation top-up — ' + rcTier +
+    var rcDesc = 'Ceiling-level insulation top-up — ' + euLabel(rcTier, 'roof_ceiling_type') +
       ' (bundle: insulation, fixings, access boards' +
       (inputs.roof_ceiling_makegood ? ', making good)' : ')');
     sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A',
@@ -7936,7 +7935,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rrSys = inputs.roof_rafter_system || 'between-below';
     var rrR = ROOF_BUNDLE_RATES.rafter[rrSys] || ROOF_BUNDLE_RATES.rafter['between-below'];
     var rrMg = inputs.roof_rafter_makegood ? MAKE_GOOD_ROOF_RATE : 0;
-    var rrDesc = 'Rafter-level insulation \u2014 ' + rrSys + ' (' +
+    var rrDesc = 'Rafter-level insulation \u2014 ' + euLabel(rrSys, 'roof_rafter_system') + ' (' +
       (inputs.roof_rafter_thick || '150') + 'mm bundle: insulation, fixings, trims' +
       (inputs.roof_rafter_makegood ? ', making good)' : ')');
     sections.push({ id: String(sid++), title: 'ROOF INSULATION \u2014 RAFTER LEVEL (WARM ROOF)', part: 'A',
@@ -7952,7 +7951,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rfSys = inputs.roof_flat_system || 'overlay-epdm';
     var rfR = ROOF_BUNDLE_RATES.flat[rfSys] || ROOF_BUNDLE_RATES.flat['overlay-epdm'];
     var rfMg = inputs.roof_flat_makegood ? MAKE_GOOD_ROOF_RATE : 0;
-    var rfDesc = 'Flat roof insulation \u2014 ' + rfSys + ' (' +
+    var rfDesc = 'Flat roof insulation \u2014 ' + euLabel(rfSys, 'roof_flat_system') + ' (' +
       (inputs.roof_flat_thick || '150') + 'mm bundle: insulation, membrane, trims' +
       (inputs.roof_flat_makegood ? ', making good)' : ')');
     sections.push({ id: String(sid++), title: 'FLAT ROOF INSULATION \u2014 WARM DECK', part: 'A',
@@ -7968,8 +7967,8 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rroomSys = inputs.roof_room_type || 'pir-mw';
     var rroomR = ROOF_BUNDLE_RATES.room[rroomSys] || ROOF_BUNDLE_RATES.room['pir-mw'];
     var rroomMg = inputs.roof_room_makegood ? MAKE_GOOD_ROOF_RATE : 0;
-    var rroomDesc = 'Room-in-roof insulation \u2014 ' + rroomSys +
-      ' (' + (inputs.roof_room_approach || 'sloped-flat') + ' bundle: insulation, vapour control' +
+    var rroomDesc = 'Room-in-roof insulation \u2014 ' + euLabel(rroomSys, 'roof_room_type') +
+      ' (' + euLabel(inputs.roof_room_approach || 'sloped-flat', 'roof_room_approach') + ' bundle: insulation, vapour control' +
       (inputs.roof_room_makegood ? ', making good)' : ')');
     sections.push({ id: String(sid++), title: 'ROOM-IN-ROOF INSULATION', part: 'A',
       items: [
@@ -7995,7 +7994,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var fThk  = inputs.floor_thick  || '150';
     var fR    = FLOOR_BUNDLE_RATES[fSys] || FLOOR_BUNDLE_RATES['solid-overlay'];
     var fMg   = inputs.floor_makegood ? 6 : 0;
-    var fDesc = 'Ground floor insulation — ' + fSys + ' (' + fThk + 'mm bundle: insulation, fixings, vapour barrier' +
+    var fDesc = 'Ground floor insulation — ' + euLabel(fSys, 'floor_system') + ' (' + fThk + 'mm bundle: insulation, fixings, vapour barrier' +
       (inputs.floor_makegood ? ', making good, perimeter strips' : '') + ')';
     sections.push({ id: String(sid++), title: 'FLOOR INSULATION', part: 'A',
       items: [ mkItem('4.1', fDesc, 'm²', fArea, fR.mat + fMg, lM(fR.lab / 22, L.craft), 'Bundled floor insulation installation') ]
@@ -8468,7 +8467,7 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
   if (has('led_lighting')) {
     var ledNr   = Math.round(fa / 8);
     var ledMat  = inputs.led_type === 'pendant' ? 65 : inputs.led_type === 'batten' ? 35 : 45;
-    var ledDesc = 'LED ' + (inputs.led_type === 'pendant' ? 'pendant/decorative' : inputs.led_type === 'batten' ? 'batten surface' : 'IP65 downlight') + ' fittings (supply & install throughout)';
+    var ledDesc = euLabel(inputs.led_type || 'downlight', 'led_type') + ' fittings (supply & install throughout)';
     var ledItems = [mkItem('LED.1', ledDesc, 'nr', ledNr, ledMat, lM(0.5, L.electrician), 'Full dwelling — all habitable rooms & circulation')];
     if (inputs.led_smart) {
       ledItems.push(mkItem('LED.2','Smart dimmable controls (Zigbee hub + smart switches)','item',1,480,lM(4,L.electrician),'App-controlled dimming & scene setting throughout'));
@@ -13546,6 +13545,104 @@ function _euMeasureKey(s) {
   return null;
 }
 
+// ── PRICING BASIS DISPLAY LABELS ──────────────────────────────────────────────
+// The Pricing Basis column is read by homeowners, lenders and contractors, so it must
+// never print a raw option value ('mw-300', 'between-below', 'upvc').
+//
+// IMPORTANT: these are DISPLAY labels only. The values on the left are the keys the rate
+// tables look up and the keys readEUSelector returns — changing any of them breaks the
+// costings. Only the text on the right is printed.
+var EU_OPTION_LABELS = {
+  // Cavity fill
+  'eps-bead':'Blown EPS bead', 'mineral-wool':'Blown mineral wool', 'walltite':'Walltite spray foam',
+  // External wall insulation — boards and renders
+  'eps':'EPS', 'pir':'PIR', 'phenolic':'Phenolic foam', 'mineral':'Mineral render',
+  'silicone':'Silicone render', 'acrylic':'Acrylic render', 'brick-slip':'Brick slip feature',
+  'stone':'Stone finish',
+  // Internal wall insulation
+  'pir-dab':'PIR board, dab-fixed', 'pir-mech':'PIR board, mechanically fixed',
+  'mineral-board':'Mineral wool board, dab-fixed',
+  // Roof — ceiling level
+  'mw-300':'Mineral wool 300mm', 'mw-400':'Mineral wool 400mm', 'cell-300':'Cellulose blown 300mm',
+  // Roof — rafter level / room in roof
+  'between-below':'Between and below rafters', 'above-deck':'Above-deck warm roof',
+  'sloped-board':'Sloped board insulation', 'hybrid':'PIR and mineral wool hybrid',
+  'pir-mw':'PIR between rafters, mineral wool to flat ceiling',
+  'sloped-only':'Sloped portion only', 'sloped-flat':'Sloped and flat ceiling combined',
+  // Roof — flat
+  'overlay-grp':'Warm-deck overlay, GRP', 'overlay-epdm':'Warm-deck overlay, EPDM',
+  'tapered':'Tapered insulation',
+  // Floor
+  'solid-overlay':'Solid slab — over-floor insulation', 'solid-breakout':'Solid slab — break out and re-screed',
+  'suspended-mineral':'Suspended timber — mineral wool between joists',
+  'suspended-rigid':'Suspended timber — rigid board between joists',
+  'suspended-spray':'Suspended timber — spray foam to underside',
+  'pir-150':'PIR boards 150mm', 'spray-foam':'Spray foam, open cell',
+  // Windows and doors
+  'upvc':'uPVC', 'alu-clad':'Aluminium-clad timber', 'aluminium':'Aluminium', 'hardwood':'Hardwood',
+  'casement':'Casement / tilt-and-turn', 'sash':'Vertical sliding sash', 'fixed':'Fixed lights',
+  'sliding-patio':'Sliding patio / bi-fold', 'composite':'Composite',
+  'timber':'Timber', 'timber-frame':'Timber frame',
+  'double':'Double glazed', 'triple':'Triple glazed',
+  // Heat pumps and emitters
+  'rads':'New low-temperature radiators', 'keep-rads':'Retain existing radiators',
+  'ufh':'Underfloor heating throughout', 'ufh-rads':'Underfloor heating ground floor, radiators above',
+  'vertical':'Vertical boreholes', 'horizontal':'Horizontal slinky',
+  // Existing system being removed / retained
+  'oil':'Oil boiler', 'gas':'Gas boiler', 'lpg':'LPG boiler', 'solid':'Solid fuel range',
+  'storage':'Storage heaters', 'back-boiler':'Back boiler and fireplace',
+  'oil-tank':'Oil boiler and tank', 'lpg-tank':'LPG boiler and tank', 'none':'Nothing to remove',
+  'combi':'Combi, no cylinder', 'system':'System, with cylinder',
+  // Ventilation
+  'radial':'Radial semi-rigid ducting', 'rigid':'Rigid galvanised ducting',
+  'humidity':'Humidity-sensing', 'continuous':'Continuous low-rate', 'timer':'Timer-controlled',
+  'ceiling':'Ceiling-mounted', 'wall':'Through-wall',
+  // Solar PV
+  'mono':'Monocrystalline', 'all-black':'All-black monocrystalline', 'bifacial':'Bifacial monocrystalline',
+  'south':'South', 'south-east':'South-East', 'south-west':'South-West', 'east-west':'East / West split',
+  // Solar thermal / hot water
+  'twin-coil':'New 300L twin-coil cylinder', 'existing':'Connect to existing cylinder',
+  // Airtightness
+  'intello':'Intello Plus', 'majrex':'Siga Majrex',
+  // Electrical
+  'dual-rcd':'Dual-RCD', 'rcbo':'RCBO per circuit',
+  'downlight':'IP65 LED downlights', 'batten':'LED batten', 'pendant':'LED pendant',
+  'pod-point':'Pod Point', 'zappi':'myenergi Zappi', 'ohme':'Ohme', 'andersen':'Andersen A2',
+  // Biomass storage
+  'integrated':'Integrated hopper', 'bulk':'Bulk store room', 'external':'External pellet silo',
+  // Tiers
+  'basic':'Basic', 'standard':'Standard', 'mid':'Mid-range', 'premium':'Premium',
+};
+
+// A handful of values mean different things in different bundles (a '200' cylinder is not a
+// '200mm' board; a 'basic' membrane is not a 'basic' MVHR unit). Field-scoped labels win.
+var EU_OPTION_LABELS_BY_FIELD = {
+  airtight_membrane: { 'basic':'Basic polyethylene', 'standard':'Standard reinforced' },
+  mvhr_unit:         { 'basic':'Basic', 'standard':'Standard', 'premium':'Premium' },
+  airAirTier:        { 'standard':'Standard', 'premium':'Premium multi-zone' },
+  ewi_insulation:    { 'mineral-wool':'Mineral wool' },
+  hybrid_fuel:       { 'gas':'Gas', 'oil':'Oil', 'lpg':'LPG' },
+};
+
+// Turns an option value into something a customer can read. Anything not in the map falls
+// back to title case with hyphens as spaces, so a raw slug can never reach the page even if
+// a new option is added and the map is not updated. Numbers, units and already-formatted
+// text pass through untouched.
+function euLabel(value, field) {
+  if (value === null || value === undefined) return '';
+  var v = String(value).trim();
+  if (!v) return '';
+  // Numbers and anything carrying a unit or sentence punctuation is already readable
+  if (/^[\d.,]+$/.test(v) || /[\s(),/°]/.test(v) || /\d\s*(mm|m²|m2|kw|kwh|l|nr|w\/m)/i.test(v)) return v;
+  var scoped = field && EU_OPTION_LABELS_BY_FIELD[field];
+  if (scoped && scoped[v]) return scoped[v];
+  if (EU_OPTION_LABELS[v]) return EU_OPTION_LABELS[v];
+  // Fallback: 'some-new-value' → 'Some new value'
+  var words = v.replace(/[-_]+/g, ' ').trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+window.euLabel = euLabel;
+
 // Derives human-readable pricing basis bullets from section items + stored inputs
 function _euPricingBasis(s, inp) {
   inp = inp || {};
@@ -13561,57 +13658,56 @@ function _euPricingBasis(s, inp) {
     pb.push('Programme: ~'+Math.max(6,Math.round((inp.floorArea||100)/15))+' weeks');
   } else if (t.indexOf('CAVITY FILL') >= 0) {
     var cq = firstItemQty('cavity fill'); if (cq) pb.push('Wall area: '+cq+'m²');
-    var cNames={'eps-bead':'blown EPS bead','mineral-wool':'blown mineral wool','walltite':'Walltite spray foam'};
-    pb.push('Fill: '+(cNames[inp.cavity_type]||inp.cavity_type||'blown EPS bead'));
+    pb.push('Fill: '+euLabel(inp.cavity_type||'eps-bead', 'cavity_type'));
     if (inp.cavity_makegood) pb.push('Making good: included');
   } else if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) {
     var ewiPk = inp.ewi_peaks || 0;
     var eq = firstItemQty('external wall insulation') || firstItemQty('ewi');
     if (eq) pb.push('Gross elevation: '+eq+'m² (wall + openings'+(ewiPk>0?' + '+ewiPk+' gable peak'+(ewiPk>1?'s':''):'')+')');
-    pb.push('Insulation: '+(inp.ewi_insulation||'eps')+' '+(inp.ewi_thickness||'150')+'mm');
-    pb.push('Render: '+(inp.ewi_render||'silicone'));
+    pb.push('Insulation: '+euLabel(inp.ewi_insulation||'eps', 'ewi_insulation')+' '+(inp.ewi_thickness||'150')+'mm');
+    pb.push('Render: '+euLabel(inp.ewi_render||'silicone', 'ewi_render'));
     if (inp.ewi_makegood) pb.push('Making good: included');
     var fasciaq = firstItemQty('fascia'); if (fasciaq) pb.push('Fascia & soffit: '+fasciaq+'m (mandatory)');
     var sq = firstItemQty('scaffolding'); if (sq) pb.push('Scaffold: '+sq+'m² gross elevation');
   } else if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0) {
     var iq = firstItemQty('pir insulated board'); if (iq) pb.push('Wall area: '+iq+'m²');
-    pb.push('System: '+(inp.iwi_type||'pir-dab'));
+    pb.push('System: '+euLabel(inp.iwi_type||'pir-dab', 'iwi_type'));
     if (inp.iwi_makegood) pb.push('Making good: included');
   } else if (t.indexOf('CEILING LEVEL') >= 0) {
     var rcq = firstItemQty('ceiling-level'); if (rcq) pb.push('Ceiling area: '+rcq+'m²');
-    if (inp.roof_ceiling_type) pb.push('Type: '+inp.roof_ceiling_type);
+    if (inp.roof_ceiling_type) pb.push('Type: '+euLabel(inp.roof_ceiling_type, 'roof_ceiling_type'));
     if (inp.roof_ceiling_makegood) pb.push('Making good: included');
   } else if (t.indexOf('RAFTER') >= 0) {
     var rrq = firstItemQty('rafter'); if (rrq) pb.push('Rafter area: '+rrq+'m²');
-    if (inp.roof_rafter_system) pb.push('System: '+inp.roof_rafter_system);
+    if (inp.roof_rafter_system) pb.push('System: '+euLabel(inp.roof_rafter_system, 'roof_rafter_system'));
     if (inp.roof_rafter_thick) pb.push('Thickness: '+inp.roof_rafter_thick+'mm');
     if (inp.roof_rafter_makegood) pb.push('Making good: included');
   } else if (t.indexOf('FLAT ROOF') >= 0) {
     var rfq = firstItemQty('flat roof'); if (rfq) pb.push('Roof area: '+rfq+'m²');
-    if (inp.roof_flat_system) pb.push('System: '+inp.roof_flat_system);
+    if (inp.roof_flat_system) pb.push('System: '+euLabel(inp.roof_flat_system, 'roof_flat_system'));
     if (inp.roof_flat_thick) pb.push('Thickness: '+inp.roof_flat_thick+'mm');
   } else if (t.indexOf('ROOM-IN-ROOF') >= 0) {
     var rroomq = firstItemQty('room-in-roof'); if (rroomq) pb.push('Area: '+rroomq+'m²');
-    if (inp.roof_room_type) pb.push('System: '+inp.roof_room_type);
+    if (inp.roof_room_type) pb.push('System: '+euLabel(inp.roof_room_type, 'roof_room_type'));
   } else if (t.indexOf('FLOOR INSULATION') >= 0 && t.indexOf('UNDERFLOOR') < 0) {
     var fq = firstItemQty('ground floor'); if (fq) pb.push('Floor area: '+fq+'m²');
-    if (inp.floor_system) pb.push('System: '+inp.floor_system);
+    if (inp.floor_system) pb.push('System: '+euLabel(inp.floor_system, 'floor_system'));
     if (inp.floor_thick) pb.push('Thickness: '+inp.floor_thick+'mm');
     if (inp.floor_makegood) pb.push('Making good: included');
   } else if (t.indexOf('WINDOWS') >= 0 && t.indexOf('SECONDARY') < 0) {
     var wq = firstItemQty('external windows'); if (wq) pb.push('Window area: '+wq+'m²');
     if (inp.windows_count) pb.push('Count: '+inp.windows_count+' units');
-    pb.push('Glazing: '+(inp.windows_glazing==='double'?'Double glazed':'Triple glazed'));
-    if (inp.windows_frame) pb.push('Frame: '+inp.windows_frame);
-    if (inp.windows_style) pb.push('Style: '+inp.windows_style);
+    pb.push('Glazing: '+euLabel(inp.windows_glazing==='double'?'double':'triple', 'windows_glazing'));
+    if (inp.windows_frame) pb.push('Frame: '+euLabel(inp.windows_frame, 'windows_frame'));
+    if (inp.windows_style) pb.push('Style: '+euLabel(inp.windows_style, 'windows_style'));
     if (inp.windows_dispose) pb.push('Disposal: included');
   } else if (t.indexOf('EXTERNAL DOOR') >= 0) {
     var dq = firstItemQty('external doors'); if (dq) pb.push('Count: '+dq+' doors');
-    pb.push('Type: '+(inp.doors_type||'composite'));
+    pb.push('Type: '+euLabel(inp.doors_type||'composite', 'doors_type'));
     if (inp.doors_dispose) pb.push('Disposal: included');
   } else if (t.indexOf('AIRTIGHTNESS') >= 0) {
     var aq = firstItemQty('membrane'); if (aq) pb.push('Ceiling area: '+aq+'m²');
-    if (inp.airtight_membrane) pb.push('Membrane: '+inp.airtight_membrane);
+    if (inp.airtight_membrane) pb.push('Membrane: '+euLabel(inp.airtight_membrane, 'airtight_membrane'));
     if (inp.airtight_tests) pb.push('Blower-door tests: '+inp.airtight_tests+' nr');
   } else if (t.indexOf('DRAUGHT') >= 0) {
     pb.push('Doors: '+(inp.doorCount||2)+' nr');
@@ -13622,12 +13718,11 @@ function _euPricingBasis(s, inp) {
     if ((inp.hli||0) > 0) pb.push('Heat Loss Indicator: '+inp.hli+' W/m²K');
     var hi = items.find(function(i){return (i.description||'').toLowerCase().indexOf('air-to-water heat pump')>=0;});
     if (hi) { var hkw = (hi.description||'').match(/\((\d+)kW\)/); if (hkw) pb.push('Design load: '+hkw[1]+'kW '+((inp.hli||0)>0?'(IS EN 12831 heat loss)':'(area-banded — add HLI)')); }
-    var emitLabels={'ufh':'UFH ground floor (screed)','keep-rads':'retain existing radiators','ufh-rads':'UFH ground floor + rads upper floor','rads':'new low-temperature radiators'};
-    pb.push('Emitters: '+(emitLabels[inp.emitterType]||'new low-temperature radiators'));
-    pb.push('Remove: '+(inp.ashpRemove||inp.existHeating||'existing system'));
+    pb.push('Emitters: '+euLabel(inp.emitterType||'rads', 'emitterType'));
+    pb.push('Remove: '+euLabel(inp.ashpRemove||inp.existHeating||'existing system', 'ashpRemove'));
   } else if (t.indexOf('CONDENSING BOILER') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
-    pb.push('Type: '+(inp.newHeating||'condensing boiler'));
+    pb.push('Type: '+euLabel(inp.newHeating||'condensing boiler', 'newHeating'));
     pb.push('Combi: '+(inp.boilerCombi==='combi'?'Yes':'No'));
   } else if (t.indexOf('GROUND SOURCE') >= 0 || t.indexOf('GSHP') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
@@ -13635,18 +13730,18 @@ function _euPricingBasis(s, inp) {
     if (inp.gshp_type==='horizontal' && inp.gshp_area) pb.push('Trench: '+inp.gshp_area+'m');
   } else if (t.indexOf('BIOMASS') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
-    if (inp.biomassStore) pb.push('Storage: '+inp.biomassStore);
+    if (inp.biomassStore) pb.push('Storage: '+euLabel(inp.biomassStore, 'biomassStore'));
   } else if (t.indexOf('AIR-TO-AIR') >= 0) {
     if (inp.airAirZones) pb.push('Zones: '+inp.airAirZones+' nr');
-    if (inp.airAirTier) pb.push('Tier: '+inp.airAirTier);
+    if (inp.airAirTier) pb.push('Tier: '+euLabel(inp.airAirTier, 'airAirTier'));
   } else if (t.indexOf('HYBRID') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
-    if (inp.hybrid_fuel) pb.push('Backup fuel: '+inp.hybrid_fuel);
-    if (inp.hybrid_emitter) pb.push('Emitters: '+inp.hybrid_emitter);
+    if (inp.hybrid_fuel) pb.push('Backup fuel: '+euLabel(inp.hybrid_fuel, 'hybrid_fuel'));
+    if (inp.hybrid_emitter) pb.push('Emitters: '+euLabel(inp.hybrid_emitter, 'hybrid_emitter'));
   } else if (t.indexOf('MVHR') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     pb.push('System: MVHR (whole-house heat recovery)');
-    if (inp.mvhr_unit) pb.push('Unit tier: '+inp.mvhr_unit);
+    if (inp.mvhr_unit) pb.push('Unit tier: '+euLabel(inp.mvhr_unit, 'mvhr_unit'));
     pb.push('Rooms: '+((inp.roomsDown||4)+(inp.roomsUp||4))+' ('+((inp.roomsDown||4)+(inp.roomsUp||4))*2+' terminals)');
   } else if (t.indexOf('DMEV') >= 0) {
     pb.push('System: DMEV (decentralised extract)');
@@ -13659,12 +13754,12 @@ function _euPricingBasis(s, inp) {
   } else if (t.indexOf('SOLAR PV') >= 0 || t.indexOf('RENEWABLES') >= 0) {
     var pva = inp.pvArea||0; if (pva) pb.push('PV area: '+pva+'m²');
     var pvp = Math.max(1,Math.floor(pva/1.7)); pb.push('Panels: ~'+pvp+' nr (400Wp)');
-    if (inp.pv_orientation) pb.push('Orientation: '+inp.pv_orientation);
-    if (inp.pv_panel) pb.push('Panel type: '+inp.pv_panel);
+    if (inp.pv_orientation) pb.push('Orientation: '+euLabel(inp.pv_orientation, 'pv_orientation'));
+    if (inp.pv_panel) pb.push('Panel type: '+euLabel(inp.pv_panel, 'pv_panel'));
     if (inp.battery && inp.battery!=='no' && inp.battery!=='No') pb.push('Battery: '+inp.battery+'kWh'); else pb.push('No battery storage');
   } else if (t.indexOf('SOLAR THERMAL') >= 0) {
     if (inp.solarThermalArea) pb.push('Collector area: '+inp.solarThermalArea+'m²');
-    pb.push('Cylinder: '+(inp.solar_th_cyl==='twin-coil'?'new 300L twin-coil':'connect to existing'));
+    pb.push('Cylinder: '+euLabel(inp.solar_th_cyl||'existing', 'solar_th_cyl'));
   } else if (t.indexOf('HEAT PUMP WATER HEATER') >= 0) {
     pb.push('Cylinder: '+(inp.hpwh_size||200)+'L integrated');
   } else if (t.indexOf('UNDERFLOOR') >= 0) {
@@ -13675,13 +13770,13 @@ function _euPricingBasis(s, inp) {
     pb.push('ETCI certification');
   } else if (t.indexOf('CONSUMER UNIT') >= 0) {
     pb.push((inp.consumer_ways||18)+'-way consumer unit');
-    if (inp.consumer_type) pb.push('Type: '+inp.consumer_type);
+    if (inp.consumer_type) pb.push('Type: '+euLabel(inp.consumer_type, 'consumer_type'));
   } else if (t.indexOf('LED LIGHTING') >= 0) {
     pb.push('~'+Math.round((inp.floorArea||100)/8)+' fittings throughout');
-    if (inp.led_type) pb.push('Type: '+inp.led_type);
+    if (inp.led_type) pb.push('Type: '+euLabel(inp.led_type, 'led_type'));
     if (inp.led_smart) pb.push('Smart controls: included');
   } else if (t.indexOf('EV CHARGING') >= 0) {
-    if (inp.ev_brand) pb.push('Charger: '+inp.ev_brand);
+    if (inp.ev_brand) pb.push('Charger: '+euLabel(inp.ev_brand, 'ev_brand'));
     if (inp.ev_cable) pb.push('Cable run: '+inp.ev_cable+'m');
   } else if (t.indexOf('SMART HEATING CONTROLS') >= 0) {
     pb.push('Smart thermostat: 1 nr');
