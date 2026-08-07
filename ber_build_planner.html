@@ -5819,6 +5819,32 @@ const MATERIALS_DEFAULT = {
   feeDAC:            { price: 750,   unit: 'item', label: 'Disability access certificate fee',            group: 'Professional Fees'  },
 };
 
+// ── RATE BOOK VERSION ─────────────────────────────────────────────────────────
+// Every plan states the version of the rate book it was priced on. Defined here once and
+// printed by the Cost Plan, the Basis of Estimate and the itemised appendix, so the three
+// documents can never claim different provenance for the same figures.
+//
+// Bump `version` and `effective` together whenever a published source behind the rate book
+// changes (SCSI supplement, SEO CWA labour agreement, SEAI grant rates, merchant pricing).
+// `sources` is what the Basis of Estimate lists underneath the stamp.
+var RATE_BOOK = {
+  version:   '2026.1',
+  effective: '6 August 2026',
+  sources: [
+    'SCSI Tender Price Index & House Rebuilding Guide 2025–26 (base rates)',
+    'SEO Construction Sector CWA 2024/25 (labour)',
+    'SCSI Regional Cost Supplement August 2025 (county multipliers)',
+    'SEAI grant rates effective 3 February and 4 March 2026',
+    'Irish merchant pricing Q1–Q2 2026',
+  ],
+};
+// "Rate book v2026.1 (effective 6 August 2026)" — the single string all three outputs print.
+function rateBookStamp() {
+  return 'Rate book v' + RATE_BOOK.version + ' (effective ' + RATE_BOOK.effective + ')';
+}
+window.RATE_BOOK = RATE_BOOK;
+window.rateBookStamp = rateBookStamp;
+
 // ── BUILD SPEC RATES — New Build element rates behind the Build Spec dropdowns ──
 // These are the per-element supply rates the BOQ uses when a spec option is chosen
 // (glazing, roof covering, doors, stairs, partitions, finishes, kitchen…). Editable
@@ -8080,7 +8106,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var wLabR      = wStyle === 'sash' ? 115 : 95;  // sash: higher labour — bespoke fitting
     var wGlazLabel = wGlaz === 'triple' ? 'Triple Glazed' : 'Double Glazed';
     var wStyleNote = wStyle === 'sash' ? ' — bespoke sash' : wStyle === 'fixed' ? ' — fixed lights' : '';
-    var wDesc      = 'External windows — ' + wGlazLabel + ', ' + wFrame + wStyleNote + ' (' + wCount + ' nr bundle: units, installation, reveal liners, sealant)';
+    var wDesc      = 'External windows — ' + wGlazLabel + ', ' + euLabel(wFrame, 'windows_frame') + wStyleNote + ' (' + wCount + ' nr bundle: units, installation, reveal liners, sealant)';
     var wItems     = [ mkItem('5.1', wDesc, 'm²', wArea, wMatR, wLabR, 'Bundled supply + install of ' + wCount + ' window units') ];
     if (inputs.windows_dispose) {
       wItems.push(mkItem('5.2', 'Window removal & disposal of existing units', 'm²', wArea, 0, WINDOW_DISPOSE_RATE, 'Labour-only; skip allowance separate'));
@@ -13989,7 +14015,8 @@ function renderEUTable(b) {
     '<div class="eu-disclaimer">All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
     'Independent estimate — not prepared by a contractor. ' +
     'Contractors quote on the gross figures above, so every quote covers the same scope and can be compared like for like; SEAI grants are then applied to the homeowner\'s invoice. ' +
-    'Only SEAI-registered contractors qualify for grant payment. Indicative accuracy ±15–20%.</div>' +
+    'Only SEAI-registered contractors qualify for grant payment. Indicative accuracy ±15–20%. ' +
+    '<strong>Priced on ' + rateBookStamp() + '.</strong></div>' +
     '</div>';
 }
 
@@ -14346,6 +14373,9 @@ function exportEUPDF(mode) {
       '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
         labMultNote + ' Contractor\'s O&amp;P (12%), contingency (10%) and VAT (13.5%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
       appxSections +
+      '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:10px;">' +
+        'All rates above are drawn from <strong style="color:#334155;">' + rateBookStamp() + '</strong>.' +
+      '</div>' +
     '</div>';
 
     methodHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
@@ -14370,16 +14400,13 @@ function exportEUPDF(mode) {
         '</tr></thead>' +
         '<tbody>'+methRows+'</tbody>' +
       '</table>' +
-      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Data Sources</h3>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Data Sources &mdash; ' + rateBookStamp() + '</h3>' +
       '<ul style="font-size:8pt;color:#475569;margin-bottom:12px;">' +
-        '<li>SEO National Wage Agreement 2024 (trade labour rates)</li>' +
-        '<li>SCSI Regional Cost Supplement August 2025 (county multipliers)</li>' +
-        '<li>SEAI Grant Rates effective February / March 2026</li>' +
-        '<li>Irish merchant pricing Q1–Q2 2026</li>' +
+        RATE_BOOK.sources.map(function(src){ return '<li>'+src+'</li>'; }).join('') +
         '<li>Floor area: '+pi.floorArea+'m² · County: '+(pi.county||'—')+' · Dwelling: '+(pi.dwellingType||'—')+'</li>' +
       '</ul>' +
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;">' +
-        'PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
+        '<strong style="color:#334155;">' + rateBookStamp() + '</strong> · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
       '</div>' +
     '</div>' +
     appendixHTML;
@@ -14397,7 +14424,7 @@ function exportEUPDF(mode) {
         '<span>Grant Scheme: <strong style="color:#1E293B;">'+seaiSchemeLabel(pi.grantScheme)+'</strong></span>' +
         (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
       '</div>' +
-      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%'+(isDetailed?' · Detailed':'')+'</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · '+rateBookStamp()+(isDetailed?' · Detailed':'')+'</div>' +
     '</div>';
 
   var colgroup7 = '<colgroup><col style="width:20px"/><col style="width:140px"/><col style="min-width:100px"/><col style="width:80px"/><col style="width:80px"/><col style="width:88px"/><col style="min-width:65px"/></colgroup>';
@@ -14470,7 +14497,7 @@ function exportEUPDF(mode) {
       'This document is an indicative cost estimate with an accuracy of ±15–20% and does not constitute a binding quotation, contract, or guarantee of final cost. ' +
       'Grant figures shown are indicative SEAI rates current at time of issue and are subject to SEAI eligibility assessment, survey, and approval. ' +
       'Only SEAI-registered contractors qualify for grant payment. Homeowner must not commence works before SEAI approval where required. ' +
-      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · Independent estimate — not prepared by any contractor.' +
+      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
     '</div>' +
   '</div>';
 
@@ -14677,7 +14704,7 @@ function exportCompactPDF() {
       'All Estimated Spend figures are fully loaded and include: <strong>VAT at 13.5%</strong> on construction works (Solar PV at 0% VAT per Revenue ruling, May 2023; professional fees at 23%); <strong>preliminaries, plant &amp; equipment</strong>; <strong>contingency</strong>. ' +
       'This document is an indicative cost estimate with an accuracy of ±15–20% and does not constitute a binding quotation, contract, or guarantee of final cost. ' +
       (hasGrants ? 'Grant figures shown are indicative SEAI rates current at time of issue and are subject to SEAI eligibility assessment, survey, and approval. Only SEAI-registered contractors qualify for grant payment. ' : '') +
-      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · Independent estimate — not prepared by any contractor.' +
+      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
     '</div>' +
   '</div>';
 
