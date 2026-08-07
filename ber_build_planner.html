@@ -333,6 +333,8 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-actgrants-row td{background:rgba(5,150,105,.04);border-top:1px solid rgba(5,150,105,.12);padding:6px 6px;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
 .eu-ber-row td{background:rgba(255,255,255,.015);}
+.eu-howto{font-size:10px;color:#94A3B8;padding:9px 12px;margin-top:10px;line-height:1.6;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.14);border-radius:5px;}
+.eu-howto strong{color:#C8D0DC;}
 .eu-disclaimer{font-size:9px;color:#4B5563;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.5;}
 @media(max-width:768px){
   .eu-c-basis{display:none;}
@@ -5635,7 +5637,10 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   <div class="boq-report-body">
     <div class="boq-accordion-wrap-inner">
       <div id="boq-accordion-wrap"></div>
-      <div style="padding:10px 16px 0;font-size:10px;color:#8090A8;line-height:1.7;border-top:1px solid rgba(46,61,82,0.4);margin-top:16px;">
+      <!-- New Build / Refurbishment only. The Energy Upgrade plan carries its own
+           homeowner-facing "How to use this document" block inside the table instead —
+           this one names a Quoted column the Cost Plan does not have, and addresses a lender. -->
+      <div id="boq-columns-help" style="padding:10px 16px 0;font-size:10px;color:#8090A8;line-height:1.7;border-top:1px solid rgba(46,61,82,0.4);margin-top:16px;">
         <strong style="color:#C8D0DC;">&#9998; How to use Quoted &amp; Actual columns:</strong>
         Enter contractor quotes in <strong>Quoted &#8364;</strong> when received &mdash; compare against the estimate to check value.
         Enter certified payment amounts in <strong>Actual &#8364;</strong> as works progress and drawdown stages are approved by your lender.
@@ -13834,6 +13839,17 @@ function _euPricingBasis(s, inp) {
 }
 
 // Renders the EU-specific measure table into #boq-accordion-wrap
+// The Retrofit Cost Plan is written for the homeowner. Other parties read it — a lender
+// files it, a contractor prices against it — but it addresses the person who has to pay.
+// Defined once so the on-screen plan and the PDF cannot drift apart.
+var EU_HOW_TO_USE =
+  'The Net Cost figure above is roughly what this work should leave you to pay once grants ' +
+  'are applied. Ask each contractor to quote against the Estimated Spend and the scope listed ' +
+  'under every measure, so all the quotes you get price the same work and you can compare them ' +
+  'properly. Record each quote in the Notes column, and what you actually pay in Actual Spend, ' +
+  'as the job progresses.';
+window.EU_HOW_TO_USE = EU_HOW_TO_USE;
+
 function renderEUTable(b) {
   var pi = b.projectInfo || {};
   var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
@@ -14012,6 +14028,7 @@ function renderEUTable(b) {
     '</tr></thead>' +
     '<tbody>'+tbodyRows+'</tbody>' +
     '</table>' +
+    '<div class="eu-howto"><strong>How to use this document.</strong> ' + EU_HOW_TO_USE + '</div>' +
     '<div class="eu-disclaimer">All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
     'Independent estimate — not prepared by a contractor. ' +
     'Contractors quote on the gross figures above, so every quote covers the same scope and can be compared like for like; SEAI grants are then applied to the homeowner\'s invoice. ' +
@@ -14486,10 +14503,7 @@ function exportEUPDF(mode) {
     '</table>' +
     schemeNoteHTML +
     '<div style="font-size:6.5pt;color:#475569;margin-top:6px;padding:4px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.5;">' +
-      '<strong style="color:#1E293B;">How to use this document</strong> — ' +
-      '<strong>Homeowner:</strong> your cost after grants is the Net Cost figure above. ' +
-      '<strong>Lender:</strong> the Net Cost to Homeowner is the amount to finance; grants are paid by SEAI directly. ' +
-      '<strong>Contractor:</strong> quote against the gross Est. Spend and the scope listed under each measure — every quote prices the same scope, so yours is compared like for like. Grants are applied to the homeowner\'s invoice separately.' +
+      '<strong style="color:#1E293B;">How to use this document.</strong> ' + EU_HOW_TO_USE +
     '</div>' +
     '<div style="font-size:6pt;color:#64748B;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       '<strong style="color:#1E293B;">Terms &amp; Conditions — Indicative Estimate</strong><br>' +
@@ -15152,9 +15166,12 @@ function renderAccordionReport() {
 
   // For standalone Energy Upgrade: render clean measure table, not accordion
   var _ptype = ((BOQ.projectInfo||{}).type||'').toString();
+  var _colHelp = document.getElementById('boq-columns-help');
   if (_ptype === 'Energy Upgrade') {
     var _euWrap = document.getElementById('boq-accordion-wrap');
     if (_euWrap) _euWrap.innerHTML = renderEUTable(BOQ);
+    // The Cost Plan carries its own homeowner how-to inside the table
+    if (_colHelp) _colHelp.style.display = 'none';
     // Header follows the table exactly — see BOQ._euTableTotal in renderEUTable()
     if (BOQ._euTableTotal != null) {
       var _tEl = document.getElementById('rpt-total');
@@ -15167,6 +15184,7 @@ function renderAccordionReport() {
     _updateEUPDFBtns(true);
     return;
   }
+  if (_colHelp) _colHelp.style.display = '';
   _updateEUPDFBtns(false);
 
   const wrap = document.getElementById('boq-accordion-wrap');
