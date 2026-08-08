@@ -14064,11 +14064,12 @@ function _updateEUPDFBtns(isEU) {
   var wrap = document.getElementById('pdf-btn-wrap');
   if (!wrap) return;
   if (isEU) {
-    // One deliverable only. Page 1 is the customer summary and the evidence sits behind it,
-    // so a separate customer PDF would just be page 1 issued on its own — two versions of
-    // the same figures that can drift apart.
+    // Two documents, for two different readers. The Cost Plan is the homeowner's — page 1 is
+    // their summary and the evidence sits behind it. The Pricing Schedule is the same scope
+    // with every figure removed, so a contractor prices it without seeing the estimate.
     wrap.innerHTML =
-      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Retrofit Cost Plan (PDF)</button>';
+      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Retrofit Cost Plan (PDF)</button>' +
+      '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>';
   } else {
     wrap.innerHTML =
       '<button id="pdf-download-btn" onclick="exportCompactPDF()" title="1–2 page customer summary — same format as Energy Upgrade" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
@@ -14534,6 +14535,107 @@ function exportEUPDF(mode) {
   window.addEventListener('afterprint', _onAfterPrint);
   window.print();
 }
+
+// ── CONTRACTOR PRICING SCHEDULE ───────────────────────────────────────────────
+// The same measures and the same measured scope as the Cost Plan, with the money taken out.
+// A contractor prices this blind: no estimate to anchor against, no grant figures, no totals.
+// That is the whole point — the quote it produces is independent, and because every
+// contractor prices this identical scope the quotes can be compared like for like.
+//
+// Scope text comes from _euPricingBasis(), the generator the Cost Plan uses, so the two
+// documents describe the same work by construction rather than by being kept in step.
+function exportContractorSchedule() {
+  if (!BOQ) return;
+  var b   = BOQ;
+  var pi  = b.projectInfo || {};
+  var inp = b.euInputs || {};
+  // Same filter as the Cost Plan. Scheme management, the BER assessment and the grant rows
+  // are added outside this list in exportEUPDF, so none of them can reach a contractor.
+  var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
+  var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
+  var B = '1px solid #E2E8F0';
+
+  var rowNum = 0, rows = '';
+  sections.forEach(function(s) {
+    rowNum++;
+    var pb = _euPricingBasis(s, inp);
+    var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
+    rows +=
+      '<tr style="page-break-inside:avoid;">' +
+        '<td style="padding:7px 4px;color:#94a3b8;text-align:center;font-size:8pt;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
+        '<td style="padding:7px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
+        '<td style="padding:7px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;line-height:1.5;">'+pbStr+'</td>' +
+        // Price — deliberately blank. No figure is offered anywhere on this document.
+        '<td style="padding:7px 6px;border:'+B+';background:#FCFCFD;vertical-align:bottom;">' +
+          '<div style="font-size:8pt;color:#CBD5E1;text-align:right;border-bottom:1px solid #E2E8F0;padding-bottom:14px;">&euro;</div>' +
+        '</td>' +
+        '<td style="padding:7px 6px;border:'+B+';background:#FCFCFD;vertical-align:bottom;">' +
+          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:14px;">&nbsp;</div>' +
+        '</td>' +
+      '</tr>';
+  });
+
+  var headerHTML =
+    '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Contractor Pricing Schedule</div>' +
+      '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
+      '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:6px;">' +
+        '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
+        '<span>County: <strong style="color:#1E293B;">'+(pi.county||'—')+'</strong></span>' +
+        '<span>Date: <strong style="color:#1E293B;">'+dateStr+'</strong></span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:8px;font-size:9pt;color:#475569;max-width:320px;">' +
+        '<span style="white-space:nowrap;font-weight:700;color:#1E293B;">Contractor:</span>' +
+        '<span style="flex:1;border-bottom:1px solid #94a3b8;height:15px;">&nbsp;</span>' +
+      '</div>' +
+    '</div>';
+
+  var tableHTML =
+    '<div style="margin:0 10mm;font-family:sans-serif;">' +
+    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
+      // Proportional, so Price and Alternative keep usable writing space at any page width
+      '<colgroup><col style="width:4%"/><col style="width:21%"/><col style="width:40%"/><col style="width:15%"/><col style="width:20%"/></colgroup>' +
+      '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+        '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope &amp; Quantities</th>' +
+        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Alternative offered</th>' +
+      '</tr>' +
+      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
+        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity.' +
+      '</td></tr></thead>' +
+      '<tbody>'+rows+'</tbody>' +
+    '</table>' +
+    '<div style="font-size:6.5pt;color:#475569;margin-top:8px;padding:5px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.55;">' +
+      'Prices requested against the scope listed above so that quotations can be compared on the same basis. ' +
+      'Quantities to be confirmed by the contractor. This schedule does not form a contract.' +
+    '</div>' +
+    '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
+      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
+      ' · Scope prepared independently of any contractor.' +
+    '</div>' +
+    '</div>';
+
+  var staleBackdrop = document.getElementById('eu-pdf-backdrop');
+  if (staleBackdrop) staleBackdrop.style.display = 'none';
+
+  var printDiv = document.getElementById('pdf-print-view');
+  if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
+  printDiv.style.cssText = 'display:block;background:white;';
+  printDiv.innerHTML = headerHTML + tableHTML;
+  var _prevBodyBg = document.body.style.background;
+  document.body.style.background = 'white';
+  printDiv.scrollIntoView();
+  var _onAfterPrint = function() {
+    printDiv.style.display = 'none';
+    document.body.style.background = _prevBodyBg;
+    window.removeEventListener('afterprint', _onAfterPrint);
+  };
+  window.addEventListener('afterprint', _onAfterPrint);
+  window.print();
+}
+window.exportContractorSchedule = exportContractorSchedule;
 
 // Compact 1–2 page customer report for New Build & Refurbishment — mirrors the EU format:
 // header band → key figures strip → single works table with scope lines → how-to → T&Cs.
