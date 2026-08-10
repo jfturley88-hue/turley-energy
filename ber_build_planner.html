@@ -335,7 +335,10 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-ber-row td{background:rgba(255,255,255,.015);}
 .eu-howto{font-size:10px;color:#94A3B8;padding:9px 12px;margin-top:10px;line-height:1.6;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.14);border-radius:5px;}
 .eu-howto strong{color:#C8D0DC;}
-.eu-disclaimer{font-size:9px;color:#4B5563;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.5;}
+/* Homeowner-facing terms. Was #4B5563 when this held a dense grey paragraph; as a bullet
+   list someone actually has to read, that is far too dark against the panel. */
+.eu-disclaimer{font-size:10px;color:#94A3B8;padding:10px 12px;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;line-height:1.6;}
+.eu-disclaimer li{margin:2px 0;}
 @media(max-width:768px){
   .eu-c-basis{display:none;}
   .eu-c-notes{display:none;}
@@ -13847,8 +13850,51 @@ var EU_HOW_TO_USE =
   'are applied. Ask each contractor to quote against the Estimated Spend and the scope listed ' +
   'under every measure, so all the quotes you get price the same work and you can compare them ' +
   'properly. Record each quote in the Notes column, and what you actually pay in Actual Spend, ' +
-  'as the job progresses.';
+  'as the job goes on.';
 window.EU_HOW_TO_USE = EU_HOW_TO_USE;
+
+// What the estimate covers and what it does not, in the words a homeowner would use.
+// Held as content rather than markup so the on-screen plan and the PDF render the same
+// points in their own styling — the dark report and the white printed page — without
+// either being retyped.
+var EU_ESTIMATE_TERMS = {
+  title: 'What this estimate includes — and what it does not',
+  includesLead: 'Every Estimated Spend figure already includes:',
+  includes: [
+    'VAT at 13.5% (solar PV is 0% under the Revenue ruling of May 2023)',
+    'The contractor\'s overhead and profit, at 12%',
+    'A 10% contingency for the unexpected',
+    'Plant and equipment hire',
+  ],
+  notLead: 'What it is not:',
+  not: [
+    'This is an estimate, not a quotation, and not a contract. Real prices come from contractors.',
+    'It is accurate to within about 15–20%. Site conditions, hidden defects and access can move the final figure.',
+    'Grant figures are current SEAI rates at the date shown. Your actual grant depends on SEAI approving your application, and on survey.',
+    'Only SEAI-registered contractors qualify for grant payment.',
+    'Do not start work before SEAI approval where it is required, or you may lose the grant.',
+  ],
+};
+
+// Renders the terms for one surface. `o.head` colours the two lead-ins, `o.bullet` the list
+// text; everything else is inherited from the containing block.
+function euTermsHTML(o) {
+  o = o || {};
+  var head   = o.head   || '#1E293B';
+  var indent = o.indent || '14px';
+  var list = function(items) {
+    return '<ul style="margin:2px 0 0;padding-left:' + indent + ';list-style:disc;">' +
+      items.map(function(t){ return '<li style="margin:1px 0;">' + t + '</li>'; }).join('') +
+      '</ul>';
+  };
+  return '<strong style="color:' + head + ';">' + EU_ESTIMATE_TERMS.title + '</strong>' +
+    '<div style="margin-top:3px;"><span style="color:' + head + ';">' + EU_ESTIMATE_TERMS.includesLead + '</span>' +
+    list(EU_ESTIMATE_TERMS.includes) + '</div>' +
+    '<div style="margin-top:3px;"><span style="color:' + head + ';">' + EU_ESTIMATE_TERMS.notLead + '</span>' +
+    list(EU_ESTIMATE_TERMS.not) + '</div>';
+}
+window.EU_ESTIMATE_TERMS = EU_ESTIMATE_TERMS;
+window.euTermsHTML = euTermsHTML;
 
 function renderEUTable(b) {
   var pi = b.projectInfo || {};
@@ -14029,11 +14075,12 @@ function renderEUTable(b) {
     '<tbody>'+tbodyRows+'</tbody>' +
     '</table>' +
     '<div class="eu-howto"><strong>How to use this document.</strong> ' + EU_HOW_TO_USE + '</div>' +
-    '<div class="eu-disclaimer">All Estimated Spend figures include VAT at 13.5%, contractor\'s overhead &amp; profit (12%) and contingency (10%). ' +
-    'Independent estimate — not prepared by a contractor. ' +
-    'Contractors quote on the gross figures above, so every quote covers the same scope and can be compared like for like; SEAI grants are then applied to the homeowner\'s invoice. ' +
-    'Only SEAI-registered contractors qualify for grant payment. Indicative accuracy ±15–20%. ' +
-    '<strong>Priced on ' + rateBookStamp() + '.</strong></div>' +
+    '<div class="eu-disclaimer">' + euTermsHTML({ head: '#C8D0DC' }) +
+      '<div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);">' +
+        'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + rateBookStamp() +
+        ' · Independent estimate — not prepared by any contractor.' +
+      '</div>' +
+    '</div>' +
     '</div>';
 }
 
@@ -14506,13 +14553,11 @@ function exportEUPDF(mode) {
     '<div style="font-size:6.5pt;color:#475569;margin-top:6px;padding:4px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.5;">' +
       '<strong style="color:#1E293B;">How to use this document.</strong> ' + EU_HOW_TO_USE +
     '</div>' +
-    '<div style="font-size:6pt;color:#64748B;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
-      '<strong style="color:#1E293B;">Terms &amp; Conditions — Indicative Estimate</strong><br>' +
-      'All Estimated Spend figures are fully loaded and include: <strong>VAT at 13.5%</strong> on all works (Solar PV at 0% VAT per Revenue ruling, May 2023); <strong>Contractor\'s Overhead &amp; Profit at 12%</strong>; <strong>Plant &amp; equipment hire</strong> (included within labour rates); <strong>Contingency at 10%</strong>. ' +
-      'This document is an indicative cost estimate with an accuracy of ±15–20% and does not constitute a binding quotation, contract, or guarantee of final cost. ' +
-      'Grant figures shown are indicative SEAI rates current at time of issue and are subject to SEAI eligibility assessment, survey, and approval. ' +
-      'Only SEAI-registered contractors qualify for grant payment. Homeowner must not commence works before SEAI approval where required. ' +
-      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
+    '<div style="font-size:6.8pt;color:#475569;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.5;">' +
+      euTermsHTML({ head: '#1E293B' }) +
+      '<div style="margin-top:5px;padding-top:4px;border-top:1px solid #E2E8F0;">' +
+        'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
+      '</div>' +
     '</div>' +
   '</div>';
 
