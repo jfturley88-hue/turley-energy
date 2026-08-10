@@ -14616,12 +14616,11 @@ function exportContractorSchedule() {
         '<td style="padding:7px 4px;color:#94a3b8;text-align:center;font-size:8pt;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
         '<td style="padding:7px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
         '<td style="padding:7px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;line-height:1.5;">'+pbStr+'</td>' +
-        // Price — deliberately blank. No figure is offered anywhere on this document.
-        '<td style="padding:7px 6px;border:'+B+';background:#FCFCFD;vertical-align:bottom;">' +
-          '<div style="font-size:8pt;color:#CBD5E1;text-align:right;border-bottom:1px solid #E2E8F0;padding-bottom:14px;">&euro;</div>' +
-        '</td>' +
-        '<td style="padding:7px 6px;border:'+B+';background:#FCFCFD;vertical-align:bottom;">' +
-          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:14px;">&nbsp;</div>' +
+        // One wide cell, deliberately blank. No figure is offered anywhere on this document.
+        // Price and any note share the space, so a contractor writes the price on the rule
+        // and whatever else they need beside or under it.
+        '<td style="padding:7px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
+          '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:15px;">&euro;</div>' +
         '</td>' +
       '</tr>';
   });
@@ -14636,7 +14635,7 @@ function exportContractorSchedule() {
         '<span>Date: <strong style="color:#1E293B;">'+dateStr+'</strong></span>' +
       '</div>' +
       '<div style="display:flex;align-items:flex-end;gap:8px;font-size:9pt;color:#475569;max-width:320px;">' +
-        '<span style="white-space:nowrap;font-weight:700;color:#1E293B;">Contractor:</span>' +
+        '<span style="white-space:nowrap;font-weight:700;color:#1E293B;">Company name:</span>' +
         '<span style="flex:1;border-bottom:1px solid #94a3b8;height:15px;">&nbsp;</span>' +
       '</div>' +
     '</div>';
@@ -14644,27 +14643,19 @@ function exportContractorSchedule() {
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
-      // Proportional, so Price and Alternative keep usable writing space at any page width
-      '<colgroup><col style="width:4%"/><col style="width:21%"/><col style="width:40%"/><col style="width:15%"/><col style="width:20%"/></colgroup>' +
+      // Proportional, so the pricing column keeps usable writing space at any page width
+      '<colgroup><col style="width:4%"/><col style="width:22%"/><col style="width:42%"/><col style="width:32%"/></colgroup>' +
       '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
         '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope &amp; Quantities</th>' +
-        '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
-        // Unheaded on purpose — open space the contractor can use for whatever they need to
-        // say: an alternative specification, an access caveat, a lead time. A heading would
-        // narrow it to one of those.
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">&nbsp;</th>' +
+        '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
       '</tr>' +
-      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
+      '<tr><td colspan="4" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
         'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity.' +
       '</td></tr></thead>' +
       '<tbody>'+rows+'</tbody>' +
     '</table>' +
-    '<div style="font-size:6.5pt;color:#475569;margin-top:8px;padding:5px 8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:4px;line-height:1.55;">' +
-      'Prices requested against the scope listed above so that quotations can be compared on the same basis. ' +
-      'Quantities to be confirmed by the contractor. This schedule does not form a contract.' +
-    '</div>' +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
       ' · Scope prepared independently of any contractor.' +
