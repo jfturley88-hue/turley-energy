@@ -13845,16 +13845,21 @@ function _euPricingBasis(s, inp) {
 // The Retrofit Cost Plan is written for the homeowner. Other parties read it — a lender
 // files it, a contractor prices against it — but it addresses the person who has to pay.
 // Defined once so the on-screen plan and the PDF cannot drift apart.
+// A contractor quotes against the SCOPE. The Estimated Spend is the homeowner's yardstick
+// for the quotes that come back — it is deliberately kept off the Contractor Pricing
+// Schedule, so telling the homeowner to have contractors "quote against the Estimated
+// Spend" would hand over the very figure the schedule exists to withhold.
 var EU_HOW_TO_USE =
   'The Net Cost figure above is roughly what this work should leave you to pay once grants ' +
-  'are applied. Ask each contractor to quote against the Estimated Spend and the scope listed ' +
-  'under every measure, so all the quotes you get price the same work and you can compare them ' +
-  'properly. Record each quote in the Notes column, and what you actually pay in Actual Spend, ' +
-  'as the job goes on. ' +
+  'are applied. Ask each contractor to quote against the scope listed under every measure, so ' +
+  'all the quotes you get price the same work. ' +
   // Without this the homeowner never learns the second document exists, and the schedule
   // only works if it reaches the contractors.
   'Your assessor can also give you a Contractor Pricing Schedule — the same list of work with ' +
-  'the prices left blank. Send that to each contractor you ask for a quote.';
+  'the prices left blank — to send to each contractor you ask. ' +
+  'When the quotes come back, compare them with each other and with the Estimated Spend ' +
+  'column. Record each quote in the Notes column, and what you actually pay in Actual Spend, ' +
+  'as the job goes on.';
 window.EU_HOW_TO_USE = EU_HOW_TO_USE;
 
 // What the estimate covers and what it does not, in the words a homeowner would use.
