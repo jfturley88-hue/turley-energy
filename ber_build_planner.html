@@ -337,6 +337,10 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
 .eu-ber-row td{background:rgba(255,255,255,.015);}
 .eu-c-diff{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+/* the baseline: fixed columns left of this rule, live ones right of it */
+.eu-measure-table .plan-edge{border-right:2px solid rgba(232,160,32,.55);}
+.eu-baseline-band th{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 8px 4px;color:#8090A8;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
+.eu-baseline-band th:last-child{color:#38bdf8;}
 .eu-howto{font-size:10px;color:#94A3B8;padding:9px 12px;margin-top:10px;line-height:1.6;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.14);border-radius:5px;}
 .eu-howto strong{color:#C8D0DC;}
 /* Homeowner-facing terms. Was #4B5563 when this held a dense grey paragraph; as a bullet
@@ -13884,6 +13888,24 @@ function planDifferenceWords(diffTotal, anyActual) {
 window.planDifference = planDifference;
 window.planDifferenceWords = planDifferenceWords;
 
+// Pricing basis for any mode. Energy Upgrade measures have a hand-written basis; New Build
+// and Refurbishment sections do not, so the basis is drawn from the measured items behind
+// the section — which is the same promise: this is what the figure was built from.
+function _planPricingBasis(s, inp, mode) {
+  var euSection = (mode === 'Energy Upgrade') || !!s.isEnergyUpgrade;
+  var eu = euSection ? _euPricingBasis(s, inp) : [];
+  if (eu && eu.length) return eu;
+  var items = (s.items || []).filter(function(i){ return (i.quantity || 0) > 0; });
+  if (!items.length) items = (s.items || []).slice(0);
+  var lines = items.slice(0, 4).map(function(i) {
+    var q = i.quantity ? (Math.round(i.quantity * 10) / 10) : null;
+    return (i.description || '').replace(/\s*\(.*?\)\s*$/, '') + (q ? ' — ' + q + (i.unit ? ' ' + i.unit : '') : '');
+  });
+  if (items.length > 4) lines.push('+ ' + (items.length - 4) + ' further items');
+  return lines;
+}
+window._planPricingBasis = _planPricingBasis;
+
 // Renders the EU-specific measure table into #boq-accordion-wrap
 // The Retrofit Cost Plan is written for the homeowner. Other parties read it — a lender
 // files it, a contractor prices against it — but it addresses the person who has to pay.
@@ -13954,6 +13976,19 @@ function renderEUTable(b) {
   var grants   = b.grants || [];
   var inp      = b.euInputs || {};
 
+  // One table for all three modes. New Build has no SEAI grants, so it carries no Grant
+  // column at all rather than an empty one; the EU-only rows (BER assessment, scheme fee,
+  // OSS extras, net-after-grants) only appear where they mean something.
+  var mode       = (pi.type || '').toString();
+  var isEU       = mode === 'Energy Upgrade';
+  var showGrants = mode !== 'New Build' && grants.length > 0;
+  var nFixed     = showGrants ? 5 : 4;      // #, item, basis, budget, [grant]
+  var nCols      = nFixed + 3;              // + variation notes, actual, difference
+  var blankGrant = showGrants ? '' : null;  // null = do not emit the cell at all
+  function gCell(html, cls) {
+    return showGrants ? '<td class="' + (cls || 'eu-c-grants') + '">' + html + '</td>' : '';
+  }
+
   // Build grant map: measureKey → [grant objects] (non-OSS only)
   var grantsByKey = {};
   grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
@@ -13984,7 +14019,7 @@ function renderEUTable(b) {
         + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description+' &mdash; '+fmt(g.amount||0); }).join('<br>') + '</div>'
       : '<span style="color:#475569;">—</span>';
 
-    var pb = _euPricingBasis(s, inp);
+    var pb = _planPricingBasis(s, inp, mode);
     var pbHtml = pb.length
       ? '<ul class="eu-pb-list">' + pb.map(function(t){ return '<li>'+t+'</li>'; }).join('') + '</ul>'
       : '<em style="color:#4B5563;font-size:10px;">—</em>';
@@ -13996,8 +14031,8 @@ function renderEUTable(b) {
         '<td class="eu-c-num">'+rowNum+'</td>' +
         '<td class="eu-c-measure"><span class="eu-measure-name">'+s.title+'</span></td>' +
         '<td class="eu-c-basis">'+pbHtml+'</td>' +
-        '<td class="eu-c-est">'+(est>0?fmt(est):'—')+'</td>' +
-        '<td class="eu-c-grants">'+grantCell+'</td>' +
+        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+(est>0?fmt(est):'—')+'</td>' +
+        gCell(grantCell, 'eu-c-grants plan-edge') +
         '<td class="eu-c-notes"><textarea id="'+nid+'" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="'+rid+'" class="eu-act-input" min="0" step="100" placeholder="—" ' +
           'data-budget="'+est+'" data-diff="'+did+'" oninput="updateEUActuals()"></td>' +
@@ -14007,7 +14042,7 @@ function renderEUTable(b) {
 
   // BER assessment grant standalone row (if not already used by a BER section)
   var BER_ASSESS_COST = 300; // typical post-works BER assessor fee — matches engine berFee
-  var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
+  var berGrant = isEU ? grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; }) : null;
   if (berGrant) {
     totalGrts += berGrant.amount||0;
     totalEst  += BER_ASSESS_COST;
@@ -14020,9 +14055,9 @@ function renderEUTable(b) {
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Required to release all SEAI grants</div>' +
         '</td>' +
         '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate issued before grants released</li></ul></td>' +
-        '<td class="eu-c-est">'+fmt(BER_ASSESS_COST)+'</td>' +
-        '<td class="eu-c-grants"><span style="color:#059669;font-weight:700;">'+fmt(berGrant.amount||0)+'</span>' +
-          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div></td>' +
+        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+fmt(BER_ASSESS_COST)+'</td>' +
+        gCell('<span style="color:#059669;font-weight:700;">'+fmt(berGrant.amount||0)+'</span>' +
+          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div>', 'eu-c-grants plan-edge') +
         '<td class="eu-c-notes"><textarea id="eu-note-ber" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="eu-act-ber" class="eu-act-input" min="0" step="10" placeholder="—" ' +
           'data-budget="'+BER_ASSESS_COST+'" data-diff="eu-diff-ber" oninput="updateEUActuals()"></td>' +
@@ -14031,7 +14066,8 @@ function renderEUTable(b) {
   }
 
   // Scheme management & grant administration fee (managed routes)
-  var _fee = euSchemeFee(BOQ.projectInfo.grantScheme, grants, totalEst);
+  var _fee = isEU ? euSchemeFee(BOQ.projectInfo.grantScheme, grants, totalEst)
+                  : { amount: 0 };
   if (_fee.amount > 0) {
     totalEst += _fee.amount;
     rowNum++;
@@ -14053,8 +14089,8 @@ function renderEUTable(b) {
               '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
               '<li>VAT included &mdash; professional fee, not works</li>') +
         '</ul></td>' +
-        '<td class="eu-c-est">'+fmt(_fee.amount)+'</td>' +
-        '<td class="eu-c-grants">—</td>' +
+        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+fmt(_fee.amount)+'</td>' +
+        gCell('—', 'eu-c-grants plan-edge') +
         '<td class="eu-c-notes"><textarea class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" class="eu-act-input" min="0" step="50" placeholder="—" ' +
           'data-budget="'+_fee.amount+'" data-diff="eu-diff-fee" oninput="updateEUActuals()"></td>' +
@@ -14063,7 +14099,7 @@ function renderEUTable(b) {
   }
 
   // OSS grants — single bundled row
-  var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
+  var ossGrants = isEU ? grants.filter(function(g){ return g.ossExclusive; }) : [];
   if (ossGrants.length) {
     var ossTotal = ossGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
     totalGrts += ossTotal;
@@ -14076,8 +14112,8 @@ function renderEUTable(b) {
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+ossItems+'</div>' +
         '</td>' +
         '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">Additional grants — only available via an OSS provider</em></td>' +
-        '<td class="eu-c-est" style="color:#475569;">—</td>' +
-        '<td class="eu-c-grants"><span style="color:#6366f1;font-weight:700;">'+fmt(ossTotal)+'</span></td>' +
+        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'" style="color:#475569;">—</td>' +
+        gCell('<span style="color:#6366f1;font-weight:700;">'+fmt(ossTotal)+'</span>', 'eu-c-grants plan-edge') +
         '<td class="eu-c-notes">—</td>' +
         '<td class="eu-c-act">—</td>' +
         '<td class="eu-c-diff" style="color:#475569;">—</td>' +
@@ -14094,10 +14130,8 @@ function renderEUTable(b) {
   tbodyRows +=
     '<tr class="eu-total-row">' +
       '<td colspan="3" class="eu-c-num" style="text-align:left;padding-left:14px;font-size:11px;font-weight:700;color:#E2E8F0;text-transform:uppercase;letter-spacing:.04em;">TOTAL</td>' +
-      '<td class="eu-c-est" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
-      '<td class="eu-c-grants">' +
-        '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">'+fmt(totalGrts)+'</div>' +
-      '</td>' +
+      '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
+      gCell('<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">'+fmt(totalGrts)+'</div>', 'eu-c-grants plan-edge') +
       '<td></td>' +
       '<td class="eu-c-act">' +
         '<input type="number" id="eu-grand-act-input" min="0" step="100" placeholder="Enter total…" ' +
@@ -14109,30 +14143,42 @@ function renderEUTable(b) {
         '<div id="eu-grand-diff-words" style="font-size:9px;font-weight:600;margin-top:2px;line-height:1.3;"></div>' +
       '</td>' +
     '</tr>' +
-    '<tr class="eu-net-row">' +
-      '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
-      '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
-      '<td class="eu-c-grants">' +
-        '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual…" ' +
-        'style="width:110px;max-width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
-      '</td>' +
-      '<td></td>' +
-      '<td>' +
-        '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
-        'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
-      '</td>' +
-      '<td></td>' +
-    '</tr>';
+    (showGrants
+      ? '<tr class="eu-net-row">' +
+          '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
+          '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
+          '<td class="eu-c-grants plan-edge">' +
+            '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual…" ' +
+            'style="width:110px;max-width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
+          '</td>' +
+          '<td></td>' +
+          '<td>' +
+            '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
+            'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
+          '</td>' +
+          '<td></td>' +
+        '</tr>'
+      : '');
 
   return '<div id="eu-table-container">' +
     '<table class="eu-measure-table">' +
-    '<colgroup><col style="width:26px"/><col style="width:126px"/><col style="min-width:130px"/><col style="width:86px"/><col style="width:104px"/><col style="width:112px"/><col style="width:86px"/><col style="width:88px"/></colgroup>' +
-    '<thead><tr>' +
-      '<th class="eu-r" style="width:28px;">#</th>' +
-      '<th>Energy Upgrade</th>' +
+    '<colgroup><col style="width:26px"/><col style="width:126px"/><col style="min-width:130px"/><col style="width:86px"/>' +
+      (showGrants ? '<col style="width:104px"/>' : '') +
+      '<col style="width:112px"/><col style="width:86px"/><col style="width:88px"/></colgroup>' +
+    '<thead>' +
+      // The baseline. Everything left of the rule is fixed at the date of issue; everything
+      // right of it is filled in as the job runs. Saying so above the headings is what makes
+      // this a baseline document rather than another estimate.
+      '<tr class="eu-baseline-band">' +
+        '<th colspan="'+nFixed+'" class="plan-edge">Baseline &mdash; fixed at date of issue</th>' +
+        '<th colspan="3">Live &mdash; recorded as the job runs</th>' +
+      '</tr>' +
+      '<tr>' +
+      '<th class="eu-r" style="width:26px;">#</th>' +
+      '<th>Item / Measure</th>' +
       '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
-      '<th class="eu-r" style="color:#E8A020;">Budget Est.</th>' +
-      '<th class="eu-r" style="color:#059669;">Grant</th>' +
+      '<th class="eu-r'+(showGrants?'':' plan-edge')+'" style="color:#E8A020;">Budget Est.</th>' +
+      (showGrants ? '<th class="eu-r plan-edge" style="color:#059669;">Grant</th>' : '') +
       '<th>Variation Notes</th>' +
       '<th class="eu-r" style="color:#38bdf8;">Actual ✏</th>' +
       '<th class="eu-r">Difference</th>' +
@@ -14196,15 +14242,18 @@ function updateEUActuals(src) {
 }
 
 // Update the PDF button area depending on project type
-function _updateEUPDFBtns(isEU) {
+function _updateEUPDFBtns(isPlan, mode) {
   var wrap = document.getElementById('pdf-btn-wrap');
   if (!wrap) return;
-  if (isEU) {
+  // "Retrofit" only where it is one. New Build and Refurbishment get the same two
+  // documents under their own name.
+  var planLabel = mode === 'Energy Upgrade' ? 'Retrofit Cost Plan (PDF)' : 'Cost Plan (PDF)';
+  if (isPlan) {
     // Two documents, for two different readers. The Cost Plan is the homeowner's — page 1 is
     // their summary and the evidence sits behind it. The Pricing Schedule is the same scope
     // with every figure removed, so a contractor prices it without seeing the estimate.
     wrap.innerHTML =
-      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; Retrofit Cost Plan (PDF)</button>' +
+      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; '+planLabel+'</button>' +
       '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>';
   } else {
     wrap.innerHTML =
@@ -14224,6 +14273,18 @@ function exportEUPDF(mode) {
   var grants   = b.grants || [];
   var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
   var isDetailed = (mode === 'detailed');
+  var B = '1px solid #E2E8F0'; // border shorthand
+
+  // Same rules as the on-screen table: New Build carries no Grant column, and the EU-only
+  // rows appear only where they mean something.
+  var pmode      = (pi.type || '').toString();
+  var isEUmode   = pmode === 'Energy Upgrade';
+  var showGrants = pmode !== 'New Build' && grants.length > 0;
+  var _nFixed    = showGrants ? 5 : 4;   // #, item, basis, budget, [grant] — used by rows too
+  var _pdfEdge   = 'border-right:2px solid #E8A020;';
+  var pdfGCell   = function(html, style) {
+    return showGrants ? '<td style="'+(style||('border:'+B+';'))+'">'+html+'</td>' : '';
+  };
 
   var grantsByKey = {};
   grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
@@ -14250,7 +14311,6 @@ function exportEUPDF(mode) {
   var LOAD_STD = 1.22 * 1.135, LOAD_PV = 1.22;
   var usedKeys = {}, rowNum = 0, totalEst = 0, totalGrts = 0, totalAct = 0;
   var pdfRows = '';
-  var B = '1px solid #E2E8F0'; // border shorthand
 
   sections.forEach(function(s, si) {
     var load = s.zeroVat ? LOAD_PV : LOAD_STD;
@@ -14269,7 +14329,7 @@ function exportEUPDF(mode) {
     var dRow   = _d(actRaw, est);      // once per row — _d() accumulates the running total
     rowNum++;
 
-    var pb = _euPricingBasis(s, inp);
+    var pb = _planPricingBasis(s, inp, pmode);
     var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
 
     var grantStr = gAmt > 0
@@ -14282,8 +14342,8 @@ function exportEUPDF(mode) {
           '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;">'+pbStr+'</td>' +
-          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';">'+(est>0?fmt(est):'—')+'</td>' +
-          '<td style="padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';">'+grantStr+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+(est>0?fmt(est):'—')+'</td>' +
+          pdfGCell(grantStr, 'padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';'+_pdfEdge) +
           '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-size:9pt;font-weight:700;white-space:nowrap;vertical-align:top;border:'+B+';color:'+dRow.colour+';">'+dRow.text+'</td>' +
@@ -14308,7 +14368,7 @@ function exportEUPDF(mode) {
   var PDF_BER_COST = 300;
   var berActualRaw = ((document.getElementById('eu-act-ber')||{value:''}).value || '').trim();
   var berActual = parseFloat(berActualRaw) || 0;
-  var berGrant = grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; });
+  var berGrant = isEUmode ? grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; }) : null;
   if (berGrant) {
     totalGrts += berGrant.amount||0;
     totalEst  += PDF_BER_COST;
@@ -14320,8 +14380,8 @@ function exportEUPDF(mode) {
           '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
           '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span></td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate issued before grants released</td>' +
-          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';">'+fmt(PDF_BER_COST)+'</td>' +
-          '<td style="border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;">'+fmt(berGrant.amount||0)+'</td>' +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(PDF_BER_COST)+'</td>' +
+          pdfGCell(fmt(berGrant.amount||0), 'border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;'+_pdfEdge) +
           '<td style="border:'+B+';"></td>' +
           '<td style="padding:5px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-weight:700;white-space:nowrap;border:'+B+';color:'+dBer.colour+';">'+dBer.text+'</td>' +
@@ -14341,7 +14401,7 @@ function exportEUPDF(mode) {
   }
 
   // Scheme management & grant administration fee (managed routes)
-  var pdfFee = euSchemeFee(pi.grantScheme, grants, totalEst);
+  var pdfFee = isEUmode ? euSchemeFee(pi.grantScheme, grants, totalEst) : { amount: 0 };
   if (pdfFee.amount > 0) {
     totalEst += pdfFee.amount;
     rowNum++;
@@ -14364,7 +14424,7 @@ function exportEUPDF(mode) {
           '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
           '<td style="padding:3px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';">'+feeBasis+'</td>' +
           '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';">'+fmt(pdfFee.amount)+'</td>' +
-          '<td style="border:'+B+';text-align:right;">—</td><td style="border:'+B+';"></td>' +
+          pdfGCell('—', 'border:'+B+';text-align:right;'+_pdfEdge) + '<td style="border:'+B+';"></td>' +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
         '</tr>';
     } else {
@@ -14373,20 +14433,20 @@ function exportEUPDF(mode) {
           '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
           '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';">'+fmt(pdfFee.amount)+'</td>' +
-          '<td style="border:'+B+';text-align:right;">—</td><td style="border:'+B+';"></td>' +
+          pdfGCell('—', 'border:'+B+';text-align:right;'+_pdfEdge) + '<td style="border:'+B+';"></td>' +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
         '</tr>';
     }
   }
 
   // OSS grants
-  var ossGrants = grants.filter(function(g){ return g.ossExclusive; });
+  var ossGrants = isEUmode ? grants.filter(function(g){ return g.ossExclusive; }) : [];
   if (ossGrants.length) {
     var ossTotal = ossGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
     totalGrts += ossTotal;
     if (isDetailed) {
       // Individual rows with subtle styling for detailed PDF
-      pdfRows += '<tr><td colspan="8" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;letter-spacing:.06em;border:'+B+';border-top:1px solid #c4b5fd;">⊕ '+seaiSchemeShort(pi.grantScheme)+' Additional Grants</td></tr>';
+      pdfRows += '<tr><td colspan="'+(_nFixed+3)+'" style="padding:3px 6px;font-size:7pt;font-weight:700;color:#6366f1;letter-spacing:.06em;border:'+B+';border-top:1px solid #c4b5fd;">⊕ '+seaiSchemeShort(pi.grantScheme)+' Additional Grants</td></tr>';
       ossGrants.forEach(function(g) {
         pdfRows +=
           '<tr>' +
@@ -14394,7 +14454,7 @@ function exportEUPDF(mode) {
             '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';">'+g.description+'</td>' +
             '<td style="border:'+B+';"></td>' +
             '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
-            '<td style="border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:3px 6px;">'+fmt(g.amount||0)+'</td>' +
+            pdfGCell(fmt(g.amount||0), 'border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:3px 6px;'+_pdfEdge) +
             '<td style="border:'+B+';"></td><td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
           '</tr>';
       });
@@ -14406,7 +14466,7 @@ function exportEUPDF(mode) {
           '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
           '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">'+seaiSchemeShort(pi.grantScheme)+' Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+ossItems+'</span></td>' +
           '<td style="border:'+B+';text-align:right;color:#E8A020;padding:4px 6px;">—</td>' +
-          '<td style="border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:4px 6px;">'+fmt(ossTotal)+'</td>' +
+          pdfGCell(fmt(ossTotal), 'border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:4px 6px;'+_pdfEdge) +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
         '</tr>';
     }
@@ -14428,8 +14488,8 @@ function exportEUPDF(mode) {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">'+fmt(totalGrts)+'</td>' +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(totalEst)+'</td>' +
+        pdfGCell(fmt(totalGrts), 'padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'')+'</td>' +
         '<td style="padding:8px 6px;text-align:right;border:'+B+';color:'+_diffCol+';">' +
@@ -14437,20 +14497,20 @@ function exportEUPDF(mode) {
           (_diffWords ? '<div style="font-size:6.5pt;font-weight:700;margin-top:1px;line-height:1.25;">'+_diffWords+'</div>' : '') +
         '</td>' +
       '</tr>' +
-      '<tr>' +
+      (showGrants ? '<tr>' +
         '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
         '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
-        '<td style="padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
+        pdfGCell((domActGrants>0?fmt(domActGrants):''), 'padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
-      '</tr>';
+      '</tr>' : '');
   } else {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="2" style="padding:5px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';">'+fmt(totalEst)+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';">'+fmt(totalGrts)+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(totalEst)+'</td>' +
+        pdfGCell(fmt(totalGrts), 'padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'')+'</td>' +
         '<td style="padding:5px 6px;text-align:right;border:'+B+';color:'+_diffCol+';">' +
@@ -14458,14 +14518,14 @@ function exportEUPDF(mode) {
           (_diffWords ? '<div style="font-size:6.5pt;font-weight:700;margin-top:1px;line-height:1.25;">'+_diffWords+'</div>' : '') +
         '</td>' +
       '</tr>' +
-      '<tr>' +
+      (showGrants ? '<tr>' +
         '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
         '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
-        '<td style="padding:4px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
+        pdfGCell((domActGrants>0?fmt(domActGrants):''), 'padding:4px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
-      '</tr>';
+      '</tr>' : '');
   }
 
   // No summary strip — HLI & design load appear under the Heating System row; BER pathway is in the header
@@ -14603,7 +14663,7 @@ function exportEUPDF(mode) {
   // Compact header band — no separate cover page, no page-break, no gap
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
-      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Energy Upgrade Cost Plan</div>' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — '+(isEUmode?'Energy Upgrade':pmode)+' Cost Plan</div>' +
       '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
       '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:2px;">' +
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
@@ -14611,27 +14671,41 @@ function exportEUPDF(mode) {
         '<span>County: <strong style="color:#1E293B;">'+(pi.county||'—')+'</strong></span>' +
         '<span>Grant Scheme: <strong style="color:#1E293B;">'+seaiSchemeLabel(pi.grantScheme)+'</strong></span>' +
         (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
+        '<span>BER basis: <strong style="color:#1E293B;">'+(pmode==='New Build'?'Provisional':'Existing')+'</strong></span>' +
       '</div>' +
       '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · '+rateBookStamp()+(isDetailed?' · Detailed':'')+'</div>' +
     '</div>';
 
-  var colgroup7 = '<colgroup><col style="width:18px"/><col style="width:112px"/><col style="min-width:92px"/><col style="width:66px"/><col style="width:80px"/><col style="min-width:70px"/><col style="width:60px"/><col style="width:66px"/></colgroup>';
-  var thead7 = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+  var _bandRow = '<tr style="background:#FFF7ED;color:#92400E;">' +
+      '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
+      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
+    '</tr>';
+  var colgroup7 = '<colgroup><col style="width:18px"/><col style="width:112px"/><col style="min-width:92px"/><col style="width:66px"/>' +
+    (showGrants ? '<col style="width:80px"/>' : '') +
+    '<col style="min-width:70px"/><col style="width:60px"/><col style="width:66px"/></colgroup>';
+  var thead7 = '<thead>' + _bandRow + '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
-    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Item / Measure</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Pricing Basis</th>' +
-    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Budget Est.</th>' +
-    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">Grant</th>' +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+(showGrants?'':_pdfEdge)+'">Budget Est.</th>' +
+    (showGrants ? '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;'+_pdfEdge+'">Grant</th>' : '') +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
     '</tr></thead>';
-  var colgroup6 = '<colgroup><col style="width:20px"/><col style="min-width:150px"/><col style="width:70px"/><col style="width:80px"/><col style="width:96px"/><col style="width:64px"/><col style="width:70px"/></colgroup>';
-  var thead6 = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+  var colgroup6 = '<colgroup><col style="width:20px"/><col style="min-width:150px"/><col style="width:70px"/>' +
+    (showGrants ? '<col style="width:80px"/>' : '') +
+    '<col style="width:96px"/><col style="width:64px"/><col style="width:70px"/></colgroup>';
+  var thead6 = '<thead>' +
+    '<tr style="background:#FFF7ED;color:#92400E;">' +
+      '<th colspan="'+(showGrants?4:3)+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
+      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
+    '</tr>' +
+    '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:4px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
-    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Energy Upgrade Measure</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;">Budget Est.</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;">Grant</th>' +
+    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Item / Measure</th>' +
+    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+(showGrants?'':_pdfEdge)+'">Budget Est.</th>' +
+    (showGrants ? '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;'+_pdfEdge+'">Grant</th>' : '') +
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
@@ -14806,7 +14880,7 @@ window.exportContractorSchedule = exportContractorSchedule;
 function exportCompactPDF() {
   if (!BOQ) return;
   var b = BOQ, pi = b.projectInfo || {}, su = b.summary || {};
-  if (pi.type === 'Energy Upgrade') { exportEUPDF('detailed'); return; }
+  exportEUPDF('detailed'); return;   // all three modes share the plan document now
   var sections = b.sections || [];
   var grants   = b.grants || [];
   var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
@@ -15493,9 +15567,12 @@ function renderAccordionReport() {
   if (!BOQ) return;
 
   // For standalone Energy Upgrade: render clean measure table, not accordion
+  // All three modes now render the same baseline plan table. New Build and Refurbishment
+  // used to get the elemental accordion; the client-facing document is the same shape in
+  // every mode, which is the point of a baseline.
   var _ptype = ((BOQ.projectInfo||{}).type||'').toString();
   var _colHelp = document.getElementById('boq-columns-help');
-  if (_ptype === 'Energy Upgrade') {
+  if (_ptype === 'Energy Upgrade' || _ptype === 'New Build' || _ptype === 'Refurbishment') {
     var _euWrap = document.getElementById('boq-accordion-wrap');
     if (_euWrap) _euWrap.innerHTML = renderEUTable(BOQ);
     // The Cost Plan carries its own homeowner how-to inside the table
@@ -16078,11 +16155,9 @@ function showToast(msg) {
 // ── EXPORT PDF ────────────────────────────────────────────────────────────────
 function exportPDF() {
   if (!BOQ) return;
-  // Standalone Energy Upgrade has one deliverable — the Retrofit Cost Plan
-  if (BOQ.projectInfo && BOQ.projectInfo.type === 'Energy Upgrade') {
-    exportEUPDF('detailed');
-    return;
-  }
+  // Every mode has one deliverable — the Cost Plan
+  exportEUPDF('detailed');
+  return;
   const b  = BOQ;
   const pi = b.projectInfo;
   const su = b.summary;
