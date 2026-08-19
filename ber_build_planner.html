@@ -13943,11 +13943,12 @@ function _planPricingBasis(s, inp, mode) {
   if (eu && eu.length) return eu;
   var items = (s.items || []).filter(function(i){ return (i.quantity || 0) > 0; });
   if (!items.length) items = (s.items || []).slice(0);
-  var lines = items.slice(0, 4).map(function(i) {
+  var maxLines = 4;
+  var lines = items.slice(0, maxLines).map(function(i) {
     var q = i.quantity ? (Math.round(i.quantity * 10) / 10) : null;
     return (i.description || '').replace(/\s*\(.*?\)\s*$/, '') + (q ? ' — ' + q + (i.unit ? ' ' + i.unit : '') : '');
   });
-  if (items.length > 4) lines.push('+ ' + (items.length - 4) + ' further items');
+  if (items.length > maxLines) lines.push('+ ' + (items.length - maxLines) + ' further items — see appendix');
   return lines;
 }
 window._planPricingBasis = _planPricingBasis;
@@ -14582,7 +14583,7 @@ function exportEUPDF(mode) {
   var methodHTML = '';
   if (isDetailed) {
     var methRows = sections.map(function(s) {
-      var pb = _euPricingBasis(s, inp);
+      var pb = _planPricingBasis(s, inp, pmode);
       return '<tr style="border-bottom:1px solid #E2E8F0;">' +
         '<td style="padding:5px 6px;font-weight:700;font-size:8pt;border:1px solid #E2E8F0;vertical-align:top;">'+s.title+'</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;white-space:pre-line;">'+pb.join('\n')+'</td>' +
@@ -14849,7 +14850,7 @@ function exportContractorSchedule() {
   var rowNum = 0, rows = '';
   sections.forEach(function(s) {
     rowNum++;
-    var pb = _euPricingBasis(s, inp);
+    var pb = _planPricingBasis(s, inp, (pi.type || '').toString());
     var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
     rows +=
       '<tr style="page-break-inside:avoid;">' +
