@@ -321,17 +321,13 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-c-act{text-align:right;width:100px;color:#38bdf8;}
 .eu-act-input{width:88px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#38bdf8;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
 .eu-act-input:focus{outline:1px solid #38bdf8;border-color:#38bdf8;}
-.eu-c-grants{text-align:right;white-space:nowrap;width:110px;color:#059669;}
-/* the grant breakdown under the amount must wrap, or it forces the column wide enough
-   to push Difference off the edge */
-.eu-c-grants div{white-space:normal;}
-.eu-c-notes{min-width:110px;}
+/* Grant has no column of its own — it prints under the measure name. */
+.eu-c-notes{min-width:180px;}
 .eu-note-input{width:100%;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
 .eu-note-input:focus{outline:1px solid rgba(74,222,128,.4);border-color:rgba(74,222,128,.4);}
 .eu-total-row td{border-top:2px solid rgba(74,222,128,.35)!important;background:rgba(74,222,128,.06);font-weight:700;padding:10px 6px;}
 .eu-total-row .eu-c-est{font-size:13px;color:#E8A020;}
 .eu-total-row .eu-c-act{font-size:13px;color:#38bdf8;}
-.eu-total-row .eu-c-grants{font-size:13px;color:#059669;}
 .eu-net-row td{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.08);padding:8px 6px;}
 .eu-actgrants-row td{background:rgba(5,150,105,.04);border-top:1px solid rgba(5,150,105,.12);padding:6px 6px;}
 .eu-oss-row td{background:rgba(99,102,241,.04);}
@@ -13923,6 +13919,32 @@ function planDifferenceWords(diffTotal, anyActual) {
 window.planDifference = planDifference;
 window.planDifferenceWords = planDifferenceWords;
 
+// The grant rides under the measure name rather than in a column of its own. With one grant
+// the name is dropped — the row is already titled WALL INSULATION, so naming the Cavity Wall
+// Insulation Grant beside it says the same thing twice. Where a row carries more than one
+// (windows plus external doors, say), each gets its own short line and keeps enough of its
+// name to tell them apart. No grant means no line at all — no dash, no empty row.
+function planGrantNote(list, opt) {
+  opt = opt || {};
+  var arr = (list || []).filter(function(g){ return (g.amount || 0) > 0; });
+  if (!arr.length) return '';
+  var lines = arr.length === 1
+    ? ['Grant: ' + fmt(arr[0].amount)]
+    : arr.map(function(g) {
+        // Just enough name to tell them apart, on one line: the word "Grant" is already
+        // the label, and the parenthetical qualifier is derivable from the amount.
+        var name = (g.description || '')
+          .replace(/\s*\([^)]*\)/g, '')
+          .replace(/\s*grants?\b/i, '')
+          .trim();
+        return 'Grant: ' + fmt(g.amount) + (name ? ' &mdash; ' + name : '');
+      });
+  return '<div style="font-size:' + (opt.size || '9px') + ';font-weight:600;color:' +
+         (opt.colour || '#059669') + ';margin-top:2px;line-height:1.35;">' +
+         lines.join('<br>') + '</div>';
+}
+window.planGrantNote = planGrantNote;
+
 // Provisional or existing BER — a property of the job, not of the mode. New Build is always
 // provisional; a refurbishment or energy upgrade is normally existing but can be provisional
 // where the works are not yet built (an extension, for instance).
@@ -14023,18 +14045,15 @@ function renderEUTable(b) {
   var grants   = b.grants || [];
   var inp      = b.euInputs || {};
 
-  // One table for all three modes. New Build has no SEAI grants, so it carries no Grant
-  // column at all rather than an empty one; the EU-only rows (BER assessment, scheme fee,
-  // OSS extras, net-after-grants) only appear where they mean something.
+  // One table for all three modes. There is no Grant column: each grant rides under its
+  // measure name, and the grant and net totals sit in the totals block beneath the table.
+  // New Build has no SEAI grants at all, so it carries neither; the EU-only rows (BER
+  // assessment, scheme fee, OSS extras) only appear where they mean something.
   var mode       = (pi.type || '').toString();
   var isEU       = mode === 'Energy Upgrade';
   var showGrants = mode !== 'New Build' && grants.length > 0;
-  var nFixed     = showGrants ? 5 : 4;      // #, item, basis, budget, [grant]
+  var nFixed     = 4;                       // #, item, basis, budget
   var nCols      = nFixed + 3;              // + variation notes, actual, difference
-  var blankGrant = showGrants ? '' : null;  // null = do not emit the cell at all
-  function gCell(html, cls) {
-    return showGrants ? '<td class="' + (cls || 'eu-c-grants') + '">' + html + '</td>' : '';
-  }
 
   // Build grant map: measureKey → [grant objects] (non-OSS only)
   var grantsByKey = {};
@@ -14061,10 +14080,7 @@ function renderEUTable(b) {
     var gAmt = secGrants.reduce(function(a, g){ return a + (g.amount||0); }, 0);
     totalGrts += gAmt;
 
-    var grantCell = gAmt > 0
-      ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span>'
-        + '<div style="font-size:9px;color:#6B7280;margin-top:2px;">' + secGrants.map(function(g){ return g.description+' &mdash; '+fmt(g.amount||0); }).join('<br>') + '</div>'
-      : '<span style="color:#475569;">—</span>';
+    var grantNote = showGrants ? planGrantNote(secGrants) : '';
 
     var pb = _planPricingBasis(s, inp, mode);
     var pbHtml = pb.length
@@ -14076,10 +14092,9 @@ function renderEUTable(b) {
     tbodyRows +=
       '<tr class="eu-row">' +
         '<td class="eu-c-num">'+rowNum+'</td>' +
-        '<td class="eu-c-measure"><span class="eu-measure-name">'+s.title+'</span></td>' +
+        '<td class="eu-c-measure"><span class="eu-measure-name">'+s.title+'</span>'+grantNote+'</td>' +
         '<td class="eu-c-basis">'+pbHtml+'</td>' +
-        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+(est>0?fmt(est):'—')+'</td>' +
-        gCell(grantCell, 'eu-c-grants plan-edge') +
+        '<td class="eu-c-est plan-edge">'+(est>0?fmt(est):'—')+'</td>' +
         '<td class="eu-c-notes"><textarea id="'+nid+'" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="'+rid+'" class="eu-act-input" min="0" step="100" placeholder="—" ' +
           'data-budget="'+est+'" data-diff="'+did+'" oninput="updateEUActuals()"></td>' +
@@ -14100,11 +14115,10 @@ function renderEUTable(b) {
         '<td class="eu-c-measure">' +
           '<span class="eu-measure-name">BER Assessment (post-works)</span>' +
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Required to release all SEAI grants</div>' +
+          (showGrants ? planGrantNote([berGrant]) : '') +
         '</td>' +
         '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate issued before grants released</li></ul></td>' +
-        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+fmt(BER_ASSESS_COST)+'</td>' +
-        gCell('<span style="color:#059669;font-weight:700;">'+fmt(berGrant.amount||0)+'</span>' +
-          '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+berGrant.description+'</div>', 'eu-c-grants plan-edge') +
+        '<td class="eu-c-est plan-edge">'+fmt(BER_ASSESS_COST)+'</td>' +
         '<td class="eu-c-notes"><textarea id="eu-note-ber" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="eu-act-ber" class="eu-act-input" min="0" step="10" placeholder="—" ' +
           'data-budget="'+BER_ASSESS_COST+'" data-diff="eu-diff-ber" oninput="updateEUActuals()"></td>' +
@@ -14136,8 +14150,7 @@ function renderEUTable(b) {
               '<li>'+_fee.measures+' grant measures &times; '+fmt(_fee.perMeasure)+(_fee.capped?' (capped)':'')+'</li>' +
               '<li>VAT included &mdash; professional fee, not works</li>') +
         '</ul></td>' +
-        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'">'+fmt(_fee.amount)+'</td>' +
-        gCell('—', 'eu-c-grants plan-edge') +
+        '<td class="eu-c-est plan-edge">'+fmt(_fee.amount)+'</td>' +
         '<td class="eu-c-notes"><textarea class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" class="eu-act-input" min="0" step="50" placeholder="—" ' +
           'data-budget="'+_fee.amount+'" data-diff="eu-diff-fee" oninput="updateEUActuals()"></td>' +
@@ -14157,10 +14170,10 @@ function renderEUTable(b) {
         '<td class="eu-c-measure">' +
           '<span class="eu-measure-name" style="color:#6366f1;">'+seaiSchemeShort(BOQ.projectInfo.grantScheme)+' Grants</span>' +
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">'+ossItems+'</div>' +
+          '<div style="font-size:9px;font-weight:600;color:#6366f1;margin-top:2px;line-height:1.35;">Grant: '+fmt(ossTotal)+'</div>' +
         '</td>' +
         '<td class="eu-c-basis"><em style="font-size:9px;color:#6366f1;">Additional grants — only available via an OSS provider</em></td>' +
-        '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'" style="color:#475569;">—</td>' +
-        gCell('<span style="color:#6366f1;font-weight:700;">'+fmt(ossTotal)+'</span>', 'eu-c-grants plan-edge') +
+        '<td class="eu-c-est plan-edge" style="color:#475569;">—</td>' +
         '<td class="eu-c-notes">—</td>' +
         '<td class="eu-c-act">—</td>' +
         '<td class="eu-c-diff" style="color:#475569;">—</td>' +
@@ -14177,8 +14190,7 @@ function renderEUTable(b) {
   tbodyRows +=
     '<tr class="eu-total-row">' +
       '<td colspan="3" class="eu-c-num" style="text-align:left;padding-left:14px;font-size:11px;font-weight:700;color:#E2E8F0;text-transform:uppercase;letter-spacing:.04em;">TOTAL</td>' +
-      '<td class="eu-c-est'+(showGrants?'':' plan-edge')+'" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
-      gCell('<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">'+fmt(totalGrts)+'</div>', 'eu-c-grants plan-edge') +
+      '<td class="eu-c-est plan-edge" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
       '<td></td>' +
       '<td class="eu-c-act">' +
         '<input type="number" id="eu-grand-act-input" min="0" step="100" placeholder="Enter total…" ' +
@@ -14190,16 +14202,26 @@ function renderEUTable(b) {
         '<div id="eu-grand-diff-words" style="font-size:9px;font-weight:600;margin-top:2px;line-height:1.3;"></div>' +
       '</td>' +
     '</tr>' +
+    // With no Grant column, the grant total and the net both live in the totals block, in
+    // the Budget Est. column where the other money sits. New Build shows neither.
     (showGrants
       ? '<tr class="eu-net-row">' +
-          '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net Cost after SEAI Grants</td>' +
-          '<td id="eu-net-est" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
-          '<td class="eu-c-grants plan-edge">' +
-            '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual…" ' +
-            'style="width:110px;max-width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
+          '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Total grants</td>' +
+          '<td class="plan-edge" style="padding:8px 6px;text-align:right;white-space:nowrap;">' +
+            '<div id="eu-grand-grants" style="color:#059669;font-weight:700;font-size:13px;">'+fmt(totalGrts)+'</div>' +
           '</td>' +
           '<td></td>' +
-          '<td>' +
+          '<td class="eu-c-act">' +
+            '<input type="number" id="eu-grand-grants-act" min="0" step="100" placeholder="Actual…" ' +
+            'style="width:100%;box-sizing:border-box;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;font-size:11px;padding:4px 5px;border-radius:4px;text-align:right;font-family:inherit;">' +
+          '</td>' +
+          '<td></td>' +
+        '</tr>' +
+        '<tr class="eu-net-row">' +
+          '<td colspan="3" style="padding:8px 14px;font-size:11px;font-weight:700;color:#CBD5E1;letter-spacing:.02em;">↳ Net to fund</td>' +
+          '<td id="eu-net-est" class="plan-edge" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
+          '<td></td>' +
+          '<td class="eu-c-act">' +
             '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
             'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
           '</td>' +
@@ -14209,9 +14231,10 @@ function renderEUTable(b) {
 
   return '<div id="eu-table-container">' +
     '<table class="eu-measure-table">' +
-    '<colgroup><col style="width:26px"/><col style="width:126px"/><col style="min-width:130px"/><col style="width:86px"/>' +
-      (showGrants ? '<col style="width:104px"/>' : '') +
-      '<col style="width:112px"/><col style="width:86px"/><col style="width:88px"/></colgroup>' +
+    // The width the Grant column used to take goes to Variation Notes, which is where the
+    // client writes. Budget Est., Actual and Difference only ever hold a figure.
+    '<colgroup><col style="width:26px"/><col style="width:186px"/><col style="min-width:130px"/><col style="width:86px"/>' +
+      '<col style="min-width:190px"/><col style="width:86px"/><col style="width:88px"/></colgroup>' +
     '<thead>' +
       // The baseline. Everything left of the rule is fixed at the date of issue; everything
       // right of it is filled in as the job runs. Saying so above the headings is what makes
@@ -14224,8 +14247,7 @@ function renderEUTable(b) {
       '<th class="eu-r" style="width:26px;">#</th>' +
       '<th>Item / Measure</th>' +
       '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
-      '<th class="eu-r'+(showGrants?'':' plan-edge')+'" style="color:#E8A020;">Budget Est.</th>' +
-      (showGrants ? '<th class="eu-r plan-edge" style="color:#059669;">Grant</th>' : '') +
+      '<th class="eu-r plan-edge" style="color:#E8A020;">Budget Est.</th>' +
       '<th>Variation Notes</th>' +
       '<th class="eu-r" style="color:#38bdf8;">Actual ✏</th>' +
       '<th class="eu-r">Difference</th>' +
@@ -14322,15 +14344,15 @@ function exportEUPDF(mode) {
   var isDetailed = (mode === 'detailed');
   var B = '1px solid #E2E8F0'; // border shorthand
 
-  // Same rules as the on-screen table: New Build carries no Grant column, and the EU-only
-  // rows appear only where they mean something.
+  // Same rules as the on-screen table: no Grant column, the grant printed under the measure
+  // name, and the EU-only rows appearing only where they mean something.
   var pmode      = (pi.type || '').toString();
   var isEUmode   = pmode === 'Energy Upgrade';
   var showGrants = pmode !== 'New Build' && grants.length > 0;
-  var _nFixed    = showGrants ? 5 : 4;   // #, item, basis, budget, [grant] — used by rows too
+  var _nFixed    = 4;                    // #, item, basis, budget — used by rows too
   var _pdfEdge   = 'border-right:2px solid #E8A020;';
-  var pdfGCell   = function(html, style) {
-    return showGrants ? '<td style="'+(style||('border:'+B+';'))+'">'+html+'</td>' : '';
+  var _gNote     = function(list, colour) {
+    return showGrants ? planGrantNote(list, { size: '6.5pt', colour: colour }) : '';
   };
 
   var grantsByKey = {};
@@ -14379,18 +14401,15 @@ function exportEUPDF(mode) {
     var pb = _planPricingBasis(s, inp, pmode);
     var pbStr = pb.map(function(t){ return '• '+t; }).join('<br>');
 
-    var grantStr = gAmt > 0
-      ? '<span style="color:#059669;font-weight:700;">'+fmt(gAmt)+'</span><br><span style="font-size:6.5pt;color:#6B7280;line-height:1.35;">'+secGrants.map(function(g){return g.description+' &mdash; '+fmt(g.amount||0);}).join('<br>')+'</span>'
-      : '—';
+    var grantStr = _gNote(secGrants);
 
     if (isDetailed) {
       pdfRows +=
         '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
           '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
-          '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
+          '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+grantStr+'</td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;">'+pbStr+'</td>' +
-          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+(est>0?fmt(est):'—')+'</td>' +
-          pdfGCell(grantStr, 'padding:5px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';'+_pdfEdge) +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+_pdfEdge+'">'+(est>0?fmt(est):'—')+'</td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-size:9pt;font-weight:700;white-space:nowrap;vertical-align:top;border:'+B+';color:'+dRow.colour+';">'+dRow.text+'</td>' +
@@ -14401,9 +14420,8 @@ function exportEUPDF(mode) {
         '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
           '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+
-            (pb.length ? '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">'+pb.join(' · ')+'</div>' : '')+'</td>' +
-          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+(est>0?fmt(est):'—')+'</td>' +
-          pdfGCell(grantStr, 'padding:3px 6px;text-align:right;font-size:9pt;vertical-align:top;border:'+B+';'+_pdfEdge) +
+            (pb.length ? '<div style="font-size:6.5pt;font-weight:400;color:#64748B;margin-top:1px;line-height:1.35;">'+pb.join(' · ')+'</div>' : '')+grantStr+'</td>' +
+          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+_pdfEdge+'">'+(est>0?fmt(est):'—')+'</td>' +
           '<td style="padding:3px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
           '<td style="padding:3px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
           '<td style="padding:3px 6px;text-align:right;font-size:9pt;font-weight:700;white-space:nowrap;vertical-align:top;border:'+B+';color:'+dRow.colour+';">'+dRow.text+'</td>' +
@@ -14425,10 +14443,9 @@ function exportEUPDF(mode) {
       pdfRows +=
         '<tr style="border-bottom:'+B+';">' +
           '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
-          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span></td>' +
+          '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span>'+_gNote([berGrant])+'</td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate issued before grants released</td>' +
-          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(PDF_BER_COST)+'</td>' +
-          pdfGCell(fmt(berGrant.amount||0), 'border:'+B+';text-align:right;color:#059669;font-weight:700;padding:5px 6px;'+_pdfEdge) +
+          '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(PDF_BER_COST)+'</td>' +
           '<td style="border:'+B+';"></td>' +
           '<td style="padding:5px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-weight:700;white-space:nowrap;border:'+B+';color:'+dBer.colour+';">'+dBer.text+'</td>' +
@@ -14437,9 +14454,8 @@ function exportEUPDF(mode) {
       pdfRows +=
         '<tr style="border-bottom:'+B+';">' +
           '<td style="padding:3px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
-          '<td style="padding:3px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:6.5pt;color:#94a3b8;">Required to release all SEAI grants</span></td>' +
-          '<td style="padding:3px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(PDF_BER_COST)+'</td>' +
-          pdfGCell(fmt(berGrant.amount||0), 'border:'+B+';text-align:right;color:#059669;font-weight:700;padding:3px 6px;'+_pdfEdge) +
+          '<td style="padding:3px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:6.5pt;color:#94a3b8;">Required to release all SEAI grants</span>'+_gNote([berGrant])+'</td>' +
+          '<td style="padding:3px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(PDF_BER_COST)+'</td>' +
           '<td style="border:'+B+';"></td>' +
           '<td style="padding:3px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
           '<td style="padding:3px 6px;text-align:right;font-weight:700;white-space:nowrap;border:'+B+';color:'+dBer.colour+';">'+dBer.text+'</td>' +
@@ -14470,8 +14486,8 @@ function exportEUPDF(mode) {
           '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
           '<td style="padding:3px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';">'+feeBasis+'</td>' +
-          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(pdfFee.amount)+'</td>' +
-          pdfGCell('—', 'border:'+B+';text-align:right;'+_pdfEdge) + '<td style="border:'+B+';"></td>' +
+          '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(pdfFee.amount)+'</td>' +
+          '<td style="border:'+B+';"></td>' +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
         '</tr>';
     } else {
@@ -14479,7 +14495,6 @@ function exportEUPDF(mode) {
         '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
           '<td style="padding:3px 4px;color:#94a3b8;text-align:center;font-size:8pt;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:3px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+feeName+'</td>' +
-          pdfGCell('—', 'border:'+B+';text-align:right;') +
           '<td style="padding:3px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(pdfFee.amount)+'</td>' +
           '<td style="border:'+B+';"></td>' +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
@@ -14499,10 +14514,10 @@ function exportEUPDF(mode) {
         pdfRows +=
           '<tr>' +
             '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
-            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';">'+g.description+'</td>' +
+            '<td style="padding:3px 6px;font-size:8pt;color:#6366f1;border:'+B+';">'+g.description+
+              '<div style="font-size:6.5pt;font-weight:600;color:#6366f1;margin-top:2px;line-height:1.35;">Grant: '+fmt(g.amount||0)+'</div></td>' +
             '<td style="border:'+B+';"></td>' +
-            '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;">—</td>' +
-            pdfGCell(fmt(g.amount||0), 'border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:3px 6px;'+_pdfEdge) +
+            '<td style="border:'+B+';text-align:right;font-size:8pt;color:#E8A020;padding:3px 6px;'+_pdfEdge+'">—</td>' +
             '<td style="border:'+B+';"></td><td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
           '</tr>';
       });
@@ -14512,9 +14527,9 @@ function exportEUPDF(mode) {
       pdfRows +=
         '<tr>' +
           '<td style="padding:3px 4px;text-align:center;color:#6366f1;font-size:7pt;border:'+B+';">★</td>' +
-          '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">'+seaiSchemeShort(pi.grantScheme)+' Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+ossItems+'</span></td>' +
-          '<td style="border:'+B+';text-align:right;color:#E8A020;padding:4px 6px;">—</td>' +
-          pdfGCell(fmt(ossTotal), 'border:'+B+';text-align:right;color:#6366f1;font-weight:700;font-size:9pt;padding:4px 6px;'+_pdfEdge) +
+          '<td style="padding:3px 6px;font-size:8pt;font-weight:700;color:#6366f1;border:'+B+';">'+seaiSchemeShort(pi.grantScheme)+' Grants<br><span style="font-size:6.5pt;font-weight:400;color:#64748B;">'+ossItems+'</span>' +
+            '<div style="font-size:6.5pt;font-weight:600;color:#6366f1;margin-top:2px;line-height:1.35;">Grant: '+fmt(ossTotal)+'</div></td>' +
+          '<td style="border:'+B+';text-align:right;color:#E8A020;padding:4px 6px;'+_pdfEdge+'">—</td>' +
           '<td style="border:'+B+';"></td><td style="border:'+B+';"></td><td style="border:'+B+';"></td>' +
         '</tr>';
     }
@@ -14536,8 +14551,7 @@ function exportEUPDF(mode) {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="3" style="padding:8px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
-        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(totalEst)+'</td>' +
-        pdfGCell(fmt(totalGrts), 'padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
+        '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(totalEst)+'</td>' +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:8px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'')+'</td>' +
         '<td style="padding:8px 6px;text-align:right;border:'+B+';color:'+_diffCol+';">' +
@@ -14546,9 +14560,15 @@ function exportEUPDF(mode) {
         '</td>' +
       '</tr>' +
       (showGrants ? '<tr>' +
-        '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
-        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
-        pdfGCell((domActGrants>0?fmt(domActGrants):''), 'padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
+        '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Total grants</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge+'">'+fmt(totalGrts)+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td colspan="3" style="padding:7px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net to fund</td>' +
+        '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';'+_pdfEdge+'">'+fmt(netCost)+'</td>' +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:7px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
@@ -14557,8 +14577,7 @@ function exportEUPDF(mode) {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
         '<td colspan="2" style="padding:5px 6px;font-size:10pt;font-weight:700;color:#1E293B;text-transform:uppercase;border:'+B+';">TOTAL</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+(showGrants?'':_pdfEdge)+'">'+fmt(totalEst)+'</td>' +
-        pdfGCell(fmt(totalGrts), 'padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
+        '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:900;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(totalEst)+'</td>' +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:11pt;font-weight:700;color:#38bdf8;border:'+B+';">'+(domActTotal>0?fmt(domActTotal):'')+'</td>' +
         '<td style="padding:5px 6px;text-align:right;border:'+B+';color:'+_diffCol+';">' +
@@ -14567,9 +14586,15 @@ function exportEUPDF(mode) {
         '</td>' +
       '</tr>' +
       (showGrants ? '<tr>' +
-        '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net Cost after SEAI Grants</td>' +
-        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';">'+fmt(netCost)+'</td>' +
-        pdfGCell((domActGrants>0?fmt(domActGrants):''), 'padding:4px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge) +
+        '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Total grants</td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:11pt;font-weight:700;color:#059669;border:'+B+';'+_pdfEdge+'">'+fmt(totalGrts)+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:9pt;font-weight:700;color:#059669;border:'+B+';">'+(domActGrants>0?fmt(domActGrants):'')+'</td>' +
+        '<td style="border:'+B+';"></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td colspan="2" style="padding:4px 6px;font-size:9pt;font-weight:700;color:#475569;border:'+B+';">↳ Net to fund</td>' +
+        '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#769B44;border:'+B+';'+_pdfEdge+'">'+fmt(netCost)+'</td>' +
         '<td style="border:'+B+';"></td>' +
         '<td style="padding:4px 6px;text-align:right;font-size:12pt;font-weight:900;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
@@ -14728,32 +14753,29 @@ function exportEUPDF(mode) {
       '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
     '</tr>';
-  var colgroup7 = '<colgroup><col style="width:18px"/><col style="width:112px"/><col style="min-width:92px"/><col style="width:66px"/>' +
-    (showGrants ? '<col style="width:80px"/>' : '') +
-    '<col style="min-width:70px"/><col style="width:60px"/><col style="width:66px"/></colgroup>';
+  // The freed Grant width goes to Variation Notes — the column the client writes in.
+  var colgroup7 = '<colgroup><col style="width:18px"/><col style="width:150px"/><col style="min-width:92px"/><col style="width:66px"/>' +
+    '<col style="min-width:120px"/><col style="width:60px"/><col style="width:66px"/></colgroup>';
   var thead7 = '<thead>' + _bandRow + '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Item / Measure</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Pricing Basis</th>' +
-    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+(showGrants?'':_pdfEdge)+'">Budget Est.</th>' +
-    (showGrants ? '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;'+_pdfEdge+'">Grant</th>' : '') +
+    '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+_pdfEdge+'">Budget Est.</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
     '</tr></thead>';
   var colgroup6 = '<colgroup><col style="width:20px"/><col style="min-width:150px"/><col style="width:70px"/>' +
-    (showGrants ? '<col style="width:80px"/>' : '') +
-    '<col style="width:96px"/><col style="width:64px"/><col style="width:70px"/></colgroup>';
+    '<col style="min-width:176px"/><col style="width:64px"/><col style="width:70px"/></colgroup>';
   var thead6 = '<thead>' +
     '<tr style="background:#FFF7ED;color:#92400E;">' +
-      '<th colspan="'+(showGrants?4:3)+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
+      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
     '</tr>' +
     '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:4px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Item / Measure</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+(showGrants?'':_pdfEdge)+'">Budget Est.</th>' +
-    (showGrants ? '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#059669;'+_pdfEdge+'">Grant</th>' : '') +
+    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+_pdfEdge+'">Budget Est.</th>' +
     '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
