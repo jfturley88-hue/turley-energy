@@ -323,6 +323,35 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-act-input:focus{outline:1px solid #38bdf8;border-color:#38bdf8;}
 /* Grant has no column of its own — it prints under the measure name. */
 .eu-c-notes{min-width:180px;}
+/* Grant route comparison — the same works priced under each SEAI route */
+.plan-routes-wrap{margin-top:16px;padding:14px 14px 12px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.02);}
+.plan-routes-head{margin-bottom:10px;}
+.plan-routes-head .pr-title{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#E8A020;}
+.plan-routes-head .pr-sub{display:block;font-size:10px;color:#8090A8;margin-top:3px;line-height:1.5;}
+.plan-routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;}
+.plan-route{display:block;width:100%;text-align:left;cursor:pointer;font-family:inherit;padding:11px 12px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);color:#C8D0DC;transition:border-color .12s,background .12s;}
+.plan-route:hover{border-color:rgba(232,160,32,.45);background:rgba(232,160,32,.05);}
+.plan-route.on{border-color:rgba(232,160,32,.75);background:rgba(232,160,32,.07);cursor:default;}
+.plan-route .pr-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px;}
+.plan-route .pr-name{font-size:12px;font-weight:700;color:#E2E8F0;}
+.plan-route .pr-tags{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+.plan-route .pr-tag{font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:10px;white-space:nowrap;}
+.plan-route .pr-on{background:rgba(232,160,32,.16);color:#E8A020;}
+.plan-route .pr-best{background:rgba(74,222,128,.14);color:#4ADE80;}
+.plan-route .pr-blurb{font-size:9.5px;color:#8090A8;margin:3px 0 8px;line-height:1.45;}
+.plan-route .pr-figs{margin:0;font-size:10.5px;}
+.plan-route .pr-figs>div{display:flex;justify-content:space-between;gap:8px;padding:2px 0;}
+.plan-route dt{color:#8090A8;margin:0;}
+.plan-route dd{margin:0;color:#C8D0DC;font-weight:600;white-space:nowrap;}
+.plan-route dd.pr-grant{color:#059669;}
+.plan-route .pr-net{margin-top:4px;padding-top:5px;border-top:1px solid rgba(255,255,255,.08);}
+.plan-route .pr-net dt{color:#CBD5E1;font-weight:700;}
+.plan-route .pr-net dd{color:#A9B85A;font-weight:900;font-size:13px;}
+.plan-route .pr-pick{margin-top:8px;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8090A8;}
+.plan-route:hover .pr-pick{color:#E8A020;}
+.plan-route.on .pr-pick{color:#E8A020;}
+.plan-routes-note{margin-top:10px;font-size:10px;color:#8090A8;line-height:1.55;}
+.plan-routes-note .pr-caveat{display:inline-block;margin-top:5px;color:#B08A48;}
 .eu-note-input{width:100%;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
 .eu-note-input:focus{outline:1px solid rgba(74,222,128,.4);border-color:rgba(74,222,128,.4);}
 .eu-total-row td{border-top:2px solid rgba(74,222,128,.35)!important;background:rgba(74,222,128,.06);font-weight:700;padding:10px 6px;}
@@ -13118,6 +13147,11 @@ async function generate() {
     ]);
     var _rfAo = (typeof readAdvancedOptions === 'function') ? readAdvancedOptions('Refurbishment') : null;
     BOQ = buildBOQRefurbSelector(refInputs, projName || 'Refurbishment Project', county, dwelling, scheme, _rfAo);
+    // Lets the route comparison price the same works under another SEAI scheme without
+    // touching the DOM or disturbing the plan on screen.
+    BOQ._rebuild = function(sc) {
+      return buildBOQRefurbSelector(refInputs, projName || 'Refurbishment Project', county, dwelling, sc, _rfAo);
+    };
     BOQ.projectInfo.currentBER    = document.getElementById('ref-eu-currentBER')?.value    || '';
     BOQ.projectInfo.targetBER     = document.getElementById('ref-eu-targetBER')?.value     || '';
     BOQ.projectInfo.ageBand       = document.getElementById('ref-eu-ageBand')?.value       || '';
@@ -13227,6 +13261,13 @@ async function generate() {
     ]);
     var _ao11 = (typeof readAdvancedOptions === 'function') ? readAdvancedOptions('Energy Upgrade') : null;
     BOQ = buildBOQRetrofit(euInputs, projName || 'Energy Upgrade Project', county, dwelling, scheme, undefined, _ao11);
+    // Lets the route comparison price the same works under another SEAI scheme without
+    // touching the DOM or disturbing the plan on screen.
+    BOQ._rebuild = function(sc) {
+      var alt = buildBOQRetrofit(euInputs, projName || 'Energy Upgrade Project', county, dwelling, sc, undefined, _ao11);
+      alt.projectInfo.type = 'Energy Upgrade';
+      return alt;
+    };
     BOQ.projectInfo.type          = 'Energy Upgrade';
     BOQ.projectInfo.currentBER    = document.getElementById('eu-currentBER')?.value    || '';
     BOQ.projectInfo.targetBER     = document.getElementById('eu-targetBER')?.value     || '';
@@ -13945,6 +13986,120 @@ function planGrantNote(list, opt) {
 }
 window.planGrantNote = planGrantNote;
 
+// ── The live half of the plan survives a re-render ──────────────────────────────
+// Re-rendering replaces the table's HTML, which used to throw away every Actual and
+// Variation Note the client had entered. Rows are matched by measure name, so a measure
+// that is still in the plan keeps what was recorded against it and one that has been
+// removed takes its entry with it.
+function capturePlanLive() {
+  var t = document.querySelector('.eu-measure-table');
+  if (!t) return null;
+  var live = { rows: {}, notes: {}, grandAct: '', grantsAct: '', netAct: '', rowSum: 0, anyRow: false };
+  t.querySelectorAll('tbody tr').forEach(function(row) {
+    var nameEl = row.querySelector('.eu-measure-name');
+    if (!nameEl) return;
+    var key = (nameEl.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!key) return;
+    var act  = row.querySelector('.eu-act-input');
+    var note = row.querySelector('.eu-note-input');
+    if (act && (act.value || '').trim() !== '') {
+      live.rows[key] = act.value;
+      live.anyRow = true;
+      live.rowSum += parseFloat(act.value) || 0;
+    }
+    if (note && (note.value || '').trim() !== '') live.notes[key] = note.value;
+  });
+  var v = function(id) { var e = document.getElementById(id); return e ? (e.value || '') : ''; };
+  live.grandAct  = v('eu-grand-act-input');
+  live.grantsAct = v('eu-grand-grants-act');
+  live.netAct    = v('eu-net-act-input');
+  return live;
+}
+
+function restorePlanLive(live) {
+  if (!live) return;
+  var t = document.querySelector('.eu-measure-table');
+  if (!t) return;
+  t.querySelectorAll('tbody tr').forEach(function(row) {
+    var nameEl = row.querySelector('.eu-measure-name');
+    if (!nameEl) return;
+    var key = (nameEl.textContent || '').replace(/\s+/g, ' ').trim();
+    var act  = row.querySelector('.eu-act-input');
+    var note = row.querySelector('.eu-note-input');
+    if (act && live.rows[key] !== undefined)  act.value  = live.rows[key];
+    if (note && live.notes[key] !== undefined) note.value = live.notes[key];
+  });
+  var set = function(id, val) { var e = document.getElementById(id); if (e && val !== '') e.value = val; };
+  set('eu-grand-grants-act', live.grantsAct);
+  set('eu-net-act-input',    live.netAct);
+  // A grand total the client typed over the row sum is theirs to keep; one that merely
+  // mirrored the rows is left to recompute, so a dropped row cannot linger in the total.
+  var typedOver = live.grandAct !== '' &&
+                  Math.abs((parseFloat(live.grandAct) || 0) - live.rowSum) > 0.5;
+  if (typedOver) { set('eu-grand-act-input', live.grandAct); updateEUActuals('manual'); }
+  else updateEUActuals();
+}
+window.capturePlanLive = capturePlanLive;
+window.restorePlanLive = restorePlanLive;
+
+// ── One source for the plan's money ────────────────────────────────────────────
+// Which grants attach to which section, what each section costs loaded, and the four
+// figures the totals block prints. The table reads from here rather than adding up as
+// it draws, so the comparison strip and the table cannot disagree.
+function planTotals(b) {
+  var pi = b.projectInfo || {};
+  var mode = (pi.type || '').toString();
+  var isEU = mode === 'Energy Upgrade';
+  var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
+  var grants = b.grants || [];
+  var LOAD_STD = 1.22 * 1.135;  // prelims 12% + contingency 10% + VAT 13.5%
+  var LOAD_PV  = 1.22;          // solar PV: 0% VAT
+
+  var byKey = {};
+  grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
+    (byKey[g.measureKey] = byKey[g.measureKey] || []).push(g);
+  });
+
+  var used = {}, works = 0, grantTotal = 0;
+  var perSection = sections.map(function(s) {
+    var est = Math.round((s.subtotal || 0) * (s.zeroVat ? LOAD_PV : LOAD_STD));
+    works += est;
+    var mk = _euMeasureKey(s);
+    var gs = (mk && byKey[mk] && !used[mk]) ? byKey[mk] : [];
+    if (gs.length) used[mk] = true;
+    grantTotal += gs.reduce(function(a, g){ return a + (g.amount || 0); }, 0);
+    return { section: s, est: est, grants: gs };
+  });
+
+  var BER_COST = 300;   // typical post-works BER assessor fee — matches engine berFee
+  var berGrant = isEU
+    ? grants.find(function(g){ return !g.ossExclusive && g.measureKey === 'ber' && !used['ber']; })
+    : null;
+  if (berGrant) grantTotal += berGrant.amount || 0;
+  var berCost = berGrant ? BER_COST : 0;
+
+  // The fee is charged on the works plus the BER assessment, so it is computed last.
+  var subtotal = works + berCost;
+  var feeObj = isEU ? euSchemeFee(pi.grantScheme, grants, subtotal) : { amount: 0 };
+  var fee = feeObj.amount || 0;
+
+  var ossGrants = isEU ? grants.filter(function(g){ return g.ossExclusive; }) : [];
+  var ossTotal = ossGrants.reduce(function(a, g){ return a + (g.amount || 0); }, 0);
+  grantTotal += ossTotal;
+
+  var totalEst = subtotal + fee;
+  return {
+    showGrants: mode !== 'New Build' && grants.length > 0,
+    perSection: perSection, works: works,
+    berGrant: berGrant, berCost: berCost, BER_COST: BER_COST,
+    feeObj: feeObj, fee: fee,
+    ossGrants: ossGrants, ossTotal: ossTotal,
+    totalEst: totalEst, grantTotal: grantTotal,
+    net: Math.max(0, totalEst - grantTotal),
+  };
+}
+window.planTotals = planTotals;
+
 // Provisional or existing BER — a property of the job, not of the mode. New Build is always
 // provisional; a refurbishment or energy upgrade is normally existing but can be provisional
 // where the works are not yet built (an extension, for instance).
@@ -14039,6 +14194,128 @@ function euTermsHTML(o) {
 window.EU_ESTIMATE_TERMS = EU_ESTIMATE_TERMS;
 window.euTermsHTML = euTermsHTML;
 
+// ── Compare the three SEAI routes on the same works ────────────────────────────
+// The route does not change the job — it changes who runs it and what comes back. So
+// the choice belongs here, after the plan is priced, where the homeowner can see all
+// three side by side. Each route is priced by re-running the engine that produced this
+// plan with a different scheme, so nothing here is a separate estimate.
+//
+// The route is a pre-issue decision. Once the plan is issued it is part of the baseline
+// and switching means a new plan, not an edit — which is why the strip says so.
+var PLAN_ROUTES = [
+  { key: 'beh', name: 'Better Energy Homes',   blurb: 'You apply, and you appoint the contractors.' },
+  { key: 'ceg', name: 'Community Energy Grant', blurb: 'A Project Coordinator runs it across several contractors.' },
+  { key: 'oss', name: 'One Stop Shop',          blurb: 'One provider, start to finish.' },
+];
+
+function planRouteComparison(b) {
+  var pi = b.projectInfo || {};
+  if ((pi.type || '').toString() === 'New Build') return '';   // no SEAI grants at all
+  if (typeof b._rebuild !== 'function') return '';
+  var current = (typeof seaiScheme === 'function') ? seaiScheme(pi.grantScheme) : pi.grantScheme;
+  if (current === 'none') return '';
+
+  var priced = [];
+  for (var i = 0; i < PLAN_ROUTES.length; i++) {
+    var r = PLAN_ROUTES[i];
+    var alt;
+    try { alt = (r.key === current) ? b : b._rebuild(r.key); }
+    catch (e) { return ''; }                                   // never break the plan over this
+    if (!alt) return '';
+    priced.push({ route: r, t: planTotals(alt) });
+  }
+
+  // Routes within this of each other are level, not ranked. Small gaps between routes are
+  // as likely to come from which incidental rows a scheme happens to carry as from any real
+  // saving, and a "cheapest" badge on a €300 spread would be a claim the figures cannot bear.
+  var LEVEL = 500;
+  var best = priced.reduce(function(a, p){ return p.t.net < a.t.net ? p : a; }, priced[0]);
+  var ranked = priced.filter(function(p){ return p.t.net > best.t.net + LEVEL; }).length > 0;
+  // Only some routes carry the post-works BER as a separate cost; where they differ, that
+  // difference has to be visible rather than hidden inside a "works" figure.
+  var anyBer  = priced.some(function(p){ return p.t.berCost > 0; });
+  var berSame = priced.every(function(p){ return p.t.berCost === priced[0].t.berCost; });
+
+  var cells = priced.map(function(p) {
+    var on   = p.route.key === current;
+    var lead = ranked && p.t.net <= best.t.net + LEVEL;
+    return '<button type="button" class="plan-route' + (on ? ' on' : '') + '" ' +
+      'onclick="selectPlanRoute(\'' + p.route.key + '\')" ' +
+      (on ? 'aria-current="true" ' : '') + '>' +
+      '<div class="pr-head">' +
+        '<span class="pr-name">' + p.route.name + '</span>' +
+        // Both tags where both apply — showing "least to fund" only on the route the plan
+        // is not on would imply it beats the current one when the two are level.
+        '<span class="pr-tags">' +
+          (on   ? '<span class="pr-tag pr-on">On this plan</span>' : '') +
+          (lead ? '<span class="pr-tag pr-best">Least to fund</span>' : '') +
+        '</span>' +
+      '</div>' +
+      '<div class="pr-blurb">' + p.route.blurb + '</div>' +
+      '<dl class="pr-figs">' +
+        '<div><dt>Measured works</dt><dd>' + fmt(p.t.works) + '</dd></div>' +
+        // Kept on its own line rather than folded into the works, because the routes do
+        // not agree on whether it is a separate cost — see the footnote below the strip.
+        (anyBer ? '<div><dt>Post-works BER</dt><dd>' + (p.t.berCost > 0 ? fmt(p.t.berCost) : '—') + '</dd></div>' : '') +
+        '<div><dt>Scheme fee</dt><dd>' + (p.t.fee > 0 ? fmt(p.t.fee) : '—') + '</dd></div>' +
+        '<div><dt>Grants</dt><dd class="pr-grant">' + fmt(p.t.grantTotal) + '</dd></div>' +
+        '<div class="pr-net"><dt>Net to fund</dt><dd>' + fmt(p.t.net) + '</dd></div>' +
+      '</dl>' +
+      '<div class="pr-pick">' + (on ? 'Selected' : 'Price this plan on this route') + '</div>' +
+    '</button>';
+  }).join('');
+
+  // The interesting number is rarely the biggest grant — say what the spread actually is.
+  // The largest grant and the least to fund are often not the same route, because the
+  // scheme fee can take back most of what the extra grant gives.
+  var cur     = priced.filter(function(p){ return p.route.key === current; })[0] || best;
+  var gap     = cur.t.net - best.t.net;
+  var topGrant = priced.reduce(function(a, p){ return p.t.grantTotal > a.t.grantTotal ? p : a; }, priced[0]);
+  var verdict;
+  if (!ranked) {
+    verdict = 'All three leave much the same to fund on these works &mdash; within ' + fmt(LEVEL) +
+              ' of each other. ' + topGrant.route.name + ' draws the most grant at ' +
+              fmt(topGrant.t.grantTotal) + ', but the scheme fee takes back what it gives, ' +
+              'so choose on how much of the job you want to run yourself.';
+  } else if (gap <= LEVEL) {
+    verdict = 'This plan is on one of the routes that leaves least to fund.';
+  } else {
+    verdict = best.route.name + ' would leave ' + fmt(gap) + ' less to fund than ' +
+              cur.route.name + ' on exactly these works.';
+  }
+
+  return '<div class="plan-routes-wrap">' +
+    '<div class="plan-routes-head">' +
+      '<span class="pr-title">Grant route</span>' +
+      '<span class="pr-sub">Same works, same measured quantities. Only the scheme fee and ' +
+        'the grants change &mdash; choose before the plan is issued.</span>' +
+    '</div>' +
+    '<div class="plan-routes">' + cells + '</div>' +
+    '<div class="plan-routes-note">' + verdict +
+      ' Switching re-prices the plan; anything already recorded under Actual or Variation ' +
+      'Notes is kept.' +
+      (anyBer && !berSame
+        ? '<br><span class="pr-caveat">Note: a post-works BER is required on every route, but only ' +
+          'the routes showing a figure above carry it as a separate cost here &mdash; on the others ' +
+          'it is not priced. Treat differences of that order between routes as noise.</span>'
+        : '') +
+    '</div>' +
+  '</div>';
+}
+
+// Put the plan on a different route: set the scheme the rest of the app reads, then
+// re-run the same generate() that produced this plan.
+function selectPlanRoute(key) {
+  var sel = document.getElementById('t0-grantScheme');
+  if (sel && sel.value !== key) {
+    sel.value = key;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  if (typeof generate === 'function') generate();
+}
+window.planRouteComparison = planRouteComparison;
+window.selectPlanRoute = selectPlanRoute;
+
 function renderEUTable(b) {
   var pi = b.projectInfo || {};
   var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
@@ -14051,35 +14328,22 @@ function renderEUTable(b) {
   // assessment, scheme fee, OSS extras) only appear where they mean something.
   var mode       = (pi.type || '').toString();
   var isEU       = mode === 'Energy Upgrade';
-  var showGrants = mode !== 'New Build' && grants.length > 0;
   var nFixed     = 4;                       // #, item, basis, budget
   var nCols      = nFixed + 3;              // + variation notes, actual, difference
 
-  // Build grant map: measureKey → [grant objects] (non-OSS only)
-  var grantsByKey = {};
-  grants.filter(function(g){ return !g.ossExclusive && g.measureKey; }).forEach(function(g) {
-    if (!grantsByKey[g.measureKey]) grantsByKey[g.measureKey] = [];
-    grantsByKey[g.measureKey].push(g);
-  });
+  // Every figure below comes from planTotals — the table draws it, it does not add it up.
+  var T          = planTotals(b);
+  var showGrants = T.showGrants;
+  var totalEst   = T.totalEst;
+  var totalGrts  = T.grantTotal;
 
-  var LOAD_STD = 1.22 * 1.135; // prelims 12% + contingency 10% + VAT 13.5%
-  var LOAD_PV  = 1.22;          // solar PV: 0% VAT
-
-  var usedKeys = {};
-  var rowNum = 0, totalEst = 0, totalGrts = 0;
+  var rowNum = 0;
   var tbodyRows = '';
 
-  sections.forEach(function(s) {
-    var load = s.zeroVat ? LOAD_PV : LOAD_STD;
-    var est  = Math.round((s.subtotal || 0) * load);
-    totalEst += est;
-
-    var mk = _euMeasureKey(s);
-    var secGrants = (mk && grantsByKey[mk] && !usedKeys[mk]) ? grantsByKey[mk] : [];
-    if (secGrants.length) usedKeys[mk] = true;
-    var gAmt = secGrants.reduce(function(a, g){ return a + (g.amount||0); }, 0);
-    totalGrts += gAmt;
-
+  T.perSection.forEach(function(ps) {
+    var s   = ps.section;
+    var est = ps.est;
+    var secGrants = ps.grants;
     var grantNote = showGrants ? planGrantNote(secGrants) : '';
 
     var pb = _planPricingBasis(s, inp, mode);
@@ -14103,11 +14367,9 @@ function renderEUTable(b) {
   });
 
   // BER assessment grant standalone row (if not already used by a BER section)
-  var BER_ASSESS_COST = 300; // typical post-works BER assessor fee — matches engine berFee
-  var berGrant = isEU ? grants.find(function(g){ return !g.ossExclusive && g.measureKey==='ber' && !usedKeys['ber']; }) : null;
+  var BER_ASSESS_COST = T.BER_COST;
+  var berGrant = T.berGrant;
   if (berGrant) {
-    totalGrts += berGrant.amount||0;
-    totalEst  += BER_ASSESS_COST;
     rowNum++;
     tbodyRows +=
       '<tr class="eu-row eu-ber-row">' +
@@ -14127,10 +14389,8 @@ function renderEUTable(b) {
   }
 
   // Scheme management & grant administration fee (managed routes)
-  var _fee = isEU ? euSchemeFee(BOQ.projectInfo.grantScheme, grants, totalEst)
-                  : { amount: 0 };
+  var _fee = T.feeObj;
   if (_fee.amount > 0) {
-    totalEst += _fee.amount;
     rowNum++;
     tbodyRows +=
       '<tr class="eu-row">' +
@@ -14159,10 +14419,9 @@ function renderEUTable(b) {
   }
 
   // OSS grants — single bundled row
-  var ossGrants = isEU ? grants.filter(function(g){ return g.ossExclusive; }) : [];
+  var ossGrants = T.ossGrants;
   if (ossGrants.length) {
-    var ossTotal = ossGrants.reduce(function(a,g){ return a+(g.amount||0); }, 0);
-    totalGrts += ossTotal;
+    var ossTotal = T.ossTotal;
     var ossItems = ossGrants.map(function(g){ return g.description; }).join(' · ');
     tbodyRows +=
       '<tr class="eu-row eu-oss-row">' +
@@ -14180,7 +14439,7 @@ function renderEUTable(b) {
       '</tr>';
   }
 
-  var netTotal = Math.max(0, totalEst - totalGrts);
+  var netTotal = T.net;
   // The table adds up rounded row figures; the header adds up before rounding, which can
   // leave the two a euro or two apart. The table is what the customer reads line by line,
   // so it is the authority — publish it and let the header resync to it.
@@ -14254,6 +14513,7 @@ function renderEUTable(b) {
     '</tr></thead>' +
     '<tbody>'+tbodyRows+'</tbody>' +
     '</table>' +
+    planRouteComparison(b) +
     '<div class="eu-howto"><strong>How to use this document.</strong> ' + EU_HOW_TO_USE + '</div>' +
     '<div class="eu-disclaimer">' + euTermsHTML({ head: '#C8D0DC' }) +
       '<div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);">' +
@@ -15644,7 +15904,10 @@ function renderAccordionReport() {
   var _colHelp = document.getElementById('boq-columns-help');
   if (_ptype === 'Energy Upgrade' || _ptype === 'New Build' || _ptype === 'Refurbishment') {
     var _euWrap = document.getElementById('boq-accordion-wrap');
+    // Re-rendering replaces the table, so the live half is lifted out and put back.
+    var _live = capturePlanLive();
     if (_euWrap) _euWrap.innerHTML = renderEUTable(BOQ);
+    restorePlanLive(_live);
     // The Cost Plan carries its own homeowner how-to inside the table
     if (_colHelp) _colHelp.style.display = 'none';
     // Header follows the table exactly — see BOQ._euTableTotal in renderEUTable()
@@ -18410,6 +18673,18 @@ window.refreshGrantChips = refreshGrantChips;
     var el = document.getElementById(id);
     if (el) el.addEventListener('change', refresh);
   });
+
+  // The chips used to switch route while a plan already on screen stayed on the old one,
+  // with nothing saying which was live. If a plan exists, re-price it to match.
+  var _schemeSel = document.getElementById('t0-grantScheme');
+  if (_schemeSel) {
+    _schemeSel.addEventListener('change', function() {
+      if (typeof BOQ === 'undefined' || !BOQ) return;   // `let BOQ` — not on window
+      var rpt = document.getElementById('screen-report');
+      if (!rpt || rpt.style.display === 'none') return;
+      if (typeof generate === 'function') generate();
+    });
+  }
 
   // Window glazing change affects the windows chip
   document.addEventListener('change', function(e) {
