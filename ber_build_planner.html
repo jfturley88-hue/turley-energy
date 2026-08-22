@@ -305,24 +305,27 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .export-pdf-btn:hover{background:rgba(232,160,32,0.28);}
 /* ── EU Measure Table ────────────────────────────────────────────── */
 #eu-table-container{overflow-x:auto;}
-.eu-measure-table{width:100%;border-collapse:collapse;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;}
+/* Fixed layout so the colgroup percentages are honoured exactly. Under auto layout the
+   browser redistributes slack by content, which is why paired columns drifted apart. */
+.eu-measure-table{width:100%;table-layout:fixed;border-collapse:collapse;font-family:'DM Sans',system-ui,sans-serif;font-size:11px;}
 .eu-measure-table thead th{background:#0d1e2a;color:#8090A8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:8px 6px;border-bottom:2px solid rgba(74,222,128,.4);text-align:left;white-space:nowrap;}
 .eu-measure-table thead th.eu-r{text-align:right;}
 .eu-row td{border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle;padding:8px 6px;}
 .eu-row:nth-child(even) td{background:rgba(255,255,255,.015);}
 .eu-row:hover td{background:rgba(74,222,128,.04);}
-.eu-c-num{text-align:center;color:#6B7280;font-weight:600;font-size:10px;width:30px;}
-.eu-c-measure{font-weight:600;min-width:140px;}
+/* Column widths live in the colgroup only — no width or min-width here, or they would
+   fight it. Pricing Basis matches Variation Notes; Budget Est., Actual and Difference
+   are all one width. */
+.eu-c-num{text-align:center;color:#6B7280;font-weight:600;font-size:10px;}
+.eu-c-measure{font-weight:600;}
 .eu-measure-name{font-size:11px;color:#E2E8F0;line-height:1.35;}
-.eu-c-basis{font-size:10px;color:#94a3b8;min-width:160px;}
+.eu-c-basis{font-size:10px;color:#94a3b8;}
 .eu-pb-list{margin:0;padding-left:14px;list-style:disc;}
-.eu-pb-list li{margin-bottom:2px;color:#94a3b8;font-size:10px;line-height:1.3;}
-.eu-c-est{text-align:right;font-weight:700;color:#E8A020;white-space:nowrap;width:100px;}
-.eu-c-act{text-align:right;width:100px;color:#38bdf8;}
-.eu-act-input{width:88px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#38bdf8;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
+.eu-pb-list li{margin-bottom:2px;color:#94a3b8;font-size:10px;line-height:1.3;overflow-wrap:anywhere;}
+.eu-c-est{text-align:right;font-weight:700;color:#E8A020;white-space:nowrap;}
+.eu-c-act{text-align:right;color:#38bdf8;}
+.eu-act-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#38bdf8;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;text-align:right;}
 .eu-act-input:focus{outline:1px solid #38bdf8;border-color:#38bdf8;}
-/* Grant has no column of its own — it prints under the measure name. */
-.eu-c-notes{min-width:180px;}
 /* Grant route comparison — the same works priced under each SEAI route */
 .plan-routes-wrap{margin-top:16px;padding:14px 14px 12px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.02);}
 .plan-routes-head{margin-bottom:10px;}
@@ -352,7 +355,7 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .plan-route.on .pr-pick{color:#E8A020;}
 .plan-routes-note{margin-top:10px;font-size:10px;color:#8090A8;line-height:1.55;}
 .plan-routes-note .pr-caveat{display:inline-block;margin-top:5px;color:#B08A48;}
-.eu-note-input{width:100%;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
+.eu-note-input{width:100%;box-sizing:border-box;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#C8D0DC;border-radius:4px;padding:4px 6px;font-size:10px;font-family:inherit;resize:vertical;min-height:34px;}
 .eu-note-input:focus{outline:1px solid rgba(74,222,128,.4);border-color:rgba(74,222,128,.4);}
 .eu-total-row td{border-top:2px solid rgba(74,222,128,.35)!important;background:rgba(74,222,128,.06);font-weight:700;padding:10px 6px;}
 .eu-total-row .eu-c-est{font-size:13px;color:#E8A020;}
@@ -14452,8 +14455,8 @@ function renderEUTable(b) {
       '<td class="eu-c-est plan-edge" id="eu-grand-est">'+fmt(totalEst)+'</td>' +
       '<td></td>' +
       '<td class="eu-c-act">' +
-        '<input type="number" id="eu-grand-act-input" min="0" step="100" placeholder="Enter total…" ' +
-        'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;" ' +
+        '<input type="number" id="eu-grand-act-input" min="0" step="100" placeholder="Total…" ' +
+        'style="width:100%;box-sizing:border-box;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;" ' +
         'oninput="updateEUActuals(\'manual\')">' +
       '</td>' +
       '<td class="eu-c-diff">' +
@@ -14481,8 +14484,8 @@ function renderEUTable(b) {
           '<td id="eu-net-est" class="plan-edge" style="padding:8px 6px;text-align:right;color:#A9B85A;font-weight:900;font-size:14px;white-space:nowrap;">'+fmt(netTotal)+'</td>' +
           '<td></td>' +
           '<td class="eu-c-act">' +
-            '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Enter net cost…" ' +
-            'style="width:100%;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
+            '<input type="number" id="eu-net-act-input" min="0" step="100" placeholder="Net…" ' +
+            'style="width:100%;box-sizing:border-box;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
           '</td>' +
           '<td></td>' +
         '</tr>'
@@ -14490,10 +14493,10 @@ function renderEUTable(b) {
 
   return '<div id="eu-table-container">' +
     '<table class="eu-measure-table">' +
-    // The width the Grant column used to take goes to Variation Notes, which is where the
-    // client writes. Budget Est., Actual and Difference only ever hold a figure.
-    '<colgroup><col style="width:26px"/><col style="width:186px"/><col style="min-width:130px"/><col style="width:86px"/>' +
-      '<col style="min-width:190px"/><col style="width:86px"/><col style="width:88px"/></colgroup>' +
+    // Pricing Basis and Variation Notes are one width; Budget Est., Actual and Difference
+    // are another. Percentages, so the pairing holds at any container width.
+    '<colgroup><col style="width:3%"/><col style="width:21%"/><col style="width:23%"/><col style="width:10%"/>' +
+      '<col style="width:23%"/><col style="width:10%"/><col style="width:10%"/></colgroup>' +
     '<thead>' +
       // The baseline. Everything left of the rule is fixed at the date of issue; everything
       // right of it is filled in as the job runs. Saying so above the headings is what makes
@@ -14503,9 +14506,9 @@ function renderEUTable(b) {
         '<th colspan="3">Live &mdash; recorded as the job runs</th>' +
       '</tr>' +
       '<tr>' +
-      '<th class="eu-r" style="width:26px;">#</th>' +
+      '<th class="eu-r">#</th>' +
       '<th>Item / Measure</th>' +
-      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
+      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;white-space:normal;">Pricing Basis <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
       '<th class="eu-r plan-edge" style="color:#E8A020;">Budget Est.</th>' +
       '<th>Variation Notes</th>' +
       '<th class="eu-r" style="color:#38bdf8;">Actual ✏</th>' +
@@ -15013,9 +15016,10 @@ function exportEUPDF(mode) {
       '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
     '</tr>';
-  // The freed Grant width goes to Variation Notes — the column the client writes in.
-  var colgroup7 = '<colgroup><col style="width:18px"/><col style="width:150px"/><col style="min-width:92px"/><col style="width:66px"/>' +
-    '<col style="min-width:120px"/><col style="width:60px"/><col style="width:66px"/></colgroup>';
+  // Same pairing as on screen: Pricing Basis equals Variation Notes, and Budget Est.,
+  // Actual and Difference are all one width.
+  var colgroup7 = '<colgroup><col style="width:3%"/><col style="width:21%"/><col style="width:23%"/><col style="width:10%"/>' +
+    '<col style="width:23%"/><col style="width:10%"/><col style="width:10%"/></colgroup>';
   var thead7 = '<thead>' + _bandRow + '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Item / Measure</th>' +
@@ -15025,8 +15029,10 @@ function exportEUPDF(mode) {
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
     '</tr></thead>';
-  var colgroup6 = '<colgroup><col style="width:20px"/><col style="min-width:150px"/><col style="width:70px"/>' +
-    '<col style="min-width:176px"/><col style="width:64px"/><col style="width:70px"/></colgroup>';
+  // No Pricing Basis column in this one, so Variation Notes has no partner; the three
+  // money columns still match.
+  var colgroup6 = '<colgroup><col style="width:3%"/><col style="width:40%"/><col style="width:10%"/>' +
+    '<col style="width:27%"/><col style="width:10%"/><col style="width:10%"/></colgroup>';
   var thead6 = '<thead>' +
     '<tr style="background:#FFF7ED;color:#92400E;">' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
@@ -15073,7 +15079,7 @@ function exportEUPDF(mode) {
 
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
-    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
+    '<table style="width:100%;table-layout:fixed;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;word-wrap:break-word;">' +
       (isDetailed ? colgroup7 : colgroup6) +
       (isDetailed ? thead7 : thead6) +
       '<tbody>'+pdfRows+'</tbody>' +
