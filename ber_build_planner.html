@@ -508,6 +508,53 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
   #pdf-print-view .pl-fig { font-size: 8.5pt !important; }
 }
 
+/* ── SELECTION FORMS (portrait A4) ──────────────────────────────────────────
+   The homeowner selection forms print portrait — exportSelectionForm() injects a
+   one-off @page override for the print itself. These rules live outside @media print
+   so the brief on-screen moment before the dialog opens is styled too. All scoped
+   under #pdf-print-view .sf-doc, so nothing leaks into the app. */
+#pdf-print-view .sf-doc { font-family: 'DM Sans', Calibri, 'Segoe UI', sans-serif; color: #1E293B; font-size: 9.5pt; line-height: 1.4; max-width: 182mm; margin: 0 auto; }
+#pdf-print-view .sf-globe { width: 34px; height: 34px; display: block; flex-shrink: 0; }
+#pdf-print-view .sf-mast { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding-bottom: 4mm; border-bottom: 2pt solid #B07D1A; }
+#pdf-print-view .sf-word { font-size: 21pt; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+#pdf-print-view .sf-word .p { color: #1E293B; } #pdf-print-view .sf-word .b { color: #E8A020; }
+#pdf-print-view .sf-title { font-family: 'Fraunces', Georgia, serif; font-size: 15pt; font-weight: 800; margin-top: 3.2mm; }
+#pdf-print-view .sf-sub { font-size: 9pt; color: #64748B; margin-top: 1.2mm; }
+#pdf-print-view .sf-prep { text-align: right; font-size: 7.5pt; color: #8090A8; line-height: 1.7; white-space: nowrap; }
+#pdf-print-view .sf-prep .who { color: #1E293B; font-weight: 700; font-size: 8.5pt; }
+#pdf-print-view .sf-lbl { font-size: 6.5pt; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 700; color: #8090A8; }
+#pdf-print-view .sf-idgrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 5mm; margin-top: 5mm; }
+#pdf-print-view .sf-idgrid > div { border-bottom: 0.5pt solid #B9C0CB; padding-bottom: 1.5mm; }
+#pdf-print-view .sf-idgrid .val { min-height: 6mm; font-size: 9.5pt; font-weight: 600; padding-top: 1mm; }
+#pdf-print-view .sf-intro { margin-top: 5mm; padding: 4mm 4.5mm; background: #FFFFFF !important; border: 0.5pt solid #DDD8CC; border-left: 2.2pt solid #B07D1A; border-radius: 2pt; }
+#pdf-print-view .sf-intro p { margin: 0 0 2mm; font-size: 9pt; line-height: 1.55; }
+#pdf-print-view .sf-intro p:last-child { margin-bottom: 0; }
+#pdf-print-view .sf-intro .grey { color: #64748B; font-size: 8.5pt; }
+#pdf-print-view .sf-intro strong { color: #1E293B; }
+#pdf-print-view .sf-sec { break-inside: auto; margin-top: 7mm; }
+#pdf-print-view .sf-sechead { display: flex; align-items: baseline; gap: 3mm; padding-bottom: 1.8mm; border-bottom: 1pt solid #1E293B; break-after: avoid; page-break-after: avoid; }
+#pdf-print-view .sf-secn { font-family: 'Fraunces', Georgia, serif; font-size: 13pt; font-weight: 800; color: #B07D1A; }
+#pdf-print-view .sf-sect { font-family: 'Fraunces', Georgia, serif; font-size: 12.5pt; font-weight: 600; }
+#pdf-print-view .sf-sectarget { margin-left: auto; font-size: 7.5pt; color: #8090A8; }
+#pdf-print-view .sf-secintro { font-size: 8.5pt; color: #475569; line-height: 1.5; margin-top: 2mm; break-after: avoid; }
+#pdf-print-view .sf-q { margin-top: 3.5mm; }
+#pdf-print-view .sf-qlabel { font-size: 8.5pt; font-weight: 700; margin-bottom: 1.8mm; break-after: avoid; page-break-after: avoid; }
+#pdf-print-view .sf-opt { display: flex; gap: 2.6mm; align-items: flex-start; padding: 2.2mm 2.8mm; border: 0.5pt solid #DDD8CC; border-radius: 2pt; background: #FFFFFF !important; margin-bottom: 1.6mm; break-inside: avoid; page-break-inside: avoid; }
+#pdf-print-view .sf-ring { width: 3.6mm; height: 3.6mm; border-radius: 50%; border: 0.9pt solid #9AA3AF; flex-shrink: 0; margin-top: 0.4mm; }
+#pdf-print-view .sf-oname { font-size: 9pt; font-weight: 700; line-height: 1.3; }
+#pdf-print-view .sf-chip { display: inline-block; font-size: 6.8pt; font-weight: 700; padding: 0.4mm 1.8mm; border-radius: 6pt; margin-left: 1.6mm; vertical-align: 0.3mm; white-space: nowrap; }
+#pdf-print-view .sf-chip.u { background: #F1F5F9 !important; color: #1E293B; border: 0.4pt solid #D5DCE4; }
+#pdf-print-view .sf-chip.money { border: 0.4pt solid; }
+#pdf-print-view .sf-chip.soft { background: #FFFFFF !important; color: #A0A8B4; border: 0.4pt solid #E2E5EA; }
+#pdf-print-view .sf-onote { font-size: 8pt; color: #475569; line-height: 1.45; margin-top: 1mm; }
+#pdf-print-view .sf-footnote { font-size: 7.5pt; color: #8090A8; font-style: italic; line-height: 1.5; margin-top: 1mm; }
+#pdf-print-view .sf-notes { border: 0.5pt solid #DDD8CC; border-radius: 2pt; background: #FFFFFF !important; margin-top: 2.5mm; padding: 1.8mm 2.8mm 9mm; break-inside: avoid; }
+#pdf-print-view .sf-return { margin-top: 8mm; padding: 4.5mm 5mm; background: #1E293B !important; border-radius: 2.5pt; color: #E8EDF3; break-inside: avoid; }
+#pdf-print-view .sf-return h3 { font-family: 'Fraunces', Georgia, serif; font-size: 11pt; font-weight: 600; color: #FFFFFF; margin: 0 0 2mm; }
+#pdf-print-view .sf-return p { font-size: 8.5pt; line-height: 1.6; margin: 0; color: #C6D0DC; }
+#pdf-print-view .sf-return .who { font-size: 7.5pt; color: #8FA0B4; margin-top: 2.5mm; }
+#pdf-print-view .sf-fine { font-size: 6.8pt; color: #A0A8B4; line-height: 1.55; margin-top: 4mm; }
+
 /* __ Tab input form ___________________________________________________ */
 .tab-bar {
   display: flex;
@@ -929,6 +976,15 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   <button onclick="openProjectSections()" style="width:100%;padding:14px;border-radius:10px;border:none;background:#E8A020;color:#1A2332;font-size:14px;font-weight:800;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background 0.2s;margin-bottom:10px;" onmouseover="this.style.background='#CF8F1A'" onmouseout="this.style.background='#E8A020'">
     Open Inputs &#8594;
   </button>
+
+  <!-- SELECTION FORMS — the client-facing paperwork that comes BEFORE the plan. New Build:
+       the homeowner fills it in and the plan is priced on it. Energy Upgrade: the assessor
+       ticks it with the homeowner at the survey. Refurbishment has no form, so the row hides. -->
+  <div id="form-btn-row" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:10px;">
+    <span style="font-size:11px;color:#8090A8;">Client paperwork:</span>
+    <button id="form-btn-nb" onclick="exportSelectionForm('nb')" title="Blank selection form the homeowner fills in before the cost plan is priced — print or save as PDF" style="padding:5px 12px;font-size:11px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128221; Homeowner Selection Form (PDF)</button>
+    <button id="form-btn-eu" onclick="exportSelectionForm('eu')" title="Survey selection form — tick it with the homeowner during the BER survey, then build the plan from it" style="display:none;padding:5px 12px;font-size:11px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128221; Survey Selection Form (PDF)</button>
+  </div>
 
 </div>
   </div>
@@ -7301,6 +7357,14 @@ function selectProjectType(mode) {
   if (_rf1) _rf1.style.display = mode === 'Refurbishment' ? '' : 'none';
   const _eu1 = document.getElementById('demo-btn-eu1');
   if (_eu1) _eu1.style.display = mode === 'Energy Upgrade' ? '' : 'none';
+
+  // Selection forms exist for two of the three modes; Refurbishment has none.
+  const _frow = document.getElementById('form-btn-row');
+  if (_frow) _frow.style.display = mode === 'Refurbishment' ? 'none' : 'flex';
+  const _fnb = document.getElementById('form-btn-nb');
+  if (_fnb) _fnb.style.display = mode === 'New Build' ? '' : 'none';
+  const _feu = document.getElementById('form-btn-eu');
+  if (_feu) _feu.style.display = mode === 'Energy Upgrade' ? '' : 'none';
 
   const hints = {
     'New Build':      'New Build \u2014 8 measurement tabs will open',
@@ -14586,9 +14650,2856 @@ function updateEUActuals(src) {
 }
 
 // Update the PDF button area depending on project type
+// ── CLIENT SELECTION FORMS ────────────────────────────────────────────────────
+// The paperwork that comes BEFORE the plan. New Build: the homeowner fills the form
+// in (architect consulted where a choice touches the design) and the cost plan is
+// priced on what they picked — the guide spec itself still travels with the Part L
+// and dwelling details report. Energy Upgrade: the assessor ticks the form with the
+// homeowner during the BER survey, then builds the plan on the grant route it implies.
+// Content lives here rather than in a static PDF so grant figures and U-values are
+// edited in one place and every print carries the current rate book stamp.
+// Structure per form: sections → questions → options {k, name, u, cost, note}.
+
+var SELECTION_FORMS = {
+ "nb": {
+  "title": "Your build, your choices",
+  "sub": "New Build — homeowner selection form",
+  "addr": "Site address",
+  "intro": "<p > Fill this in before your cost plan is prepared &mdash; your selections are what it will be priced on. The guidance beside each option is drawn from the guide specification that accompanies your dwelling details and Part L compliance report; where a choice touches the design itself, your architect is the right person to ask. </p> <p style=\"font-size: 13px; line-height: 1.6; margin-top: 8px;\"> Pick one option in each question. Every option meets the standard your house is being designed to &mdash; none of them is a wrong answer. What changes is what you pay, how thick the walls end up, how much work happens on site, and how the house feels to live in. </p> <p class=\"grey\"> <strong style=\"color: #1E293B;\">U-value</strong> is the rate heat escapes through a square metre. Lower is better. Where two options reach the same number, the choice is about cost, thickness and how easy it is to get right on site &mdash; not about warmth. </p> <p class=\"grey\"> If you are unsure, leave it blank and write a question in the notes. That is what the conversation is for. </p>",
+  "ret": "Send it back and your PlanitBER cost plan is prepared from it — your selections become the specification the plan is priced on. Nothing is final until you say so: if you change your mind on a section after the plan is issued, that is a variation, and it gets recorded against the budget rather than quietly replacing it. If a question needs a conversation, write it in the notes and it will be the first thing discussed.",
+  "fine": "U-values and build-ups are taken from the guide specification that accompanies your dwelling details and Part L compliance report. Certified window and door values must come from the supplier, determined to IS EN ISO 10077-1, 10077-2 or 12567-1. Where a figure is shown in brackets it has not been priced for this house yet.",
+  "data": [
+   {
+    "n": "1",
+    "title": "Floors",
+    "target": "ground floor target U-value 0.11 W/m²K",
+    "intro": "The ground floor build-up, and what separates the storeys above it.",
+    "questions": [
+     {
+      "key": "gftype",
+      "label": "Ground floor construction",
+      "options": [
+       {
+        "k": "slab150",
+        "name": "Insulated solid concrete slab 150mm",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The standard ground floor. Solid, quiet underfoot and it works well with underfloor heating."
+       },
+       {
+        "k": "slab200",
+        "name": "Insulated solid concrete slab 200mm",
+        "u": "",
+        "cost": "Dearer",
+        "note": "A thicker slab for heavier loads or a wider span."
+       },
+       {
+        "k": "timber",
+        "name": "Suspended timber floor",
+        "u": "",
+        "cost": "Varies",
+        "note": "A void beneath, so services are easy to reach later. It needs ventilating and it is less suited to underfloor heating."
+       },
+       {
+        "k": "raft",
+        "name": "Insulated raft foundation",
+        "u": "",
+        "cost": "Site-dependent",
+        "note": "Foundation and floor in one pour. Often the answer on poor ground, and it can work out cheaper overall than strip footings plus a slab."
+       },
+       {
+        "k": "basement",
+        "name": "Heated basement",
+        "u": "",
+        "cost": "Dearest",
+        "note": "A storey below ground with everything that implies — tanking, drainage and structure before you are back to ground level."
+       }
+      ]
+     },
+     {
+      "key": "floorins",
+      "label": "Floor insulation",
+      "options": [
+       {
+        "k": "pir75",
+        "name": "PIR 75mm",
+        "u": "",
+        "cost": "Least",
+        "note": "The thinnest option. It will not reach the guide specification on its own."
+       },
+       {
+        "k": "pir100",
+        "name": "PIR 100mm",
+        "u": "",
+        "cost": "Middle",
+        "note": "Better, and still a modest build-up."
+       },
+       {
+        "k": "pir125",
+        "name": "PIR 125mm",
+        "u": "",
+        "cost": "Most",
+        "note": "The thickest of the standard build-ups. Ask the assessor to confirm it reaches 0.11 with the edge insulation, or whether the specification wants more."
+       },
+       {
+        "k": "mw100",
+        "name": "Mineral wool 100mm",
+        "u": "",
+        "cost": "Cheaper per m²",
+        "note": "Cheaper board, poorer per millimetre, so it needs more depth for the same result."
+       },
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": "Not compliant for a new dwelling."
+       }
+      ]
+     },
+     {
+      "key": "screed",
+      "label": "Screed",
+      "options": [
+       {
+        "k": "sc65",
+        "name": "Sand and cement 65mm",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The usual. Slow to dry — allow weeks before floor finishes go down."
+       },
+       {
+        "k": "sc75",
+        "name": "Sand and cement 75mm",
+        "u": "",
+        "cost": "Slightly dearer",
+        "note": "A little more cover over underfloor pipes."
+       },
+       {
+        "k": "anhydrite",
+        "name": "Liquid anhydrite 50mm",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Self-levelling and poured in a day, thinner and far better around underfloor heating pipes because it flows around them with no voids."
+       },
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "upperfloor",
+      "label": "Upper floor structure",
+      "options": [
+       {
+        "k": "joists",
+        "name": "Timber joists",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Fast and light. Sound carries between storeys more than the alternatives, so allow for insulation between the joists if that matters to you."
+       },
+       {
+        "k": "plank",
+        "name": "Concrete plank",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Much quieter and it gives you a solid first floor you can tile without bounce. Heavier, so the walls below are designed for it."
+       },
+       {
+        "k": "screedconc",
+        "name": "Screed on concrete",
+        "u": "",
+        "cost": "Dearest",
+        "note": "The quietest and most solid, and the slowest to build."
+       },
+       {
+        "k": "none",
+        "name": "Single storey — none",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ],
+    "footnote": "If concrete floor panels are used upstairs, the ends are sealed with fibreglass — it improves both the insulation value and the airtightness."
+   },
+   {
+    "n": "2",
+    "title": "Walls",
+    "target": "target U-value 0.16–0.17 W/m²K",
+    "intro": "The first three fills reach much the same number for much the same money. What separates them is how they behave on site and how easy they are to inspect while they go in.",
+    "questions": [
+     {
+      "key": "walltype",
+      "label": "Wall construction",
+      "options": [
+       {
+        "k": "cav300",
+        "name": "300mm cavity block",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The standard Irish wall. Outer leaf, cavity, inner leaf."
+       },
+       {
+        "k": "cav425",
+        "name": "425mm cavity block",
+        "u": "",
+        "cost": "Dearer",
+        "note": "A wider cavity means more insulation and a better U-value, at the cost of wall thickness and a bigger footprint for the same internal area."
+       },
+       {
+        "k": "timber",
+        "name": "Timber frame",
+        "u": "",
+        "cost": "Comparable",
+        "note": "Much faster to weathertight, and the insulation is inside the frame rather than in a cavity. Different rules for airtightness and for anything you later fix to a wall."
+       },
+       {
+        "k": "brick",
+        "name": "225mm solid brick",
+        "u": "",
+        "cost": "Dearer",
+        "note": "No cavity, so the insulation has to go inside or outside."
+       },
+       {
+        "k": "stone",
+        "name": "Stone",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Usually a feature elevation rather than the whole house."
+       },
+       {
+        "k": "hollow",
+        "name": "Concrete hollow block",
+        "u": "",
+        "cost": "Cheaper",
+        "note": "Single leaf. It needs insulation inside or outside to reach the standard."
+       }
+      ]
+     },
+     {
+      "key": "cavityins",
+      "label": "Cavity insulation",
+      "options": [
+       {
+        "k": "bead",
+        "name": "Blown bead (EPS)",
+        "u": "U 0.16",
+        "cost": "Much the same as the next two",
+        "note": "Pumped once the walls are up and easy to observe. Needs the inner block plastered for airtightness and an insulated slab on top, so it brings two more trades with it."
+       },
+       {
+        "k": "pir",
+        "name": "PIR board 100mm",
+        "u": "U 0.16",
+        "cost": "Much the same",
+        "note": "Rigid board built into the cavity as the wall goes up. Only as good as the fit — gaps between boards are exactly where the heat leaves."
+       },
+       {
+        "k": "eps",
+        "name": "EPS board",
+        "u": "U 0.17",
+        "cost": "Cheapest board",
+        "note": "Cheaper than PIR and slightly poorer per millimetre."
+       },
+       {
+        "k": "walltite",
+        "name": "Walltite spray foam",
+        "u": "U 0.17",
+        "cost": "Much the same",
+        "note": "Seals the blockwork as it is poured, so the inner leaf needs no sand-and-cement coat for airtightness. In use it performs about 5% better than the others because it bridges less. Not NSAI-certified for the installation method — get the contractor’s certified procedure in writing."
+       },
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": "Only where the insulation is going entirely inside or outside instead."
+       }
+      ]
+     },
+     {
+      "key": "drylining",
+      "label": "Dry lining",
+      "options": [
+       {
+        "k": "ip52",
+        "name": "Insulated plasterboard 52mm",
+        "u": "",
+        "cost": "Baseline",
+        "note": "Board and insulation in one, dabbed to the inner leaf. The usual finish alongside a filled cavity."
+       },
+       {
+        "k": "ip62",
+        "name": "Insulated plasterboard 62mm",
+        "u": "",
+        "cost": "Dearer",
+        "note": "More insulation for about 10mm more room depth. A cheap way to buy back a little U-value."
+       },
+       {
+        "k": "standard",
+        "name": "Standard plasterboard",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "No added insulation, so the cavity has to do all the work."
+       },
+       {
+        "k": "none",
+        "name": "None — wet plaster",
+        "u": "",
+        "cost": "",
+        "note": "Plaster direct to the block. Better airtightness, slower, and no added insulation."
+       }
+      ]
+     },
+     {
+      "key": "wallfinish",
+      "label": "Outside finish",
+      "options": [
+       {
+        "k": "drydash",
+        "name": "Dry dash",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Hard-wearing and traditional. Hides movement cracks well; hard to clean."
+       },
+       {
+        "k": "smooth",
+        "name": "Smooth render",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The standard sand-and-cement finish. Shows hairline cracking more than dash does."
+       },
+       {
+        "k": "silicone",
+        "name": "Silicone render",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Flexible, self-cleaning and colour-through, so no repainting. The extra buys back years of maintenance."
+       },
+       {
+        "k": "brick",
+        "name": "Brick slip",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Usually a feature panel rather than the whole house. Priced by area, so it adds up quickly."
+       },
+       {
+        "k": "stone",
+        "name": "Stone finish",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Handsome and slow. A skilled trade, and the programme has to allow for it."
+       },
+       {
+        "k": "cladding",
+        "name": "Timber cladding",
+        "u": "",
+        "cost": "Varies with species",
+        "note": "Warm-looking and light. Needs a ventilated batten zone behind it, and it will weather — decide now whether you will maintain it or let it silver."
+       }
+      ]
+     }
+    ],
+    "footnote": "Whichever fill you pick, allow for 32.5mm insulated slab around all openings and PIR filling the void behind the cills."
+   },
+   {
+    "n": "3",
+    "title": "Roof",
+    "target": "target U-value 0.11–0.15 W/m²K",
+    "intro": "Where the insulation sits decides how much of the roof space you keep.",
+    "questions": [
+     {
+      "key": "rooftype",
+      "label": "Roof type",
+      "options": [
+       {
+        "k": "ceiling",
+        "name": "Pitched, insulated at ceiling level",
+        "u": "U 0.11",
+        "cost": "Cheapest route to a good number",
+        "note": "150mm between the joists and 200mm lapped over. A ventilation tray at the wallplate lets the insulation lap over the cavity without blocking airflow. The attic stays cold, so it is storage only."
+       },
+       {
+        "k": "rafter",
+        "name": "Pitched, insulated at rafter level",
+        "u": "U 0.15",
+        "cost": "Dearer",
+        "note": "Brings the attic inside the warm envelope. More insulation and more detailing, and the depth available limits how far you can get."
+       },
+       {
+        "k": "flat",
+        "name": "Flat roof",
+        "u": "U 0.11",
+        "cost": "Dearer",
+        "note": "A warm deck with a ventilated cavity above. More layers and more detailing, with less room for error."
+       },
+       {
+        "k": "room",
+        "name": "Room in roof",
+        "u": "U 0.15",
+        "cost": "Dearest",
+        "note": "Sloped ceilings, a flat section and knee walls all insulated. It buys you a whole storey for far less than building one, but every surface is involved."
+       }
+      ]
+     },
+     {
+      "key": "ceilins",
+      "label": "Insulation",
+      "options": [
+       {
+        "k": "mw200",
+        "name": "Mineral wool 200mm",
+        "u": "",
+        "cost": "Least",
+        "note": "Below what the specification asks for on its own."
+       },
+       {
+        "k": "mw300",
+        "name": "Mineral wool 300mm",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The usual answer at ceiling level."
+       },
+       {
+        "k": "mw400",
+        "name": "Mineral wool 400mm",
+        "u": "",
+        "cost": "A little dearer",
+        "note": "Better again, and it costs little more once the crew is up there."
+       },
+       {
+        "k": "pir100",
+        "name": "PIR at rafter level 100mm",
+        "u": "",
+        "cost": "Dearer",
+        "note": "For a warm roof where depth is tight."
+       },
+       {
+        "k": "pir150",
+        "name": "PIR at rafter level 150mm",
+        "u": "",
+        "cost": "Dearest",
+        "note": "What a rafter-level roof usually needs to reach the target."
+       },
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "rooffinish",
+      "label": "Covering",
+      "options": [
+       {
+        "k": "tile",
+        "name": "Concrete tile",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "The default. Heavy, so the roof structure is sized for it, and reliable for decades."
+       },
+       {
+        "k": "slate",
+        "name": "Natural slate",
+        "u": "",
+        "cost": "Dearest",
+        "note": "A lifetime roof and the best-looking of them. Slow to lay and priced accordingly."
+       },
+       {
+        "k": "fibre",
+        "name": "Fibre cement slate",
+        "u": "",
+        "cost": "Middle",
+        "note": "The look of slate at a fraction of the weight and cost, with a shorter life."
+       },
+       {
+        "k": "metal",
+        "name": "Standing seam metal",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Suits low pitches and modern forms. Long-lived, and noisier in heavy rain unless the build-up allows for it."
+       },
+       {
+        "k": "membrane",
+        "name": "Flat membrane",
+        "u": "",
+        "cost": "For flat areas",
+        "note": "Single-ply or EPDM with very few joints."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "4",
+    "title": "Windows, doors & roof lights",
+    "target": "specified 1.20 W/m²K glazing, 1.4 doors",
+    "intro": "The specification asks for 1.20 or better. Going further is a comfort decision as much as an energy one.",
+    "questions": [
+     {
+      "key": "glazing",
+      "label": "Glazing",
+      "options": [
+       {
+        "k": "double",
+        "name": "Double-glazed uPVC",
+        "u": "U 1.20",
+        "cost": "As specified",
+        "note": "Average U-value 1.20 with solar transmittance 0.70, which lets useful winter sun in. What the house has been designed around."
+       },
+       {
+        "k": "triple",
+        "name": "Triple-glazed uPVC",
+        "u": "U typically 0.8–1.0",
+        "cost": "Dearer",
+        "note": "Less heat lost and a warmer inner pane, so no cold draught by the glass and less condensation. Heavier units, so frames and fixings matter."
+       },
+       {
+        "k": "aluclad",
+        "name": "Triple-glazed aluminium-clad",
+        "u": "U typically 0.8–1.0",
+        "cost": "Dearest",
+        "note": "The same thermal story with a slimmer sightline and an outside face that never needs painting. The premium is architectural."
+       },
+       {
+        "k": "secondary",
+        "name": "Secondary glazing",
+        "u": "",
+        "cost": "",
+        "note": "For a protected structure where the original windows must stay. Rare in a new build."
+       }
+      ]
+     },
+     {
+      "key": "rooflights",
+      "label": "Roof lights",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No cost",
+        "note": ""
+       },
+       {
+        "k": "std",
+        "name": "550 × 780mm — standard",
+        "u": "",
+        "cost": "Least",
+        "note": "Enough to light a landing or a bathroom."
+       },
+       {
+        "k": "mid",
+        "name": "780 × 980mm — mid",
+        "u": "",
+        "cost": "Middle",
+        "note": "The usual size for a room in the roof."
+       },
+       {
+        "k": "large",
+        "name": "940 × 1600mm — large",
+        "u": "",
+        "cost": "Most",
+        "note": "A serious amount of light, and a serious amount of solar gain — worth checking against overheating on a south slope."
+       },
+       {
+        "k": "custom",
+        "name": "Custom",
+        "u": "",
+        "cost": "",
+        "note": "Say what you have in mind in the notes."
+       }
+      ]
+     }
+    ],
+    "footnote": "Doors are specified at 1.4 W/m²K and belong in the window schedule. Ask every supplier for certified values determined to IS EN ISO 10077, not brochure figures."
+   },
+   {
+    "n": "5",
+    "title": "Internal finishes",
+    "target": "none of this changes the BER",
+    "intro": "All of it changes the bill, and these are the lines people most often under-allow for.",
+    "questions": [
+     {
+      "key": "floors",
+      "label": "Floor finishes",
+      "options": [
+       {
+        "k": "screed",
+        "name": "Screed only — you finish later",
+        "u": "",
+        "cost": "Lowest",
+        "note": "A provisional sum. Keeps the build cost down and moves the decision to when you know the money better."
+       },
+       {
+        "k": "tile",
+        "name": "Tile allowance included",
+        "u": "",
+        "cost": "Middle",
+        "note": "Priced on an allowance, so the rate you pick later matters as much as the area."
+       },
+       {
+        "k": "timber",
+        "name": "Engineered timber included",
+        "u": "",
+        "cost": "Highest",
+        "note": "Works over underfloor heating where solid timber does not."
+       }
+      ]
+     },
+     {
+      "key": "partitions",
+      "label": "Internal walls",
+      "options": [
+       {
+        "k": "stud",
+        "name": "Timber stud with mineral wool",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Fast and light, with reasonable sound separation."
+       },
+       {
+        "k": "block",
+        "name": "Blockwork",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Much better sound separation and you can hang anything off it. Slower, heavier, needs plastering."
+       },
+       {
+        "k": "metal",
+        "name": "Metal stud",
+        "u": "",
+        "cost": "Middle",
+        "note": "Straight and quick."
+       },
+       {
+        "k": "mixed",
+        "name": "Mixed — block where it matters",
+        "u": "",
+        "cost": "Middle",
+        "note": "Block around bathrooms, plant rooms and the main bedroom wall; stud elsewhere. Usually the sensible answer."
+       }
+      ]
+     },
+     {
+      "key": "decorating",
+      "label": "Painting & decorating",
+      "options": [
+       {
+        "k": "basic",
+        "name": "Basic",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Mist coat and two coats throughout in one colour."
+       },
+       {
+        "k": "full",
+        "name": "Full decorating",
+        "u": "",
+        "cost": "Usual",
+        "note": "Proper preparation, cutting in, and gloss or satin to all timber."
+       },
+       {
+        "k": "premium",
+        "name": "Premium — feature walls and specialist finishes",
+        "u": "",
+        "cost": "Highest",
+        "note": "Priced per room rather than per house."
+       }
+      ]
+     },
+     {
+      "key": "stairs",
+      "label": "Staircase",
+      "options": [
+       {
+        "k": "softwood",
+        "name": "Softwood, painted",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Fine where it is painted and carpeted."
+       },
+       {
+        "k": "hardwood",
+        "name": "Hardwood, lacquered",
+        "u": "",
+        "cost": "Middle",
+        "note": "The usual choice where the stairs are on show in the hall."
+       },
+       {
+        "k": "steel",
+        "name": "Steel feature staircase",
+        "u": "",
+        "cost": "Highest",
+        "note": "An architectural item with a lead time to match. Needs structural coordination early."
+       }
+      ]
+     },
+     {
+      "key": "skirting",
+      "label": "Skirting & architraves",
+      "options": [
+       {
+        "k": "mdf",
+        "name": "MDF primed",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Straight, stable and paints beautifully. The default for good reason."
+       },
+       {
+        "k": "softwood",
+        "name": "Softwood painted",
+        "u": "",
+        "cost": "Middle",
+        "note": "Traditional, and more prone to movement."
+       },
+       {
+        "k": "hardwood",
+        "name": "Hardwood stained",
+        "u": "",
+        "cost": "Highest",
+        "note": "Only where the timber is meant to be seen."
+       }
+      ]
+     },
+     {
+      "key": "intdoors",
+      "label": "Internal doors",
+      "options": [
+       {
+        "k": "standard",
+        "name": "Standard solid core",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Solid enough to feel right and to hold a fire rating where one is needed."
+       },
+       {
+        "k": "mid",
+        "name": "Hardwood veneer",
+        "u": "",
+        "cost": "Middle",
+        "note": "Real timber face over a solid core."
+       },
+       {
+        "k": "premium",
+        "name": "Solid hardwood",
+        "u": "",
+        "cost": "Highest",
+        "note": "Heavy, so frames and hinges have to be up to it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "6",
+    "title": "Fit-out & fixtures",
+    "target": "the two biggest allowance lines",
+    "intro": "Carried as allowances until you choose. Naming a band now is what stops the budget drifting later.",
+    "questions": [
+     {
+      "key": "speclevel",
+      "label": "Overall specification level",
+      "options": [
+       {
+        "k": "budget",
+        "name": "Budget",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Sets the default grade for everything not named individually below."
+       },
+       {
+        "k": "standard",
+        "name": "Standard",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The usual starting point."
+       },
+       {
+        "k": "mid",
+        "name": "Mid-range",
+        "u": "",
+        "cost": "Dearer",
+        "note": ""
+       },
+       {
+        "k": "premium",
+        "name": "Premium",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Lifts the assumed grade across the whole fit-out, not just the items you name."
+       }
+      ]
+     },
+     {
+      "key": "kitchen",
+      "label": "Kitchen",
+      "options": [
+       {
+        "k": "standard",
+        "name": "Standard",
+        "u": "",
+        "cost": "€8–12k",
+        "note": "Carcase and doors from a range, laminate worktop, standard appliances."
+       },
+       {
+        "k": "mid",
+        "name": "Mid-range",
+        "u": "",
+        "cost": "€12–20k",
+        "note": "Better doors and hardware, stone or composite worktop, integrated appliances."
+       },
+       {
+        "k": "premium",
+        "name": "Premium",
+        "u": "",
+        "cost": "€20–40k",
+        "note": "Bespoke or in-frame, solid stone, appliances chosen individually."
+       }
+      ]
+     },
+     {
+      "key": "bathroom",
+      "label": "Bathrooms (each)",
+      "options": [
+       {
+        "k": "standard",
+        "name": "Standard",
+        "u": "",
+        "cost": "€3.5–5k",
+        "note": "Sanitaryware from a range, standard tiling, mixer shower."
+       },
+       {
+        "k": "mid",
+        "name": "Mid-range",
+        "u": "",
+        "cost": "€5–8k",
+        "note": "Better brassware, a larger tiled area, thermostatic shower."
+       },
+       {
+        "k": "premium",
+        "name": "Premium",
+        "u": "",
+        "cost": "€8–14k",
+        "note": "Wet room, full-height tiling, feature basin and specialist brassware."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "7",
+    "title": "Air tightness & ventilation",
+    "target": "specified 3 m³/m²/hr",
+    "intro": "How much air leaks through the fabric, and how the house breathes once it is sealed. The two are one decision.",
+    "questions": [
+     {
+      "key": "airtight",
+      "label": "Air tightness target",
+      "options": [
+       {
+        "k": "three",
+        "name": "Aim for 3 m³/m²/hr",
+        "u": "0.15 ac/hr in DEAP",
+        "cost": "More sealing work on site",
+        "note": "The specified target, and what the rest of the design assumes. At or below 3, a whole-house ventilation system becomes a requirement rather than an option."
+       },
+       {
+        "k": "five",
+        "name": "Aim for 5 m³/m²/hr",
+        "u": "compliance floor",
+        "cost": "Less sealing work",
+        "note": "Enough to comply and easier to hit. You give up the DEAP benefit and the draught-free feel of a genuinely tight envelope."
+       }
+      ]
+     },
+     {
+      "key": "vent",
+      "label": "Ventilation strategy",
+      "options": [
+       {
+        "k": "mhrv",
+        "name": "Mechanical heat recovery ventilation",
+        "u": "91% heat recovery",
+        "cost": "Dearest",
+        "note": "Recovers the heat from the air it throws out. Worth 12% on the efficiency of the building alongside a heat pump on a 24-hour cycle. Fan power 0.69 W/l/s. Needs rigid insulated ductwork and commissioning against your air test result."
+       },
+       {
+        "k": "mev",
+        "name": "Mechanical extract",
+        "u": "no heat recovery",
+        "cost": "Middle",
+        "note": "Continuous quiet extract from the wet rooms. It deals with moisture and nothing else."
+       },
+       {
+        "k": "natural",
+        "name": "Natural — trickle vents",
+        "u": "no heat recovery",
+        "cost": "Cheapest",
+        "note": "Only viable if the air test lands above 5. In a house built to 3 it is not an option."
+       }
+      ]
+     }
+    ],
+    "footnote": "With heat recovery, an extract in the plant room makes an excellent drying space for clothes, and a separate mechanical extract over the cooker keeps grease out of the heat exchanger. Leave a 10mm gap under internal doors either way."
+   },
+   {
+    "n": "8",
+    "title": "Heating & hot water",
+    "target": "air-to-water heat pump",
+    "intro": "The heat pump is the same in all three emitter options. What changes is the water temperature it has to produce, and a heat pump gets less efficient the hotter it runs.",
+    "questions": [
+     {
+      "key": "heatsys",
+      "label": "Heat source and emitters",
+      "options": [
+       {
+        "k": "ashp-ufh-rads",
+        "name": "Heat pump with underfloor downstairs and radiators up",
+        "u": "runs at 45°C",
+        "cost": "As specified",
+        "note": "The specified arrangement and a sensible middle. Radiators must be sized for 45°C, which means noticeably bigger radiators than an oil boiler would need."
+       },
+       {
+        "k": "ashp-rads",
+        "name": "Heat pump with radiators only",
+        "u": "runs at 55°C",
+        "cost": "Lowest to install",
+        "note": "Cheapest to fit and dearest to run, because the heat pump works hardest to reach 55°C. Radiators still have to be sized for that temperature."
+       },
+       {
+        "k": "ashp-ufh",
+        "name": "Heat pump with underfloor throughout",
+        "u": "runs at 35°C",
+        "cost": "Highest to install",
+        "note": "The lowest flow temperature and the most efficient to run, every day for the life of the house. Slow to respond, which suits continuous heating."
+       },
+       {
+        "k": "gas",
+        "name": "Gas condensing boiler with radiators",
+        "u": "",
+        "cost": "[not priced yet]",
+        "note": "Cheaper to install, needs a gas connection brought in, and rules out an A0 rating because A0 requires zero fossil fuel burnt on site."
+       },
+       {
+        "k": "oil",
+        "name": "Oil condensing boiler with radiators",
+        "u": "",
+        "cost": "[not priced yet]",
+        "note": "Cheaper to install, needs a tank and a delivery route, and rules out A0 for the same reason."
+       },
+       {
+        "k": "lpg",
+        "name": "LPG condensing boiler with radiators",
+        "u": "",
+        "cost": "[not priced yet]",
+        "note": "Where there is no mains gas. Bulk tank on site, same A0 restriction."
+       }
+      ]
+     },
+     {
+      "key": "cylinder",
+      "label": "Hot water cylinder",
+      "options": [
+       {
+        "k": "hp150",
+        "name": "Heat pump cylinder 150L",
+        "u": "",
+        "cost": "Smallest",
+        "note": "Suits one or two people. Undersize it and the immersion does the work at full electricity price."
+       },
+       {
+        "k": "hp210",
+        "name": "Heat pump cylinder 210L",
+        "u": "",
+        "cost": "Usual",
+        "note": "The common answer for a three- or four-bedroom house."
+       },
+       {
+        "k": "hp300",
+        "name": "Heat pump cylinder 300L",
+        "u": "",
+        "cost": "Largest",
+        "note": "For a bigger household or two bathrooms in use at once. More to buy and more plant room space."
+       },
+       {
+        "k": "un210",
+        "name": "Unvented cylinder 210L",
+        "u": "",
+        "cost": "",
+        "note": "For a boiler rather than a heat pump — a heat pump needs the larger coil area a heat pump cylinder gives it."
+       },
+       {
+        "k": "un300",
+        "name": "Unvented cylinder 300L",
+        "u": "",
+        "cost": "",
+        "note": "As above, larger."
+       }
+      ]
+     },
+     {
+      "key": "secondary",
+      "label": "Secondary heating",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No cost",
+        "note": "With heat recovery and the heat pump on a 24-hour cycle, many houses do not want one. Overheating on a sunny shoulder-season day is the more common complaint."
+       },
+       {
+        "k": "airair",
+        "name": "Air-to-air heat pump (split unit)",
+        "u": "electric",
+        "cost": "[not priced yet]",
+        "note": "No combustion on site, so nothing to flue and nothing to store. Instant, controllable, and it cools in summer."
+       },
+       {
+        "k": "log",
+        "name": "Wood log stove",
+        "u": "80% efficient",
+        "cost": "[not priced yet]",
+        "note": "Solid wood only, with a direct combustion air supply through a balanced flue so it does not pull air out of an airtight house. Needs a chimney, and needs feeding."
+       },
+       {
+        "k": "pellet",
+        "name": "Wood pellet stove",
+        "u": "80% efficient",
+        "cost": "[not priced yet]",
+        "note": "Hopper-fed and thermostatically controlled, so less attention than a log stove and a more consistent burn. You need somewhere dry for the pellets."
+       },
+       {
+        "k": "bio",
+        "name": "Bioethanol fire",
+        "u": "flueless",
+        "cost": "[not priced yet]",
+        "note": "No chimney and no core drilling. Everything it produces — carbon dioxide and water vapour — goes into the room, so it suits occasional use."
+       }
+      ]
+     }
+    ],
+    "footnote": "The heat pump is sized by the installer from the Total Heat Loss figure on page one of your report — not from floor area. An A0 rating needs zero fossil fuel burnt on site, so an open fire or a gas or oil stove rules it out."
+   },
+   {
+    "n": "9",
+    "title": "Electricity & renewables",
+    "target": "solar PV carries no VAT",
+    "intro": "What you generate, store and plug in.",
+    "questions": [
+     {
+      "key": "pv",
+      "label": "Solar PV and battery",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": "The roof will still be there later, but the scaffold will not — running the cabling now costs very little."
+       },
+       {
+        "k": "pv",
+        "name": "Solar PV, no battery",
+        "u": "",
+        "cost": "No VAT on PV",
+        "note": "Worth most if someone is home during the day or you run a heat pump, because a unit you use yourself is worth far more than one you export."
+       },
+       {
+        "k": "b5",
+        "name": "Solar PV with 5 kWh battery",
+        "u": "",
+        "cost": "No VAT on PV",
+        "note": "Enough to shift an evening’s use."
+       },
+       {
+        "k": "b10",
+        "name": "Solar PV with 10 kWh battery",
+        "u": "",
+        "cost": "No VAT on PV",
+        "note": "The common size where a heat pump and an EV are both in the picture."
+       },
+       {
+        "k": "b15",
+        "name": "Solar PV with 15 kWh or more",
+        "u": "",
+        "cost": "No VAT on PV",
+        "note": "Adds substantially to the cost, and the battery will not last as long as the panels."
+       }
+      ]
+     },
+     {
+      "key": "solarth",
+      "label": "Solar thermal",
+      "options": [
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "",
+        "note": "The usual answer alongside PV and a heat pump — two systems heating the same water rarely pays."
+       },
+       {
+        "k": "yes",
+        "name": "Yes",
+        "u": "",
+        "cost": "",
+        "note": "Hot water only. It makes more sense with a boiler than with a heat pump."
+       }
+      ]
+     },
+     {
+      "key": "ev",
+      "label": "EV charging",
+      "options": [
+       {
+        "k": "no",
+        "name": "No charger",
+        "u": "",
+        "cost": "",
+        "note": "At least run the duct and cable while the ground is open. Retrofitting the trench is the expensive part, not the charger."
+       },
+       {
+        "k": "yes",
+        "name": "Yes — 7kW smart charger",
+        "u": "",
+        "cost": "",
+        "note": "A smart charger can be told to draw from your own solar or wait for a night tariff, which is where the saving is."
+       }
+      ]
+     },
+     {
+      "key": "cu",
+      "label": "Consumer unit",
+      "options": [
+       {
+        "k": "12",
+        "name": "12-way with RCDs",
+        "u": "",
+        "cost": "Baseline",
+        "note": "Enough for a modest house with no EV charger and no PV."
+       },
+       {
+        "k": "16",
+        "name": "16-way with RCDs",
+        "u": "",
+        "cost": "Usual",
+        "note": "Room for the circuits a heat pump and a charger add."
+       },
+       {
+        "k": "18",
+        "name": "18-way with RCBOs",
+        "u": "",
+        "cost": "Dearest",
+        "note": "A separate breaker per circuit, so a fault takes out one circuit rather than half the house. Worth it with PV, a battery and a charger."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "10",
+    "title": "Site investigation",
+    "target": "the biggest unknown in any build",
+    "intro": "The ground decides the foundation, and the foundation is the one cost that can move by tens of thousands before a block is laid.",
+    "questions": [
+     {
+      "key": "si",
+      "label": "Site investigation",
+      "options": [
+       {
+        "k": "none",
+        "name": "None or desktop only",
+        "u": "",
+        "cost": "No cost",
+        "note": "Cheapest now, and the most likely thing to produce a nasty surprise later."
+       },
+       {
+        "k": "trial",
+        "name": "Trial holes",
+        "u": "",
+        "cost": "Modest",
+        "note": "A digger and a few hours. Usually enough to confirm the foundation on a straightforward site."
+       },
+       {
+        "k": "full",
+        "name": "Full SI report",
+        "u": "",
+        "cost": "Higher",
+        "note": "Boreholes and lab testing with an engineer’s report. Worth it on poor ground, and often required for a piled or basement design."
+       }
+      ]
+     },
+     {
+      "key": "foundation",
+      "label": "Foundation",
+      "options": [
+       {
+        "k": "strip",
+        "name": "Strip footings",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The normal answer on good ground."
+       },
+       {
+        "k": "raft",
+        "name": "Raft",
+        "u": "",
+        "cost": "Dearer than strip",
+        "note": "Spreads the load over the whole footprint. Usual where the ground is soft but not bad enough to pile."
+       },
+       {
+        "k": "piled",
+        "name": "Piled",
+        "u": "",
+        "cost": "Considerably dearer",
+        "note": "Driven or bored down to something solid. Specialist plant, and the design comes from an engineer."
+       },
+       {
+        "k": "basement",
+        "name": "Basement",
+        "u": "",
+        "cost": "Dearest by a distance",
+        "note": "A build within a build — excavation, tanking, structure and drainage before you are back to ground level."
+       }
+      ]
+     },
+     {
+      "key": "ground",
+      "label": "Site conditions",
+      "options": [
+       {
+        "k": "flat",
+        "name": "Standard, reasonably flat",
+        "u": "",
+        "cost": "Baseline",
+        "note": "Nothing unusual to allow for."
+       },
+       {
+        "k": "slope",
+        "name": "Sloped",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "Retaining, stepped foundations and more muck away. The steeper it is, the more of the budget disappears below ground."
+       },
+       {
+        "k": "access",
+        "name": "Difficult access",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "Narrow lane or no room to turn. It slows every delivery and every trade for the whole build."
+       },
+       {
+        "k": "poor",
+        "name": "Poor ground",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "Soft, wet, filled or peaty. This is the one that changes the foundation type."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "11",
+    "title": "Substructure",
+    "target": "radon, drainage and services",
+    "intro": "Three questions that have little to do with the house design and a great deal to do with the bill.",
+    "questions": [
+     {
+      "key": "radon",
+      "label": "Radon protection",
+      "options": [
+       {
+        "k": "membrane",
+        "name": "Standard membrane",
+        "u": "",
+        "cost": "Baseline",
+        "note": "A barrier under the floor, required almost everywhere in Ireland."
+       },
+       {
+        "k": "sump",
+        "name": "Full sump system",
+        "u": "",
+        "cost": "Adds a little",
+        "note": "A membrane plus a sump that can be vented later if a post-build test comes back high. Cheap insurance while the floor is open, very expensive to add afterwards."
+       }
+      ]
+     },
+     {
+      "key": "waste",
+      "label": "Wastewater",
+      "options": [
+       {
+        "k": "mains",
+        "name": "Mains sewer",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "A connection and a run to the boundary. Nothing to maintain afterwards."
+       },
+       {
+        "k": "septic",
+        "name": "Septic tank",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "Needs a site suitability assessment and enough ground for a percolation area. It has to be desludged periodically for the life of the house."
+       },
+       {
+        "k": "treatment",
+        "name": "Treatment plant",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Where percolation fails or the site is tight. It uses electricity, needs servicing under contract, and the running cost never stops."
+       }
+      ]
+     },
+     {
+      "key": "services",
+      "label": "Services connection",
+      "options": [
+       {
+        "k": "standard",
+        "name": "Standard — mains water and ESB",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The usual arrangement where services are at the boundary."
+       },
+       {
+        "k": "gas",
+        "name": "Including a gas connection",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "Only worth it if something will actually burn gas. With a heat pump and an A rating, most builds no longer bring gas in."
+       },
+       {
+        "k": "rural",
+        "name": "Rural — well and ESB only",
+        "u": "",
+        "cost": "Adds cost",
+        "note": "A well, a pump and treatment if the water needs it. Budget for the drilling being deeper than quoted; it often is."
+       }
+      ]
+     }
+    ],
+    "footnote": "Take the radon barrier out to finished floor level, protect it with the edge insulation during the build, and tape it to the block."
+   },
+   {
+    "n": "12",
+    "title": "Externals & site works",
+    "target": "easiest to defer, easiest to underestimate",
+    "intro": "Say what you want now even if it happens in year two — it is far cheaper to allow for it than to discover it.",
+    "questions": [
+     {
+      "key": "drive",
+      "label": "Driveway",
+      "options": [
+       {
+        "k": "tarmac",
+        "name": "Tarmac",
+        "u": "",
+        "cost": "Cheapest hard surface",
+        "note": "Quick to lay over a large area."
+       },
+       {
+        "k": "paving",
+        "name": "Block paving",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Individual units can be lifted for a service run and put back."
+       },
+       {
+        "k": "gravel",
+        "name": "Gravel",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Cheap and permeable. It migrates, and it needs an edge to hold it."
+       },
+       {
+        "k": "permeable",
+        "name": "Permeable paving",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Handles surface water on site. Sometimes a planning condition rather than a choice."
+       },
+       {
+        "k": "none",
+        "name": "None for now",
+        "u": "",
+        "cost": "",
+        "note": "Leave the sub-base in and finish it later."
+       }
+      ]
+     },
+     {
+      "key": "boundary",
+      "label": "Boundary",
+      "options": [
+       {
+        "k": "wall",
+        "name": "Block and render wall",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Permanent and private, priced by the metre — it adds up fast on a big site."
+       },
+       {
+        "k": "fence",
+        "name": "Post and rail fencing",
+        "u": "",
+        "cost": "Cheaper",
+        "note": "Quick and rural in character. Little privacy."
+       },
+       {
+        "k": "hedge",
+        "name": "Hedging or planting",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Cheapest now and the best-looking in ten years. It takes those ten years."
+       },
+       {
+        "k": "mixed",
+        "name": "Mixed",
+        "u": "",
+        "cost": "",
+        "note": "Wall to the road, hedge to the sides. The usual compromise."
+       },
+       {
+        "k": "none",
+        "name": "None for now",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "landscape",
+      "label": "Landscaping",
+      "options": [
+       {
+        "k": "basic",
+        "name": "Basic — topsoil and seed",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Gets you a green site cheaply."
+       },
+       {
+        "k": "enhanced",
+        "name": "Enhanced — turf and planting",
+        "u": "",
+        "cost": "Middle",
+        "note": "Instant lawn and a planting scheme."
+       },
+       {
+        "k": "full",
+        "name": "Full — hard and soft",
+        "u": "",
+        "cost": "Highest",
+        "note": "Patios, paths, levels and planting as a designed scheme."
+       },
+       {
+        "k": "none",
+        "name": "None for now",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "garden",
+      "label": "Garden building",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "shed",
+        "name": "Garden shed",
+        "u": "",
+        "cost": "Modest",
+        "note": ""
+       },
+       {
+        "k": "single",
+        "name": "Separate single garage",
+        "u": "",
+        "cost": "Substantial",
+        "note": "A building in its own right — foundations, roof and services."
+       },
+       {
+        "k": "double",
+        "name": "Separate double garage",
+        "u": "",
+        "cost": "Substantial",
+        "note": "Check whether it needs planning permission in its own right before you budget for it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "13",
+    "title": "Professional fees",
+    "target": "who is answerable for what",
+    "intro": "The assessor needs to know who else is involved, because it changes both the fee line and who signs off on site.",
+    "questions": [
+     {
+      "key": "architect",
+      "label": "Architect",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No fee",
+        "note": "You are coordinating the design yourself."
+       },
+       {
+        "k": "planning",
+        "name": "Planning only",
+        "u": "",
+        "cost": "Lower fee",
+        "note": "Drawings to get permission, then you are on your own for construction detail."
+       },
+       {
+        "k": "full",
+        "name": "Full service",
+        "u": "",
+        "cost": "Higher fee",
+        "note": "Design, tender and inspection through to completion."
+       }
+      ]
+     },
+     {
+      "key": "engineer",
+      "label": "Engineer",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No fee",
+        "note": "Only viable on the simplest strip-footing build."
+       },
+       {
+        "k": "design",
+        "name": "Design only",
+        "u": "",
+        "cost": "Lower fee",
+        "note": "Foundations, structure and calculations."
+       },
+       {
+        "k": "full",
+        "name": "Full service",
+        "u": "",
+        "cost": "Higher fee",
+        "note": "Design plus site inspections and sign-off at each stage."
+       }
+      ]
+     },
+     {
+      "key": "qs",
+      "label": "Quantity surveyor",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No fee",
+        "note": "The common answer on a self-build — and the reason this cost plan exists."
+       },
+       {
+        "k": "boq",
+        "name": "Bill of quantities only",
+        "u": "",
+        "cost": "Lower fee",
+        "note": "A priced document to tender from."
+       },
+       {
+        "k": "full",
+        "name": "Full service",
+        "u": "",
+        "cost": "Higher fee",
+        "note": "Tender, valuations and final account."
+       }
+      ]
+     },
+     {
+      "key": "certifier",
+      "label": "Assigned certifier",
+      "options": [
+       {
+        "k": "none",
+        "name": "Not appointed — opting out",
+        "u": "",
+        "cost": "",
+        "note": "Permitted for a one-off house you are building for yourself. You take on the certification responsibility."
+       },
+       {
+        "k": "appointed",
+        "name": "Appointed",
+        "u": "",
+        "cost": "Adds a fee",
+        "note": "Statutory inspections and certification under BCAR, with a Certificate of Compliance on Completion at the end."
+       }
+      ]
+     },
+     {
+      "key": "fire",
+      "label": "Fire safety and disability access certificates",
+      "options": [
+       {
+        "k": "none",
+        "name": "Neither required",
+        "u": "",
+        "cost": "",
+        "note": "The usual position for a one-off house."
+       },
+       {
+        "k": "fire",
+        "name": "Fire safety certificate required",
+        "u": "",
+        "cost": "Adds a fee",
+        "note": ""
+       },
+       {
+        "k": "both",
+        "name": "Both required",
+        "u": "",
+        "cost": "Adds a fee",
+        "note": "More common where part of the building is not a private dwelling."
+       }
+      ]
+     }
+    ],
+    "footnote": "A provisional BER is prepared at design stage and a full BER after completion. An air pressure test is required either way. Preliminaries and contingency are carried by the cost plan as percentages and are not asked here."
+   }
+  ]
+ },
+ "eu": {
+  "title": "Your upgrade, your choices",
+  "sub": "Energy Upgrade — survey selection form",
+  "addr": "Address",
+  "intro": "<p > Use this with your assessor &mdash; tick it together during the survey, or fill it in beforehand using the advisory notes. You are not committing to anything: this records what you want priced and what you want left out. </p> <p class=\"grey\"> <strong style=\"color: #1E293B;\">U-value</strong> is the rate heat escapes through a square metre. Lower is better. <strong style=\"color: #1E293B;\">Grant</strong> is what SEAI pays towards that measure. Grants are paid on the measure, not on the house, so leaving one out only saves you the share you were paying anyway. </p> <p class=\"grey\"> Some grants exist on one SEAI route and not another. Where that decides something, it is said on the line. If you are unsure, leave it blank and write a question in the notes. </p>",
+  "ret": "Your assessor takes these selections, confirms them against the survey, and builds your PlanitBER cost plan on the grant route that fits them best — the grants shown here are indicative until the route is chosen. The plan then fixes a budget against each measure, and you record what you actually pay beside it as the work goes on.",
+  "fine": "Grant amounts are the SEAI rates the cost plan is built on and depend on the grant route and the dwelling type; the amount for your house is confirmed in the cost plan itself. Certified window and door U-values must come from the supplier, determined to IS EN ISO 10077-1, 10077-2 or 12567-1. Where a figure is shown in brackets it has not been established for this house yet.",
+  "data": [
+   {
+    "n": "1",
+    "title": "About your house",
+    "target": "what the assessor needs before anything else",
+    "intro": "Three facts that decide which measures are even possible. If you are not sure of any of them, leave it — the survey will confirm it.",
+    "questions": [
+     {
+      "key": "existheat",
+      "label": "What heats the house now?",
+      "options": [
+       {
+        "k": "oil",
+        "name": "Oil boiler",
+        "u": "",
+        "cost": "",
+        "note": "The most common starting point. Removing the tank as well as the boiler is a separate line, so say if you want it gone."
+       },
+       {
+        "k": "gas",
+        "name": "Gas boiler",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "lpg",
+        "name": "LPG boiler",
+        "u": "",
+        "cost": "",
+        "note": "The bulk tank usually goes with it."
+       },
+       {
+        "k": "solid",
+        "name": "Solid fuel range or stove",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "back",
+        "name": "Back boiler behind a fire",
+        "u": "",
+        "cost": "",
+        "note": "Taking one out means removing the fireplace assembly and making good, which is more work than swapping a boiler."
+       },
+       {
+        "k": "storage",
+        "name": "Electric storage heaters",
+        "u": "",
+        "cost": "",
+        "note": "Usually the most expensive heating to run, so a heat pump changes more here than anywhere."
+       },
+       {
+        "k": "direct",
+        "name": "Direct electric heating",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "hp",
+        "name": "Existing heat pump",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "walltype",
+      "label": "How are the walls built?",
+      "options": [
+       {
+        "k": "cav-un",
+        "name": "Cavity, not insulated",
+        "u": "",
+        "cost": "",
+        "note": "Most houses built before 1990. The cheapest big win on the whole list."
+       },
+       {
+        "k": "cav-part",
+        "name": "Cavity, partly filled",
+        "u": "",
+        "cost": "",
+        "note": "Sometimes it can be topped up, sometimes not. The survey settles it."
+       },
+       {
+        "k": "cav-full",
+        "name": "Cavity, already fully insulated",
+        "u": "",
+        "cost": "",
+        "note": "Nothing more to do inside the cavity — any further work has to go inside or outside."
+       },
+       {
+        "k": "stone",
+        "name": "Solid stone",
+        "u": "",
+        "cost": "",
+        "note": "No cavity, so it is external or internal insulation only."
+       },
+       {
+        "k": "brick",
+        "name": "Solid brick",
+        "u": "",
+        "cost": "",
+        "note": "As above."
+       },
+       {
+        "k": "concrete",
+        "name": "Solid concrete block",
+        "u": "",
+        "cost": "",
+        "note": "As above."
+       },
+       {
+        "k": "timber",
+        "name": "Timber frame",
+        "u": "",
+        "cost": "",
+        "note": "Different rules again — do not pump anything into a timber frame without checking."
+       },
+       {
+        "k": "unknown",
+        "name": "I do not know",
+        "u": "",
+        "cost": "",
+        "note": "Perfectly normal. The survey establishes it, usually from a borescope."
+       }
+      ]
+     },
+     {
+      "key": "age",
+      "label": "Roughly when was it built?",
+      "options": [
+       {
+        "k": "pre40",
+        "name": "Before 1940",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "41-77",
+        "name": "1941 to 1977",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "78-82",
+        "name": "1978 to 1982",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "83-93",
+        "name": "1983 to 1993",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "94-99",
+        "name": "1994 to 1999",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "00-04",
+        "name": "2000 to 2004",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "05-10",
+        "name": "2005 to 2010",
+        "u": "",
+        "cost": "",
+        "note": ""
+       },
+       {
+        "k": "11plus",
+        "name": "2011 or later",
+        "u": "",
+        "cost": "",
+        "note": "Later houses often need very little fabric work — the money may do more on renewables."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "2",
+    "title": "Roof",
+    "target": "usually the cheapest heat saved",
+    "intro": "Where the insulation goes depends on whether the attic is used.",
+    "questions": [
+     {
+      "key": "roof",
+      "label": "Which roof measure?",
+      "options": [
+       {
+        "k": "ceiling",
+        "name": "Ceiling level — top up the attic",
+        "u": "U 0.11 achievable",
+        "cost": "Grant up to €2,000",
+        "note": "The cheapest measure on the list per unit of heat saved. Quilt between and over the joists, with a ventilation tray at the eaves so the airflow is not blocked. You lose the attic as storage unless boards go over it."
+       },
+       {
+        "k": "rafter",
+        "name": "Rafter level — warm roof",
+        "u": "U 0.15 typical",
+        "cost": "Grant €3,000 — Community Energy Grant only",
+        "note": "Needed where the attic is a room. Several times the cost of ceiling level for a similar amount of heat saved, and it takes the ceiling down and puts it back. There is no rafter grant under Better Energy Homes, which can decide the route on its own."
+       },
+       {
+        "k": "room",
+        "name": "Room in the roof — sloped and flat ceilings together",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant [confirm route]",
+        "note": "For a converted attic with sloped ceilings, a flat section and knee walls. The most disruptive roof option because every surface in the room is involved."
+       },
+       {
+        "k": "flat",
+        "name": "Flat roof",
+        "u": "U 0.11 achievable",
+        "cost": "Grant [confirm route]",
+        "note": "A warm-deck overlay, or done as part of a re-roof if the covering is due anyway. Doing both at once saves the strip-out twice."
+       },
+       {
+        "k": "none",
+        "name": "Leave the roof",
+        "u": "",
+        "cost": "No grant",
+        "note": "Only sensible if there is already 300mm or more, evenly laid, with no gaps at the eaves."
+       }
+      ]
+     },
+     {
+      "key": "roofmat",
+      "label": "If topping up the attic — with what?",
+      "options": [
+       {
+        "k": "mw300",
+        "name": "Mineral wool 300mm",
+        "u": "",
+        "cost": "Baseline",
+        "note": "The standard answer, laid between and across the joists."
+       },
+       {
+        "k": "mw400",
+        "name": "Mineral wool 400mm",
+        "u": "",
+        "cost": "A little dearer",
+        "note": "Better again, and it costs little more once the crew is up there. It buries the joists deeper, so plan the boarding."
+       },
+       {
+        "k": "cell",
+        "name": "Blown cellulose 300mm",
+        "u": "",
+        "cost": "Similar",
+        "note": "Blown in, so it fills awkward corners a quilt cannot reach. Good in an attic with a lot of obstructions."
+       },
+       {
+        "k": "pir",
+        "name": "PIR boards 150mm over a boarded floor",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Where you want to keep using the attic. Rigid board under the boards gets you the U-value without losing the storage."
+       },
+       {
+        "k": "na",
+        "name": "Not applicable",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "3",
+    "title": "Walls",
+    "target": "the biggest single heat loss in most houses",
+    "intro": "Which one is possible depends on how the walls were built. Grants are paid per measure, so leaving one out only saves you the share you were paying anyway.",
+    "questions": [
+     {
+      "key": "wall",
+      "label": "Which wall measure?",
+      "options": [
+       {
+        "k": "bead",
+        "name": "Cavity fill — blown EPS bead",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant up to €1,800",
+        "note": "The cheapest and least disruptive wall measure by a distance. Pumped from outside in a day, no rooms disturbed. Only possible if the cavity is empty and dry."
+       },
+       {
+        "k": "mw",
+        "name": "Cavity fill — blown mineral wool",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant up to €1,800",
+        "note": "Much the same thermally as bead and non-combustible, which can matter in a semi or terrace. A little dearer to install."
+       },
+       {
+        "k": "foam",
+        "name": "Cavity fill — Walltite poured foam",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant up to €1,800",
+        "note": "Seals the blockwork as well as insulating it, so it does the airtightness job at the same time. Not NSAI-certified for the installation method — get the contractor’s certified procedure in writing."
+       },
+       {
+        "k": "ewi",
+        "name": "External wall insulation",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant [confirm route]",
+        "note": "The best thermal result and the only one that also fixes cold bridging at the junctions. It changes how the house looks, adds significantly to wall thickness, and needs new cills, eaves and a drainage detail at ground level."
+       },
+       {
+        "k": "iwi",
+        "name": "Internal wall insulation (dry lining)",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant [confirm route]",
+        "note": "For solid walls where the outside must stay. It costs room area, and every room it touches has to be emptied, re-skirted and redecorated. Vapour control and a ventilated service cavity are not optional."
+       },
+       {
+        "k": "none",
+        "name": "Leave the walls",
+        "u": "",
+        "cost": "No grant",
+        "note": "Reasonable if the cavity is already full and the outside has to stay as it is."
+       }
+      ]
+     },
+     {
+      "key": "ewifinish",
+      "label": "If external insulation — what finish?",
+      "options": [
+       {
+        "k": "silicone",
+        "name": "Silicone render",
+        "u": "",
+        "cost": "",
+        "note": "Flexible, self-cleaning and colour-through, so no repainting later. The usual choice."
+       },
+       {
+        "k": "acrylic",
+        "name": "Acrylic render",
+        "u": "",
+        "cost": "",
+        "note": "Cheaper than silicone and less breathable. Fine on most houses."
+       },
+       {
+        "k": "mineral",
+        "name": "Mineral render",
+        "u": "",
+        "cost": "",
+        "note": "The most breathable, which matters on older solid-wall houses. It is painted rather than colour-through."
+       },
+       {
+        "k": "brick",
+        "name": "Brick slip feature",
+        "u": "",
+        "cost": "Dearer",
+        "note": "Usually a panel to keep some of the original character."
+       },
+       {
+        "k": "stone",
+        "name": "Stone finish",
+        "u": "",
+        "cost": "Dearest",
+        "note": ""
+       },
+       {
+        "k": "na",
+        "name": "Not applicable",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "4",
+    "title": "Floor",
+    "target": "rarely first, sometimes worth it",
+    "intro": "The most disruptive fabric measure in an occupied house, and the one most often left out. Under Better Energy Homes there is no grant for it at all.",
+    "questions": [
+     {
+      "key": "floor",
+      "options": [
+       {
+        "k": "breakout",
+        "name": "Solid floor — break out, insulate, re-screed",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant €3,500 — One Stop Shop only",
+        "note": "The thorough version. The room is out of use for weeks, skirtings and door thresholds all change, and the kitchen has to come out if it is in the kitchen."
+       },
+       {
+        "k": "overfloor",
+        "name": "Solid floor — insulation over the existing slab",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant €3,500 — One Stop Shop only",
+        "note": "Much less disruptive because nothing is dug up, but it raises the floor by 60–100mm. Doors, stairs and thresholds all have to be looked at."
+       },
+       {
+        "k": "suspended",
+        "name": "Suspended timber floor — insulate between the joists",
+        "u": "U [confirm from DEAP]",
+        "cost": "Grant €3,500 — One Stop Shop only",
+        "note": "Much cheaper than a solid floor if there is a crawl space to work from. If there is not, the boards have to come up."
+       },
+       {
+        "k": "none",
+        "name": "Leave the floor",
+        "u": "",
+        "cost": "No grant",
+        "note": "The usual answer in an occupied house. The money almost always does more in the roof and walls first."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "5",
+    "title": "Draughts & air tightness",
+    "target": "the cheapest comfort on the list",
+    "intro": "Draughts are what people actually feel. Two separate things here: sealing the obvious gaps, and doing it properly with a test to prove it.",
+    "questions": [
+     {
+      "key": "draught",
+      "label": "Draught-proofing",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Yes — doors, letterboxes, chimney balloons, gaps",
+        "u": "",
+        "cost": "Low cost",
+        "note": "A day’s work, no grant, and often the single most noticeable thing in the whole job."
+       },
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "airtight",
+      "label": "Airtightness works and a blower door test",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Yes — membrane, tape and test",
+        "u": "target 3–5 m³/m²/hr",
+        "cost": "Grant €1,000 — One Stop Shop only",
+        "note": "Membrane and tape at the floor and ceiling junctions, then a blower-door test to prove it. A heat pump in a leaky house works harder than it should."
+       },
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "No grant",
+        "note": "The insulation still works; the house will not feel as warm as the numbers suggest."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "6",
+    "title": "Windows & doors",
+    "target": "comfort as much as heat",
+    "intro": "Rarely the cheapest heat saved, usually the most noticeable — draughts, cold glass and street noise all go at once.",
+    "questions": [
+     {
+      "key": "windows",
+      "label": "Windows",
+      "options": [
+       {
+        "k": "keep",
+        "name": "Keep the existing windows",
+        "u": "",
+        "cost": "No grant",
+        "note": "If they are double glazed, sealed and under about fifteen years old, the money almost always does more elsewhere first."
+       },
+       {
+        "k": "double",
+        "name": "Replace with double glazing",
+        "u": "U 1.20 or better",
+        "cost": "Grant up to €4,000",
+        "note": "Meets the standard, costs less than triple, and the frames are lighter on old openings."
+       },
+       {
+        "k": "triple",
+        "name": "Replace with triple glazing",
+        "u": "U typically 0.8–1.0",
+        "cost": "Grant up to €4,000",
+        "note": "A warmer inner pane, so no cold draught by the glass and less condensation. The grant is the same either way, so the extra is yours."
+       },
+       {
+        "k": "secondary",
+        "name": "Secondary glazing inside the existing windows",
+        "u": "",
+        "cost": "Not grant eligible",
+        "note": "For protected structures and conservation areas where the original windows must stay. It works, but SEAI pays nothing towards it."
+       }
+      ]
+     },
+     {
+      "key": "frame",
+      "label": "Frame material",
+      "options": [
+       {
+        "k": "upvc",
+        "name": "uPVC",
+        "u": "",
+        "cost": "Cheapest",
+        "note": "Best value and no maintenance. Frames are chunkier, so you lose a little glass."
+       },
+       {
+        "k": "alu",
+        "name": "Aluminium-clad timber",
+        "u": "",
+        "cost": "Dearest",
+        "note": "Timber inside, weatherproof aluminium outside. Slim sightlines and nothing to paint."
+       },
+       {
+        "k": "hardwood",
+        "name": "Hardwood",
+        "u": "",
+        "cost": "Dearer",
+        "note": "The right answer in a period house. It needs repainting on a cycle."
+       },
+       {
+        "k": "composite",
+        "name": "Composite",
+        "u": "",
+        "cost": "Middle",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "doors",
+      "label": "External doors",
+      "options": [
+       {
+        "k": "keep",
+        "name": "Keep the existing doors",
+        "u": "",
+        "cost": "No grant",
+        "note": ""
+       },
+       {
+        "k": "composite",
+        "name": "Composite with an insulated core",
+        "u": "",
+        "cost": "Grant €800 each, up to two",
+        "note": "The usual choice: well insulated, secure and no maintenance."
+       },
+       {
+        "k": "hardwood",
+        "name": "Hardwood",
+        "u": "",
+        "cost": "Grant €800 each, up to two",
+        "note": "Handsome and heavier. Needs maintenance and a good frame."
+       },
+       {
+        "k": "alu",
+        "name": "Aluminium or aluminium-clad",
+        "u": "",
+        "cost": "Grant €800 each, up to two",
+        "note": ""
+       },
+       {
+        "k": "upvc",
+        "name": "uPVC",
+        "u": "",
+        "cost": "Grant €800 each, up to two",
+        "note": "Cheapest of the four."
+       },
+       {
+        "k": "patio",
+        "name": "Sliding patio or bi-fold",
+        "u": "",
+        "cost": "",
+        "note": "Mostly glass, so it is priced and rated much more like a window than a door."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "7",
+    "title": "Heating",
+    "target": "after the fabric, not before",
+    "intro": "A heat pump only makes sense once the fabric is done — that is why this sits below insulation. What changes the running cost most is the water temperature the system has to produce.",
+    "questions": [
+     {
+      "key": "heatsys",
+      "label": "Heat source",
+      "options": [
+       {
+        "k": "ashp",
+        "name": "Air-to-water heat pump",
+        "u": "",
+        "cost": "Grant up to €12,500",
+        "note": "The main event, and the largest grant on the list. Requires a technical assessment and a heat loss indicator of 2.0 W/m²K or better — which is what the insulation above is for."
+       },
+       {
+        "k": "hybrid",
+        "name": "Heat pump alongside the existing boiler",
+        "u": "",
+        "cost": "Grant [confirm route]",
+        "note": "The heat pump does the everyday heating and the boiler covers the coldest days. A sensible half-step where the fabric is not there yet, at the cost of keeping two systems."
+       },
+       {
+        "k": "gshp",
+        "name": "Ground source heat pump",
+        "u": "",
+        "cost": "Grant [confirm route]",
+        "note": "More efficient than air source and far more expensive to install, because it needs either a large trenched area or boreholes. Rarely the right answer on a small site."
+       },
+       {
+        "k": "boiler",
+        "name": "New condensing boiler",
+        "u": "",
+        "cost": "No heat pump grant",
+        "note": "Cheapest to install and it keeps you on fossil fuel. Worth considering only if the fabric work cannot get the house to the standard a heat pump needs."
+       },
+       {
+        "k": "biomass",
+        "name": "Wood pellet boiler",
+        "u": "",
+        "cost": "Grant [confirm route]",
+        "note": "Carbon-neutral fuel, but it needs a dry bulk store and regular attention, and pellet delivery has to reach the store."
+       },
+       {
+        "k": "airair",
+        "name": "Air-to-air heat pump",
+        "u": "",
+        "cost": "No hot water",
+        "note": "Heats and cools rooms but makes no hot water at all, so it has to be paired with something else. Useful as a supplement."
+       },
+       {
+        "k": "keep",
+        "name": "Keep the existing heating for now",
+        "u": "",
+        "cost": "No grant",
+        "note": "Defensible if the fabric comes first and the boiler has years left. Doing fabric first also means a smaller, cheaper heat pump later."
+       }
+      ]
+     },
+     {
+      "key": "emitter",
+      "label": "How the heat reaches the room",
+      "options": [
+       {
+        "k": "keep",
+        "name": "Keep the existing radiators",
+        "u": "runs at 55°C",
+        "cost": "",
+        "note": "Cheapest and dearest to run. Radiators sized for an oil boiler at 70°C force the heat pump to run hot, which is when it is least efficient."
+       },
+       {
+        "k": "over",
+        "name": "Oversized radiators",
+        "u": "runs at 45–50°C",
+        "cost": "",
+        "note": "Bigger radiators let the heat pump run cooler and cheaper. Every radiator changes, but no floors come up. The usual retrofit answer."
+       },
+       {
+        "k": "ufhrad",
+        "name": "Underfloor downstairs, radiators upstairs",
+        "u": "runs at 35–45°C",
+        "cost": "",
+        "note": "Lower running cost again, but the ground floor has to come up — only sensible if the floors are being done anyway."
+       },
+       {
+        "k": "ufh",
+        "name": "Underfloor throughout",
+        "u": "runs at 35°C",
+        "cost": "",
+        "note": "The lowest running cost and the biggest intervention."
+       }
+      ]
+     },
+     {
+      "key": "controls",
+      "label": "Heating controls",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Upgrade to smart zoned controls",
+        "u": "",
+        "cost": "Covered under the heat pump grant",
+        "note": "Time and temperature control per zone. Where a heat pump is fitted, this is normally covered by the heat pump grant rather than paid for separately."
+       },
+       {
+        "k": "no",
+        "name": "Keep the existing controls",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "8",
+    "title": "Hot water",
+    "target": "often forgotten, always noticed",
+    "intro": "A heat pump needs a cylinder with a bigger coil than a boiler does. An existing cylinder usually cannot be kept.",
+    "questions": [
+     {
+      "key": "cylinder",
+      "label": "Cylinder",
+      "options": [
+       {
+        "k": "new",
+        "name": "New unvented mains-pressure cylinder",
+        "u": "",
+        "cost": "Usually part of the heat pump works",
+        "note": "Sized from the number of bedrooms. Mains pressure means a proper shower without a pump."
+       },
+       {
+        "k": "hpwh",
+        "name": "Heat pump water heater — hot water only",
+        "u": "",
+        "cost": "Grant [confirm route]",
+        "note": "A small heat pump that does hot water and nothing else. Worth considering where the space heating is staying as it is."
+       },
+       {
+        "k": "keep",
+        "name": "Keep the existing cylinder",
+        "u": "",
+        "cost": "",
+        "note": "Only realistic if the heat source is not changing. Add lagging if it has none."
+       }
+      ]
+     },
+     {
+      "key": "solarth",
+      "label": "Solar thermal",
+      "options": [
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "",
+        "note": "The usual answer where solar PV and a heat pump are going in — two systems heating the same water rarely pays."
+       },
+       {
+        "k": "yes",
+        "name": "Yes — evacuated tube collectors",
+        "u": "",
+        "cost": "Grant [confirm route]",
+        "note": "Hot water only, and it needs a twin-coil cylinder to work alongside the main heat source."
+       }
+      ]
+     },
+     {
+      "key": "lagging",
+      "label": "Pipe insulation and cylinder lagging",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Yes",
+        "u": "",
+        "cost": "Very low cost",
+        "note": "A few hundred euro that stops heat you have paid for leaking into the hot press. Almost always worth doing."
+       },
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "9",
+    "title": "Ventilation",
+    "target": "required once the house is sealed",
+    "intro": "The tighter the house, the more this matters. Sealing a house without ventilating it causes damp — this is not an optional extra.",
+    "questions": [
+     {
+      "key": "vent",
+      "options": [
+       {
+        "k": "mvhr",
+        "name": "Mechanical ventilation with heat recovery",
+        "u": "91% heat recovery",
+        "cost": "Grant up to €1,500",
+        "note": "Recovers the heat from the air it throws out, and worth about 12% on the efficiency of the house alongside a heat pump. It needs rigid insulated ductwork to every room, which is a real intervention in an existing house."
+       },
+       {
+        "k": "dcv",
+        "name": "Demand control ventilation",
+        "u": "no heat recovery",
+        "cost": "Grant [confirm route]",
+        "note": "Humidity-controlled vents in the rooms with central extract from the wet rooms. Far less disruptive to retrofit than full ductwork, and it ventilates harder only when the house needs it."
+       },
+       {
+        "k": "mev",
+        "name": "Continuous mechanical extract",
+        "u": "no heat recovery",
+        "cost": "No standalone grant",
+        "note": "A quiet continuous extract from the wet rooms with trickle vents elsewhere. Deals with damp, recovers nothing, and SEAI pays nothing towards it on its own."
+       },
+       {
+        "k": "dmev",
+        "name": "Individual fans in each wet room",
+        "u": "no heat recovery",
+        "cost": "No standalone grant",
+        "note": "The simplest of all — a humidity-sensing fan per bathroom and utility. No ducting to run, so it suits a house where nothing else is coming down."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "10",
+    "title": "Electricity & renewables",
+    "target": "solar PV carries no VAT",
+    "intro": "The only measures here that make electricity rather than save heat, plus the electrical work that often has to happen anyway.",
+    "questions": [
+     {
+      "key": "pv",
+      "label": "Solar PV",
+      "options": [
+       {
+        "k": "none",
+        "name": "None",
+        "u": "",
+        "cost": "No grant",
+        "note": "Nothing wrong with this. Fabric and heating almost always repay faster."
+       },
+       {
+        "k": "pv",
+        "name": "Solar PV panels",
+        "u": "",
+        "cost": "Grant applies — amount by array size",
+        "note": "Best value if someone is home during the day or you run a heat pump, because a unit you use is worth far more than one you export. PV carries no VAT, unlike every other measure here."
+       },
+       {
+        "k": "pvbatt",
+        "name": "Solar PV with a battery",
+        "u": "",
+        "cost": "Grant plus battery grant",
+        "note": "Stores the middle of the day for the evening. Adds substantially to the cost and the battery will not last as long as the panels."
+       }
+      ]
+     },
+     {
+      "key": "consumer",
+      "label": "Consumer unit",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Upgrade the consumer unit",
+        "u": "",
+        "cost": "No standalone grant",
+        "note": "Often unavoidable rather than optional — an older board may not have the capacity or the protection for a heat pump, PV and a charger."
+       },
+       {
+        "k": "no",
+        "name": "Leave as it is",
+        "u": "",
+        "cost": "",
+        "note": "Only if the electrician confirms it can take the new load."
+       }
+      ]
+     },
+     {
+      "key": "led",
+      "label": "Lighting",
+      "options": [
+       {
+        "k": "yes",
+        "name": "LED lighting throughout",
+        "u": "",
+        "cost": "No standalone grant",
+        "note": "Cheap, immediate, and it counts towards the BER. Avoid downlights punched through the attic insulation — they undo the roof work."
+       },
+       {
+        "k": "no",
+        "name": "Leave as it is",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "ev",
+      "label": "EV charging",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Yes — 7kW smart charger",
+        "u": "",
+        "cost": "No SEAI grant since 2022",
+        "note": "A smart charger can draw from your own solar or wait for a night tariff, which is where the saving is. The SEAI home charger grant closed in 2022."
+       },
+       {
+        "k": "no",
+        "name": "No",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "n": "11",
+    "title": "Putting the house back",
+    "target": "the part people forget to budget",
+    "intro": "Insulation work leaves marks. These lines are what turns a finished job into a finished house, and they are the most common reason a retrofit runs over.",
+    "questions": [
+     {
+      "key": "redecorate",
+      "label": "Redecoration afterwards",
+      "options": [
+       {
+        "k": "patch",
+        "name": "Patch and touch up only",
+        "u": "",
+        "cost": "Lowest",
+        "note": "Makes good where the work happened and nothing else. The new paint will not match."
+       },
+       {
+        "k": "full",
+        "name": "Full repaint throughout",
+        "u": "",
+        "cost": "Middle",
+        "note": "The usual answer after internal insulation, because half a wall of new plaster never blends in."
+       },
+       {
+        "k": "premium",
+        "name": "Premium finish",
+        "u": "",
+        "cost": "Highest",
+        "note": ""
+       },
+       {
+        "k": "none",
+        "name": "None — I will handle it",
+        "u": "",
+        "cost": "No cost",
+        "note": "Fine, as long as you know it is coming."
+       }
+      ]
+     },
+     {
+      "key": "floorfin",
+      "label": "Floor finishes, if the floor is being insulated",
+      "options": [
+       {
+        "k": "screed",
+        "name": "Screed only — I will finish it",
+        "u": "",
+        "cost": "Lowest",
+        "note": ""
+       },
+       {
+        "k": "tile",
+        "name": "Ceramic or porcelain tiles",
+        "u": "",
+        "cost": "Middle",
+        "note": ""
+       },
+       {
+        "k": "timber",
+        "name": "Engineered timber",
+        "u": "",
+        "cost": "Higher",
+        "note": "Works over underfloor heating where solid timber does not."
+       },
+       {
+        "k": "lvt",
+        "name": "Luxury vinyl tile",
+        "u": "",
+        "cost": "Middle",
+        "note": "Warm underfoot and forgiving over a new screed."
+       },
+       {
+        "k": "na",
+        "name": "Not applicable",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "reveals",
+      "label": "Window reveals and internal sills",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Include them",
+        "u": "",
+        "cost": "",
+        "note": "Needed after almost any window replacement. Leaving them out is the classic way a job looks unfinished."
+       },
+       {
+        "k": "no",
+        "name": "Not needed",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     },
+     {
+      "key": "skirt",
+      "label": "New skirting boards after internal insulation",
+      "options": [
+       {
+        "k": "yes",
+        "name": "Include them",
+        "u": "",
+        "cost": "",
+        "note": "Dry lining moves the wall face inward, so the old skirtings will not go back on."
+       },
+       {
+        "k": "no",
+        "name": "Not needed",
+        "u": "",
+        "cost": "",
+        "note": ""
+       }
+      ]
+     }
+    ],
+    "footnote": "External insulation also needs sills, copings and flashings made good outside — that is carried automatically when external insulation is in the scope."
+   }
+  ]
+ }
+};
+
+function exportSelectionForm(kind) {
+  var F = SELECTION_FORMS[kind];
+  if (!F) return;
+  var esc = function(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+  var dateStr = new Date().toLocaleDateString('en-IE', {day:'numeric', month:'long', year:'numeric'});
+  // Money chips wear the form's own accent: green for grant-driven EU, sand for NB cost bands.
+  var moneyCss = kind === 'eu'
+    ? 'background:#F0FBF5;color:#046C4C;border-color:#BFE7D2;'
+    : 'background:#FBF3E4;color:#8A6214;border-color:#EBD9B4;';
+
+  // Pre-fill what the project screen already knows; blank underlines remain for handwriting.
+  var _val = function(id) { var el = document.getElementById(id); return el && el.value ? el.value.trim() : ''; };
+  var clientName = _val('t0-clientName');
+  var siteAddr   = _val('t0-projName');
+  // NB pre-fills the assessor identity where it has been typed; EU stays generic —
+  // the survey form is often printed in batches before any project is open.
+  var preparedBy = kind === 'nb' ? _val('t0-preparedBy') : '';
+  var prepWho  = preparedBy ? esc(preparedBy) : '[Assessor name]';
+  var prepRest = preparedBy ? '' : '<div>[Phone]</div><div>[Email]</div>';
+
+  var globe =
+    '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="sf-globe">' +
+      '<defs>' +
+        '<radialGradient id="sf-gg" cx="35%" cy="30%" r="65%"><stop offset="0%" stop-color="#62AADF"/><stop offset="100%" stop-color="#2464A0"/></radialGradient>' +
+        '<clipPath id="sf-gc"><circle cx="60" cy="60" r="55"/></clipPath>' +
+      '</defs>' +
+      '<circle cx="60" cy="60" r="55" fill="url(#sf-gg)"/>' +
+      '<g clip-path="url(#sf-gc)" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.9">' +
+        '<ellipse cx="60" cy="37" rx="52" ry="9"/><ellipse cx="60" cy="60" rx="55" ry="11"/><ellipse cx="60" cy="83" rx="52" ry="9"/>' +
+        '<ellipse cx="60" cy="60" rx="10" ry="55"/><ellipse cx="60" cy="60" rx="30" ry="55"/><line x1="60" y1="5" x2="60" y2="115"/>' +
+      '</g>' +
+      '<g clip-path="url(#sf-gc)">' +
+        '<ellipse cx="53" cy="27" rx="21" ry="13" transform="rotate(-15 53 27)" fill="#2D7A4F" opacity="0.9"/>' +
+        '<ellipse cx="77" cy="45" rx="14" ry="9" transform="rotate(12 77 45)" fill="#2D7A4F" opacity="0.85"/>' +
+        '<ellipse cx="39" cy="64" rx="13" ry="22" transform="rotate(4 39 64)" fill="#2D7A4F" opacity="0.9"/>' +
+        '<ellipse cx="71" cy="77" rx="10" ry="7" transform="rotate(-10 71 77)" fill="#2D7A4F" opacity="0.82"/>' +
+        '<ellipse cx="59" cy="50" rx="6" ry="4" fill="#4ab870" opacity="0.65"/>' +
+        '<ellipse cx="47" cy="84" rx="9" ry="5" transform="rotate(15 47 84)" fill="#2D7A4F" opacity="0.75"/>' +
+      '</g>' +
+      '<circle cx="60" cy="60" r="55" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1.5"/>' +
+    '</svg>';
+
+  var parts = [];
+  parts.push(
+    '<div class="sf-mast">' +
+      '<div>' +
+        '<div style="display:flex;align-items:center;gap:2.6mm;">' + globe +
+          '<div class="sf-word"><span class="p">Planit</span><span class="b">BER</span></div>' +
+        '</div>' +
+        '<div class="sf-title">' + esc(F.title) + '</div>' +
+        '<div class="sf-sub">' + esc(F.sub) + '</div>' +
+      '</div>' +
+      '<div class="sf-prep"><div class="sf-lbl">Prepared by</div>' +
+        '<div class="who">' + prepWho + '</div>' + prepRest + '</div>' +
+    '</div>' +
+    '<div class="sf-idgrid">' +
+      '<div><div class="sf-lbl">Name</div><div class="val">' + esc(clientName) + '</div></div>' +
+      '<div><div class="sf-lbl">' + esc(F.addr) + '</div><div class="val">' + esc(siteAddr) + '</div></div>' +
+      '<div><div class="sf-lbl">Date</div><div class="val"></div></div>' +
+    '</div>' +
+    '<div class="sf-intro">' + F.intro + '</div>'
+  );
+
+  F.data.forEach(function(sec) {
+    var qhtml = sec.questions.map(function(q) {
+      var rows = q.options.map(function(o) {
+        var chips = '';
+        if (o.u) chips += '<span class="sf-chip u">' + esc(o.u) + '</span>';
+        if (o.cost) {
+          // Square brackets mark a figure not yet established for this house — soft chip.
+          var soft = o.cost.indexOf('[') !== -1;
+          chips += soft
+            ? '<span class="sf-chip soft">' + esc(o.cost) + '</span>'
+            : '<span class="sf-chip money" style="' + moneyCss + '">' + esc(o.cost) + '</span>';
+        }
+        var note = o.note ? '<div class="sf-onote">' + esc(o.note) + '</div>' : '';
+        return '<div class="sf-opt"><div class="sf-ring"></div>' +
+               '<div><span class="sf-oname">' + esc(o.name) + '</span>' + chips + note + '</div></div>';
+      }).join('');
+      var label = q.label ? '<div class="sf-qlabel">' + esc(q.label) + '</div>' : '';
+      return '<div class="sf-q">' + label + rows + '</div>';
+    }).join('');
+    var foot = sec.footnote ? '<div class="sf-footnote">' + esc(sec.footnote) + '</div>' : '';
+    parts.push(
+      '<div class="sf-sec">' +
+        '<div class="sf-sechead"><span class="sf-secn">' + esc(sec.n) + '</span><span class="sf-sect">' + esc(sec.title) + '</span>' +
+          '<span class="sf-sectarget">' + esc(sec.target || '') + '</span></div>' +
+        '<div class="sf-secintro">' + esc(sec.intro || '') + '</div>' +
+        qhtml + foot +
+        '<div class="sf-notes"><div class="sf-lbl">Questions or preferences</div></div>' +
+      '</div>'
+    );
+  });
+
+  parts.push(
+    '<div class="sf-return"><h3>When you have filled this in</h3>' +
+      '<p>' + F.ret + '</p>' +
+      '<div class="who">' + prepWho + (preparedBy ? '' : ' &middot; [Phone] &middot; [Email]') + '</div></div>' +
+    '<div class="sf-fine">' + esc(F.fine) + ' ' +
+      'Prepared with PlanitBER V1 &middot; ' + esc(rateBookStamp()) + ' &middot; Printed ' + esc(dateStr) + '.</div>'
+  );
+
+  // Hide any stale backdrop from a previous PDF call
+  var staleBackdrop = document.getElementById('eu-pdf-backdrop');
+  if (staleBackdrop) staleBackdrop.style.display = 'none';
+
+  var printDiv = document.getElementById('pdf-print-view');
+  if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
+  printDiv.style.cssText = 'display:block;background:white;';
+  printDiv.innerHTML = '<div class="sf-doc">' + parts.join('') + '</div>';
+
+  // The app's print default is A4 landscape (the seven-column plan needs it); the form is a
+  // portrait document. Injected after the main stylesheet, this later @page rule wins, and
+  // it is removed again once the dialog closes so the plan exports are untouched.
+  var pageStyle = document.getElementById('sf-portrait-page');
+  if (!pageStyle) {
+    pageStyle = document.createElement('style');
+    pageStyle.id = 'sf-portrait-page';
+    document.head.appendChild(pageStyle);
+  }
+  pageStyle.textContent = '@media print { @page { size: A4 portrait; margin: 14mm 14mm 13mm; } }';
+
+  var _prevBodyBg = document.body.style.background;
+  document.body.style.background = 'white';
+  printDiv.scrollIntoView();
+  var _onAfterPrint = function() {
+    printDiv.style.display = 'none';
+    document.body.style.background = _prevBodyBg;
+    var ps = document.getElementById('sf-portrait-page');
+    if (ps && ps.parentNode) ps.parentNode.removeChild(ps);
+    window.removeEventListener('afterprint', _onAfterPrint);
+  };
+  window.addEventListener('afterprint', _onAfterPrint);
+  window.print();
+}
+window.exportSelectionForm = exportSelectionForm;
+
+
 function _updateEUPDFBtns(isPlan, mode) {
   var wrap = document.getElementById('pdf-btn-wrap');
   if (!wrap) return;
+  // Callers rarely pass the mode; the generated plan knows it.
+  if (!mode && typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) mode = (BOQ.projectInfo.type || '').toString();
   // "Retrofit" only where it is one. New Build and Refurbishment get the same two
   // documents under their own name.
   var planLabel = mode === 'Energy Upgrade' ? 'Retrofit Cost Plan (PDF)' : 'Cost Plan (PDF)';
@@ -14596,9 +17507,16 @@ function _updateEUPDFBtns(isPlan, mode) {
     // Two documents, for two different readers. The Cost Plan is the homeowner's — page 1 is
     // their summary and the evidence sits behind it. The Pricing Schedule is the same scope
     // with every figure removed, so a contractor prices it without seeing the estimate.
+    var formBtn = '';
+    if (mode === 'Energy Upgrade' || mode === 'New Build') {
+      var formKind  = mode === 'Energy Upgrade' ? 'eu' : 'nb';
+      var formLabel = mode === 'Energy Upgrade' ? 'Survey Selection Form (PDF)' : 'Homeowner Selection Form (PDF)';
+      formBtn = '<button onclick="exportSelectionForm(\'' + formKind + '\')" title="Reprint the blank client selection form" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128221; ' + formLabel + '</button>';
+    }
     wrap.innerHTML =
       '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; '+planLabel+'</button>' +
-      '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>';
+      '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>' +
+      formBtn;
   } else {
     wrap.innerHTML =
       '<button id="pdf-download-btn" onclick="exportCompactPDF()" title="1–2 page customer summary — same format as Energy Upgrade" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Customer PDF</button>' +
