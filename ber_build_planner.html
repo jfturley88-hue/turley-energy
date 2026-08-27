@@ -14022,10 +14022,11 @@ function _euPricingBasis(s, inp) {
 }
 
 // ── VARIANCE AGAINST THE BUDGET BASELINE ──────────────────────────────────────
-// Difference is Actual minus Budget Est. It is never typed — always derived — and it stays
-// BLANK until an Actual is entered. A column of zeros on an issued plan would read as
-// "on budget everywhere", which is the opposite of what an unfilled plan means.
-// Over budget is red, under budget green, on both the dark screen and the printed page.
+// Difference is Budget Est. minus Actual, so a positive figure is money still in the
+// homeowner's pocket: + means under budget (green), − means over budget (red). It is
+// never typed — always derived — and it stays BLANK until an Actual is entered. A column
+// of zeros on an issued plan would read as "on budget everywhere", which is the opposite
+// of what an unfilled plan means.
 var DIFF_COLOURS = {
   screen: { over: '#F87171', under: '#4ADE80', muted: '#475569' },
   print:  { over: '#DC2626', under: '#059669', muted: '#94a3b8' },
@@ -14041,19 +14042,19 @@ function planDifference(actual, budget, surface) {
   if (raw === '') return { blank: true, amount: 0, text: '', colour: c.muted };
   var a = parseFloat(raw);
   if (!isFinite(a)) return { blank: true, amount: 0, text: '', colour: c.muted };
-  var d = Math.round(a - (parseFloat(budget) || 0));
+  var d = Math.round((parseFloat(budget) || 0) - a);
   if (d === 0) return { blank: false, amount: 0, text: fmt(0), colour: c.muted };
   return {
     blank: false, amount: d,
     text: (d > 0 ? '+' : '−') + fmt(Math.abs(d)),
-    colour: d > 0 ? c.over : c.under,
+    colour: d > 0 ? c.under : c.over,
   };
 }
 
 // The difference total said in words, under the figure. Empty until something is entered.
 function planDifferenceWords(diffTotal, anyActual) {
   if (!anyActual || !diffTotal) return '';
-  return fmt(Math.abs(diffTotal)) + (diffTotal > 0 ? ' over budget estimate' : ' under budget estimate');
+  return fmt(Math.abs(diffTotal)) + (diffTotal > 0 ? ' under budget estimate' : ' over budget estimate');
 }
 window.planDifference = planDifference;
 window.planDifferenceWords = planDifferenceWords;
@@ -14647,8 +14648,8 @@ function updateEUActuals(src) {
     if (!anyRows) {
       gd.textContent = ''; if (gdw) gdw.textContent = '';
     } else {
-      var col = diffSum > 0 ? DIFF_COLOURS.screen.over
-              : diffSum < 0 ? DIFF_COLOURS.screen.under : DIFF_COLOURS.screen.muted;
+      var col = diffSum > 0 ? DIFF_COLOURS.screen.under
+              : diffSum < 0 ? DIFF_COLOURS.screen.over : DIFF_COLOURS.screen.muted;
       gd.textContent = diffSum === 0 ? fmt(0) : (diffSum > 0 ? '+' : '−') + fmt(Math.abs(diffSum));
       gd.style.color = col;
       if (gdw) { gdw.textContent = planDifferenceWords(diffSum, anyRows); gdw.style.color = col; }
@@ -17753,7 +17754,7 @@ function exportEUPDF(mode) {
   // TOTAL + actual rows. Difference totals only the rows that carry an actual — see _d().
   var netCost = Math.max(0, totalEst - totalGrts);
   var _diffCol   = pdfAnyActual
-    ? (pdfDiffSum > 0 ? DIFF_COLOURS.print.over : pdfDiffSum < 0 ? DIFF_COLOURS.print.under : DIFF_COLOURS.print.muted)
+    ? (pdfDiffSum > 0 ? DIFF_COLOURS.print.under : pdfDiffSum < 0 ? DIFF_COLOURS.print.over : DIFF_COLOURS.print.muted)
     : DIFF_COLOURS.print.muted;
   var _diffFig   = !pdfAnyActual ? '' : (pdfDiffSum === 0 ? fmt(0) : (pdfDiffSum > 0 ? '+' : '−') + fmt(Math.abs(pdfDiffSum)));
   var _diffWords = planDifferenceWords(pdfDiffSum, pdfAnyActual);
@@ -18300,7 +18301,7 @@ function exportCompactPDF() {
   var _cpActTotal = 0;
   sections.forEach(function(sec) { var a = _secActual(sec); if (a != null) _cpActTotal += a; });
   var _cpCol   = cpAnyActual
-    ? (cpDiffSum > 0 ? DIFF_COLOURS.print.over : cpDiffSum < 0 ? DIFF_COLOURS.print.under : DIFF_COLOURS.print.muted)
+    ? (cpDiffSum > 0 ? DIFF_COLOURS.print.under : cpDiffSum < 0 ? DIFF_COLOURS.print.over : DIFF_COLOURS.print.muted)
     : DIFF_COLOURS.print.muted;
   var _cpFig   = !cpAnyActual ? '' : (cpDiffSum === 0 ? fmt(0) : (cpDiffSum > 0 ? '+' : '−') + fmt(Math.abs(cpDiffSum)));
   var _cpWords = planDifferenceWords(cpDiffSum, cpAnyActual);
@@ -18724,8 +18725,8 @@ function updateNBDifference() {
   var gw = document.getElementById('nb-grand-diff-words');
   if (!gd) return;
   if (!anyActual) { gd.textContent = ''; if (gw) gw.textContent = ''; return; }
-  var col = diffSum > 0 ? DIFF_COLOURS.screen.over
-          : diffSum < 0 ? DIFF_COLOURS.screen.under : DIFF_COLOURS.screen.muted;
+  var col = diffSum > 0 ? DIFF_COLOURS.screen.under
+          : diffSum < 0 ? DIFF_COLOURS.screen.over : DIFF_COLOURS.screen.muted;
   gd.textContent = diffSum === 0 ? fmt(0) : (diffSum > 0 ? '+' : '−') + fmt(Math.abs(diffSum));
   gd.style.color = col;
   if (gw) { gw.textContent = planDifferenceWords(diffSum, anyActual); gw.style.color = col; }
