@@ -8719,7 +8719,7 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
 
   // Making Good (conditional)
   if (inputs.includeMakingGood) {
-    sections.push({id:String(sid++),title:'MAKING GOOD & DECORATION',part:'B',items:[
+    sections.push({id:String(sid++),title:'MAKING GOOD & REINSTATEMENT',part:'B',items:[
       mkItem('MG.1','Making good after insulation & works — wall areas','m²',Math.round(fa*0.15),12,lM(0.5,L.craft),'Plaster patching, skim coat & redecoration'),
       mkItem('MG.2','Decoration — spot repairs & repaint affected areas','m²',Math.round(fa*0.35),2.5,lM(0.2,L.craft),'Emulsion to affected ceilings & walls'),
       mkItem('MG.3','Floor finish reinstatement — PC sum','m²',Math.round(gfa*0.1),0,lM(0.5,L.craft),'Allow for localised floor repairs after service runs'),
@@ -8827,7 +8827,9 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     }
 
     if (finItems.length > 0) {
-      sections.push({ id: String(sid++), title: 'FINISHES & DECORATING', part: 'B', items: finItems });
+      var mgSec = sections.find(function(x){ return x.title === 'MAKING GOOD & REINSTATEMENT'; });
+      if (mgSec) mgSec.items = mgSec.items.concat(finItems);
+      else sections.push({ id: String(sid++), title: 'MAKING GOOD & REINSTATEMENT', part: 'B', items: finItems });
     }
   })();
 
@@ -14003,8 +14005,11 @@ function _euPricingBasis(s, inp) {
   } else if (t.indexOf('PIPE INSULATION') >= 0) {
     pb.push('HW pipework + cylinder lagging jacket');
   } else if (t.indexOf('MAKING GOOD') >= 0) {
-    pb.push('Patch repair to insulation areas');
-    pb.push('Decoration to affected areas');
+    var mg=[]; if(inp.fin_redecorate)mg.push('redecoration'); if(inp.fin_reveals)mg.push('window reveals');
+    if(inp.fin_skirtings)mg.push('skirtings'); if(inp.fin_tiling)mg.push('tiling');
+    if(inp.fin_floor)mg.push('floor finishes'); if(inp.fin_external)mg.push('external sills & flashings');
+    if (mg.length) pb.push('Reinstatement: '+mg.join(', '));
+    else { pb.push('Patch repair to insulation areas'); pb.push('Decoration to affected areas'); }
   } else if (t.indexOf('SECONDARY GLAZING') >= 0) {
     var sgq = firstItemQty('secondary glazing'); if (sgq) pb.push('Window area: '+sgq+'m²');
     pb.push('Internal magnetic or channel units');
