@@ -13935,6 +13935,17 @@ function _euPricingBasis(s, inp) {
     var hi = items.find(function(i){return (i.description||'').toLowerCase().indexOf('air-to-water heat pump')>=0;});
     if (hi) { var hkw = (hi.description||'').match(/\((\d+)kW\)/); if (hkw) pb.push('Design load: '+hkw[1]+'kW '+((inp.hli||0)>0?'(IS EN 12831 heat loss)':'(area-banded — add HLI)')); }
     pb.push('Emitters: '+euLabel(inp.emitterType||'rads', 'emitterType'));
+    // The cylinder, the controls and the pipework are inside this price. Say so, or the
+    // homeowner reads a bare heat-pump figure and a contractor prices a different job.
+    var cyl = items.find(function(i){return (i.description||'').toLowerCase().indexOf('cylinder')>=0;});
+    if (cyl) {
+      var cv = (cyl.description||'').match(/\((\d+)L([^)]*)\)/);
+      pb.push('Cylinder: '+(cv ? cv[1]+'L'+(cv[2]||'').replace(/\s+/g,' ') : 'new indirect unvented')+' — replaces existing');
+    }
+    if (items.some(function(i){return (i.description||'').toLowerCase().indexOf('zone control')>=0;}))
+      pb.push('Controls: weather compensation & smart zoning');
+    if (items.some(function(i){return (i.description||'').toLowerCase().indexOf('system flush')>=0;}))
+      pb.push('Pipework modifications & system flush: included');
     pb.push('Remove: '+euLabel(inp.ashpRemove||inp.existHeating||'existing system', 'ashpRemove'));
   } else if (t.indexOf('CONDENSING BOILER') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
