@@ -8033,6 +8033,103 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   };
   var EWI_RENDER_RATES = { 'silicone': 18, 'brick-slip': 28, 'stone': 35 };
 
+  // ── RATE SETUP ─────────────────────────────────────────────────────────────
+  // Every rate table, constant and the Rate Settings override pass must run BEFORE
+  // any measure is priced. They used to be declared alongside the measures that read
+  // them, which meant the fabric measures priced above this point saw hoisted-undefined
+  // constants (EWI silently lost its material cost) and never saw a user's rate edits.
+  var ROOF_BUNDLE_RATES = {
+    // Ceiling: scaffold not required. Source: blog.retrofitdublin.ie, SEAI 2025 median.
+    'ceiling': {
+      'mw-300':   { mat: 18, lab:  4 },  // €26/m² total
+      'mw-400':   { mat: 22, lab:  9 },  // €40/m² total
+      'cell-300': { mat: 24, lab:  2 },  // €28/m² total
+      'pir-150':  { mat: 32, lab: 17 }   // €66/m² total
+    },
+    // Rafter: scaffold priced separately as RI-R.SCAF. Source: energyefficiency.ie, UK proxied +20%.
+    'rafter': {
+      'between-below': { mat: 38, lab: 21 },  // €80/m² (excl. scaffold)
+      'above-deck':    { mat: 55, lab: 24 },  // €103/m² (excl. scaffold)
+      'sloped-board':  { mat: 42, lab: 29 }   // €100/m² (excl. scaffold)
+    },
+    // Flat roof: source roofcostireland.com, bookmyroofer.ie. No scaffold line (priced in mat).
+    'flat': {
+      'overlay-epdm': { mat: 48, lab: 34 },  // €116/m² total
+      'overlay-grp':  { mat: 52, lab: 27 },  // €106/m² total
+      'full-replace': { mat: 65, lab: 40 },  // €145/m² total
+      'tapered':      { mat: 62, lab: 52 }   // €166/m² total
+    },
+    // Room-in-roof: scaffold priced separately. No specific Irish data — estimated from rafter rates.
+    'room': {
+      'pir-mw':     { mat: 48, lab: 46 },  // €140/m² (excl. scaffold)
+      'spray-foam': { mat: 65, lab: 25 },  // €115/m² (excl. scaffold)
+      'hybrid':     { mat: 52, lab: 39 }   // €130/m² (excl. scaffold)
+    }
+  };
+  var MAKE_GOOD_ROOF_RATE = 8;
+  var MAKE_GOOD_WALL_RATE = 6;  // €/m² patching & making good to wall surfaces
+  var FLOOR_BUNDLE_RATES = {
+    'solid-breakout':    { mat: 38, lab: 39 },  // €116/m² total (breakout + DPM + PIR + screed)
+    'solid-overlay':     { mat: 32, lab: 17 },  // €66/m²  total (PIR overlay + screed, no breakout)
+    'suspended-mineral': { mat: 18, lab:  9 },  // €36/m²  total (mineral wool between joists)
+    'suspended-rigid':   { mat: 28, lab: 10 },  // €48/m²  total (rigid PIR between joists)
+    'suspended-spray':   { mat: 42, lab: 19 }   // €80/m²  total (spray foam under suspended)
+  };
+  var WINDOW_RATES = {
+    glazing:    { 'triple': 280, 'double': 175 },
+    frame_mult: { 'upvc': 1.0, 'alu-clad': 1.9, 'hardwood': 2.2, 'composite': 1.6 },
+    style_mult: { 'casement': 1.0, 'sash': 1.35, 'fixed': 0.85 }
+  };
+  // Doors: supply-only unit cost; labour fixed at €220/nr. Total = mat + €220.
+  // Source: compositedoor.ie, expertwindows.ie, buildersdublin.ie 2025.
+  var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
+  var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
+  var _EU_PV=250,_EU_TRICKLE=28;
+  var WINDOW_DISPOSE_RATE = 45;
+  var DOOR_DISPOSE_RATE   = 80;
+  // EU rate overrides — read from localStorage (Rate Settings → EU Rates tab) each BOQ run
+  (function(){
+    var ov={},cat={};
+    try{ov=JSON.parse(localStorage.getItem('eu_ov')||'{}');}catch(e){}
+    try{cat=JSON.parse(localStorage.getItem('eu_cat')||'{}');}catch(e){}
+    function r(k,d,c){return((ov[k]!=null&&ov[k]!=='')?+ov[k]:d)*(1+(+cat[c]||0)/100);}
+    var wm=1+(+cat.wall||0)/100,rm=1+(+cat.roof||0)/100,fm=1+(+cat.floor||0)/100;
+    WALL_BUNDLE_RATES.cavity['eps-bead'].mat=r('cav_eps',6,'wall');
+    WALL_BUNDLE_RATES.cavity['mineral-wool'].mat=r('cav_mw',8,'wall');
+    WALL_BUNDLE_RATES.cavity.walltite.mat=r('cav_wt',20,'wall');
+    WALL_BUNDLE_RATES.ewi_insulation_base.eps.mat=r('ewi_eps',38,'wall');
+    WALL_BUNDLE_RATES.ewi_insulation_base['mineral-wool'].mat=r('ewi_mw',48,'wall');
+    WALL_BUNDLE_RATES.ewi_insulation_base.phenolic.mat=r('ewi_phen',58,'wall');
+    WALL_BUNDLE_RATES.ewi_insulation_base.pir.mat=r('ewi_pir',52,'wall');
+    WALL_BUNDLE_RATES.ewi_render_addon.silicone.mat=r('ewi_rend_sil',18,'wall');
+    WALL_BUNDLE_RATES.ewi_render_addon.acrylic.mat=r('ewi_rend_acr',14,'wall');
+    WALL_BUNDLE_RATES.ewi_render_addon.mineral.mat=r('ewi_rend_min',22,'wall');
+    WALL_BUNDLE_RATES.ewi_render_addon['brick-slip'].mat=r('ewi_rend_bsl',48,'wall');
+    WALL_BUNDLE_RATES.ewi_render_addon.stone.mat=r('ewi_rend_stn',62,'wall');
+    WALL_BUNDLE_RATES.iwi['pir-dab'].mat=38*wm;WALL_BUNDLE_RATES.iwi['pir-mech'].mat=42*wm;WALL_BUNDLE_RATES.iwi['mineral-board'].mat=32*wm;
+    ROOF_BUNDLE_RATES.ceiling['mw-300'].mat=18*rm;ROOF_BUNDLE_RATES.ceiling['mw-400'].mat=22*rm;
+    ROOF_BUNDLE_RATES.ceiling['cell-300'].mat=24*rm;ROOF_BUNDLE_RATES.ceiling['pir-150'].mat=32*rm;
+    ROOF_BUNDLE_RATES.rafter['between-below'].mat=38*rm;ROOF_BUNDLE_RATES.rafter['above-deck'].mat=55*rm;ROOF_BUNDLE_RATES.rafter['sloped-board'].mat=42*rm;
+    ROOF_BUNDLE_RATES.flat['overlay-epdm'].mat=48*rm;ROOF_BUNDLE_RATES.flat['overlay-grp'].mat=52*rm;
+    ROOF_BUNDLE_RATES.flat['full-replace'].mat=65*rm;ROOF_BUNDLE_RATES.flat.tapered.mat=62*rm;
+    ROOF_BUNDLE_RATES.room['pir-mw'].mat=48*rm;ROOF_BUNDLE_RATES.room['spray-foam'].mat=65*rm;ROOF_BUNDLE_RATES.room.hybrid.mat=52*rm;
+    FLOOR_BUNDLE_RATES['solid-breakout'].mat=38*fm;FLOOR_BUNDLE_RATES['solid-overlay'].mat=32*fm;
+    FLOOR_BUNDLE_RATES['suspended-mineral'].mat=18*fm;FLOOR_BUNDLE_RATES['suspended-rigid'].mat=28*fm;FLOOR_BUNDLE_RATES['suspended-spray'].mat=42*fm;
+    WINDOW_RATES.glazing.triple=r('win_tri',280,'wind');WINDOW_RATES.glazing.double=r('win_dbl',175,'wind');
+    DOOR_RATES.composite=r('door_comp',2800,'wind');DOOR_RATES.hardwood=r('door_hw',4300,'wind');
+    DOOR_RATES.aluminium=r('door_alu',4800,'wind');DOOR_RATES.upvc=r('door_upvc',1200,'wind');DOOR_RATES['sliding-patio']=r('door_patio',2400,'wind');
+    _EU_ASHP[0]=r('ashp_s',4000,'heat');_EU_ASHP[1]=r('ashp_m',5200,'heat');_EU_ASHP[2]=r('ashp_l',6700,'heat');_EU_ASHP[3]=r('ashp_xl',8500,'heat');
+    _EU_FASCIA=r('ewi_fascia',38,'wall');
+    _EU_MVHR[0]=r('mvhr_s',2000,'vent');_EU_MVHR[1]=r('mvhr_m',2750,'vent');_EU_MVHR[2]=r('mvhr_l',4000,'vent');
+    _EU_MEV[0]=r('mev_unit',580,'vent');_EU_MEV[1]=r('mev_duct',8.5,'vent');_EU_MEV[2]=r('mev_term',55,'vent');
+    _EU_DMEV[0]=r('dmev_fan',120,'vent');_EU_DMEV[1]=r('dmev_drill',38,'vent');_EU_DMEV[2]=r('dmev_spur',45,'vent');
+    _EU_TRICKLE=r('mev_trickle',28,'vent');
+    _EU_PV=r('pv',250,'solar');
+    _EU_BAT[0]=r('bat_s',2300,'solar');_EU_BAT[1]=r('bat_m',4500,'solar');_EU_BAT[2]=r('bat_l',7000,'solar');_EU_BAT[3]=r('bat_xl',9000,'solar');
+  })();
+  // ── end rate setup ─────────────────────────────────────────────────────────
+
+
   if (has('wall_cavity')) {
     var cavR    = WALL_BUNDLE_RATES.cavity[inputs.cavity_type] || WALL_BUNDLE_RATES.cavity['eps-bead'];
     var cavArea = inputs.cavity_area || netWallArea;
@@ -8087,36 +8184,6 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   }
 
   // 3. Roof Insulation — bundled branches (Chunk 5)
-  var ROOF_BUNDLE_RATES = {
-    // Ceiling: scaffold not required. Source: blog.retrofitdublin.ie, SEAI 2025 median.
-    'ceiling': {
-      'mw-300':   { mat: 18, lab:  4 },  // €26/m² total
-      'mw-400':   { mat: 22, lab:  9 },  // €40/m² total
-      'cell-300': { mat: 24, lab:  2 },  // €28/m² total
-      'pir-150':  { mat: 32, lab: 17 }   // €66/m² total
-    },
-    // Rafter: scaffold priced separately as RI-R.SCAF. Source: energyefficiency.ie, UK proxied +20%.
-    'rafter': {
-      'between-below': { mat: 38, lab: 21 },  // €80/m² (excl. scaffold)
-      'above-deck':    { mat: 55, lab: 24 },  // €103/m² (excl. scaffold)
-      'sloped-board':  { mat: 42, lab: 29 }   // €100/m² (excl. scaffold)
-    },
-    // Flat roof: source roofcostireland.com, bookmyroofer.ie. No scaffold line (priced in mat).
-    'flat': {
-      'overlay-epdm': { mat: 48, lab: 34 },  // €116/m² total
-      'overlay-grp':  { mat: 52, lab: 27 },  // €106/m² total
-      'full-replace': { mat: 65, lab: 40 },  // €145/m² total
-      'tapered':      { mat: 62, lab: 52 }   // €166/m² total
-    },
-    // Room-in-roof: scaffold priced separately. No specific Irish data — estimated from rafter rates.
-    'room': {
-      'pir-mw':     { mat: 48, lab: 46 },  // €140/m² (excl. scaffold)
-      'spray-foam': { mat: 65, lab: 25 },  // €115/m² (excl. scaffold)
-      'hybrid':     { mat: 52, lab: 39 }   // €130/m² (excl. scaffold)
-    }
-  };
-  var MAKE_GOOD_ROOF_RATE = 8;
-  var MAKE_GOOD_WALL_RATE = 6;  // €/m² patching & making good to wall surfaces
 
   if (has('roof_ceiling')) {
     var rcArea = inputs.roof_ceiling_area || 0;
@@ -8182,13 +8249,6 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
 
   // 4. Floor Insulation — bundled branch (Chunk 7)
   // Floor: source energyefficiency.ie, buildtech.ie. LOW CONFIDENCE category — limited Irish data.
-  var FLOOR_BUNDLE_RATES = {
-    'solid-breakout':    { mat: 38, lab: 39 },  // €116/m² total (breakout + DPM + PIR + screed)
-    'solid-overlay':     { mat: 32, lab: 17 },  // €66/m²  total (PIR overlay + screed, no breakout)
-    'suspended-mineral': { mat: 18, lab:  9 },  // €36/m²  total (mineral wool between joists)
-    'suspended-rigid':   { mat: 28, lab: 10 },  // €48/m²  total (rigid PIR between joists)
-    'suspended-spray':   { mat: 42, lab: 19 }   // €80/m²  total (spray foam under suspended)
-  };
 
   if (has('floor')) {
     var fSys  = inputs.floor_system || 'solid-overlay';
@@ -8216,58 +8276,6 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   // Windows: mat = supply-only (unit + frame); labour fixed at €95/m² casement, €115/m² sash.
   // Total triple uPVC casement = €280 + €95 = €375/m² vs market mid €375. ✓
   // Source: calcireland.com, horizonwindows.ie, expertwindows.ie, buildtech.ie 2025.
-  var WINDOW_RATES = {
-    glazing:    { 'triple': 280, 'double': 175 },
-    frame_mult: { 'upvc': 1.0, 'alu-clad': 1.9, 'hardwood': 2.2, 'composite': 1.6 },
-    style_mult: { 'casement': 1.0, 'sash': 1.35, 'fixed': 0.85 }
-  };
-  // Doors: supply-only unit cost; labour fixed at €220/nr. Total = mat + €220.
-  // Source: compositedoor.ie, expertwindows.ie, buildersdublin.ie 2025.
-  var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
-  // EU rate overrides — read from localStorage (Rate Settings → EU Rates tab) each BOQ run
-  var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
-  var _EU_PV=250,_EU_TRICKLE=28;
-  (function(){
-    var ov={},cat={};
-    try{ov=JSON.parse(localStorage.getItem('eu_ov')||'{}');}catch(e){}
-    try{cat=JSON.parse(localStorage.getItem('eu_cat')||'{}');}catch(e){}
-    function r(k,d,c){return((ov[k]!=null&&ov[k]!=='')?+ov[k]:d)*(1+(+cat[c]||0)/100);}
-    var wm=1+(+cat.wall||0)/100,rm=1+(+cat.roof||0)/100,fm=1+(+cat.floor||0)/100;
-    WALL_BUNDLE_RATES.cavity['eps-bead'].mat=r('cav_eps',6,'wall');
-    WALL_BUNDLE_RATES.cavity['mineral-wool'].mat=r('cav_mw',8,'wall');
-    WALL_BUNDLE_RATES.cavity.walltite.mat=r('cav_wt',20,'wall');
-    WALL_BUNDLE_RATES.ewi_insulation_base.eps.mat=r('ewi_eps',38,'wall');
-    WALL_BUNDLE_RATES.ewi_insulation_base['mineral-wool'].mat=r('ewi_mw',48,'wall');
-    WALL_BUNDLE_RATES.ewi_insulation_base.phenolic.mat=r('ewi_phen',58,'wall');
-    WALL_BUNDLE_RATES.ewi_insulation_base.pir.mat=r('ewi_pir',52,'wall');
-    WALL_BUNDLE_RATES.ewi_render_addon.silicone.mat=r('ewi_rend_sil',18,'wall');
-    WALL_BUNDLE_RATES.ewi_render_addon.acrylic.mat=r('ewi_rend_acr',14,'wall');
-    WALL_BUNDLE_RATES.ewi_render_addon.mineral.mat=r('ewi_rend_min',22,'wall');
-    WALL_BUNDLE_RATES.ewi_render_addon['brick-slip'].mat=r('ewi_rend_bsl',48,'wall');
-    WALL_BUNDLE_RATES.ewi_render_addon.stone.mat=r('ewi_rend_stn',62,'wall');
-    WALL_BUNDLE_RATES.iwi['pir-dab'].mat=38*wm;WALL_BUNDLE_RATES.iwi['pir-mech'].mat=42*wm;WALL_BUNDLE_RATES.iwi['mineral-board'].mat=32*wm;
-    ROOF_BUNDLE_RATES.ceiling['mw-300'].mat=18*rm;ROOF_BUNDLE_RATES.ceiling['mw-400'].mat=22*rm;
-    ROOF_BUNDLE_RATES.ceiling['cell-300'].mat=24*rm;ROOF_BUNDLE_RATES.ceiling['pir-150'].mat=32*rm;
-    ROOF_BUNDLE_RATES.rafter['between-below'].mat=38*rm;ROOF_BUNDLE_RATES.rafter['above-deck'].mat=55*rm;ROOF_BUNDLE_RATES.rafter['sloped-board'].mat=42*rm;
-    ROOF_BUNDLE_RATES.flat['overlay-epdm'].mat=48*rm;ROOF_BUNDLE_RATES.flat['overlay-grp'].mat=52*rm;
-    ROOF_BUNDLE_RATES.flat['full-replace'].mat=65*rm;ROOF_BUNDLE_RATES.flat.tapered.mat=62*rm;
-    ROOF_BUNDLE_RATES.room['pir-mw'].mat=48*rm;ROOF_BUNDLE_RATES.room['spray-foam'].mat=65*rm;ROOF_BUNDLE_RATES.room.hybrid.mat=52*rm;
-    FLOOR_BUNDLE_RATES['solid-breakout'].mat=38*fm;FLOOR_BUNDLE_RATES['solid-overlay'].mat=32*fm;
-    FLOOR_BUNDLE_RATES['suspended-mineral'].mat=18*fm;FLOOR_BUNDLE_RATES['suspended-rigid'].mat=28*fm;FLOOR_BUNDLE_RATES['suspended-spray'].mat=42*fm;
-    WINDOW_RATES.glazing.triple=r('win_tri',280,'wind');WINDOW_RATES.glazing.double=r('win_dbl',175,'wind');
-    DOOR_RATES.composite=r('door_comp',2800,'wind');DOOR_RATES.hardwood=r('door_hw',4300,'wind');
-    DOOR_RATES.aluminium=r('door_alu',4800,'wind');DOOR_RATES.upvc=r('door_upvc',1200,'wind');DOOR_RATES['sliding-patio']=r('door_patio',2400,'wind');
-    _EU_ASHP[0]=r('ashp_s',4000,'heat');_EU_ASHP[1]=r('ashp_m',5200,'heat');_EU_ASHP[2]=r('ashp_l',6700,'heat');_EU_ASHP[3]=r('ashp_xl',8500,'heat');
-    _EU_FASCIA=r('ewi_fascia',38,'wall');
-    _EU_MVHR[0]=r('mvhr_s',2000,'vent');_EU_MVHR[1]=r('mvhr_m',2750,'vent');_EU_MVHR[2]=r('mvhr_l',4000,'vent');
-    _EU_MEV[0]=r('mev_unit',580,'vent');_EU_MEV[1]=r('mev_duct',8.5,'vent');_EU_MEV[2]=r('mev_term',55,'vent');
-    _EU_DMEV[0]=r('dmev_fan',120,'vent');_EU_DMEV[1]=r('dmev_drill',38,'vent');_EU_DMEV[2]=r('dmev_spur',45,'vent');
-    _EU_TRICKLE=r('mev_trickle',28,'vent');
-    _EU_PV=r('pv',250,'solar');
-    _EU_BAT[0]=r('bat_s',2300,'solar');_EU_BAT[1]=r('bat_m',4500,'solar');_EU_BAT[2]=r('bat_l',7000,'solar');_EU_BAT[3]=r('bat_xl',9000,'solar');
-  })();
-  var WINDOW_DISPOSE_RATE = 45;
-  var DOOR_DISPOSE_RATE   = 80;
 
   if (has('windows_bundle')) {
     var wArea      = inputs.windows_area    || winA;
