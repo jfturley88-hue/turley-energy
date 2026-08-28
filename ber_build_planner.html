@@ -14080,6 +14080,15 @@ function planDifferenceWords(diffTotal, anyActual) {
   if (!anyActual || !diffTotal) return '';
   return fmt(Math.abs(diffTotal)) + (diffTotal > 0 ? ' under budget estimate' : ' over budget estimate');
 }
+// "€361/m² of floor area · €165/m² after grants" — the sanity check a homeowner can
+// carry to any other quote, and the fastest way to spot a measure that is out of line.
+function planPerM2Note(t) {
+  if (!t || !t.perM2) return '';
+  return '€' + t.perM2.toLocaleString() + '/m² of floor area' +
+         (t.showGrants ? ' · €' + t.netPerM2.toLocaleString() + '/m² after grants' : '') +
+         ' · ' + t.floorArea + ' m²';
+}
+window.planPerM2Note = planPerM2Note;
 window.planDifference = planDifference;
 window.planDifferenceWords = planDifferenceWords;
 
@@ -14183,6 +14192,9 @@ function planTotals(b) {
     (byKey[g.measureKey] = byKey[g.measureKey] || []).push(g);
   });
 
+  // Cost per m² of floor area — the check a QS makes first, and the one that shows an
+  // outlier measure at a glance. Floor area comes from the survey, so it is never guessed.
+  var _fa = parseFloat(pi.floorArea || (b.euInputs || {}).floorArea || 0) || 0;
   var used = {}, works = 0, grantTotal = 0;
   var perSection = sections.map(function(s) {
     var est = Math.round((s.subtotal || 0) * sectionLoad(s));
@@ -14219,6 +14231,9 @@ function planTotals(b) {
     ossGrants: ossGrants, ossTotal: ossTotal,
     totalEst: totalEst, grantTotal: grantTotal,
     net: Math.max(0, totalEst - grantTotal),
+    floorArea: _fa,
+    perM2:    _fa > 0 ? Math.round(totalEst / _fa) : 0,
+    netPerM2: _fa > 0 ? Math.round(Math.max(0, totalEst - grantTotal) / _fa) : 0,
   };
 }
 window.planTotals = planTotals;
@@ -14608,7 +14623,13 @@ function renderEUTable(b) {
             'style="width:100%;box-sizing:border-box;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
           '</td>' +
           '<td></td>' +
-        '</tr>'
+        '</tr>' +
+        (planPerM2Note(T) ?
+        '<tr>' +
+          '<td colspan="7" style="padding:6px 14px 8px;font-size:10px;color:#8090A8;letter-spacing:.02em;">' +
+            'Benchmark: <strong style="color:#C8D0DC;">' + planPerM2Note(T) + '</strong>' +
+          '</td>' +
+        '</tr>' : '')
       : '');
 
   return '<div id="eu-table-container">' +
@@ -17777,6 +17798,11 @@ function exportEUPDF(mode) {
 
   // TOTAL + actual rows. Difference totals only the rows that carry an actual — see _d().
   var netCost = Math.max(0, totalEst - totalGrts);
+  // Same benchmark the screen prints, from this document's own totals.
+  var _faPdf = parseFloat(pi.floorArea || inp.floorArea || 0) || 0;
+  var _T = { floorArea: _faPdf, showGrants: showGrants,
+             perM2:    _faPdf > 0 ? Math.round(totalEst / _faPdf) : 0,
+             netPerM2: _faPdf > 0 ? Math.round(netCost / _faPdf) : 0 };
   var _diffCol   = pdfAnyActual
     ? (pdfDiffSum > 0 ? DIFF_COLOURS.print.under : pdfDiffSum < 0 ? DIFF_COLOURS.print.over : DIFF_COLOURS.print.muted)
     : DIFF_COLOURS.print.muted;
@@ -17807,7 +17833,13 @@ function exportEUPDF(mode) {
         '<td style="border:'+B+';"></td>' +
         '<td class="pl-fig" style="padding:7px 6px;text-align:right;font-size:11pt;font-weight:900;white-space:nowrap;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
-      '</tr>' : '');
+      '</tr>' +
+      (planPerM2Note(_T) ?
+      '<tr>' +
+        '<td colspan="'+(_nFixed+3)+'" style="padding:5px 6px;font-size:7.5pt;color:#64748B;border:'+B+';">' +
+          'Benchmark: <strong style="color:#1E293B;">'+planPerM2Note(_T)+'</strong>' +
+        '</td>' +
+      '</tr>' : '') : '');
   } else {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
