@@ -8189,14 +8189,20 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rcArea = inputs.roof_ceiling_area || 0;
     var rcTier = inputs.roof_ceiling_type || 'mw-300';
     var rcR = ROOF_BUNDLE_RATES.ceiling[rcTier] || ROOF_BUNDLE_RATES.ceiling['mw-300'];
-    var rcMg = inputs.roof_ceiling_makegood ? MAKE_GOOD_ROOF_RATE : 0;
+    // Making good after an attic top-up is the hatch surround, the eaves ventilation trays
+    // and any localised reinstatement — not the whole ceiling. Carried as its own visible
+    // line on a realistic quantity rather than as a blanket adder on every square metre,
+    // which pushed the researched €26/m² bundle rate to €35/m² wherever it was ticked.
     var rcDesc = 'Ceiling-level insulation top-up — ' + euLabel(rcTier, 'roof_ceiling_type') +
-      ' (bundle: insulation, fixings, access boards' +
-      (inputs.roof_ceiling_makegood ? ', making good)' : ')');
-    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A',
-      items: [ mkItem('RI-C.1', rcDesc, 'm²', rcArea, rcR.mat + rcMg, lM(rcR.lab / 22, L.craft),
-        'Bundled installation by approved insulation contractor') ]
-    });
+      ' (bundle: insulation, fixings, access boards)';
+    var rcItems = [ mkItem('RI-C.1', rcDesc, 'm²', rcArea, rcR.mat, lM(rcR.lab / 22, L.craft),
+      'Bundled installation by approved insulation contractor') ];
+    if (inputs.roof_ceiling_makegood) {
+      rcItems.push(mkItem('RI-C.2', 'Making good — attic hatch surround, eaves ventilation trays & localised reinstatement',
+        'm²', Math.max(1, Math.round(rcArea * 0.15)), MAKE_GOOD_ROOF_RATE, lM(0.25, L.craft),
+        'Localised — 15% of ceiling area; an attic top-up disturbs the hatch and eaves, not the ceilings'));
+    }
+    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A', items: rcItems });
   }
 
   if (has('roof_rafter')) {
