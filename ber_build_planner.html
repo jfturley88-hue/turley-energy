@@ -8011,8 +8011,13 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       'walltite':     { mat: 20, lab:  4 }   // €28/m² total [LOW CONFIDENCE — verify with Foam Master contractor]
     },
     // EWI: base insulation + render addon. Scaffold priced separately as EWI.SCAF.
-    // Total per m² (150mm EPS+silicone+scaffold) ≈ €98 vs market mid €105 — within estimator tolerance.
-    // Source: osber.ie, premierinsulations.com, saveonheat.ie, SEAI median 2025.
+    // These are BASE rates — O&P, contingency and VAT are applied on top, so compare the
+    // LOADED figure to a market quote, not this one. 150mm EPS + silicone + scaffold works
+    // out at ~€103/m² base → ~€155/m² loaded, against an Irish installed market of
+    // €110–160/m² (most jobs €100–140). That sits at the top of the band: sound for a
+    // homeowner's benchmark, but drop the eps base toward €30 if a mid-band figure is wanted.
+    // Fascia/soffit is a separate linear-metre item and is not part of that €/m².
+    // Source: osber.ie, premierinsulations.com, saveonheat.ie, isotherm.ie 2026, SEAI median.
     ewi_insulation_base: {
       'eps':          { mat: 38, lab: 14 },  // base €66/m² (excl. render + scaffold)
       'mineral-wool': { mat: 48, lab: 24 },  // base €96/m²
