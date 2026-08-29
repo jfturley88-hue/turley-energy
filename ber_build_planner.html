@@ -12142,6 +12142,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       roof_room_makegood:    inputs.eu_roof_room_makegood !== false,
       windowArea:   winAEU,
       doorCount:    inputs.doorCount || inputs.door_count || 2,
+      doorArea:     inputs.doorArea || inputs.door_area || 0,
       existWallType: inputs.eu_wallType || (inputs.eu_ewi ? 'Solid Masonry — uninsulated' : 'Cavity Wall — uninsulated'),
       existHeating: inputs.eu_existingHeating || 'Oil Boiler',
       newHeating:   inputs.eu_ashp ? 'ASHP' : inputs.gshp ? 'GSHP' : inputs.eu_boiler ? (inputs.eu_boiler_fuel || 'Gas Boiler') : 'none',
@@ -12946,6 +12947,7 @@ function readEUSelector() {
   const ra   = (typeof getCurrentRoofAreaSum   === 'function' ? getCurrentRoofAreaSum()   : 0) || Math.round(fa * 0.55);
   const winA = (typeof getCurrentWindowAreaSum === 'function' ? getCurrentWindowAreaSum() : 0) || Math.round(fa * 0.15);
   const doors = parseFloat(document.getElementById('t4-doorCount')?.value) || 2;
+  const doorAreaSurveyed = parseFloat(document.getElementById('t4-doorArea')?.value) || 0;
   const rd =
     (parseFloat(document.getElementById('t5-livingAreas')?.value)||0) +
     (parseFloat(document.getElementById('t5-additionalRooms')?.value)||0) ||
@@ -13010,6 +13012,7 @@ function readEUSelector() {
     roofArea:          ra,
     windowArea:        winA,
     doorCount:         doors,
+    doorArea:          doorAreaSurveyed,
     hli:               nv('eu-hli') || 0,
     roomsDown:         rd,
     roomsUp:           ru,
@@ -13950,10 +13953,20 @@ function _euPricingBasis(s, inp) {
     if (inp.windows_dispose) pb.push('Disposal: included');
     if (t.indexOf('DOOR') >= 0) {
       var dq2 = firstItemQty('external doors');
-      if (dq2) pb.push('External doors: ' + dq2 + ' nr — ' + euLabel(inp.doors_type || 'composite', 'doors_type'));
+      if (dq2) {
+        var dA2 = parseFloat(inp.doorArea) || 0;
+        pb.push('External doors: ' + dq2 + ' nr · ' +
+                (dA2 > 0 ? dA2 + 'm²' : Math.round(dq2 * 1.89) + 'm² (est)') +
+                ' — ' + euLabel(inp.doors_type || 'composite', 'doors_type'));
+      }
     }
   } else if (t.indexOf('EXTERNAL DOOR') >= 0) {
-    var dq = firstItemQty('external doors'); if (dq) pb.push('Count: '+dq+' doors');
+    var dq = firstItemQty('external doors');
+    if (dq) {
+      var dA = parseFloat(inp.doorArea) || 0;
+      pb.push('Count: '+dq+' doors');
+      pb.push('Door area: ' + (dA > 0 ? dA + 'm²' : Math.round(dq * 1.89) + 'm² (est)'));
+    }
     pb.push('Type: '+euLabel(inp.doors_type||'composite', 'doors_type'));
     if (inp.doors_dispose) pb.push('Disposal: included');
   } else if (t.indexOf('AIRTIGHTNESS') >= 0) {
