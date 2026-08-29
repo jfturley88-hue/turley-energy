@@ -14030,11 +14030,17 @@ function _euPricingBasis(s, inp) {
   } else if (t.indexOf('PIPE INSULATION') >= 0) {
     pb.push('HW pipework + cylinder lagging jacket');
   } else if (t.indexOf('MAKING GOOD') >= 0) {
-    var mg=[]; if(inp.fin_redecorate)mg.push('redecoration'); if(inp.fin_reveals)mg.push('window reveals');
-    if(inp.fin_skirtings)mg.push('skirtings'); if(inp.fin_tiling)mg.push('tiling');
-    if(inp.fin_floor)mg.push('floor finishes'); if(inp.fin_external)mg.push('external sills & flashings');
-    if (mg.length) pb.push('Reinstatement: '+mg.join(', '));
-    else { pb.push('Patch repair to insulation areas'); pb.push('Decoration to affected areas'); }
+    // Every other measure states its quantities; this one used to say "Reinstatement:
+    // window reveals" and leave the counts out, so two contractors pricing the blank
+    // schedule priced different jobs. One line per item, quantities from the items
+    // themselves, so the scope cannot drift from what is costed.
+    (items || []).forEach(function(i) {
+      var d = (i.description || '').split(' — ')[0].trim();
+      if (!d) return;
+      var q = i.quantity;
+      pb.push(d + (q ? ': ' + (Math.round(q * 10) / 10) + (i.unit ? ' ' + i.unit : '') : ''));
+    });
+    if (!pb.length) { pb.push('Patch repair to insulation areas'); pb.push('Decoration to affected areas'); }
   } else if (t.indexOf('SECONDARY GLAZING') >= 0) {
     var sgq = firstItemQty('secondary glazing'); if (sgq) pb.push('Window area: '+sgq+'m²');
     pb.push('Internal magnetic or channel units');
