@@ -13956,7 +13956,7 @@ function _euPricingBasis(s, inp) {
       if (dq2) {
         var dA2 = parseFloat(inp.doorArea) || 0;
         pb.push('External doors: ' + dq2 + ' nr · ' +
-                (dA2 > 0 ? dA2 + 'm²' : Math.round(dq2 * 1.89) + 'm² (est)') +
+                (dA2 > 0 ? dA2 : Math.round(dq2 * 1.89)) + 'm²' +
                 ' — ' + euLabel(inp.doors_type || 'composite', 'doors_type'));
       }
     }
@@ -13965,7 +13965,7 @@ function _euPricingBasis(s, inp) {
     if (dq) {
       var dA = parseFloat(inp.doorArea) || 0;
       pb.push('Count: '+dq+' doors');
-      pb.push('Door area: ' + (dA > 0 ? dA + 'm²' : Math.round(dq * 1.89) + 'm² (est)'));
+      pb.push('Door area: ' + (dA > 0 ? dA : Math.round(dq * 1.89)) + 'm²');
     }
     pb.push('Type: '+euLabel(inp.doors_type||'composite', 'doors_type'));
     if (inp.doors_dispose) pb.push('Disposal: included');
