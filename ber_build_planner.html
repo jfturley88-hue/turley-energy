@@ -8305,10 +8305,19 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     if (inputs.windows_dispose) {
       wItems.push(mkItem('5.2', 'Window removal & disposal of existing units', 'm²', wArea, 0, WINDOW_DISPOSE_RATE, 'Labour-only; skip allowance separate'));
     }
-    sections.push({ id: String(sid++), title: 'WINDOWS — REPLACEMENT', part: 'A', items: wItems });
+    // Doors are an opening upgrade like the windows, they share the same grant key, and
+    // SEAI treats them together. Where both are in scope they belong on one row, so the
+    // homeowner sees the doors grant beside the doors that earned it rather than against a
+    // windows-only scope. Doors on their own still get their own section.
+    if (has('doors_bundle')) {
+      _euDoorItems().forEach(function(it){ wItems.push(it); });
+      sections.push({ id: String(sid++), title: 'WINDOWS & EXTERNAL DOORS', part: 'A', items: wItems });
+    } else {
+      sections.push({ id: String(sid++), title: 'WINDOWS — REPLACEMENT', part: 'A', items: wItems });
+    }
   }
 
-  if (has('doors_bundle')) {
+  function _euDoorItems() {
     var dCount = inputs.doors_count || doors;
     var dMatR  = DOOR_RATES[inputs.doors_type] || 1100;
     var dLabR  = 220;
@@ -8317,7 +8326,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     if (inputs.doors_dispose) {
       dItems.push(mkItem('D.2', 'Door removal & disposal of existing', 'nr', dCount, 0, DOOR_DISPOSE_RATE, 'Labour-only'));
     }
-    sections.push({ id: String(sid++), title: 'EXTERNAL DOOR REPLACEMENT', part: 'A', items: dItems });
+    return dItems;
+  }
+
+  if (has('doors_bundle') && !has('windows_bundle')) {
+    sections.push({ id: String(sid++), title: 'EXTERNAL DOOR REPLACEMENT', part: 'A', items: _euDoorItems() });
   }
 
   // 6. Airtightness — bundle branch (Chunk 8)
@@ -13935,6 +13948,10 @@ function _euPricingBasis(s, inp) {
     if (inp.windows_frame) pb.push('Frame: '+euLabel(inp.windows_frame, 'windows_frame'));
     if (inp.windows_style) pb.push('Style: '+euLabel(inp.windows_style, 'windows_style'));
     if (inp.windows_dispose) pb.push('Disposal: included');
+    if (t.indexOf('DOOR') >= 0) {
+      var dq2 = firstItemQty('external doors');
+      if (dq2) pb.push('External doors: ' + dq2 + ' nr — ' + euLabel(inp.doors_type || 'composite', 'doors_type'));
+    }
   } else if (t.indexOf('EXTERNAL DOOR') >= 0) {
     var dq = firstItemQty('external doors'); if (dq) pb.push('Count: '+dq+' doors');
     pb.push('Type: '+euLabel(inp.doors_type||'composite', 'doors_type'));
@@ -14639,13 +14656,7 @@ function renderEUTable(b) {
             'style="width:100%;box-sizing:border-box;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);color:#38bdf8;font-weight:700;font-size:12px;padding:4px 6px;border-radius:4px;text-align:right;font-family:inherit;">' +
           '</td>' +
           '<td></td>' +
-        '</tr>' +
-        (planPerM2Note(T) ?
-        '<tr>' +
-          '<td colspan="7" style="padding:6px 14px 8px;font-size:10px;color:#8090A8;letter-spacing:.02em;">' +
-            'Benchmark: <strong style="color:#C8D0DC;">' + planPerM2Note(T) + '</strong>' +
-          '</td>' +
-        '</tr>' : '')
+        '</tr>'
       : '');
 
   return '<div id="eu-table-container">' +
@@ -17849,13 +17860,7 @@ function exportEUPDF(mode) {
         '<td style="border:'+B+';"></td>' +
         '<td class="pl-fig" style="padding:7px 6px;text-align:right;font-size:11pt;font-weight:900;white-space:nowrap;color:#38bdf8;border:'+B+';">'+(domActNet>0?fmt(domActNet):'')+'</td>' +
         '<td style="border:'+B+';"></td>' +
-      '</tr>' +
-      (planPerM2Note(_T) ?
-      '<tr>' +
-        '<td colspan="'+(_nFixed+3)+'" style="padding:5px 6px;font-size:7.5pt;color:#64748B;border:'+B+';">' +
-          'Benchmark: <strong style="color:#1E293B;">'+planPerM2Note(_T)+'</strong>' +
-        '</td>' +
-      '</tr>' : '') : '');
+      '</tr>' : '');
   } else {
     pdfRows +=
       '<tr style="background:#F8FAFC;border-top:2px solid #E2E8F0;font-weight:700;">' +
@@ -17977,6 +17982,16 @@ function exportEUPDF(mode) {
       '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
         labMultNote + ' Contractor\'s O&amp;P (12%), contingency (10%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
       appxSections +
+      // The cost-per-m2 check belongs here rather than on the homeowner's plan page: it is a
+      // quantity surveyor's sanity test, and this is the technical half of the document.
+      (planPerM2Note(_T)
+        ? '<div style="font-size:8.5pt;color:#334155;border:1px solid #E2E8F0;background:#F8FAFC;' +
+          'border-radius:4px;padding:8px 10px;margin-top:12px;line-height:1.5;">' +
+            '<strong>Cost benchmark.</strong> This plan works out at <strong>' + planPerM2Note(_T) +
+            '</strong>. Dividing the total by the floor area is the quickest way to compare this house ' +
+            'against another, or to see whether a single measure is out of line with the rest.' +
+          '</div>'
+        : '') +
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:10px;">' +
         'All rates above are drawn from <strong style="color:#334155;">' + rateBookStamp() + '</strong>.' +
       '</div>' +
