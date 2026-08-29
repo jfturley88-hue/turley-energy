@@ -8019,7 +8019,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     // Fascia/soffit is a separate linear-metre item and is not part of that €/m².
     // Source: osber.ie, premierinsulations.com, saveonheat.ie, isotherm.ie 2026, SEAI median.
     ewi_insulation_base: {
-      'eps':          { mat: 38, lab: 14 },  // base €66/m² (excl. render + scaffold)
+      'eps':          { mat: 30, lab: 14 },  // base €58/m² (excl. render + scaffold)
       'mineral-wool': { mat: 48, lab: 24 },  // base €96/m²
       'phenolic':     { mat: 58, lab: 29 },  // base €116/m²
       'pir':          { mat: 52, lab: 29 }   // base €110/m²
@@ -8106,7 +8106,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     WALL_BUNDLE_RATES.cavity['eps-bead'].mat=r('cav_eps',6,'wall');
     WALL_BUNDLE_RATES.cavity['mineral-wool'].mat=r('cav_mw',8,'wall');
     WALL_BUNDLE_RATES.cavity.walltite.mat=r('cav_wt',20,'wall');
-    WALL_BUNDLE_RATES.ewi_insulation_base.eps.mat=r('ewi_eps',38,'wall');
+    WALL_BUNDLE_RATES.ewi_insulation_base.eps.mat=r('ewi_eps',30,'wall');
     WALL_BUNDLE_RATES.ewi_insulation_base['mineral-wool'].mat=r('ewi_mw',48,'wall');
     WALL_BUNDLE_RATES.ewi_insulation_base.phenolic.mat=r('ewi_phen',58,'wall');
     WALL_BUNDLE_RATES.ewi_insulation_base.pir.mat=r('ewi_pir',52,'wall');
@@ -8152,8 +8152,21 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   }
 
   if (has('wall_ewi')) {
+    // A gable peak is the triangle above wall-plate level, so its area follows the gable
+    // width and the roof pitch — it is not a fixed 5 m². Width comes from the footprint:
+    // for a rectangle of area A and perimeter P the shorter side is
+    // (P/2 − √((P/2)² − 4A)) / 2, falling back to a square where the survey has no
+    // perimeter. Area = ½ × W × rise, rise = (W/2) × tan(pitch), pitch 35° (Irish 30–40°).
     var ewiPeaks  = inputs.ewi_peaks || 0;
-    var peakArea  = ewiPeaks * 5;
+    var _gW = Math.sqrt(gfa);                       // square fallback
+    var _P  = parseFloat(inputs.perimeter) || 0;
+    if (_P > 0) {
+      var _h = _P / 2, _disc = _h * _h - 4 * gfa;
+      if (_disc > 0) _gW = (_h - Math.sqrt(_disc)) / 2;
+    }
+    var _pitch    = parseFloat(inputs.roof_pitch) || 35;
+    var _peakEach = Math.max(3, Math.round(_gW * _gW * Math.tan(_pitch * Math.PI / 180) / 4));
+    var peakArea  = ewiPeaks * _peakEach;
     var grossElev = Math.round((inputs.ewi_area || netWallArea) + winA + (doors * 1.89) + peakArea);
     var ewiIns    = inputs.ewi_insulation || 'eps';
     var ewiRnd    = inputs.ewi_render     || 'silicone';
@@ -8162,7 +8175,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var ewiBase   = WALL_BUNDLE_RATES.ewi_insulation_base[ewiIns]   || WALL_BUNDLE_RATES.ewi_insulation_base['eps'];
     var ewiRndAdd = WALL_BUNDLE_RATES.ewi_render_addon[ewiRnd]       || WALL_BUNDLE_RATES.ewi_render_addon['silicone'];
     var ewiThkAdj = WALL_BUNDLE_RATES.ewi_thickness_adj[ewiThk]     || 0;
-    var ewiMg     = inputs.ewi_makegood ? MAKE_GOOD_WALL_RATE * 1.5 : 0;
+    // Making good for EWI is priced once, as its own line in the making-good section
+    // (sills, copings and flashings — auto-selected whenever EWI is). It used to be added
+    // here as well, at €9 on every square metre of elevation, so every EWI job carried it
+    // twice.
+    var ewiMg     = 0;
     var ewiMatR   = ewiBase.mat + ewiThkAdj + ewiRndAdd.mat + ewiMg;
     var ewiLabR   = Math.round(ewiBase.lab * ewiRndAdd.labMult);
     var ewiDesc   = 'External wall insulation — ' + euLabel(ewiIns, 'ewi_insulation') + ' ' + ewiThk + 'mm + ' + euLabel(ewiRnd, 'ewi_render') +
@@ -13013,6 +13030,8 @@ function readEUSelector() {
   return {
     floorArea:         fa,
     groundFloor:       gfa,
+    perimeter:         parseFloat(document.getElementById('t1-perimeter')?.value) ||
+                       (typeof getCurrentPerimeterSum === 'function' ? getCurrentPerimeterSum() : 0) || 0,
     wallArea:          wa,
     roofArea:          ra,
     windowArea:        winA,
@@ -13921,8 +13940,11 @@ function _euPricingBasis(s, inp) {
     if (eq) pb.push('Gross elevation: '+eq+'m² (wall + openings'+(ewiPk>0?' + '+ewiPk+' gable peak'+(ewiPk>1?'s':''):'')+')');
     pb.push('Insulation: '+euLabel(inp.ewi_insulation||'eps', 'ewi_insulation')+' '+(inp.ewi_thickness||'150')+'mm');
     pb.push('Render: '+euLabel(inp.ewi_render||'silicone', 'ewi_render'));
-    if (inp.ewi_makegood) pb.push('Making good: included');
-    var fasciaq = firstItemQty('fascia'); if (fasciaq) pb.push('Fascia & soffit: '+fasciaq+'m (mandatory)');
+    // Sills, copings and flashings are priced in the making-good row, not in this rate —
+    // say where, so a contractor pricing the blank schedule does not allow for it twice.
+    if (inp.ewi_makegood) pb.push('Making good: sills, copings & flashings — priced under Making Good');
+    var fasciaq = firstItemQty('fascia');
+    if (fasciaq) pb.push('Fascia & soffit: '+fasciaq+'m — eaves extended over the thickened wall');
     var sq = firstItemQty('scaffolding'); if (sq) pb.push('Scaffold: '+sq+'m² gross elevation');
   } else if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0) {
     var iq = firstItemQty('pir insulated board'); if (iq) pb.push('Wall area: '+iq+'m²');
@@ -22275,7 +22297,7 @@ function _ufType(t) {
           <tr><td>EU.2c</td><td>Cavity &mdash; Walltite PU foam</td><td>m&#178;</td><td>DEAP net wall area (m&#178;)</td><td>&#8364;20/m&#178;</td><td>4 &divide; 22 = 0.18hr craft &times; &#8364;44 = &#8364;8.0/m&#178;</td><td>&#8212;</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;1,800</td></tr>
           <!-- ═══ EWI ═══ -->
           <tr class="mdb-variant"><td colspan="8">&nbsp; External Wall Insulation (EWI) &mdash; Base insulation + render finish; mat total = base_mat + render_mat &plusmn; thickness_adj</td></tr>
-          <tr><td>EU.3a</td><td>EWI base &mdash; EPS 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;38/m&#178; base <span class="mdb-note">(100mm &minus;&#8364;8 / 120mm &minus;&#8364;4 / 200mm +&#8364;10)</span></td><td>14 &divide; 22 = 0.64hr craft &times; &#8364;44 = &#8364;28.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
+          <tr><td>EU.3a</td><td>EWI base &mdash; EPS 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;30/m&#178; base <span class="mdb-note">(100mm &minus;&#8364;8 / 120mm &minus;&#8364;4 / 200mm +&#8364;10)</span></td><td>14 &divide; 22 = 0.64hr craft &times; &#8364;44 = &#8364;28.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
           <tr><td>EU.3b</td><td>EWI base &mdash; Mineral wool 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;48/m&#178; base</td><td>24 &divide; 22 = 1.09hr craft &times; &#8364;44 = &#8364;48.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
           <tr><td>EU.3c</td><td>EWI base &mdash; Phenolic board 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;58/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
           <tr><td>EU.3d</td><td>EWI base &mdash; PIR 150mm</td><td>m&#178;</td><td>Gross elevation: net wall + openings + gable peaks</td><td>&#8364;52/m&#178; base</td><td>29 &divide; 22 = 1.32hr craft &times; &#8364;44 = &#8364;58.0/m&#178;</td><td>+5%</td><td style="color:#4ade80;font-size:11px;">Up to &#8364;8,000 detached</td></tr>
