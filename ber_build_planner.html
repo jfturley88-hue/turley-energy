@@ -6390,8 +6390,12 @@ function calculateSEAIGrants(d, projType, dwellingType, scheme, measures) {
 
   // ── Openings ──────────────────────────────────────────────────────────────
   if (has('windows')) add('Windows Grant', val('windows'), 'windows');
+  // The doors grant follows the doors measure, not the windows one. It used to be awarded
+  // whenever windows were selected and the survey recorded a door, so a plan with no door
+  // replacement in it still claimed 2 × €800 — grant money against work that was neither
+  // scoped nor costed, which SEAI would refuse and which understated the net to fund.
   var dCount = Math.min(d.doorCount || 2, 2);
-  if (has('windows') && dCount > 0) {
+  if ((has('doors_bundle') || has('doors')) && dCount > 0) {
     add('External Doors Grant (' + dCount + ' × €' + val('doorPerUnit').toLocaleString('en-IE') + ')',
         dCount * val('doorPerUnit'), 'windows', 'Maximum 2 doors — ' + schemeName);
   }
