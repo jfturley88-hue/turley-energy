@@ -13938,6 +13938,12 @@ function _euPricingBasis(s, inp) {
     var ewiPk = inp.ewi_peaks || 0;
     var eq = firstItemQty('external wall insulation') || firstItemQty('ewi');
     if (eq) pb.push('Gross elevation: '+eq+'m² (wall + openings'+(ewiPk>0?' + '+ewiPk+' gable peak'+(ewiPk>1?'s':''):'')+')');
+    // The render covers the whole elevation, so the gable triangle above ceiling level is
+    // added back. DEAP measures the heated envelope, which excludes it on a cold attic —
+    // but an assessor who measured to the ridge would already have it, and it would then be
+    // counted twice. State the assumption where both the homeowner and the contractor can
+    // check it against the survey.
+    if (ewiPk > 0) pb.push('Gable peaks measured ceiling level to apex — confirm the surveyed wall area stops at ceiling level');
     pb.push('Insulation: '+euLabel(inp.ewi_insulation||'eps', 'ewi_insulation')+' '+(inp.ewi_thickness||'150')+'mm');
     pb.push('Render: '+euLabel(inp.ewi_render||'silicone', 'ewi_render'));
     // Sills, copings and flashings are priced in the making-good row, not in this rate —
