@@ -4007,19 +4007,24 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         <!-- Heat Loss Indicator -->
         <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;padding:10px 12px;margin-bottom:10px;background:rgba(56,189,248,0.05);border-left:3px solid rgba(56,189,248,0.4);border-radius:5px;">
           <div class="tab-field">
-            <label style="color:#38bdf8;">Heat Loss Indicator &mdash; post-upgrade (W/m&#178;K)</label>
+            <label style="color:#38bdf8;">Heat Loss Indicator &mdash; from provisional BER (W/m&#178;K)</label>
             <div style="display:flex;align-items:center;gap:6px;">
               <input type="number" id="eu-hli" min="0.5" max="6" step="0.1" placeholder="e.g. 2.0"
                 style="width:80px;background:rgba(255,255,255,.08);border:1px solid rgba(56,189,248,.35);color:#38bdf8;border-radius:4px;padding:5px 8px;font-size:13px;font-family:inherit;text-align:center;"
-                oninput="this.dataset.userEdited='true';euUpdateHeatLoad()">
+                oninput="if(event.isTrusted){this.dataset.userEdited='true';var _s=document.getElementById('eu-hli-source');if(_s)_s.value='ber';}euUpdateHeatLoad()">
               <span style="font-size:11px;color:#64748b;">W/m&#178;K</span>
+              <select id="eu-hli-source" onchange="euUpdateHeatLoad()"
+                style="background:rgba(255,255,255,.08);border:1px solid rgba(56,189,248,.25);color:#8FA0B8;border-radius:4px;padding:4px 6px;font-size:11px;font-family:inherit;">
+                <option value="indicative">Indicative &mdash; not yet from BER</option>
+                <option value="ber">From provisional BER</option>
+              </select>
             </div>
-            <div style="font-size:10px;color:#8FA0B8;margin-top:3px;">Auto-filled from age band &mdash; enter the post-works HLI from the technical assessment. SEAI heat pump grant requires HLI &#8804;2.3 W/m&#178;K (2.0 recommended)</div>
+            <div style="font-size:10px;color:#8FA0B8;margin-top:3px;">Read the HLI off the provisional BER and enter it here &mdash; that is the post-works figure the heat pump is sized on. Until then the plan carries an indicative value and says so. SEAI heat pump grant requires HLI &#8804;2.3 W/m&#178;K (2.0 recommended)</div>
           </div>
           <div style="text-align:right;padding-bottom:2px;">
             <div style="font-size:10px;color:#8FA0B8;margin-bottom:2px;letter-spacing:0.04em;text-transform:uppercase;">Est. design load</div>
             <div id="eu-heat-load-display" style="font-size:22px;font-weight:700;color:#38bdf8;line-height:1;">&#8212;</div>
-            <div style="font-size:10px;color:#64748b;">kW @ &#8722;3&#8451; &mdash; sizes heat pump</div>
+            <div style="font-size:10px;color:#64748b;" id="eu-heat-load-basis">kW &mdash; 45&#8451; flow, existing rads</div>
           </div>
         </div>
 
@@ -4504,7 +4509,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                   <div class="ws-sub-grid">
                     <div class="ws-sub-field">
                       <label>Emitter upgrade</label>
-                      <select id="eu-emitter-type">
+                      <select id="eu-emitter-type" onchange="euUpdateHeatLoad()">
                         <option value="keep-rads">Keep existing radiators</option>
                         <option value="rads">Oversized radiators (new)</option>
                         <option value="ufh-rads">UFH ground + rads upstairs</option>
@@ -8391,15 +8396,21 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
 
   // 7. Heating System
   if (has('heating')) {
-    // Size from HLI if provided (HLI × FA × ΔT23K ÷ 1000); fallback to floor area bands
+    // Sized off the provisional BER: HLI × floor area is the heat loss coefficient, and
+    // × ΔT gives the design load. Falls back to floor-area bands only when no HLI at all.
+    // Emitters are not assessed — existing radiators are assumed to work at 45°C flow, and
+    // any emitter change is the contractor's to price under Variation Notes.
     const hli = inputs.hli || 0;
     const ashpKwNum = hli > 0
-      ? Math.max(4, Math.ceil(hli * fa * 23 / 1000))
+      ? euDesignLoadKW(hli, fa)
       : (fa <= 80 ? 6 : fa <= 120 ? 8 : fa <= 160 ? 10 : 12);
     const ashpKw  = ashpKwNum + 'kW';
     const ashpSizeNote = hli > 0
-      ? 'HLI ' + hli + ' W/m²K × ' + fa + 'm² × 23K ÷ 1000 = ' + ashpKwNum + 'kW design load (IS EN 12831)'
-      : fa + 'm² floor area — enter HLI above for accurate sizing';
+      ? 'HLI ' + euHLIText(hli) + ' W/m²K × ' + fa + 'm² × ' + HP_DESIGN_DT + 'K ÷ 1000 = ' + ashpKwNum +
+        'kW design load at ' + euFlowTemp(inputs.emitterType || 'keep-rads') + '°C flow — ' + (inputs.hliFromBER
+          ? 'HLI from provisional BER (IS EN 12831)'
+          : 'indicative HLI, confirm from provisional BER')
+      : fa + 'm² floor area — enter the provisional BER HLI for accurate sizing';
     // Source: irishheatpumps.com, heatpumppricesreviews.com, saveonheat.ie 2025 (supply-only unit).
     const ashpMat  = ashpKwNum <= 6 ? _EU_ASHP[0] : ashpKwNum <= 8 ? _EU_ASHP[1] : ashpKwNum <= 11 ? _EU_ASHP[2] : _EU_ASHP[3];
     const radsNr   = Math.round(fa / 14);
@@ -8426,11 +8437,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     }
 
     // Emitter items — driven by eu-emitter-type
-    const emitter = inputs.emitterType || 'rads';
+    const emitter = inputs.emitterType || 'keep-rads';
     var emitterItems;
     if (emitter === 'keep-rads') {
       emitterItems = [
-        mkItem('7.3','Power-flush existing radiator circuit & verify compatibility','item',1,180,lM(8,L.plumber),'High-velocity power flush — essential pre-heat-pump requirement. Existing rads retained — confirm sizing suits 45°C flow temperature with installer'),
+        mkItem('7.3','Power-flush existing radiator circuit & verify compatibility','item',1,180,lM(8,L.plumber),'High-velocity power flush — essential pre-heat-pump requirement. Existing rads retained and assumed to work at 45°C flow; emitters are not assessed in this plan. Installer to confirm and price any radiator changes under Variation Notes'),
         mkItem('7.3b','Heat-pump-compatible TRV heads — replace existing','nr',radsNr,22,lM(0.5,L.plumber),'Low-temperature TRV heads (e.g. Danfoss RA2000) — replace throughout'),
       ];
     } else if (emitter === 'ufh') {
@@ -8585,7 +8596,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var hybridMat     = fa <= 80 ? 3000 : fa <= 120 ? 3800 : fa <= 160 ? 4800 : 5800;
     var hybridRadsNr  = Math.round(fa / 14);
     var hybridEmItems = hybridEmitter === 'keep-rads' ? [
-      mkItem('HHP.E1','Power-flush existing radiator circuit & verify compatibility','item',1,180,lM(8,L.plumber),'High-velocity power flush — essential pre-heat-pump requirement. Existing rads retained — confirm sizing suits 45°C flow temperature with installer'),
+      mkItem('HHP.E1','Power-flush existing radiator circuit & verify compatibility','item',1,180,lM(8,L.plumber),'High-velocity power flush — essential pre-heat-pump requirement. Existing rads retained and assumed to work at 45°C flow; emitters are not assessed in this plan. Installer to confirm and price any radiator changes under Variation Notes'),
       mkItem('HHP.E2','Heat-pump-compatible TRV heads — replace existing','nr',hybridRadsNr,22,lM(0.5,L.plumber),'Low-temperature TRV heads — replace throughout'),
     ] : hybridEmitter === 'ufh-rads' ? [
       mkItem('HHP.E1','UFH pipe — ground floor (200mm centres)','m²',gfa,14,lM(0.5,L.plumber),'Ground floor UFH — clipped to insulation board'),
@@ -11157,34 +11168,80 @@ function wsAutoPlaceholders() {
   sv('ws-door-count',       doors,                  false);             // external doors → from t4-doorCount
 }
 
-// HLI helpers — EU heat loss indicator
-function euHLIFromAgeBand(ab) {
-  if (!ab) return 0;
-  if (ab.includes('2020') || ab.includes('2011')) return 1.5;
-  if (ab.includes('2005') || ab.includes('2000')) return 1.9;
-  if (ab.includes('1994')) return 2.2;
-  if (ab.includes('1983')) return 2.6;
-  if (ab.includes('1978')) return 2.9;
-  if (ab.includes('1941')) return 3.1;
-  return 3.3; // Pre 1940
+// ── HEAT PUMP SIZING ─────────────────────────────────────────────────────────
+// Design load = heat loss coefficient × design temperature difference. DEAP gives the
+// HLI (W/m²K), and HLI × floor area IS the heat loss coefficient (W/K), so the provisional
+// BER supplies the whole calculation — no proxy, no age-band guess.
+//
+// ΔT is 21°C internal over −2°C external. Confirm against the IS EN 12831-1 Irish national
+// annex for the dwelling's location before issue; change it here and every design load,
+// on screen and in print, follows.
+var HP_DESIGN_DT = 23;
+
+// Indicative HLI used until the provisional BER figure is entered. 2.0 is the SEAI
+// recommendation for a heat pump — deliberately the post-works target, because the plan
+// prices the upgraded dwelling. Sizing off the dwelling's pre-works HLI would specify a
+// heat pump for a house that will not exist once the fabric measures in this plan are done.
+var HP_INDICATIVE_HLI = 2.0;
+
+// The one place design load is calculated. The Works Selector readout and the priced BOQ
+// item both call this, so the number on screen is the number in the Cost Plan.
+function euDesignLoadKW(hli, fa) {
+  if (!(hli > 0) || !(fa > 0)) return 0;
+  return Math.max(4, Math.ceil(hli * fa * HP_DESIGN_DT / 1000));
 }
+
+// An HLI of 2 reads as a rounded-off guess; 2.0 reads as a measured figure. Only pad whole
+// numbers — never round a value the assessor actually typed.
+function euHLIText(hli) {
+  var n = parseFloat(hli) || 0;
+  return Number.isInteger(n) ? n.toFixed(1) : String(n);
+}
+
+// Design flow temperature by emitter type. Retained radiators are the 45°C case this plan
+// assumes; underfloor runs cooler. Only used for wording — the design load itself is set by
+// fabric and ventilation, not by flow temperature.
+function euFlowTemp(emitter) {
+  return (emitter === 'ufh' || emitter === 'ufh-rads') ? 35 : 45;
+}
+
+// Whether the HLI came off the provisional BER or is still the indicative seed. Held in a
+// real select rather than inferred from a dataset flag: restoreSnapshot replays synthetic
+// input events over every field, so a dataset flag would stamp "provisional BER" on any
+// reloaded project, and it would not survive the save either way.
+function euHLIFromBER() {
+  var src = document.getElementById('eu-hli-source');
+  var el  = document.getElementById('eu-hli');
+  return !!(src && src.value === 'ber' && (parseFloat(el && el.value) || 0) > 0);
+}
+
 function euAutoHLI() {
   var hliEl = document.getElementById('eu-hli');
-  if (hliEl && hliEl.dataset.userEdited !== 'true') {
-    var ab = document.getElementById('eu-ageBand') && document.getElementById('eu-ageBand').value || '';
-    var def = euHLIFromAgeBand(ab);
-    if (def > 0) hliEl.value = def;
-  }
+  var src   = document.getElementById('eu-hli-source');
+  // Never overwrite a BER figure. The select survives save/load; the dataset flag covers
+  // the current session before the select has been touched.
+  var locked = (src && src.value === 'ber') || (hliEl && hliEl.dataset.userEdited === 'true');
+  if (hliEl && !locked) hliEl.value = HP_INDICATIVE_HLI;
   euUpdateHeatLoad();
 }
+
 function euUpdateHeatLoad() {
-  var hliEl = document.getElementById('eu-hli');
+  var hliEl   = document.getElementById('eu-hli');
   var display = document.getElementById('eu-heat-load-display');
+  var src = document.getElementById('eu-hli-source');
+  if (src) src.style.color = euHLIFromBER() ? '#4ade80' : '#E8A020';
+  var basis = document.getElementById('eu-heat-load-basis');
+  if (basis) {
+    var em = (document.getElementById('eu-emitter-type') || {}).value || 'keep-rads';
+    basis.textContent = 'kW — ' + euFlowTemp(em) + '℃ flow, ' +
+      (em === 'keep-rads' ? 'existing rads' : em === 'ufh' ? 'underfloor' :
+       em === 'ufh-rads' ? 'underfloor + rads' : 'new rads');
+  }
   if (!display) return;
   var hli = parseFloat(hliEl && hliEl.value) || 0;
   var fa  = (typeof getCurrentFloorAreaSum === 'function' ? getCurrentFloorAreaSum() : 0) || 100;
-  if (hli > 0) {
-    var kw = Math.max(4, Math.ceil(hli * fa * 23 / 1000));
+  var kw  = euDesignLoadKW(hli, fa);
+  if (kw > 0) {
     display.textContent = kw + ' kW';
     display.style.color = kw <= 8 ? '#4ade80' : kw <= 12 ? '#E8A020' : '#f87171';
   } else {
@@ -12179,7 +12236,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       battery:      inputs.eu_battery || 'no',
       ewiThickness: inputs.eu_ewi_thickness || '150',
       ewiRender:    inputs.eu_ewi_render || 'silicone',
-      emitterType:  inputs.eu_emitter || 'rads',
+      emitterType:  inputs.eu_emitter || 'keep-rads',
       floor_system: document.getElementById('ref-eu-floor-system')?.value || 'solid-overlay',
       measures:     euPanelMeasures,
     };
@@ -12813,7 +12870,7 @@ function readRefurbSelector(prefix) {
     eu_floor_slab:    (document.getElementById('ref-eu-floor')?.checked && (document.getElementById('ref-eu-floor-system')?.value || '').startsWith('solid')) || false,
     eu_floor_susp:    (document.getElementById('ref-eu-floor')?.checked && (document.getElementById('ref-eu-floor-system')?.value || '').startsWith('suspended')) || false,
     eu_ashp:          document.getElementById('ref-eu-ashp')?.checked || false,
-    eu_emitter:       document.getElementById('ref-eu-emitter-type')?.value || 'rads',
+    eu_emitter:       document.getElementById('ref-eu-emitter-type')?.value || 'keep-rads',
     eu_remove_heat:   document.getElementById('ref-eu-ashp-remove')?.value || 'oil',
     eu_boiler:        document.getElementById('ref-eu-boiler')?.checked || false,
     eu_boiler_fuel:   document.getElementById('ref-eu-boiler-fuel')?.value || 'Gas Boiler',
@@ -13038,6 +13095,7 @@ function readEUSelector() {
     doorCount:         doors,
     doorArea:          doorAreaSurveyed,
     hli:               nv('eu-hli') || 0,
+    hliFromBER:        euHLIFromBER(),   // typed in from the provisional BER, vs the indicative seed
     roomsDown:         rd,
     roomsUp:           ru,
     totalRooms:        totalRooms,
@@ -13055,7 +13113,7 @@ function readEUSelector() {
     battery:           sv('eu-battery') || 'no',
     solarThermalArea:  nv('eu-solar-th-area') || 4,
     lightPct:          cb('eu-led') ? 100 : 0,
-    emitterType:       sv('eu-emitter-type') || 'rads',
+    emitterType:       sv('eu-emitter-type') || 'keep-rads',
     boilerCombi:       sv('eu-boiler-combi'),
     ashpRemove:        sv('eu-ashp-remove'),
     biomass:           cb('eu-biomass'),
@@ -14012,10 +14070,25 @@ function _euPricingBasis(s, inp) {
     pb.push('Attic hatch: 1 nr');
   } else if (t.indexOf('AIR-TO-WATER') >= 0 || t.indexOf('ASHP') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
-    if ((inp.hli||0) > 0) pb.push('Heat Loss Indicator: '+inp.hli+' W/m²K');
+    // Say where the HLI came from. A figure read off the provisional BER and an indicative
+    // placeholder size very different heat pumps, and the homeowner cannot tell them apart
+    // from the kW alone.
+    if ((inp.hli||0) > 0)
+      pb.push('Heat Loss Indicator: '+euHLIText(inp.hli)+' W/m²K '+(inp.hliFromBER ? '(provisional BER)' : '(indicative — confirm from provisional BER)'));
+    var _em = inp.emitterType || 'keep-rads';
     var hi = items.find(function(i){return (i.description||'').toLowerCase().indexOf('air-to-water heat pump')>=0;});
-    if (hi) { var hkw = (hi.description||'').match(/\((\d+)kW\)/); if (hkw) pb.push('Design load: '+hkw[1]+'kW '+((inp.hli||0)>0?'(IS EN 12831 heat loss)':'(area-banded — add HLI)')); }
-    pb.push('Emitters: '+euLabel(inp.emitterType||'rads', 'emitterType'));
+    if (hi) {
+      var hkw = (hi.description||'').match(/\((\d+)kW\)/);
+      if (hkw) pb.push('Design load: '+hkw[1]+'kW at '+euFlowTemp(_em)+'°C flow — '+((inp.hli||0) > 0
+        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' (IS EN 12831)' : '')
+        : 'area-banded — add the provisional BER HLI'));
+    }
+    pb.push('Emitters: '+euLabel(_em, 'emitterType'));
+    // Emitters are deliberately not assessed. Existing radiators are assumed to work at
+    // 45°C flow; if they do not, that is the contractor's to price rather than a silent
+    // hole in the budget.
+    if (_em === 'keep-rads')
+      pb.push('Emitter upgrade: excluded — existing radiators retained and assumed to work at 45°C flow. Contractor to price any radiator changes under Variation Notes');
     // The cylinder, the controls and the pipework are inside this price. Say so, or the
     // homeowner reads a bare heat-pump figure and a contractor prices a different job.
     var cyl = items.find(function(i){return (i.description||'').toLowerCase().indexOf('cylinder')>=0;});
