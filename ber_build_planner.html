@@ -18146,7 +18146,23 @@ function _updateEUPDFBtns(isPlan, mode) {
       var formLabel = mode === 'Energy Upgrade' ? 'Survey Selection Form (PDF)' : 'Homeowner Selection Form (PDF)';
       formBtn = '<button onclick="exportSelectionForm(\'' + formKind + '\')" title="Reprint the blank client selection form" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128221; ' + formLabel + '</button>';
     }
+    // Grant route selector at the moment of download — the same selectPlanRoute the
+    // comparison strip uses, so switching here re-prices the plan before it prints.
+    // The assessor can change the route there and then, with the homeowner watching.
+    var routeSel = '';
+    if (mode === 'Energy Upgrade' || mode === 'Refurbishment') {
+      var _curScheme = (document.getElementById('t0-grantScheme') || {}).value || 'beh';
+      var _routeOpts = [['beh','Better Energy Homes'],['ceg','Community Energy Grant'],['oss','One Stop Shop'],['none','No SEAI grants']]
+        .map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===_curScheme?' selected':'')+'>'+o[1]+'</option>'; }).join('');
+      routeSel =
+        '<span style="display:inline-flex;align-items:center;gap:6px;margin-right:8px;padding:4px 8px 4px 10px;background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.35);border-radius:8px;">' +
+          '<span style="font-size:10px;color:#E8A020;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;">Grant route</span>' +
+          '<select id="rpt-grantScheme" onchange="selectPlanRoute(this.value)" title="Switching re-prices the plan before it prints — anything recorded under Actual or Variation Notes is kept"' +
+            ' style="background:#1a2332;border:1px solid #2e3d52;color:#c8d0dc;border-radius:6px;padding:4px 6px;font-size:12px;font-family:\'DM Sans\',system-ui,sans-serif;cursor:pointer;">' + _routeOpts + '</select>' +
+        '</span>';
+    }
     wrap.innerHTML =
+      routeSel +
       '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; '+planLabel+'</button>' +
       '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>' +
       formBtn;
