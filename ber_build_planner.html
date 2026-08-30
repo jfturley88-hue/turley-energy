@@ -5237,6 +5237,28 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       </div>
 
       </div>
+        <!-- NOT INCLUDED — VARIATIONS (rows injected from EU_EXCL by euBuildExclTab) -->
+        <div class="ws-group" id="eu-excl-group">
+          <button type="button" class="ws-group-toggle"
+            onclick="wsToggle(this)">
+            &#128683; Not Included &mdash; Variations <span id="eu-excl-count" style="font-size:10px;color:#8FA0B8;font-weight:400;"></span> <span>&#9654;</span>
+          </button>
+          <div class="ws-group-body">
+            <div style="font-size:10.5px;color:#8FA0B8;line-height:1.55;margin:2px 0 10px;">
+              Each measure above prices only what is <strong style="color:#CBD5E1;">definitely needed</strong>. The items here are
+              only needed on some houses &mdash; tick one <strong style="color:#CBD5E1;">only where the survey shows it</strong>, and it is
+              priced into that measure at the same rates.
+            </div>
+            <div id="eu-excl-body"></div>
+            <div id="eu-excl-empty" style="font-size:11px;color:#64748b;font-style:italic;padding:4px 0 8px;">
+              Select measures above &mdash; each measure&rsquo;s excluded items will appear here.
+            </div>
+            <div style="font-size:10px;color:#64748b;line-height:1.5;border-top:1px solid #2e3d52;padding-top:8px;margin-top:4px;">
+              Anything left unticked prints as <strong style="color:#8FA0B8;">Not Included</strong> on the plan, with guide prices in the
+              appendix index, for the contractor to price under Variations on the schedule.
+            </div>
+          </div>
+        </div>
       <!-- end eu-works-panel -->
       </div><!-- end eu-works-shared -->
     </div>
@@ -7945,6 +7967,178 @@ function buildBOQRenovation(inputs, projName, county, dwellingType, grantScheme,
   };
 }
 
+// ── NOT INCLUDED — THE VARIATION CATALOGUE ────────────────────────────────────
+// Standard = definitely needed in the bundle. Everything in this catalogue is only needed
+// on SOME houses, so it stays out of the baseline: named in the plan's scope, guide-priced
+// in the appendix index, and priced by the contractor on the schedule's Variations table.
+// The Not Included tab in the Energy Upgrade selector renders from this same catalogue,
+// and ticking an item there moves it INTO its measure's priced section. One catalogue,
+// four surfaces — they cannot disagree.
+// qty is a function of the survey inputs. Guide price = (materials + county-adjusted
+// labour) loaded exactly like the plan: O&P 12% + contingency 10% + VAT 13.5%.
+function _x(id, item, detail, unit, qty, mat, hrs, trade, when) {
+  return { id: id, item: item, detail: detail, unit: unit, qty: qty, mat: mat, hrs: hrs, trade: trade, when: when };
+}
+var _xFA    = function(i){ return parseFloat(i.floorArea) || 100; };
+var _xGFA   = function(i){ return parseFloat(i.groundFloor) || Math.round(_xFA(i) * 0.5); };
+var _xROOMS = function(i){ return i.totalRooms || Math.max(4, Math.round(_xFA(i) / 18)); };
+var _xWIN   = function(i){ return i.windowCount || Math.max(4, Math.round((parseFloat(i.windowArea) || _xFA(i) * 0.15) / 1.5)); };
+var _xRADS  = function(i){ return Math.max(4, Math.round(_xFA(i) / 14)); };
+var _xCHIM  = function(i){ return i.chimneyCount || i.chimney_count || 1; };
+var _xONE   = function(){ return 1; };
+// Fascia €/m follows the Rate Settings override, like the item it replaced
+var _xFASCIA_MAT = function(){ try { var ov = JSON.parse(localStorage.getItem('eu_ov') || '{}'); var v = parseFloat(ov.ewi_fascia); if (v > 0) return v; } catch(_){} return 38; };
+
+var EU_EXCL = {
+  wall_cavity: [
+    _x('cav_vents','Room ventilation','Wall vents to habitable rooms brought up to current ventilation standards once the cavity is filled — per vent','nr',_xROOMS,30,1,'craft'),
+  ],
+  wall_ewi: [
+    _x('ewi_fascia','Fascia & soffit over the thickened wall','Eaves extended over the new insulation — uPVC fascia, vented soffit, gutters refixed','m',function(i){ return Math.round(4 * Math.sqrt(_xGFA(i)) * 1.1); },_xFASCIA_MAT,0.35,'craft'),
+    _x('ewi_vents','Wall ventilation','Extend or re-form wall vents through the new insulation — per vent','nr',_xROOMS,30,1,'craft'),
+    _x('ewi_esb','ESB service sleeving','Sleeve and protect the ESB service cable and meter box surround at the thickened wall','item',_xONE,120,4,'craft'),
+  ],
+  wall_iwi: [
+    _x('iwi_rads','Radiators re-hung on external walls','Remove, extend pipework and re-fix radiators on the newly lined walls — per radiator','nr',function(i){ return Math.max(2, Math.round(_xFA(i) / 28)); },20,2.5,'plumber'),
+    _x('iwi_boards','Window boards & deepened reveals','Replace internal window boards and build out reveals to the new wall thickness — per window','nr',_xWIN,45,1.5,'craft'),
+    _x('iwi_cornice','Cornice & coving reinstatement','Re-run or replace decorative cornice disturbed by the lining — period houses','item',_xONE,180,6,'craft'),
+  ],
+  roof_ceiling: [
+    _x('attic_vent','Attic ventilation','Eaves vent trays or soffit/tile vents to keep the attic cross-ventilated over the deeper insulation','item',_xONE,110,4,'craft'),
+    _x('attic_draught','Draught stripping','Compression seal & insulated lid to the attic hatch — whole-house draught-proofing is its own measure','nr',_xONE,55,1.5,'craft'),
+  ],
+  roof_rafter: [
+    _x('raft_repairs','Roof covering repairs','Slipped or broken slates and torn felt found once the roof is opened up','item',_xONE,260,6,'craft'),
+    _x('raft_vent','Eaves & ridge ventilation path','Maintain the 50mm ventilation path over the insulation — vents at eaves and ridge','item',_xONE,180,5,'craft'),
+  ],
+  roof_flat: [
+    _x('flat_deck','Deck repairs where rot is found','Cut out and replace rotten decking before the overlay goes down','m²',function(i){ return Math.max(2, Math.round((parseFloat(i.roof_flat_area) || 20) * 0.1)); },38,0.8,'craft'),
+    _x('flat_lights','Rooflight upstands & re-flashing','Raise and re-flash rooflights to the new roof level','nr',_xONE,220,4,'craft'),
+    _x('flat_rwg','Gutters & downpipes renewal','Renew rainwater goods disturbed by the raised edge detail','m',function(i){ return Math.max(8, Math.round(Math.sqrt(_xGFA(i)) * 2)); },16,0.4,'craft'),
+  ],
+  roof_room: [
+    _x('rr_repairs','Roof covering repairs','Slipped or broken slates found once the sloped ceilings are opened','item',_xONE,260,6,'craft'),
+    _x('rr_eaves','Insulated eaves access doors','Insulate and draught-seal the eaves crawl-space doors','nr',function(){ return 2; },85,2,'craft'),
+    _x('rr_lights','Fire-rated downlighters in sloped ceilings','Replace downlights with insulation-safe fire-rated fittings','nr',function(){ return 6; },28,0.6,'electrician'),
+  ],
+  floor: [
+    _x('floor_doors','Internal doors trimmed & re-hung','The floor level rises with the insulation — trim and re-hang each affected door','nr',function(i){ return Math.max(4, (i.roomsDown || 4) + 2); },8,0.75,'craft'),
+    _x('floor_finish','Floor finishes','Tile, timber or vinyl to the homeowner’s selection — a PC choice, not a builder’s cost','m²',function(i){ return parseFloat(i.floor_area) || _xGFA(i); },35,0.8,'craft'),
+    _x('floor_rads','Radiator drops & pipework alterations','Extend radiator drops and pipe penetrations through the new floor build-up','nr',function(i){ return Math.max(2, Math.round(_xGFA(i) / 20)); },15,1.2,'plumber'),
+  ],
+  windows_bundle: [
+    _x('win_boards','Internal window boards','Replace internal boards where the new frames sit differently — per window','nr',_xWIN,45,1,'craft'),
+    _x('win_reveals','External reveal repairs','Patch plaster or render to external reveals beyond the sealant line — per window','nr',_xWIN,18,0.9,'craft'),
+    _x('win_lintels','Lintel repairs where found','Replace or repair defective lintels discovered on removing the old frames','item',_xONE,180,6,'craft'),
+  ],
+  doors_bundle: [
+    _x('door_threshold','Threshold & step alterations','Masonry alterations where the new threshold height differs — per door','nr',function(i){ return i.doorCount || 2; },60,3,'craft'),
+    _x('door_alarm','Alarm sensor re-wiring','Re-fit and re-wire door alarm contacts on the new frames','item',_xONE,40,1.5,'electrician'),
+  ],
+  airtightness: [
+    _x('at_boarding','Re-boarding & skim over membrane','Plasterboard and skim finish over the service void — the ceiling has to be closed up again','m²',function(i){ return parseFloat(i.roofArea) || Math.round(_xFA(i) * 0.55); },9,0.55,'craft'),
+    _x('at_hoods','Airtight downlight hoods','Sealed hoods over recessed fittings that pierce the membrane','nr',function(i){ return Math.max(4, Math.round(_xFA(i) / 12)); },14,0.3,'electrician'),
+    _x('at_chimney','Chimney sealing & decommissioning','Permanently seal redundant flues top and bottom','nr',_xCHIM,150,6,'craft'),
+  ],
+  draught_proofing: [
+    _x('dp_cap','Permanent chimney capping','Cap the redundant flue at the crown — needs roof access','nr',_xCHIM,120,4,'craft'),
+    _x('dp_sash','Sash window overhaul','Re-balance, re-cord and fit parting-bead seals to traditional sashes — per window','nr',function(i){ return Math.max(2, Math.round(_xWIN(i) / 2)); },90,3,'craft'),
+  ],
+  heating: [
+    _x('hp_emitters','Emitter (radiator) upgrades','Existing radiators retained and assumed to work at 45°C flow — contractor to survey; per radiator replaced, supplied & fitted','nr',_xRADS,260,3.5,'plumber',
+      function(i){ return (i.newHeating || 'ASHP') === 'ASHP' && (i.emitterType || 'keep-rads') === 'keep-rads'; }),
+    _x('hp_supply','Electrical supply upgrade','Dedicated supply, tails or board work where the existing installation cannot carry the heat pump','item',_xONE,180,6,'electrician',
+      function(i){ return (i.newHeating || 'ASHP') === 'ASHP'; }),
+    _x('blr_tank','Fuel tank renewal','Replace a degraded oil/LPG tank — bunded, to current standards','item',_xONE,950,5,'craft',
+      function(i){ return (i.newHeating || 'ASHP') !== 'ASHP'; }),
+    _x('blr_gas','Gas connection & meter works','Network connection or meter alterations for the new boiler','item',_xONE,300,2,'plumber',
+      function(i){ return (i.newHeating || 'ASHP') !== 'ASHP'; }),
+    _x('blr_rads','Radiator upgrades','Replace tired or undersized radiators found on the power flush — per radiator','nr',_xRADS,260,3.5,'plumber',
+      function(i){ return (i.newHeating || 'ASHP') !== 'ASHP'; }),
+  ],
+  gshp: [
+    _x('gshp_emitters','Emitter (radiator) upgrades','Existing radiators retained and assumed to work at 45°C flow — contractor to survey; per radiator replaced, supplied & fitted','nr',_xRADS,260,3.5,'plumber'),
+    _x('gshp_landscape','Garden & landscape reinstatement','Lawn, planting and surfaces reinstated after the ground array trenching','item',_xONE,350,10,'craft'),
+    _x('gshp_supply','Electrical supply upgrade','Dedicated supply, tails or board work for the heat pump','item',_xONE,180,6,'electrician'),
+  ],
+  hybrid_hp: [
+    _x('hyb_emitters','Emitter (radiator) upgrades','Existing radiators retained and assumed to work at 45°C flow — per radiator replaced, supplied & fitted','nr',_xRADS,260,3.5,'plumber',
+      function(i){ return (i.hybrid_emitter || 'rads') === 'keep-rads'; }),
+    _x('hyb_boiler','Replacement of the retained boiler','The existing boiler stays as backup — if it fails, its replacement is a separate job','item',_xONE,1700,16,'plumber'),
+  ],
+  air_air: [
+    _x('aa_cond','Condensate pump & drain runs','Pumped condensate where no gravity fall exists from the indoor unit','nr',_xONE,120,2.5,'plumber'),
+    _x('aa_decor','Redecoration around trunking','Make good and repaint where pipe trunking crosses finished walls','item',_xONE,40,3,'craft'),
+  ],
+  biomass: [
+    _x('bio_base','Concrete base for external silo','Foundation slab for the pellet store','item',_xONE,240,8,'craft'),
+    _x('bio_fuel','First fuel load','Initial bulk pellet delivery to commission and hand over','item',_xONE,420,0,'craft'),
+  ],
+  ufh: [
+    _x('ufh_finish','Floor finishes','Tile, timber or vinyl to the homeowner’s selection — a PC choice, not a builder’s cost','m²',_xGFA,35,0.8,'craft'),
+    _x('ufh_doors','Internal doors trimmed & re-hung','The floor level rises with the build-up — trim and re-hang each affected door','nr',function(i){ return Math.max(4, (i.roomsDown || 4) + 2); },8,0.75,'craft'),
+  ],
+  solar_pv: [
+    _x('pv_roofrep','Roof repairs before mounting','Replace broken tiles or slates under the array before the anchors go in','item',_xONE,120,4,'craft'),
+    _x('pv_birds','Bird-proofing mesh','Mesh skirt around the array perimeter — keeps nesting out from under the panels','m',function(i){ return Math.max(8, Math.round((parseFloat(i.pvArea) || 12) * 1.4)); },6,0.25,'craft'),
+    _x('pv_esb','ESB Networks charges','Connection charges or supply upgrade required by ESB Networks','item',_xONE,350,0,'craft'),
+  ],
+  solar_thermal: [
+    _x('st_roofrep','Roof repairs before mounting','Replace broken tiles or slates under the collectors before fixing','item',_xONE,120,4,'craft'),
+    _x('st_press','Hot press carpentry alterations','Shelving and framing altered to take the larger cylinder','item',_xONE,90,4,'craft'),
+  ],
+  hpwh: [
+    _x('hpwh_duct','Duct kit to outside','Intake and exhaust ducting where the unit runs ducted rather than on room air','item',_xONE,160,3,'craft'),
+    _x('hpwh_press','Hot press enlargement','Carpentry to make the clearances the unit needs','item',_xONE,140,6,'craft'),
+  ],
+  electrical: [
+    _x('el_rewire','Remedial rewiring','Unsafe circuits found at inspection brought up to the ETCI rules','item',_xONE,280,12,'electrician'),
+    _x('el_chase','Chasing & redecoration','Make good and repaint where new cable runs cross finished walls','item',_xONE,60,5,'craft'),
+  ],
+  consumer_unit: [
+    _x('cu_earth','Main earthing & bonding upgrade','Earthing and equipotential bonding brought up to current regulations','item',_xONE,85,3,'electrician'),
+    _x('cu_meter','Meter box works','Repair or replace a damaged external meter box','item',_xONE,120,2,'craft'),
+  ],
+  led_lighting: [
+    _x('led_patch','Ceiling patching at old fittings','Fill and make good where removed fittings leave holes','nr',function(i){ return Math.max(3, Math.round(_xFA(i) / 16)); },6,0.4,'craft'),
+    _x('led_hoods','Insulation-safe fire hoods','Hoods over downlights beneath attic insulation','nr',function(i){ return Math.max(4, Math.round(_xFA(i) / 12)); },14,0.25,'craft'),
+  ],
+  ev_charger: [
+    _x('ev_trench','Trenching through hardstanding','Excavate, duct and reinstate where the cable run crosses paving or concrete','m',function(){ return 8; },14,0.9,'craft'),
+    _x('ev_fuse','ESB fuse upgrade','Supply fuse uprated by ESB Networks where the load requires it','item',_xONE,250,0,'craft'),
+  ],
+  hw_cylinder: [
+    _x('hw_main','Incoming cold main upgrade','Unvented cylinders need mains pressure and flow — upgrade an undersized incoming main','item',_xONE,220,8,'plumber'),
+    _x('hw_carp','Hot press carpentry reinstatement','Shelving and framing reinstated around the new cylinder','item',_xONE,90,4,'craft'),
+  ],
+};
+
+// Which selector checkboxes make a catalogue group relevant (any of them ticked)
+var EU_EXCL_UI = {
+  wall_cavity: ['eu-cavity'], wall_ewi: ['eu-ewi'], wall_iwi: ['eu-iwi'],
+  roof_ceiling: ['eu-roof-ceiling'], roof_rafter: ['eu-roof-rafter'],
+  roof_flat: ['eu-roof-flat'], roof_room: ['eu-roof-room'], floor: ['eu-floor'],
+  windows_bundle: ['eu-windows'], doors_bundle: ['eu-doors'],
+  airtightness: ['eu-airtight'], draught_proofing: ['eu-draught'],
+  heating: ['eu-ashp', 'eu-boiler'], gshp: ['eu-gshp'], hybrid_hp: ['eu-hybrid-hp'],
+  air_air: ['eu-air-air'], biomass: ['eu-biomass'], ufh: ['eu-ufh'],
+  solar_pv: ['eu-pv'], solar_thermal: ['eu-solar-th'], hpwh: ['eu-hpwh'],
+  electrical: ['eu-consumer', 'eu-led', 'eu-ev'], consumer_unit: ['eu-consumer'],
+  led_lighting: ['eu-led'], ev_charger: ['eu-ev'],
+  // the HW cylinder section only builds when no heat pump carries its own cylinder
+  hw_cylinder: { ids: ['eu-hw-cyl'], not: ['eu-ashp', 'eu-gshp'] },
+};
+
+function euExclQty(e, inp) {
+  var q = inp && inp.exclQty && parseFloat(inp.exclQty[e.id]);
+  if (q > 0) return Math.round(q);
+  return Math.max(1, Math.round(e.qty(inp || {})));
+}
+function euExclMat(e) { return typeof e.mat === 'function' ? e.mat() : e.mat; }
+function euExclRate(e, mult) {
+  return Math.round((euExclMat(e) + Math.round(e.hrs * (TRADE_RATES[e.trade] || 45) * (mult || 1))) * 1.22 * 1.135);
+}
+
 // ── RETROFIT BOQ BUILDER ──────────────────────────────────────────────────────
 function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, measuresOverride, ao) {
   const labMult = getCountyInfo(county).mult;
@@ -8099,13 +8293,26 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
   var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
 
-  // Variation guide price for an item deliberately OUTSIDE the baseline scope: materials +
-  // county-adjusted labour, loaded the same way as the plan (O&P 12% + contingency 10%,
-  // VAT 13.5%). Printed in the appendix so the homeowner can judge what a contractor's
-  // variation should roughly cost — the plan itself never carries these figures.
-  function exGuide(mat, hours, trade) { return Math.round((mat + lM(hours, trade)) * 1.22 * 1.135); }
-  // Habitable rooms, for per-vent guide quantities — falls back to a floor-area estimate
-  var habRooms = inputs.totalRooms || Math.max(4, Math.round(fa / 18));
+  // Split a measure's catalogue between the two sides of the plan: entries ticked on the
+  // Not Included tab become priced items INSIDE the measure's section (inheriting its VAT
+  // and its grant row); everything else stays an exclusion — scope line, appendix guide
+  // price, schedule Variations row. Same catalogue, same county labour, same loading.
+  function exApply(key, refPfx) {
+    var out = { excl: [], items: [] }, n = 0;
+    (EU_EXCL[key] || []).forEach(function(e) {
+      if (e.when && !e.when(inputs)) return;
+      var qty = euExclQty(e, inputs);
+      if (inputs.exclTicked && inputs.exclTicked[e.id]) {
+        n++;
+        out.items.push(mkItem(refPfx + '.V' + n, e.item + ' — surveyed as needed', e.unit, qty,
+          euExclMat(e), lM(e.hrs, L[e.trade] || L.craft),
+          e.detail + ' — added from the Not Included checklist'));
+      } else {
+        out.excl.push({ item: e.item, detail: e.detail, unit: e.unit, qty: qty, rate: euExclRate(e, labMult) });
+      }
+    });
+    return out;
+  }
   var _EU_PV=250,_EU_TRICKLE=28;
   var WINDOW_DISPOSE_RATE = 45;
   var DOOR_DISPOSE_RATE   = 80;
@@ -8161,11 +8368,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     if (inputs.cavity_makegood) {
       cavItems.push(mkItem('2.2', 'Making good — reveals & cold bridges', 'm²', cavArea * 0.12, 22, lM(0.8, L.craft), 'Returns & reveals only'));
     }
-    sections.push({ id: String(sid++), title: 'WALL INSULATION — CAVITY FILL', part: 'A', items: cavItems,
-      exclusions: [
-        { item: 'Room ventilation', detail: 'Wall vents to habitable rooms brought up to current ventilation standards once the cavity is filled — per vent', unit: 'nr', qty: habRooms, rate: exGuide(30, 1, L.craft) },
-      ]
-    });
+    var EXcav = exApply('wall_cavity', 'CW');
+    sections.push({ id: String(sid++), title: 'WALL INSULATION — CAVITY FILL', part: 'A',
+      items: cavItems.concat(EXcav.items), exclusions: EXcav.excl });
   }
 
   if (has('wall_ewi')) {
@@ -8212,12 +8417,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
         mkItem('EWI.SCAF', 'Scaffolding — external elevations (erect, 2–3 wk hire, dismantle)', 'm²', grossElev, 10, lM(0.1, L.craft), 'Gross elevation area incl. openings & peaks — scaffold contractor'),
         mkItem('EWI.1', ewiDesc, 'm²', ewiArea, ewiMatR, lM(ewiLabR / 22, L.craft), 'Gross elevation: net wall + openings + gable peaks'),
       ],
-      exclusions: [
-        { item: 'Fascia & soffit over the thickened wall', detail: 'Eaves extended over the new insulation — uPVC fascia, vented soffit, gutters refixed', unit: 'm', qty: fasciaLen, rate: exGuide(_EU_FASCIA, 0.35, L.craft) },
-        { item: 'Wall ventilation', detail: 'Extend or re-form wall vents through the new insulation — per vent', unit: 'nr', qty: habRooms, rate: exGuide(30, 1, L.craft) },
-        { item: 'ESB service sleeving', detail: 'Sleeve and protect the ESB service cable and meter box surround at the thickened wall', unit: 'item', qty: 1, rate: exGuide(120, 4, L.craft) },
-      ]
+      exclusions: []
     });
+    var EXewi = exApply('wall_ewi', 'EWI');
+    var _ewiSec = sections[sections.length - 1];
+    _ewiSec.items = _ewiSec.items.concat(EXewi.items);
+    _ewiSec.exclusions = EXewi.excl;
   }
 
   if (has('wall_iwi')) {
@@ -8230,7 +8435,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     if (inputs.iwi_makegood) {
       iwiItems.push(mkItem('IWI.3', 'Making good \u2014 skirtings, architraves, electrical back boxes', 'item', 1, 520, lM(14, L.craft), 'Reinstate all disturbed finishes throughout'));
     }
-    sections.push({ id: String(sid++), title: 'INTERNAL WALL INSULATION (IWI \u2014 DRY-LINING)', part: 'A', items: iwiItems });
+    var EXiwi = exApply('wall_iwi', 'IWI');
+    sections.push({ id: String(sid++), title: 'INTERNAL WALL INSULATION (IWI \u2014 DRY-LINING)', part: 'A',
+      items: iwiItems.concat(EXiwi.items), exclusions: EXiwi.excl });
   }
 
   // 3. Roof Insulation — bundled branches (Chunk 5)
@@ -8259,12 +8466,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     rcItems.push(mkItem('RI-C.4', 'Insulation to attic pipework — foam lagging', 'm', Math.max(8, Math.round(Math.sqrt(rcArea) * 1.5)), 4.5, lM(0.25, L.craft), 'All accessible CW & HW runs above the new insulation'));
     rcItems.push(mkItem('RI-C.5', 'Raised access walkway — hatch to tank (loft legs & boards)', 'm', rcWalk, 18, lM(0.5, L.craft), 'Access across the attic without compressing the new insulation'));
     rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 10m² over loft legs', 'm²', 10, 22, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
-    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A', items: rcItems,
-      exclusions: [
-        { item: 'Attic ventilation', detail: 'Eaves vent trays or soffit/tile vents to keep the attic cross-ventilated over the deeper insulation', unit: 'item', qty: 1, rate: exGuide(110, 4, L.craft) },
-        { item: 'Draught stripping', detail: 'Compression seal & insulated lid to the attic hatch — whole-house draught-proofing is its own measure', unit: 'nr', qty: 1, rate: exGuide(55, 1.5, L.craft) },
-      ]
-    });
+    var EXrc = exApply('roof_ceiling', 'RI-C');
+    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A',
+      items: rcItems.concat(EXrc.items), exclusions: EXrc.excl });
   }
 
   if (has('roof_rafter')) {
@@ -8275,11 +8479,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rrDesc = 'Rafter-level insulation \u2014 ' + euLabel(rrSys, 'roof_rafter_system') + ' (' +
       (inputs.roof_rafter_thick || '150') + 'mm bundle: insulation, fixings, trims' +
       (inputs.roof_rafter_makegood ? ', making good)' : ')');
+    var EXrr = exApply('roof_rafter', 'RI-R');
     sections.push({ id: String(sid++), title: 'ROOF INSULATION \u2014 RAFTER LEVEL (WARM ROOF)', part: 'A',
       items: [
         mkItem('RI-R.SCAF', 'Scaffolding \u2014 eaves, ridge & valley access (erect, hire, dismantle)', 'm\u00b2', Math.round((rrArea || ra) * 1.1), 8, lM(0.1, L.craft), 'For rafter-level insulation access'),
         mkItem('RI-R.1', rrDesc, 'm\u00b2', rrArea, rrR.mat + rrMg, lM(rrR.lab / 22, L.craft), 'Bundled warm-roof installation'),
-      ]
+      ].concat(EXrr.items), exclusions: EXrr.excl
     });
   }
 
@@ -8295,8 +8500,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       items: [
         mkItem('RI-F.SCAF', 'Scaffolding \u2014 perimeter eaves access (erect, hire, dismantle)', 'm\u00b2', Math.round((rfArea || ra) * 0.6), 8, lM(0.1, L.craft), 'Perimeter scaffold for flat roof access'),
         mkItem('RI-F.1', rfDesc, 'm\u00b2', rfArea, rfR.mat + rfMg, lM(rfR.lab / 22, L.craft), 'Bundled flat-roof installation'),
-      ]
+      ], exclusions: []
     });
+    var EXrf = exApply('roof_flat', 'RI-F');
+    var _rfSec = sections[sections.length - 1];
+    _rfSec.items = _rfSec.items.concat(EXrf.items);
+    _rfSec.exclusions = EXrf.excl;
   }
 
   if (has('roof_room')) {
@@ -8311,8 +8520,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       items: [
         mkItem('RI-RR.SCAF', 'Scaffolding \u2014 dormer, ridge & valley access (erect, hire, dismantle)', 'm\u00b2', Math.round((rroomArea || ra) * 1.15), 8, lM(0.1, L.craft), 'For room-in-roof works'),
         mkItem('RI-RR.1', rroomDesc, 'm\u00b2', rroomArea, rroomR.mat + rroomMg, lM(rroomR.lab / 22, L.craft), 'Bundled habitable-attic insulation'),
-      ]
+      ], exclusions: []
     });
+    var EXrroom = exApply('roof_room', 'RI-RR');
+    var _rrSec = sections[sections.length - 1];
+    _rrSec.items = _rrSec.items.concat(EXrroom.items);
+    _rrSec.exclusions = EXrroom.excl;
   }
 
   // 4. Floor Insulation — bundled branch (Chunk 7)
@@ -8326,8 +8539,10 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var fMg   = inputs.floor_makegood ? 6 : 0;
     var fDesc = 'Ground floor insulation — ' + euLabel(fSys, 'floor_system') + ' (' + fThk + 'mm bundle: insulation, fixings, vapour barrier' +
       (inputs.floor_makegood ? ', making good, perimeter strips' : '') + ')';
+    var EXfl = exApply('floor', 'FL');
     sections.push({ id: String(sid++), title: 'FLOOR INSULATION', part: 'A',
-      items: [ mkItem('4.1', fDesc, 'm²', fArea, fR.mat + fMg, lM(fR.lab / 22, L.craft), 'Bundled floor insulation installation') ]
+      items: [ mkItem('4.1', fDesc, 'm²', fArea, fR.mat + fMg, lM(fR.lab / 22, L.craft), 'Bundled floor insulation installation') ].concat(EXfl.items),
+      exclusions: EXfl.excl
     });
   }
 
@@ -8367,11 +8582,15 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     // SEAI treats them together. Where both are in scope they belong on one row, so the
     // homeowner sees the doors grant beside the doors that earned it rather than against a
     // windows-only scope. Doors on their own still get their own section.
+    var EXwin = exApply('windows_bundle', 'W');
     if (has('doors_bundle')) {
       _euDoorItems().forEach(function(it){ wItems.push(it); });
-      sections.push({ id: String(sid++), title: 'WINDOWS & EXTERNAL DOORS', part: 'A', items: wItems });
+      var EXdrs = exApply('doors_bundle', 'D');
+      sections.push({ id: String(sid++), title: 'WINDOWS & EXTERNAL DOORS', part: 'A',
+        items: wItems.concat(EXwin.items, EXdrs.items), exclusions: EXwin.excl.concat(EXdrs.excl) });
     } else {
-      sections.push({ id: String(sid++), title: 'WINDOWS — REPLACEMENT', part: 'A', items: wItems });
+      sections.push({ id: String(sid++), title: 'WINDOWS — REPLACEMENT', part: 'A',
+        items: wItems.concat(EXwin.items), exclusions: EXwin.excl });
     }
   }
 
@@ -8388,7 +8607,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   }
 
   if (has('doors_bundle') && !has('windows_bundle')) {
-    sections.push({ id: String(sid++), title: 'EXTERNAL DOOR REPLACEMENT', part: 'A', items: _euDoorItems() });
+    var EXdro = exApply('doors_bundle', 'D');
+    sections.push({ id: String(sid++), title: 'EXTERNAL DOOR REPLACEMENT', part: 'A',
+      items: _euDoorItems().concat(EXdro.items), exclusions: EXdro.excl });
   }
 
   // 6. Airtightness — bundle branch (Chunk 8)
@@ -8405,10 +8626,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       atItems.push(mkItem('6.3','Service void battens (25mm) to protect membrane','m²',ra,3,lM(0.2,L.craft),'Protects membrane from services — strongly recommended'));
     }
     atItems.push(mkItem('6.4','Blower-door test (NSAI certified)','nr',atTests,0,atTests * 480,'Air permeability test — NSAI / ATTMA certified tester'));
-    sections.push({id:String(sid++),title:'AIRTIGHTNESS & MEMBRANES',part:'A',items:atItems});
+    var EXat = exApply('airtightness', 'AT');
+    sections.push({id:String(sid++),title:'AIRTIGHTNESS & MEMBRANES',part:'A',items:atItems.concat(EXat.items),exclusions:EXat.excl});
   }
 
   if (has('draught_proofing')) {
+    var EXdp = exApply('draught_proofing', 'DP');
     sections.push({id:String(sid++), title:'DRAUGHT-PROOFING & AIR SEALING', part:'A', items:[
       mkItem('DP.1','External door draught seals \u2014 perimeter brush strips','nr',doors,42,lM(1.5,L.craft),'All external door frames \u2014 brush & compression seals'),
       mkItem('DP.2','Letterbox draught excluder \u2014 brush type','nr',Math.min(doors,2),22,lM(0.5,L.craft),'Brush letterbox draught excluder'),
@@ -8416,7 +8639,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('DP.4','Attic hatch \u2014 draught seal + insulated lid (100mm)','nr',1,55,lM(1.5,L.craft),'Perimeter compression seal + rigid insulated lid'),
       mkItem('DP.5','Gap fill \u2014 skirtings, pipe penetrations, floorboards','item',1,130,lM(6,L.craft),'Expanding foam, mastic & flexible fillers throughout'),
       mkItem('DP.6','Keyhole covers & window gap draught-proofing','item',1,85,lM(3,L.craft),'All windows, keyholes & trickle vents checked'),
-    ]});
+    ].concat(EXdp.items), exclusions: EXdp.excl});
   }
   if (has('secondary_glazing') && !has('windows')) {
     sections.push({id:String(sid++), title:'SECONDARY GLAZING \u2014 RETROFIT', part:'A', items:[
@@ -8524,13 +8747,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('7.4','Smart thermostat & controls','nr',1,280,lM(2,L.electrician),'Programmable smart control'),
     ];
 
-    sections.push({id:String(sid++),title:heating==='ASHP'?'HEATING SYSTEM — AIR-TO-WATER HEAT PUMP':'HEATING SYSTEM — CONDENSING BOILER',part:'B',vatRate:heating==='ASHP'?0.09:0.135,items:heating==='ASHP'?ashpItems:boilerItems,
-      // Emitters are deliberately not assessed when radiators are retained: they are the
-      // contractor's to survey, and the guide price tells the homeowner what a fair
-      // per-radiator variation looks like.
-      exclusions: (heating==='ASHP' && emitter==='keep-rads') ? [
-        { item: 'Emitter (radiator) upgrades', detail: 'Existing radiators retained and assumed to work at 45°C flow — contractor to survey; guide price per radiator replaced, supplied & fitted', unit: 'nr', qty: radsNr, rate: exGuide(260, 3.5, L.plumber) },
-      ] : []});
+    var EXht = exApply('heating', '7');
+    sections.push({id:String(sid++),title:heating==='ASHP'?'HEATING SYSTEM — AIR-TO-WATER HEAT PUMP':'HEATING SYSTEM — CONDENSING BOILER',part:'B',vatRate:heating==='ASHP'?0.09:0.135,
+      items:(heating==='ASHP'?ashpItems:boilerItems).concat(EXht.items),exclusions:EXht.excl});
   }
   if (has('gshp')) {
     var gshpType  = inputs.gshp_type || 'horizontal';
@@ -8571,9 +8790,13 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('GSHP.3','GSHP unit ('+gshpKwNum+'kW) — supply & commission','nr',1,gshpUnit,lM(32,L.plumber),'kW size indicative — confirmed by technical assessment. Final sizing per IS EN 12831 heat loss calc'),
       mkItem('GSHP.4','Heat pump cylinder — '+cylL+'L indirect mains pressure','nr',1,cylMat,lM(8,L.plumber),cylL+'L indicative — sized from '+fa+'m² floor area. Volume confirmed by installer post heat-loss calc — unvented, PED compliant'),
       mkItem('GSHP.5','Buffer vessel (100L) — hydraulic separation','nr',1,480,lM(4,L.plumber),'System buffer — Flamco or equivalent'),
-      mkItem('GSHP.6','Low-temperature radiators — oversized for 45°C flow','nr',Math.round(fa/14),260,lM(3.5,L.plumber),'Sized for low flow temperatures'),
+      mkItem('GSHP.6','Power-flush existing radiator circuit & heat-pump-compatible TRV heads','nr',1,180 + Math.round(fa/14)*22,lM(8,L.plumber),'Existing rads retained and assumed to work at 45°C flow — replacements are a surveyed variation, not a default'),
       mkItem('GSHP.7','Weather compensation & smart zone controls','nr',1,380,lM(4,L.electrician),'SEAI-compliant controls — app-enabled'),
-    ]});
+    ], exclusions: []});
+    var EXg = exApply('gshp', 'GSHP');
+    var _gSec = sections[sections.length - 1];
+    _gSec.items = _gSec.items.concat(EXg.items);
+    _gSec.exclusions = EXg.excl;
   }
   if (has('biomass')) {
     // BIO.3 — storage type driven by eu-biomass-store
@@ -8602,7 +8825,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('BIO.4','Indirect unvented hot water cylinder (210L)','nr',1,950,lM(8,L.plumber),'Mains pressure HW cylinder — PED compliant'),
       mkItem('BIO.5','Radiator TRV upgrades throughout','nr',Math.round(fa/16),220,lM(2.5,L.plumber),'TRV heads on all radiators'),
       mkItem('BIO.6','Commissioning & SEAI registration','item',1,0,480,'SEAI registered biomass installer — sign-off'),
-    ]});
+    ], exclusions: []});
+    var EXbio = exApply('biomass', 'BIO');
+    var _bioSec = sections[sections.length - 1];
+    _bioSec.items = _bioSec.items.concat(EXbio.items);
+    _bioSec.exclusions = EXbio.excl;
   }
 
   if (has('air_air')) {
@@ -8623,7 +8850,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
         'Commissioning, handover & SEAI grant registration',
         'item', 1, 0, lM(2, L.electrician),
         'Commissioning report, user handover & SEAI grant application sign-off'),
-    ]});
+    ], exclusions: []});
+    var EXaa = exApply('air_air', 'AA');
+    var _aaSec = sections[sections.length - 1];
+    _aaSec.items = _aaSec.items.concat(EXaa.items);
+    _aaSec.exclusions = EXaa.excl;
   }
 
   if (has('hybrid_hp')) {
@@ -8652,7 +8883,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       ...hybridEmItems,
       mkItem('HHP.5','Service existing ' + hybridFuel + ' boiler & modify pipework','item',1,380,lM(8,L.plumber),'Annual service, MagnaClean, connect HP circuit — boiler retained as backup'),
       mkItem('HHP.6','Weather compensation & smart bivalent controls','item',1,480,lM(4,L.electrician),'SEAI-compliant controls — app-enabled HP/boiler management'),
-    ]});
+    ], exclusions: []});
+    var EXhyb = exApply('hybrid_hp', 'HHP');
+    var _hybSec = sections[sections.length - 1];
+    _hybSec.items = _hybSec.items.concat(EXhyb.items);
+    _hybSec.exclusions = EXhyb.excl;
   }
 
   // 8. Ventilation — bundle branches (Chunk 8)
@@ -8706,9 +8941,12 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('UFH.2','PIR rigid insulation board (100mm) \u2014 under UFH','m\u00b2',gfa,mat.pir100mm*1.05,lM(0.35,L.craft),'Taped joints \u2014 no thermal bridges'),
       mkItem('UFH.3','UFH pipe \u2014 16mm PERT-AL-PERT (200mm centres)','m\u00b2',gfa,14,lM(0.5,L.plumber),'Clipped to insulation board'),
       mkItem('UFH.4','Manifold, actuators & zone wiring','nr',Math.max(1,Math.ceil(gfa/50)),480,lM(4,L.plumber),'One manifold per zone (max 50m\u00b2)'),
-      mkItem('UFH.5','Liquid anhydrite screed (65mm) over UFH','m\u00b2',gfa,8.5,lM(0.5,L.craft),'Poured screed \u2014 min 28 days drying before flooring'),
-      mkItem('UFH.6','Floor finishes reinstatement \u2014 PC sum','m\u00b2',gfa,35,lM(0.8,L.craft),'PC sum \u2014 tile / engineered timber to client selection'),
-    ]});
+      mkItem('UFH.5','Liquid anhydrite screed (65mm) over UFH','m\u00b2',gfa,8.5,lM(0.5,L.craft),'Poured screed \u2014 min 28 days drying before flooring — floor finishes are the homeowner\u2019s selection, carried as a variation'),
+    ], exclusions: []});
+    var EXufh = exApply('ufh', 'UFH');
+    var _ufhSec = sections[sections.length - 1];
+    _ufhSec.items = _ufhSec.items.concat(EXufh.items);
+    _ufhSec.exclusions = EXufh.excl;
   }
 
   // 9. Renewables — Solar PV bundle (Chunk 8)
@@ -8726,7 +8964,8 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
 const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU_BAT[2] : _EU_BAT[3]; return mkItem('9.5', bKwh + 'kWh LiFePO4 battery storage (supply & install)', 'nr', 1, bMat, lM(6, L.electrician), bKwh + 'kWh home battery — SEAI grant: €600/kWh up to €1,200'); })() ] : []),
       ...(inputs.pv_diverter ? [mkItem('9.6','Immersion diverter (Eddi / iBoost — surplus PV to HW)','nr',1,320,lM(2,L.electrician),'Diverts surplus PV generation to hot water immersion')] : []),
     ];
-    sections.push({id:String(sid++),title:'RENEWABLES — SOLAR PV / BATTERY',part:'B',items:pvItems,zeroVat:true});
+    var EXpv = exApply('solar_pv', '9');
+    sections.push({id:String(sid++),title:'RENEWABLES — SOLAR PV / BATTERY',part:'B',items:pvItems.concat(EXpv.items),exclusions:EXpv.excl,zeroVat:true});
   }
 
   if (has('solar_thermal')) {
@@ -8738,7 +8977,8 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
       mkItem('ST.4','Glycol pipework \u2014 flow & return (22mm copper, foam lagged)','m',Math.max(12,Math.round(Math.sqrt(fa)*1.8)),12,lM(0.5,L.plumber),'25mm armaflex insulation throughout \u2014 collector-to-cylinder run scaled to dwelling size'),
       mkItem('ST.5','Commissioning & SEAI grant registration','item',1,0,360,'SEAI registered solar thermal installer \u2014 sign-off'),
     ];
-    sections.push({id:String(sid++), title:'SOLAR THERMAL \u2014 HOT WATER SYSTEM', part:'B', items:stItems});
+    var EXst = exApply('solar_thermal', 'ST');
+    sections.push({id:String(sid++), title:'SOLAR THERMAL \u2014 HOT WATER SYSTEM', part:'B', items:stItems.concat(EXst.items), exclusions:EXst.excl});
   }
 
   if (has('hpwh')) {
@@ -8750,16 +8990,21 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
       mkItem('HPWH.3','Dedicated 16A electrical circuit & RCBO','nr',1,65,lM(2,L.electrician),'2.5mm² cable run from consumer unit — RCBO protection'),
       mkItem('HPWH.4','Timer, thermostat & smart app controls','nr',1,120,lM(1,L.electrician),'App or timer control — daily legionella pasteurisation cycle'),
       mkItem('HPWH.5','Decommission & remove existing cylinder / immersion','item',1,0,lM(3,L.craft),'Isolate, drain, disconnect & remove existing hot water system'),
-    ]});
+    ], exclusions: []});
+    var EXhpwh = exApply('hpwh', 'HPWH');
+    var _hpwhSec = sections[sections.length - 1];
+    _hpwhSec.items = _hpwhSec.items.concat(EXhpwh.items);
+    _hpwhSec.exclusions = EXhpwh.excl;
   }
 
   // 10. Electrical — per-item bundle branches (Chunk 8)
   if (has('electrical')) {
     // Wiring upgrades fire whenever any electrical measure is selected
+    var EXel = exApply('electrical', '10');
     sections.push({id:String(sid++),title:'ELECTRICAL UPGRADES — WIRING & CIRCUITS',part:'B',items:[
       mkItem('10.1','Wiring upgrades — new dedicated circuits','item',1,0,lM(fa*0.4,L.electrician),'Heat pump, MVHR, EV charger, PV inverter circuits as required'),
       mkItem('10.2','First-fix test & inspection (ETCI cert)','item',1,0,lM(3,L.electrician),'ETCI National Rules — certificate issued'),
-    ]});
+    ].concat(EXel.items),exclusions:EXel.excl});
   }
   if (has('consumer_unit')) {
     var conWays  = parseInt(inputs.consumer_ways) || 18;
@@ -8770,7 +9015,11 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     sections.push({id:String(sid++),title:'CONSUMER UNIT UPGRADE',part:'B',items:[
       mkItem('CU.1','Consumer unit — ' + conWays + '-way ' + conLabel + ' (supply & install)','nr',1,conMat,lM(6,L.electrician),'17th edition compliant — Hager or equivalent'),
       mkItem('CU.2','Labelling & schedule of circuits','item',1,0,lM(1,L.electrician),'Circuit schedule, labels & ETCI completion cert'),
-    ]});
+    ], exclusions: []});
+    var EXcu = exApply('consumer_unit', 'CU');
+    var _cuSec = sections[sections.length - 1];
+    _cuSec.items = _cuSec.items.concat(EXcu.items);
+    _cuSec.exclusions = EXcu.excl;
   }
   if (has('led_lighting')) {
     var ledNr   = Math.round(fa / 8);
@@ -8780,7 +9029,8 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     if (inputs.led_smart) {
       ledItems.push(mkItem('LED.2','Smart dimmable controls (Zigbee hub + smart switches)','item',1,480,lM(4,L.electrician),'App-controlled dimming & scene setting throughout'));
     }
-    sections.push({id:String(sid++),title:'LED LIGHTING UPGRADE',part:'B',items:ledItems});
+    var EXled = exApply('led_lighting', 'LED');
+    sections.push({id:String(sid++),title:'LED LIGHTING UPGRADE',part:'B',items:ledItems.concat(EXled.items),exclusions:EXled.excl});
   }
   if (has('ev_charger')) {
     var evBrand  = inputs.ev_brand  || 'zappi';
@@ -8790,7 +9040,11 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
     sections.push({id:String(sid++),title:'EV CHARGING POINT',part:'B',items:[
       mkItem('EV.1','7kW smart EV charger — ' + evLabel + ' (supply & install)','nr',1,evMat,lM(4,L.electrician),'OLEV compliant — earthing, RCD protection, 32A circuit'),
       mkItem('EV.2','Armoured cable run to parking position (' + evCable + 'm)','m',evCable,18,lM(0.4,L.electrician),'6mm² SWA armoured cable — surface or buried'),
-    ]});
+    ], exclusions: []});
+    var EXev = exApply('ev_charger', 'EV');
+    var _evSec = sections[sections.length - 1];
+    _evSec.items = _evSec.items.concat(EXev.items);
+    _evSec.exclusions = EXev.excl;
   }
 
   if (has('smart_controls') && !has('heating') && !has('gshp') && !has('hybrid_hp')) {
@@ -8808,7 +9062,11 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
       mkItem('HW.1','Unvented mains-pressure cylinder (' + hwCylL + 'L) \u2014 ' + hwBeds + ' bed','nr',1,hwCylMat,lM(10,L.plumber),'PED compliant \u2014 insulated jacket included \u2014 sized from bedroom count'),
       mkItem('HW.2','Pressure relief valve, expansion vessel & tundish','nr',1,180,lM(2,L.plumber),'Safety devices \u2014 Building Regulations requirement'),
       mkItem('HW.3','Hot water distribution pipework insulation (22mm)','m',fa*0.35,4.5,lM(0.3,L.craft),'25mm foam insulation to all accessible HW pipes'),
-    ]});
+    ], exclusions: []});
+    var EXhw = exApply('hw_cylinder', 'HW');
+    var _hwSec = sections[sections.length - 1];
+    _hwSec.items = _hwSec.items.concat(EXhw.items);
+    _hwSec.exclusions = EXhw.excl;
   }
   if (has('immersion')) {
     sections.push({id:String(sid++), title:'IMMERSION HEATER UPGRADE', part:'B', items:[
@@ -11292,6 +11550,101 @@ function euUpdateHeatLoad() {
   }
 }
 
+// ── NOT INCLUDED TAB — renders from EU_EXCL, one row per catalogue entry ──────
+// Rows exist for every entry from load (stable ids, so save/load round-trips them);
+// visibility follows the selected measures, and prices follow county & geometry.
+var EU_EXCL_LABELS = {
+  wall_cavity: 'Cavity fill', wall_ewi: 'External wall insulation', wall_iwi: 'Internal wall insulation',
+  roof_ceiling: 'Attic insulation', roof_rafter: 'Rafter insulation', roof_flat: 'Flat roof insulation',
+  roof_room: 'Room-in-roof insulation', floor: 'Floor insulation', windows_bundle: 'Windows',
+  doors_bundle: 'External doors', airtightness: 'Airtightness', draught_proofing: 'Draught-proofing',
+  heating: 'Heating system', gshp: 'Ground source heat pump', hybrid_hp: 'Hybrid heat pump',
+  air_air: 'Air-to-air heat pump', biomass: 'Biomass heating', ufh: 'Underfloor heating',
+  solar_pv: 'Solar PV', solar_thermal: 'Solar thermal', hpwh: 'Heat pump water heater',
+  electrical: 'Electrical works', consumer_unit: 'Consumer unit', led_lighting: 'LED lighting',
+  ev_charger: 'EV charger', hw_cylinder: 'Hot water cylinder',
+};
+
+function euBuildExclTab() {
+  var body = document.getElementById('eu-excl-body');
+  if (!body || body.childElementCount) return;
+  var html = '';
+  Object.keys(EU_EXCL).forEach(function(key) {
+    html += '<div class="eux-g" data-mkey="' + key + '" style="display:none;margin-bottom:10px;">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#E8A020;margin-bottom:4px;">' +
+        (EU_EXCL_LABELS[key] || key) + '</div>';
+    EU_EXCL[key].forEach(function(e) {
+      html +=
+        '<div class="eux-row" data-exrow="' + e.id + '" style="display:flex;gap:8px;align-items:flex-start;padding:4px 0 4px 4px;border-bottom:1px solid rgba(46,61,82,0.5);">' +
+          '<input type="checkbox" id="eux-' + e.id + '" data-exid="' + e.id + '" style="margin-top:2px;">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<label for="eux-' + e.id + '" style="font-size:12px;color:#E2E8F0;cursor:pointer;">' + e.item + '</label>' +
+            '<div style="font-size:10px;color:#64748b;line-height:1.4;">' + e.detail + '</div>' +
+          '</div>' +
+          (e.unit !== 'item'
+            ? '<input type="number" id="euxq-' + e.id + '" data-exqty="' + e.id + '" min="1" step="1"' +
+              ' oninput="if(event.isTrusted)this.dataset.userEdited=\'true\';euSyncExclTab()"' +
+              ' style="width:44px;background:rgba(255,255,255,.06);border:1px solid #2e3d52;color:#CBD5E1;border-radius:4px;padding:3px 4px;font-size:11px;font-family:inherit;text-align:center;">' +
+              '<span style="font-size:10px;color:#64748b;padding-top:5px;">' + e.unit + '</span>'
+            : '') +
+          '<span class="eux-price" data-exprice="' + e.id + '" style="font-size:11px;color:#8FA0B8;white-space:nowrap;min-width:74px;text-align:right;padding-top:3px;"></span>' +
+        '</div>';
+    });
+    html += '</div>';
+  });
+  body.innerHTML = html;
+  euSyncExclTab();
+}
+
+function euSyncExclTab() {
+  var body = document.getElementById('eu-excl-body');
+  if (!body || !body.childElementCount) return;
+  var inp;
+  try { inp = readEUSelector(); } catch (_) { inp = {}; }
+  var mult = getCountyInfo(document.getElementById('t0-county') && document.getElementById('t0-county').value || '').mult || 1;
+  var anyVisible = false, ticked = 0;
+  body.querySelectorAll('.eux-g').forEach(function(g) {
+    var key = g.dataset.mkey;
+    var ui = EU_EXCL_UI[key] || [];
+    var uiIds = Array.isArray(ui) ? ui : ui.ids;
+    var uiNot = Array.isArray(ui) ? [] : (ui.not || []);
+    var ckd = function(id) { var c = document.getElementById(id); return c && c.checked; };
+    var on = uiIds.some(ckd) && !uiNot.some(ckd);
+    var rowsOn = 0;
+    (EU_EXCL[key] || []).forEach(function(e) {
+      var row = g.querySelector('[data-exrow="' + e.id + '"]');
+      if (!row) return;
+      var rowOn = on && (!e.when || !!e.when(inp));
+      row.style.display = rowOn ? 'flex' : 'none';
+      if (!rowOn) return;
+      rowsOn++;
+      var q = document.getElementById('euxq-' + e.id);
+      if (q) {
+        var def = String(Math.max(1, Math.round(e.qty(inp))));
+        if (q.value === '' || q.value === q.dataset.autoValue) { q.value = def; q.dataset.autoValue = def; }
+      }
+      var rate = euExclRate(e, mult);
+      var priceEl = row.querySelector('[data-exprice]');
+      if (priceEl) priceEl.textContent = e.unit === 'item' ? '≈ €' + rate.toLocaleString('en-IE') : '€' + rate.toLocaleString('en-IE') + '/' + e.unit;
+      var c = document.getElementById('eux-' + e.id);
+      if (c && c.checked) ticked++;
+    });
+    g.style.display = rowsOn ? '' : 'none';
+    if (rowsOn) anyVisible = true;
+  });
+  var empty = document.getElementById('eu-excl-empty');
+  if (empty) empty.style.display = anyVisible ? 'none' : '';
+  var count = document.getElementById('eu-excl-count');
+  if (count) count.textContent = ticked ? '· ' + ticked + ' ticked into the plan' : '';
+}
+
+// Any change in the selector or geometry re-syncs the tab (visibility, defaults, prices)
+document.addEventListener('change', function(ev) {
+  var id = ev.target && ev.target.id || '';
+  if (/^(eu-|fc-|t0-|t1-|t4-|t5-)/.test(id) && id.indexOf('eu-excl') !== 0) euSyncExclTab();
+});
+euBuildExclTab();
+
 // Mark ws-* fields as user-edited when typed so geometry auto-fill won't overwrite them.
 // isTrusted guard: only real user keystrokes (isTrusted=true) set the flag; synthetic events
 // dispatched by restoreSnapshot() have isTrusted=false and must not lock auto-fill fields.
@@ -13195,6 +13548,9 @@ function readEUSelector() {
     airtight_service_void: cb('eu-airtight-service-void'),
     includeBER:        cb('eu-anc-ber'),
     includeSkip:       cb('eu-anc-skip'),
+    // Not Included tab — ticked variations move into their measure's priced section
+    exclTicked: (function(){ var o = {}; document.querySelectorAll('#eu-excl-body input[data-exid]').forEach(function(c){ if (c.checked) o[c.dataset.exid] = true; }); return o; })(),
+    exclQty:    (function(){ var o = {}; document.querySelectorAll('#eu-excl-body input[data-exqty]').forEach(function(q){ var v = parseFloat(q.value); if (v > 0) o[q.dataset.exqty] = v; }); return o; })(),
     includeMakingGood: false,
     includeAirTest:    cb('eu-anc-airtest'),
     includeStructEng:  cb('eu-anc-struct-eng'),
@@ -14148,6 +14504,7 @@ function _euPricingBasis(s, inp) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     pb.push('Array: '+(inp.gshp_type==='vertical'?'Vertical boreholes':'Horizontal slinky'));
     if (inp.gshp_type==='horizontal' && inp.gshp_area) pb.push('Trench: '+inp.gshp_area+'m');
+    pb.push('Emitters: existing radiators retained — assumed to work at 45°C flow');
   } else if (t.indexOf('BIOMASS') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     if (inp.biomassStore) pb.push('Storage: '+euLabel(inp.biomassStore, 'biomassStore'));
@@ -14242,9 +14599,12 @@ function _euPricingBasis(s, inp) {
     pb.push('SEAI registered assessor required');
     pb.push('Certificate required before grant payment');
   }
-  // What the baseline deliberately leaves out. Named in the scope so no one can read the
-  // figure as covering it; the guide prices live in the appendix, and the contractor's own
-  // prices go on the schedule's Variations table.
+  // What the survey ticked INTO the baseline, and what it deliberately leaves out. Both
+  // named in the scope; guide prices for the excluded items live in the appendix, and the
+  // contractor's own prices go on the schedule's Variations table.
+  var _vAdd = (s.items || []).filter(function(i){ return /Not Included checklist/.test(i.note || ''); });
+  if (_vAdd.length)
+    pb.push('Added after survey: ' + _vAdd.map(function(i){ return (i.description || '').replace(/ — surveyed as needed$/, ''); }).join(' · '));
   if (s.exclusions && s.exclusions.length)
     pb.push('Not included: ' + s.exclusions.map(function(e){ return e.item; }).join(' · ') + ' — variation guide prices in appendix');
   return pb.filter(Boolean);
