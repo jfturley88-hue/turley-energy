@@ -2916,9 +2916,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                     <div class="ws-sub-field">
                       <label>Thickness</label>
                       <select id="ref-eu-ewi-thickness">
-                        <option value="100">100mm</option>
+                        <option value="100" selected>100mm</option>
                         <option value="120">120mm</option>
-                        <option value="150" selected>150mm</option>
+                        <option value="150">150mm</option>
                         <option value="200">200mm</option>
                       </select>
                     </div>
@@ -4234,9 +4234,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                     <div class="ws-sub-field">
                       <label>Thickness</label>
                       <select id="eu-ewi-thickness">
-                        <option value="100">100mm</option>
+                        <option value="100" selected>100mm</option>
                         <option value="120">120mm</option>
-                        <option value="150" selected>150mm</option>
+                        <option value="150">150mm</option>
                         <option value="200">200mm</option>
                       </select>
                     </div>
@@ -8098,6 +8098,14 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   // Source: compositedoor.ie, expertwindows.ie, buildersdublin.ie 2025.
   var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
   var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
+
+  // Variation guide price for an item deliberately OUTSIDE the baseline scope: materials +
+  // county-adjusted labour, loaded the same way as the plan (O&P 12% + contingency 10%,
+  // VAT 13.5%). Printed in the appendix so the homeowner can judge what a contractor's
+  // variation should roughly cost — the plan itself never carries these figures.
+  function exGuide(mat, hours, trade) { return Math.round((mat + lM(hours, trade)) * 1.22 * 1.135); }
+  // Habitable rooms, for per-vent guide quantities — falls back to a floor-area estimate
+  var habRooms = inputs.totalRooms || Math.max(4, Math.round(fa / 18));
   var _EU_PV=250,_EU_TRICKLE=28;
   var WINDOW_DISPOSE_RATE = 45;
   var DOOR_DISPOSE_RATE   = 80;
@@ -8153,7 +8161,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     if (inputs.cavity_makegood) {
       cavItems.push(mkItem('2.2', 'Making good — reveals & cold bridges', 'm²', cavArea * 0.12, 22, lM(0.8, L.craft), 'Returns & reveals only'));
     }
-    sections.push({ id: String(sid++), title: 'WALL INSULATION — CAVITY FILL', part: 'A', items: cavItems });
+    sections.push({ id: String(sid++), title: 'WALL INSULATION — CAVITY FILL', part: 'A', items: cavItems,
+      exclusions: [
+        { item: 'Room ventilation', detail: 'Wall vents to habitable rooms brought up to current ventilation standards once the cavity is filled — per vent', unit: 'nr', qty: habRooms, rate: exGuide(30, 1, L.craft) },
+      ]
+    });
   }
 
   if (has('wall_ewi')) {
@@ -8175,7 +8187,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var grossElev = Math.round((inputs.ewi_area || netWallArea) + winA + (doors * 1.89) + peakArea);
     var ewiIns    = inputs.ewi_insulation || 'eps';
     var ewiRnd    = inputs.ewi_render     || 'silicone';
-    var ewiThk    = inputs.ewi_thickness  || '150';
+    var ewiThk    = inputs.ewi_thickness  || '100';
     var ewiArea   = grossElev;
     var ewiBase   = WALL_BUNDLE_RATES.ewi_insulation_base[ewiIns]   || WALL_BUNDLE_RATES.ewi_insulation_base['eps'];
     var ewiRndAdd = WALL_BUNDLE_RATES.ewi_render_addon[ewiRnd]       || WALL_BUNDLE_RATES.ewi_render_addon['silicone'];
@@ -8192,11 +8204,18 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       (inputs.ewi_makegood ? ', making good' : '') + ')' +
       (ewiPeaks > 0 ? ' [incl. ' + ewiPeaks + ' gable peak' + (ewiPeaks > 1 ? 's' : '') + ']' : '');
     var fasciaLen = Math.round(4 * Math.sqrt(gfa) * 1.1);
+    // Baseline = the wall itself: scaffold, insulation, render. Fascia & soffit, wall vents
+    // and ESB sleeving are only needed on some houses, so they are excluded from the price
+    // and carried as variations with guide costs — pricing them everywhere pads every budget.
     sections.push({ id: String(sid++), title: 'EXTERNAL WALL INSULATION (EWI)', part: 'A',
       items: [
         mkItem('EWI.SCAF', 'Scaffolding — external elevations (erect, 2–3 wk hire, dismantle)', 'm²', grossElev, 10, lM(0.1, L.craft), 'Gross elevation area incl. openings & peaks — scaffold contractor'),
         mkItem('EWI.1', ewiDesc, 'm²', ewiArea, ewiMatR, lM(ewiLabR / 22, L.craft), 'Gross elevation: net wall + openings + gable peaks'),
-        mkItem('EWI.F', 'Fascia & soffit replacement — UPVC (supply, fix, ventilation strip)', 'm', fasciaLen, _EU_FASCIA, lM(0.35, L.craft), 'Mandatory with EWI — eave perimeter estimated from ground floor area'),
+      ],
+      exclusions: [
+        { item: 'Fascia & soffit over the thickened wall', detail: 'Eaves extended over the new insulation — uPVC fascia, vented soffit, gutters refixed', unit: 'm', qty: fasciaLen, rate: exGuide(_EU_FASCIA, 0.35, L.craft) },
+        { item: 'Wall ventilation', detail: 'Extend or re-form wall vents through the new insulation — per vent', unit: 'nr', qty: habRooms, rate: exGuide(30, 1, L.craft) },
+        { item: 'ESB service sleeving', detail: 'Sleeve and protect the ESB service cable and meter box surround at the thickened wall', unit: 'item', qty: 1, rate: exGuide(120, 4, L.craft) },
       ]
     });
   }
@@ -8229,11 +8248,23 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var rcItems = [ mkItem('RI-C.1', rcDesc, 'm²', rcArea, rcR.mat, lM(rcR.lab / 22, L.craft),
       'Bundled installation by approved insulation contractor') ];
     if (inputs.roof_ceiling_makegood) {
-      rcItems.push(mkItem('RI-C.2', 'Making good — attic hatch surround, eaves ventilation trays & localised reinstatement',
+      rcItems.push(mkItem('RI-C.2', 'Making good — attic hatch surround & localised reinstatement',
         'm²', Math.max(1, Math.round(rcArea * 0.15)), MAKE_GOOD_ROOF_RATE, lM(0.25, L.craft),
         'Localised — 15% of ceiling area; an attic top-up disturbs the hatch and eaves, not the ceilings'));
     }
-    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A', items: rcItems });
+    // The top-up buries the tank, the pipes and the storage the family already uses, so
+    // protecting all three is part of the measure — not a variation a contractor adds later.
+    var rcWalk = Math.max(3, Math.round(Math.sqrt(rcArea) * 0.6));
+    rcItems.push(mkItem('RI-C.3', 'Insulating jacket to cold water storage tank & lid', 'nr', 1, 55, lM(1, L.craft), 'Tank sits above the new insulation and must be protected from frost'));
+    rcItems.push(mkItem('RI-C.4', 'Insulation to attic pipework — foam lagging', 'm', Math.max(8, Math.round(Math.sqrt(rcArea) * 1.5)), 4.5, lM(0.25, L.craft), 'All accessible CW & HW runs above the new insulation'));
+    rcItems.push(mkItem('RI-C.5', 'Raised access walkway — hatch to tank (loft legs & boards)', 'm', rcWalk, 18, lM(0.5, L.craft), 'Access across the attic without compressing the new insulation'));
+    rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 10m² over loft legs', 'm²', 10, 22, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
+    sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A', items: rcItems,
+      exclusions: [
+        { item: 'Attic ventilation', detail: 'Eaves vent trays or soffit/tile vents to keep the attic cross-ventilated over the deeper insulation', unit: 'item', qty: 1, rate: exGuide(110, 4, L.craft) },
+        { item: 'Draught stripping', detail: 'Compression seal & insulated lid to the attic hatch — whole-house draught-proofing is its own measure', unit: 'nr', qty: 1, rate: exGuide(55, 1.5, L.craft) },
+      ]
+    });
   }
 
   if (has('roof_rafter')) {
@@ -8493,7 +8524,13 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       mkItem('7.4','Smart thermostat & controls','nr',1,280,lM(2,L.electrician),'Programmable smart control'),
     ];
 
-    sections.push({id:String(sid++),title:heating==='ASHP'?'HEATING SYSTEM — AIR-TO-WATER HEAT PUMP':'HEATING SYSTEM — CONDENSING BOILER',part:'B',vatRate:heating==='ASHP'?0.09:0.135,items:heating==='ASHP'?ashpItems:boilerItems});
+    sections.push({id:String(sid++),title:heating==='ASHP'?'HEATING SYSTEM — AIR-TO-WATER HEAT PUMP':'HEATING SYSTEM — CONDENSING BOILER',part:'B',vatRate:heating==='ASHP'?0.09:0.135,items:heating==='ASHP'?ashpItems:boilerItems,
+      // Emitters are deliberately not assessed when radiators are retained: they are the
+      // contractor's to survey, and the guide price tells the homeowner what a fair
+      // per-radiator variation looks like.
+      exclusions: (heating==='ASHP' && emitter==='keep-rads') ? [
+        { item: 'Emitter (radiator) upgrades', detail: 'Existing radiators retained and assumed to work at 45°C flow — contractor to survey; guide price per radiator replaced, supplied & fitted', unit: 'nr', qty: radsNr, rate: exGuide(260, 3.5, L.plumber) },
+      ] : []});
   }
   if (has('gshp')) {
     var gshpType  = inputs.gshp_type || 'horizontal';
@@ -8650,12 +8687,17 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const ventTitle = vent === 'MVHR' ? 'MECHANICAL VENTILATION WITH HEAT RECOVERY (MVHR)'
                     : vent === 'DMEV' ? 'DECENTRALISED MECHANICAL EXTRACT VENTILATION (DMEV)'
                     :                   'MECHANICAL EXTRACT VENTILATION (MEV)';
-    sections.push({id:String(sid++),title:ventTitle,part:'B',items:vent==='MVHR'?[
+    // The ventilation measure carries its own post-works air-tightness test — unless the
+    // Airtightness measure or the standalone Air Pressure Test section (auto-included with
+    // MVHR) already prices one; only ever one test in the plan.
+    const ventAT = (has('airtightness') || inputs.includeAirTest) ? [] :
+      [mkItem('8.AT','Air-tightness test (blower door) — post-works verification','nr',1,0,480,'NSAI / ATTMA certified tester — included with the ventilation measure')];
+    sections.push({id:String(sid++),title:ventTitle,part:'B',items:(vent==='MVHR'?[
       mkItem('8.1','MVHR unit — whole house (' + unitLabel + ')','nr',1,mvhrMat,lM(16,L.craft),unitLabel + ' — sized to ' + fa + 'm² floor area — airtightness n50 ≤3 ACH required for effective MVHR performance'),
       mkItem('8.2',ductLabel + ' — supply & extract runs','m',Math.round(fa*0.4),17,lM(0.9,L.craft),'Sealed, insulated runs — all habitable rooms'),
       mkItem('8.3','Supply & extract terminals (valves/grilles)','nr',totalRooms*2,55,lM(1,L.craft),'One supply + one extract per habitable room'),
       mkItem('8.4','Commissioning & air balancing certificate','nr',1,0,lM(6,L.craft),'CIBSE commissioning flow rates — MVHR certification'),
-    ]:vent==='DMEV'?dmevItems:mevItems});
+    ]:vent==='DMEV'?dmevItems:mevItems).concat(ventAT)});
   }
 
   if (has('ufh')) {
@@ -12234,7 +12276,7 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
       ventilation:  inputs.eu_mvhr ? 'MVHR' : inputs.eu_mev ? 'MEV' : 'none',
       pvArea:       inputs.eu_pv ? (inputs.eu_pv_area || 12) : 0,
       battery:      inputs.eu_battery || 'no',
-      ewiThickness: inputs.eu_ewi_thickness || '150',
+      ewiThickness: inputs.eu_ewi_thickness || '100',
       ewiRender:    inputs.eu_ewi_render || 'silicone',
       emitterType:  inputs.eu_emitter || 'keep-rads',
       floor_system: document.getElementById('ref-eu-floor-system')?.value || 'solid-overlay',
@@ -12864,7 +12906,7 @@ function readRefurbSelector(prefix) {
     eu_cavity:             document.getElementById('ref-eu-cavity')?.checked || false,
     eu_cavity_type:   document.getElementById('ref-eu-cavity-type')?.value || 'eps-bead',
     eu_ewi:           document.getElementById('ref-eu-ewi')?.checked || false,
-    eu_ewi_thickness: document.getElementById('ref-eu-ewi-thickness')?.value || '150',
+    eu_ewi_thickness: document.getElementById('ref-eu-ewi-thickness')?.value || '100',
     eu_ewi_render:    document.getElementById('ref-eu-ewi-render')?.value || 'silicone',
     eu_iwi:           document.getElementById('ref-eu-iwi')?.checked || false,
     eu_floor_slab:    (document.getElementById('ref-eu-floor')?.checked && (document.getElementById('ref-eu-floor-system')?.value || '').startsWith('solid')) || false,
@@ -13178,7 +13220,7 @@ function readEUSelector() {
     cavity_area:          nv('eu-cavity-area') || netWallArea,
     cavity_makegood:      cb('eu-cavity-makegood'),
     ewi_insulation:       sv('eu-ewi-insulation') || 'eps',
-    ewi_thickness:        sv('eu-ewi-thickness') || '150',
+    ewi_thickness:        sv('eu-ewi-thickness') || '100',
     ewi_render:           sv('eu-ewi-render') || 'silicone',
     ewi_area:             nv('eu-ewi-area') || netWallArea,
     ewi_peaks:            nv('eu-ewi-peaks') || 0,
@@ -13188,7 +13230,7 @@ function readEUSelector() {
     iwi_makegood:         cb('eu-iwi-makegood'),
     // Legacy aliases (kept for buildBOQRefurbSelector compatibility)
     cavityType:           sv('eu-cavity-type') || 'eps-bead',
-    ewiThickness:         sv('eu-ewi-thickness') || '150',
+    ewiThickness:         sv('eu-ewi-thickness') || '100',
     ewiRender:            sv('eu-ewi-render') || 'silicone',
     roof_ceiling:         cb('eu-roof-ceiling'),
     roof_ceiling_type:    sv('eu-roof-ceiling-type') || 'mw-300',
@@ -14002,13 +14044,11 @@ function _euPricingBasis(s, inp) {
     // counted twice. State the assumption where both the homeowner and the contractor can
     // check it against the survey.
     if (ewiPk > 0) pb.push('Gable peaks measured ceiling level to apex — confirm the surveyed wall area stops at ceiling level');
-    pb.push('Insulation: '+euLabel(inp.ewi_insulation||'eps', 'ewi_insulation')+' '+(inp.ewi_thickness||'150')+'mm');
+    pb.push('Insulation: '+euLabel(inp.ewi_insulation||'eps', 'ewi_insulation')+' '+(inp.ewi_thickness||'100')+'mm');
     pb.push('Render: '+euLabel(inp.ewi_render||'silicone', 'ewi_render'));
     // Sills, copings and flashings are priced in the making-good row, not in this rate —
     // say where, so a contractor pricing the blank schedule does not allow for it twice.
     if (inp.ewi_makegood) pb.push('Making good: sills, copings & flashings — priced under Making Good');
-    var fasciaq = firstItemQty('fascia');
-    if (fasciaq) pb.push('Fascia & soffit: '+fasciaq+'m — eaves extended over the thickened wall');
     var sq = firstItemQty('scaffolding'); if (sq) pb.push('Scaffold: '+sq+'m² gross elevation');
   } else if (t.indexOf('INTERNAL WALL') >= 0 || t.indexOf('IWI') >= 0) {
     var iq = firstItemQty('pir insulated board'); if (iq) pb.push('Wall area: '+iq+'m²');
@@ -14060,6 +14100,10 @@ function _euPricingBasis(s, inp) {
     }
     pb.push('Type: '+euLabel(inp.doors_type||'composite', 'doors_type'));
     if (inp.doors_dispose) pb.push('Disposal: included');
+  } else if (t.indexOf('AIR PRESSURE TEST') >= 0) {
+    // Not the membrane measure — this section is the test itself plus a sealing allowance
+    pb.push('Blower-door test: 1 nr — n50 result issued as certificate');
+    pb.push('Remedial airtightness works: allowance included');
   } else if (t.indexOf('AIRTIGHTNESS') >= 0) {
     var aq = firstItemQty('membrane'); if (aq) pb.push('Ceiling area: '+aq+'m²');
     if (inp.airtight_membrane) pb.push('Membrane: '+euLabel(inp.airtight_membrane, 'airtight_membrane'));
@@ -14083,12 +14127,7 @@ function _euPricingBasis(s, inp) {
         ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' (IS EN 12831)' : '')
         : 'area-banded — add the provisional BER HLI'));
     }
-    pb.push('Emitters: '+euLabel(_em, 'emitterType'));
-    // Emitters are deliberately not assessed. Existing radiators are assumed to work at
-    // 45°C flow; if they do not, that is the contractor's to price rather than a silent
-    // hole in the budget.
-    if (_em === 'keep-rads')
-      pb.push('Emitter upgrade: excluded — existing radiators retained and assumed to work at 45°C flow. Contractor to price any radiator changes under Variation Notes');
+    pb.push('Emitters: '+euLabel(_em, 'emitterType') + (_em === 'keep-rads' ? ' — assumed to work at 45°C flow' : ''));
     // The cylinder, the controls and the pipework are inside this price. Say so, or the
     // homeowner reads a bare heat-pump figure and a contractor prices a different job.
     var cyl = items.find(function(i){return (i.description||'').toLowerCase().indexOf('cylinder')>=0;});
@@ -14124,14 +14163,23 @@ function _euPricingBasis(s, inp) {
     pb.push('System: MVHR (whole-house heat recovery)');
     if (inp.mvhr_unit) pb.push('Unit tier: '+euLabel(inp.mvhr_unit, 'mvhr_unit'));
     pb.push('Rooms: '+((inp.roomsDown||4)+(inp.roomsUp||4))+' ('+((inp.roomsDown||4)+(inp.roomsUp||4))*2+' terminals)');
+    pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
+      ? 'Air-tightness test: included'
+      : 'Air-tightness test: priced under ' + (inp.includeAirTest ? 'Air Pressure Test' : 'Airtightness'));
   } else if (t.indexOf('DMEV') >= 0) {
     pb.push('System: DMEV (decentralised extract)');
     pb.push('Wet rooms: '+((inp.bathrooms||1)+(inp.ensuites||0)+(inp.wc||0))+' + kitchen');
+    pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
+      ? 'Air-tightness test: included'
+      : 'Air-tightness test: priced under ' + (inp.includeAirTest ? 'Air Pressure Test' : 'Airtightness'));
   } else if (t.indexOf('MECHANICAL EXTRACT') >= 0 || t.indexOf('MEV') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     pb.push('System: MEV (centralised whole-house extract)');
     pb.push('Extract terminals: '+Math.max(3,(inp.bathrooms||1)+(inp.ensuites||0)+1)+' nr');
     if (inp.mev_trickle) pb.push('Trickle vents: '+(inp.windowCount||Math.round((inp.floorArea||100)*0.15/1.5))+' nr');
+    pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
+      ? 'Air-tightness test: included'
+      : 'Air-tightness test: priced under ' + (inp.includeAirTest ? 'Air Pressure Test' : 'Airtightness'));
   } else if (t.indexOf('SOLAR PV') >= 0 || t.indexOf('RENEWABLES') >= 0) {
     var pva = inp.pvArea||0; if (pva) pb.push('PV area: '+pva+'m²');
     var pvp = Math.max(1,Math.floor(pva/1.7)); pb.push('Panels: ~'+pvp+' nr (400Wp)');
@@ -14194,6 +14242,11 @@ function _euPricingBasis(s, inp) {
     pb.push('SEAI registered assessor required');
     pb.push('Certificate required before grant payment');
   }
+  // What the baseline deliberately leaves out. Named in the scope so no one can read the
+  // figure as covering it; the guide prices live in the appendix, and the contractor's own
+  // prices go on the schedule's Variations table.
+  if (s.exclusions && s.exclusions.length)
+    pb.push('Not included: ' + s.exclusions.map(function(e){ return e.item; }).join(' · ') + ' — variation guide prices in appendix');
   return pb.filter(Boolean);
 }
 
@@ -18096,11 +18149,42 @@ function exportEUPDF(mode) {
           '<th style="padding:3px 5px;text-align:right;font-size:6.5pt;border:1px solid #E2E8F0;color:#64748B;">Base total</th>' +
         '</tr></thead><tbody>'+rows+'</tbody></table>';
     }).join('');
+    // Not included — variation guide prices. The baseline prices each measure itself;
+    // the items below are deliberately outside it, and the guide price is what a fair
+    // contractor variation should roughly cost, so the homeowner can judge one on sight.
+    var exRows = '';
+    sections.forEach(function(s) {
+      (s.exclusions || []).forEach(function(e) {
+        var guide = (e.qty || 1) > 1
+          ? fmt(e.rate) + ' per ' + e.unit + ' &nbsp;·&nbsp; assessor estimate ' + e.qty + ' ' + e.unit + ' &asymp; ' + fmt(e.rate * e.qty)
+          : '&asymp; ' + fmt(Math.round(e.rate * (e.qty || 1)));
+        exRows += '<tr style="border-bottom:1px solid #EEF2F7;page-break-inside:avoid;">' +
+          '<td style="padding:4px 6px;font-size:7.5pt;font-weight:700;color:#1E293B;border:1px solid #E2E8F0;vertical-align:top;">' + s.title + '</td>' +
+          '<td style="padding:4px 6px;font-size:7.5pt;color:#334155;border:1px solid #E2E8F0;vertical-align:top;"><strong>' + e.item + '</strong> — ' + e.detail + '</td>' +
+          '<td style="padding:4px 6px;font-size:7.5pt;text-align:right;border:1px solid #E2E8F0;vertical-align:top;">' + guide + '</td>' +
+        '</tr>';
+      });
+    });
+    var exclusionsHTML = !exRows ? '' :
+      '<h3 style="font-size:10pt;color:#1E293B;margin:14px 0 6px;">Not Included — Variation Guide Prices</h3>' +
+      '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">The baseline above prices each measure itself. The items below are deliberately outside it — ' +
+        'they are only needed on some houses, and pricing them into every plan would pad every budget. If your contractor finds one is needed, ' +
+        'this is roughly what it should cost. Agree the figure before work starts and record it under <strong>Variation Notes</strong> — ' +
+        'a variation adjusts the budget, it never silently replaces it. Guide prices include VAT at 13.5%.</p>' +
+      '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;margin-bottom:10px;table-layout:fixed;">' +
+        '<colgroup><col style="width:24%"/><col style="width:48%"/><col style="width:28%"/></colgroup>' +
+        '<thead><tr style="background:#F1F5F9;">' +
+          '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Measure</th>' +
+          '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Not included in the baseline</th>' +
+          '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Guide price (incl. VAT)</th>' +
+        '</tr></thead><tbody>' + exRows + '</tbody></table>';
+
     var appendixHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
       '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:8px;">Appendix — Itemised Measurements &amp; Rates</h2>' +
       '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
         labMultNote + ' Contractor\'s O&amp;P (12%), contingency (10%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
       appxSections +
+      exclusionsHTML +
       // The cost-per-m2 check belongs here rather than on the homeowner's plan page: it is a
       // quantity surveyor's sanity test, and this is the technical half of the document.
       (planPerM2Note(_T)
@@ -18325,6 +18409,52 @@ function exportContractorSchedule() {
       '</div>' +
     '</div>';
 
+  // Variations — the items each measure deliberately leaves out, listed so the contractor
+  // prices them HERE when the survey shows they are needed, instead of folding them
+  // unpriced into the baseline figure. Same three-part shape: item, what it covers, price.
+  var vRows = '';
+  sections.forEach(function(s) {
+    (s.exclusions || []).forEach(function(e) {
+      vRows +=
+        '<tr style="page-break-inside:avoid;">' +
+          '<td style="padding:6px 6px;font-size:8.5pt;font-weight:700;color:#1E293B;vertical-align:top;border:'+B+';">' + e.item +
+            '<div style="font-size:7pt;font-weight:400;color:#94a3b8;margin-top:1px;">' + s.title + '</div></td>' +
+          '<td style="padding:6px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';line-height:1.5;">' + e.detail +
+            ((e.qty || 1) > 1 ? ' &nbsp;·&nbsp; assessor estimate: ' + e.qty + ' ' + e.unit : '') + '</td>' +
+          '<td style="padding:6px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
+            '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&euro;</div>' +
+          '</td>' +
+        '</tr>';
+    });
+  });
+  // Two open rows for anything the contractor's own survey turns up
+  for (var _v = 0; _v < 2; _v++) {
+    vRows +=
+      '<tr style="page-break-inside:avoid;">' +
+        '<td style="padding:6px 6px;vertical-align:top;border:'+B+';"><div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&nbsp;</div></td>' +
+        '<td style="padding:6px 6px;vertical-align:top;border:'+B+';"><div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&nbsp;</div></td>' +
+        '<td style="padding:6px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
+          '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&euro;</div>' +
+        '</td>' +
+      '</tr>';
+  }
+  var variationsHTML =
+    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:6mm;page-break-inside:avoid;">' +
+      '<colgroup><col style="width:26%"/><col style="width:48%"/><col style="width:26%"/></colgroup>' +
+      '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+        '<th colspan="3" style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #CBD5E1;">VARIATIONS — outside the baseline scope</th>' +
+      '</tr><tr style="background:#F1F5F9;color:#1E293B;">' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation item</th>' +
+        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">What it covers</th>' +
+        '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
+      '</tr>' +
+      '<tr><td colspan="3" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
+        'These items are deliberately not in the baseline figures above. Price one only where your survey shows it is needed. ' +
+        'Agreed variations are recorded on the Cost Plan against the fixed budget — they adjust it, they never replace it.' +
+      '</td></tr></thead>' +
+      '<tbody>'+vRows+'</tbody>' +
+    '</table>';
+
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
@@ -18341,6 +18471,7 @@ function exportContractorSchedule() {
       '</td></tr></thead>' +
       '<tbody>'+rows+'</tbody>' +
     '</table>' +
+    variationsHTML +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
       ' · Scope prepared independently of any contractor.' +
@@ -22601,7 +22732,7 @@ function _ufType(t) {
                 </tbody>
               </table>
               <div style="font-size:10px;color:#64748b;margin-top:5px;line-height:1.45;">Cavity: SEAI 2025 (47k upgrades), saveonheat.ie 2026<br>EWI: SEAI 2025 median, trade quotes, osber.ie<br>IWI: trade installer quotes 2025<br><span style="color:#f59e0b;">&#9888; Walltite: LOW CONFIDENCE (limited published contractor rates)</span></div>
-              <div style="font-size:10px;font-weight:600;color:#E8A020;margin:8px 0 5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">EWI Mandatory — Fascia &amp; Soffit (&#8364;/m linear)</div>
+              <div style="font-size:10px;font-weight:600;color:#E8A020;margin:8px 0 5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">EWI Variation Guide — Fascia &amp; Soffit (&#8364;/m linear — excluded from the baseline, feeds the appendix guide price)</div>
               <table class="mdb-tbl" style="margin-bottom:4px;">
                 <thead><tr><th>Item</th><th style="width:85px;">Rate</th></tr></thead>
                 <tbody>
