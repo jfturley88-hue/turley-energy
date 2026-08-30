@@ -8134,7 +8134,12 @@ function euExclQty(e, inp) {
   if (q > 0) return Math.round(q);
   return Math.max(1, Math.round(e.qty(inp || {})));
 }
-function euExclMat(e) { return typeof e.mat === 'function' ? e.mat() : e.mat; }
+function euExclMat(e) {
+  if (typeof e.mat === 'function') return e.mat();
+  // Rate Settings → EU Rates → Variations: key x_<id> in the same eu_ov store
+  try { var ov = JSON.parse(localStorage.getItem('eu_ov') || '{}'); var v = parseFloat(ov['x_' + e.id]); if (!isNaN(v) && v >= 0) return v; } catch(_){}
+  return e.mat;
+}
 function euExclRate(e, mult) {
   return Math.round((euExclMat(e) + Math.round(e.hrs * (TRADE_RATES[e.trade] || 45) * (mult || 1))) * 1.22 * 1.135);
 }
@@ -8292,6 +8297,8 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   // Source: compositedoor.ie, expertwindows.ie, buildersdublin.ie 2025.
   var DOOR_RATES = { 'composite': 2800, 'hardwood': 4300, 'aluminium': 4800, 'upvc': 1200, 'sliding-patio': 2400 };
   var _EU_ASHP=[4000,5200,6700,8500],_EU_MVHR=[2000,2750,4000],_EU_MEV=[580,8.5,55],_EU_DMEV=[120,38,45],_EU_BAT=[2300,4500,7000,9000],_EU_FASCIA=38;
+  // Attic bundle ancillaries — the standard items the top-up buries (Rate Settings → EU Rates)
+  var _EU_ATTIC_ANC={tank:55,pipe:4.5,walk:18,store:22};
 
   // Split a measure's catalogue between the two sides of the plan: entries ticked on the
   // Not Included tab become priced items INSIDE the measure's section (inheriting its VAT
@@ -8353,6 +8360,8 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     _EU_MEV[0]=r('mev_unit',580,'vent');_EU_MEV[1]=r('mev_duct',8.5,'vent');_EU_MEV[2]=r('mev_term',55,'vent');
     _EU_DMEV[0]=r('dmev_fan',120,'vent');_EU_DMEV[1]=r('dmev_drill',38,'vent');_EU_DMEV[2]=r('dmev_spur',45,'vent');
     _EU_TRICKLE=r('mev_trickle',28,'vent');
+    _EU_ATTIC_ANC.tank=r('attic_tank',55,'roof');_EU_ATTIC_ANC.pipe=r('attic_pipe',4.5,'roof');
+    _EU_ATTIC_ANC.walk=r('attic_walk',18,'roof');_EU_ATTIC_ANC.store=r('attic_store',22,'roof');
     _EU_PV=r('pv',250,'solar');
     _EU_BAT[0]=r('bat_s',2300,'solar');_EU_BAT[1]=r('bat_m',4500,'solar');_EU_BAT[2]=r('bat_l',7000,'solar');_EU_BAT[3]=r('bat_xl',9000,'solar');
   })();
@@ -8462,10 +8471,10 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     // The top-up buries the tank, the pipes and the storage the family already uses, so
     // protecting all three is part of the measure — not a variation a contractor adds later.
     var rcWalk = Math.max(3, Math.round(Math.sqrt(rcArea) * 0.6));
-    rcItems.push(mkItem('RI-C.3', 'Insulating jacket to cold water storage tank & lid', 'nr', 1, 55, lM(1, L.craft), 'Tank sits above the new insulation and must be protected from frost'));
-    rcItems.push(mkItem('RI-C.4', 'Insulation to attic pipework — foam lagging', 'm', Math.max(8, Math.round(Math.sqrt(rcArea) * 1.5)), 4.5, lM(0.25, L.craft), 'All accessible CW & HW runs above the new insulation'));
-    rcItems.push(mkItem('RI-C.5', 'Raised access walkway — hatch to tank (loft legs & boards)', 'm', rcWalk, 18, lM(0.5, L.craft), 'Access across the attic without compressing the new insulation'));
-    rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 10m² over loft legs', 'm²', 10, 22, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
+    rcItems.push(mkItem('RI-C.3', 'Insulating jacket to cold water storage tank & lid', 'nr', 1, _EU_ATTIC_ANC.tank, lM(1, L.craft), 'Tank sits above the new insulation and must be protected from frost'));
+    rcItems.push(mkItem('RI-C.4', 'Insulation to attic pipework — foam lagging', 'm', Math.max(8, Math.round(Math.sqrt(rcArea) * 1.5)), _EU_ATTIC_ANC.pipe, lM(0.25, L.craft), 'All accessible CW & HW runs above the new insulation'));
+    rcItems.push(mkItem('RI-C.5', 'Raised access walkway — hatch to tank (loft legs & boards)', 'm', rcWalk, _EU_ATTIC_ANC.walk, lM(0.5, L.craft), 'Access across the attic without compressing the new insulation'));
+    rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 10m² over loft legs', 'm²', 10, _EU_ATTIC_ANC.store, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
     var EXrc = exApply('roof_ceiling', 'RI-C');
     sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A',
       items: rcItems.concat(EXrc.items), exclusions: EXrc.excl });
@@ -23074,7 +23083,7 @@ function _ufType(t) {
                   <tr><td>Cavity &mdash; EPS bead</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-cav_eps" class="mdb-pi" type="number" min="1" step="0.5" value="6" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>Cavity &mdash; Mineral wool</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-cav_mw" class="mdb-pi" type="number" min="1" step="0.5" value="8" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>Cavity &mdash; Walltite PU</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-cav_wt" class="mdb-pi" type="number" min="1" step="0.5" value="20" oninput="euRatesSave()" style="width:62px;"></td></tr>
-                  <tr><td>EWI base &mdash; EPS</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_eps" class="mdb-pi" type="number" min="1" step="0.5" value="38" oninput="euRatesSave()" style="width:62px;"></td></tr>
+                  <tr><td>EWI base &mdash; EPS</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_eps" class="mdb-pi" type="number" min="1" step="0.5" value="30" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>EWI base &mdash; Mineral wool</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_mw" class="mdb-pi" type="number" min="1" step="0.5" value="48" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>EWI base &mdash; Phenolic</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_phen" class="mdb-pi" type="number" min="1" step="0.5" value="58" oninput="euRatesSave()" style="width:62px;"></td></tr>
                   <tr><td>EWI base &mdash; PIR</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_pir" class="mdb-pi" type="number" min="1" step="0.5" value="52" oninput="euRatesSave()" style="width:62px;"></td></tr>
@@ -23099,7 +23108,7 @@ function _ufType(t) {
                   <tr><td>UPVC fascia &amp; soffit (supply, fix, vent strip)</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_fascia" class="mdb-pi" type="number" min="10" step="1" value="38" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
                 </tbody>
               </table>
-              <div style="font-size:10px;color:#64748b;margin-top:3px;">Always included with EWI &mdash; qty estimated from ground floor perimeter</div>
+              <div style="font-size:10px;color:#64748b;margin-top:3px;">Excluded from the baseline &mdash; feeds the guide price in the appendix and the Variations tab; qty estimated from ground-floor perimeter</div>
             </div>
 
             <!-- Heat + Vent -->
@@ -23182,10 +23191,26 @@ function _ufType(t) {
               <div style="font-size:10px;color:#64748b;margin-top:5px;line-height:1.45;">Source: solarinfo.ie, goingsolar.ie 2025<br><span style="color:#f59e0b;">&#9888; Battery &gt; 15kWh: LOW CONFIDENCE &mdash; limited market data</span></div>
             </div>
 
+            <!-- Attic bundle ancillaries -->
+            <div>
+              <div style="font-size:10px;font-weight:600;color:#E8A020;margin-bottom:5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">Attic Bundle &mdash; standard ancillaries (supply only)</div>
+              <table class="mdb-tbl">
+                <thead><tr><th>Item</th><th style="width:85px;">Rate</th></tr></thead>
+                <tbody>
+                  <tr><td>Tank insulating jacket &amp; lid</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-attic_tank" class="mdb-pi" type="number" min="0" step="1" value="55" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/nr</span></td></tr>
+                  <tr><td>Pipework foam lagging</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-attic_pipe" class="mdb-pi" type="number" min="0" step="0.5" value="4.5" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
+                  <tr><td>Access walkway (legs &amp; boards)</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-attic_walk" class="mdb-pi" type="number" min="0" step="1" value="18" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
+                  <tr><td>Raised storage platform</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-attic_store" class="mdb-pi" type="number" min="0" step="1" value="22" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m&#178;</span></td></tr>
+                </tbody>
+              </table>
+              <div style="font-size:10px;color:#64748b;margin-top:5px;">Standard in every attic top-up &mdash; the insulation buries the tank, the pipes and the storage</div>
+            </div>
+
           </div>
         </div>
 
       </div>
+      <div id="eur-vars-section"></div>
       <div style="font-size:10px;color:#64748b;padding:8px 0 4px;line-height:1.6;">All rates: 2026 Irish market mid-range, supply-only. Floor insulation: limited Irish-specific data &mdash; treat as indicative. <strong style="color:#f59e0b;">&#9888; LOW CONFIDENCE</strong> items should be verified with a specialist contractor before use in a formal estimate. Labour calculated from hourly rates in Labour Rates tab &times; county multiplier.</div>
     </div>
 
@@ -23371,7 +23396,7 @@ function toggleMatOverlay() {
 </script>
 <script>
 (function(){
-  var D={cav_eps:6,cav_mw:8,cav_wt:20,ewi_eps:38,ewi_mw:48,ewi_phen:58,ewi_pir:52,
+  var D={cav_eps:6,cav_mw:8,cav_wt:20,ewi_eps:30,ewi_mw:48,ewi_phen:58,ewi_pir:52,
     ewi_rend_sil:18,ewi_rend_acr:14,ewi_rend_min:22,ewi_rend_bsl:48,ewi_rend_stn:62,ewi_fascia:38,
     door_alu:4800,door_upvc:1200,door_patio:2400,
     mev_unit:580,mev_duct:8.5,mev_term:55,mev_trickle:28,
@@ -23379,7 +23404,26 @@ function toggleMatOverlay() {
     ashp_s:4000,ashp_m:5200,ashp_l:6700,ashp_xl:8500,
     mvhr_s:2000,mvhr_m:2750,mvhr_l:4000,
     win_tri:280,win_dbl:175,door_comp:2800,door_hw:4300,
-    pv:165,bat_s:2300,bat_m:4500,bat_l:7000,bat_xl:9000};
+    pv:250,bat_s:2300,bat_m:4500,bat_l:7000,bat_xl:9000};
+  D.attic_tank=55;D.attic_pipe=4.5;D.attic_walk=18;D.attic_store=22;
+  // Variations (Not Included) material rates — one input per catalogue item, saved into the
+  // same eu_ov store as everything else, so save/load/reset need no special handling.
+  (function(){
+    var host=document.getElementById('eur-vars-section');
+    if(!host||typeof EU_EXCL==='undefined')return;
+    var h='<div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:16px 0 8px;">&#128683; Variations &mdash; Not Included guide rates (&#8364; material per unit &middot; labour from Labour Rates tab &middot; loaded like the plan: O&amp;P + contingency + VAT 13.5%)</div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px 18px;">';
+    Object.keys(EU_EXCL).forEach(function(mk){EU_EXCL[mk].forEach(function(e){
+      if(typeof e.mat==='function')return; // fascia is edited via its own EWI input above
+      var k='x_'+e.id;D[k]=e.mat;
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px solid rgba(46,61,82,.5);padding:3px 0;">'+
+        '<span style="font-size:10.5px;color:#c8d0dc;line-height:1.3;">'+e.item+'<span style="color:#64748b;font-size:9.5px;"> &middot; '+((typeof EU_EXCL_LABELS!=='undefined'&&EU_EXCL_LABELS[mk])||mk)+'</span></span>'+
+        '<span style="white-space:nowrap;"><span style="color:#8090A8;margin-right:2px;">&#8364;</span>'+
+        '<input id="eur-'+k+'" class="mdb-pi" type="number" min="0" step="1" value="'+e.mat+'" oninput="euRatesSave()" style="width:64px;">'+
+        '<span style="color:#8090A8;font-size:9px;">/'+e.unit+'</span></span></div>';
+    });});
+    host.innerHTML=h+'</div><div style="font-size:10px;color:#64748b;margin-top:6px;">These feed the guide prices in the Cost Plan appendix and the Not Included tab &mdash; and when an item is ticked into a plan, its priced line uses the same rate.</div>';
+  })();
   var CK=['wall','roof','floor','wind','heat','vent','solar'];
   window.euRatesLoad=function(){
     var ov={},cat={};
