@@ -3858,14 +3858,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
           </div>
 
-          <div class="ws-item" id="ref-eu-fin-reveals-row">
-            <input type="checkbox" id="ref-eu-fin-reveals"/>
-            <label class="ws-item-label" for="ref-eu-fin-reveals">
-              Window reveal liners &amp; internal sills
-              <span class="ws-geo-note">× window count nr</span>
-              <span class="ws-auto-tag">after window replacement</span>
-            </label>
-          </div>
 
           <div class="ws-item" id="ref-eu-fin-skirtings-row">
             <input type="checkbox" id="ref-eu-fin-skirtings"
@@ -5185,14 +5177,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
           </div>
 
-          <div class="ws-item" id="eu-fin-reveals-row">
-            <input type="checkbox" id="eu-fin-reveals"/>
-            <label class="ws-item-label" for="eu-fin-reveals">
-              Window reveal liners &amp; internal sills
-              <span class="ws-geo-note">× window count nr</span>
-              <span class="ws-auto-tag">after window replacement</span>
-            </label>
-          </div>
 
           <div class="ws-item" id="eu-fin-skirtings-row">
             <input type="checkbox" id="eu-fin-skirtings"
@@ -8027,7 +8011,8 @@ var EU_EXCL = {
     _x('floor_rads','Radiator drops & pipework alterations','Extend radiator drops and pipe penetrations through the new floor build-up','nr',function(i){ return Math.max(2, Math.round(_xGFA(i) / 20)); },15,1.2,'plumber'),
   ],
   windows_bundle: [
-    _x('win_boards','Internal window boards','Replace internal boards where the new frames sit differently — per window','nr',_xWIN,45,1,'craft'),
+    _x('win_boards','Internal window boards (sills)','Replace internal boards where the new frames sit differently — per window','nr',_xWIN,55,1,'craft'),
+    _x('win_liners','Window reveal liners','Painted MDF lining to the three sides of each internal reveal — per window','nr',_xWIN,48,0.75,'craft'),
     _x('win_reveals','External reveal repairs','Patch plaster or render to external reveals beyond the sealant line — per window','nr',_xWIN,18,0.9,'craft'),
     _x('win_lintels','Lintel repairs where found','Replace or repair defective lintels discovered on removing the old frames','item',_xONE,180,6,'craft'),
   ],
@@ -9156,12 +9141,6 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
                    : scope === 'full'  ? 'Full 2-coat emulsion repaint — walls & ceilings'
                    :                    'Premium 3-coat finish — walls, ceilings & woodwork';
       finItems.push(mkItem(fid(), 'Redecoration — ' + lbl, 'm²', affArea, matR, lM(labHr, L.craft), 'Decorator at craft rate'));
-    }
-
-    if (inputs.fin_reveals) {
-      const wc2 = inputs.windowCount || winCount || 10;
-      finItems.push(mkItem(fid(), 'Window reveal liners — painted MDF (3-sided) to window reveals', 'nr', wc2, 48, lM(0.75, L.craft), 'Per opening — fix & paint'));
-      finItems.push(mkItem(fid(), 'Internal window boards (sills) — 300mm painted MDF', 'nr', wc2, 55, lM(0.5, L.craft), 'Supply & fix per window'));
     }
 
     if (inputs.fin_skirtings) {
@@ -11736,13 +11715,11 @@ function setItemVisibility(itemContainerId, parentCheckIds) {
 function refreshConditionalItems() {
   setItemVisibility('eu-fin-redecorate-row',  ['eu-iwi', 'eu-ewi']);
   setItemVisibility('eu-fin-floor-row',       ['eu-floor']); // Chunk 7: was eu-floor-slab/susp
-  setItemVisibility('eu-fin-reveals-row',     ['eu-windows']);
   setItemVisibility('eu-fin-skirtings-row',   ['eu-iwi']);
   setItemVisibility('eu-fin-tiling-row',      ['eu-iwi', 'eu-ewi']);
   setItemVisibility('eu-fin-external-row',    ['eu-ewi']);
   setItemVisibility('ref-eu-fin-redecorate-row', ['ref-eu-iwi', 'ref-eu-ewi']);
   setItemVisibility('ref-eu-fin-floor-row',      ['ref-eu-floor-slab', 'ref-eu-floor-susp']);
-  setItemVisibility('ref-eu-fin-reveals-row',    ['ref-eu-windows']);
   setItemVisibility('ref-eu-fin-skirtings-row',  ['ref-eu-iwi']);
   setItemVisibility('ref-eu-fin-tiling-row',     ['ref-eu-iwi', 'ref-eu-ewi']);
   setItemVisibility('ref-eu-fin-external-row',   ['ref-eu-ewi']);
@@ -11771,18 +11748,16 @@ function euAutoFinish() {
 
   const redec    = document.getElementById('eu-fin-redecorate');
   const floor    = document.getElementById('eu-fin-floor');
-  const reveals  = document.getElementById('eu-fin-reveals');
   const external = document.getElementById('eu-fin-external');
   const skirtings = document.getElementById('eu-fin-skirtings');
   if (redec    && (ewi || iwi))               redec.checked    = true;
   if (floor    && (floorSlab || floorSusp))   floor.checked    = true;
-  if (reveals  && windows)                    reveals.checked  = true;
   if (external && ewi)                        external.checked = true;
   if (skirtings && iwi)                       skirtings.checked = true;
 
   // Open the Finish Spec group if any item was auto-ticked
-  if ((ewi || iwi || floorSlab || floorSusp || windows) &&
-      (redec?.checked || floor?.checked || reveals?.checked)) {
+  if ((ewi || iwi || floorSlab || floorSusp) &&
+      (redec?.checked || floor?.checked)) {
     document.querySelectorAll('#eu-works-panel .ws-group-toggle').forEach(function(btn) {
       if (btn.textContent.includes('Finish Specification')) {
         if (!btn.classList.contains('open')) {
@@ -11806,13 +11781,11 @@ function refEuAutoFinish() {
 
   const redec    = document.getElementById('ref-eu-fin-redecorate');
   const floor    = document.getElementById('ref-eu-fin-floor');
-  const reveals  = document.getElementById('ref-eu-fin-reveals');
   const external = document.getElementById('ref-eu-fin-external');
   const skirtings = document.getElementById('ref-eu-fin-skirtings');
 
   if (redec    && (ewi || iwi))             redec.checked    = true;
   if (floor    && (floorSlab || floorSusp)) floor.checked    = true;
-  if (reveals  && windows)                  reveals.checked  = true;
   if (external && ewi)                      external.checked = true;
   if (skirtings && iwi)                     skirtings.checked = true;
 }
@@ -13622,7 +13595,6 @@ function readEUSelector() {
     fin_floor:         cb('eu-fin-floor'),
     fin_floor_type:    sv('eu-fin-floor-type')   || 'tiles',
     fin_floor_spec:    sv('eu-fin-floor-spec')   || 'standard',
-    fin_reveals:       cb('eu-fin-reveals'),
     fin_skirtings:     cb('eu-fin-skirtings'),
     fin_skirt_spec:    sv('eu-fin-skirt-spec')   || 'mdf',
     fin_tiling:        cb('eu-fin-tiling'),
@@ -14599,7 +14571,7 @@ function _euPricingBasis(s, inp) {
     var sgq = firstItemQty('secondary glazing'); if (sgq) pb.push('Window area: '+sgq+'m²');
     pb.push('Internal magnetic or channel units');
   } else if (t.indexOf('FINISHES') >= 0) {
-    var fp=[]; if(inp.fin_redecorate)fp.push('redecoration'); if(inp.fin_reveals)fp.push('window reveals');
+    var fp=[]; if(inp.fin_redecorate)fp.push('redecoration');
     if(inp.fin_skirtings)fp.push('skirtings'); if(inp.fin_tiling)fp.push('tiling');
     if(inp.fin_floor)fp.push('floor finishes'); if(inp.fin_external)fp.push('external making good');
     if(fp.length) pb.push('Includes: '+fp.join(', '));
@@ -18773,9 +18745,10 @@ function exportContractorSchedule() {
         // The contractor's column, mirroring the Cost Plan's Variation Notes: anything their
         // own survey shows beyond this scope goes here, item and price, where the homeowner
         // can weigh it against the guide prices in their plan's appendix.
+        // Open space, no ruling — the contractor writes their own items here in whatever
+        // shape suits. Only the Price column carries a rule to write the figure on.
         '<td style="padding:7px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
-          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:13px;">&nbsp;</div>' +
-          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:13px;">&nbsp;</div>' +
+          '<div style="min-height:30px;">&nbsp;</div>' +
         '</td>' +
         // Deliberately blank. No figure is offered anywhere on this document.
         '<td style="padding:7px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
