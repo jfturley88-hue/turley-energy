@@ -8656,7 +8656,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const ashpSizeNote = hli > 0
       ? 'HLI ' + euHLIText(hli) + ' W/m²K × ' + fa + 'm² × ' + HP_DESIGN_DT + 'K ÷ 1000 = ' + ashpKwNum +
         'kW design load at ' + euFlowTemp(inputs.emitterType || 'keep-rads') + '°C flow — ' + (inputs.hliFromBER
-          ? 'HLI from provisional BER (IS EN 12831)'
+          ? 'HLI from provisional BER — same basis as the SEAI technical assessment'
           : 'indicative HLI, confirm from provisional BER')
       : fa + 'm² floor area — enter the provisional BER HLI for accurate sizing';
     // Source: irishheatpumps.com, heatpumppricesreviews.com, saveonheat.ie 2025 (supply-only unit).
@@ -8713,7 +8713,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
 
     const ashpItems = [
       ...removeItems,
-      mkItem('7.TA','Heat pump technical assessment (IS EN 12831 heat loss calculation)','item',1,0,200,'SEAI-required pre-installation survey — €200 SEAI grant available — completed by registered installer'),
+      mkItem('7.TA','Heat pump technical assessment — room-by-room heat loss (IS EN 12831)','item',1,0,200,'SEAI-required pre-installation survey — €200 SEAI grant available — completed by registered installer. Confirms the unit size above and sizes the emitters'),
       mkItem('7.1','Air-to-water heat pump ('+ashpKw+') — supply & commission','nr',1,ashpMat,lM(24,L.plumber), ashpSizeNote + ' — final sizing confirmed by technical assessment'),
       mkItem('7.2','Heat pump cylinder ('+cylL+'L indirect unvented)','nr',1,cylMat,lM(8,L.plumber),cylL+'L indicative — sized from '+fa+'m² floor area. Volume confirmed by installer post heat-loss calc — mains pressure, PED compliant'),
       ...emitterItems,
@@ -14461,7 +14461,7 @@ function _euPricingBasis(s, inp) {
     if (hi) {
       var hkw = (hi.description||'').match(/\((\d+)kW\)/);
       if (hkw) pb.push('Design load: '+hkw[1]+'kW at '+euFlowTemp(_em)+'°C flow — '+((inp.hli||0) > 0
-        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' (IS EN 12831)' : '')
+        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' — same basis as the SEAI technical assessment' : '')
         : 'area-banded — add the provisional BER HLI'));
     }
     pb.push('Emitters: '+euLabel(_em, 'emitterType') + (_em === 'keep-rads' ? ' — assumed to work at 45°C flow' : ''));
