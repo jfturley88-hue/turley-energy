@@ -14608,14 +14608,12 @@ function _euPricingBasis(s, inp) {
     pb.push('SEAI registered assessor required');
     pb.push('Certificate required before grant payment');
   }
-  // What the survey ticked INTO the baseline, and what it deliberately leaves out. Both
-  // named in the scope; guide prices for the excluded items live in the appendix, and the
-  // contractor's own prices go on the schedule's Variations table.
+  // The scope lists only what IS in the price. What each measure deliberately leaves out
+  // sits in the appendix with a guide price — the homeowner's reference for judging the
+  // variations a contractor writes into the schedule's Variations column.
   var _vAdd = (s.items || []).filter(function(i){ return /Not Included checklist/.test(i.note || ''); });
   if (_vAdd.length)
     pb.push('Added after survey: ' + _vAdd.map(function(i){ return (i.description || '').replace(/ — surveyed as needed$/, ''); }).join(' · '));
-  if (s.exclusions && s.exclusions.length)
-    pb.push('Not included: ' + s.exclusions.map(function(e){ return e.item; }).join(' · ') + ' — variation guide prices in appendix');
   return pb.filter(Boolean);
 }
 
@@ -18770,9 +18768,14 @@ function exportContractorSchedule() {
         '<td style="padding:7px 4px;color:#94a3b8;text-align:center;font-size:8pt;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
         '<td style="padding:7px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
         '<td style="padding:7px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;line-height:1.5;">'+pbStr+'</td>' +
-        // One wide cell, deliberately blank. No figure is offered anywhere on this document.
-        // Price and any note share the space, so a contractor writes the price on the rule
-        // and whatever else they need beside or under it.
+        // The contractor's column, mirroring the Cost Plan's Variation Notes: anything their
+        // own survey shows beyond this scope goes here, item and price, where the homeowner
+        // can weigh it against the guide prices in their plan's appendix.
+        '<td style="padding:7px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
+          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:13px;">&nbsp;</div>' +
+          '<div style="border-bottom:1px solid #E2E8F0;padding-bottom:13px;">&nbsp;</div>' +
+        '</td>' +
+        // Deliberately blank. No figure is offered anywhere on this document.
         '<td style="padding:7px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
           '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:15px;">&euro;</div>' +
         '</td>' +
@@ -18794,69 +18797,27 @@ function exportContractorSchedule() {
       '</div>' +
     '</div>';
 
-  // Variations — the items each measure deliberately leaves out, listed so the contractor
-  // prices them HERE when the survey shows they are needed, instead of folding them
-  // unpriced into the baseline figure. Same three-part shape: item, what it covers, price.
-  var vRows = '';
-  sections.forEach(function(s) {
-    (s.exclusions || []).forEach(function(e) {
-      vRows +=
-        '<tr style="page-break-inside:avoid;">' +
-          '<td style="padding:6px 6px;font-size:8.5pt;font-weight:700;color:#1E293B;vertical-align:top;border:'+B+';">' + e.item +
-            '<div style="font-size:7pt;font-weight:400;color:#94a3b8;margin-top:1px;">' + s.title + '</div></td>' +
-          '<td style="padding:6px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';line-height:1.5;">' + e.detail +
-            ((e.qty || 1) > 1 ? ' &nbsp;·&nbsp; assessor estimate: ' + e.qty + ' ' + e.unit : '') + '</td>' +
-          '<td style="padding:6px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
-            '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&euro;</div>' +
-          '</td>' +
-        '</tr>';
-    });
-  });
-  // Two open rows for anything the contractor's own survey turns up
-  for (var _v = 0; _v < 2; _v++) {
-    vRows +=
-      '<tr style="page-break-inside:avoid;">' +
-        '<td style="padding:6px 6px;vertical-align:top;border:'+B+';"><div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&nbsp;</div></td>' +
-        '<td style="padding:6px 6px;vertical-align:top;border:'+B+';"><div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&nbsp;</div></td>' +
-        '<td style="padding:6px 8px;border:'+B+';background:#FCFCFD;vertical-align:top;">' +
-          '<div style="font-size:8pt;color:#CBD5E1;border-bottom:1px solid #E2E8F0;padding-bottom:12px;">&euro;</div>' +
-        '</td>' +
-      '</tr>';
-  }
-  var variationsHTML =
-    '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:6mm;page-break-inside:avoid;">' +
-      '<colgroup><col style="width:26%"/><col style="width:48%"/><col style="width:26%"/></colgroup>' +
-      '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
-        '<th colspan="3" style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #CBD5E1;">VARIATIONS — outside the baseline scope</th>' +
-      '</tr><tr style="background:#F1F5F9;color:#1E293B;">' +
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation item</th>' +
-        '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">What it covers</th>' +
-        '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
-      '</tr>' +
-      '<tr><td colspan="3" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
-        'These items are deliberately not in the baseline figures above. Price one only where your survey shows it is needed. ' +
-        'Agreed variations are recorded on the Cost Plan against the fixed budget — they adjust it, they never replace it.' +
-      '</td></tr></thead>' +
-      '<tbody>'+vRows+'</tbody>' +
-    '</table>';
-
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;">' +
-      // Proportional, so the pricing column keeps usable writing space at any page width
-      '<colgroup><col style="width:4%"/><col style="width:22%"/><col style="width:42%"/><col style="width:32%"/></colgroup>' +
+      // The schedule mirrors the homeowner's Cost Plan: same scope, and Variations given
+      // the same standing beside it that Variation Notes has on the plan. Proportional, so
+      // the writing columns keep usable space at any page width.
+      '<colgroup><col style="width:4%"/><col style="width:19%"/><col style="width:33%"/><col style="width:26%"/><col style="width:18%"/></colgroup>' +
       '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
         '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope &amp; Quantities</th>' +
+        '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variations &mdash; your survey</th>' +
         '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
       '</tr>' +
-      '<tr><td colspan="4" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
-        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity.' +
+      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
+        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity. ' +
+        'Anything your survey shows beyond this scope goes under Variations, itemised with its price &mdash; ' +
+        'the homeowner holds guide prices for common variations and will agree each one before work starts.' +
       '</td></tr></thead>' +
       '<tbody>'+rows+'</tbody>' +
     '</table>' +
-    variationsHTML +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
       ' · Scope prepared independently of any contractor.' +
