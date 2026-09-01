@@ -8655,7 +8655,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const ashpSizeNote = hli > 0
       ? 'HLI ' + euHLIText(hli) + ' W/m²K × ' + fa + 'm² × ' + HP_DESIGN_DT + 'K ÷ 1000 = ' + ashpKwNum +
         'kW design load at ' + euFlowTemp(inputs.emitterType || 'keep-rads') + '°C flow — ' + (inputs.hliFromBER
-          ? 'HLI from provisional BER — same basis as the SEAI technical assessment'
+          ? 'HLI from provisional BER — ' + HP_SIZING_BASIS
           : 'indicative HLI, confirm from provisional BER')
       : fa + 'm² floor area — enter the provisional BER HLI for accurate sizing';
     // Source: irishheatpumps.com, heatpumppricesreviews.com, saveonheat.ie 2025 (supply-only unit).
@@ -11470,6 +11470,12 @@ var HP_DESIGN_DT = 23;
 // prices the upgraded dwelling. Sizing off the dwelling's pre-works HLI would specify a
 // heat pump for a house that will not exist once the fabric measures in this plan are done.
 var HP_INDICATIVE_HLI = 2.0;
+
+// What the plan claims about its own design load. HLI x floor area x deltaT is the
+// whole-house core of IS EN 12831 and the basis SEAI's technical assessment works to; the
+// full room-by-room design, with its reheat allowance, is the installer's. Stated on the
+// priced item and again in the scope, so it lives here rather than in two string literals.
+var HP_SIZING_BASIS = 'same basis as the SEAI heat pump technical assessment';
 
 // The one place design load is calculated. The Works Selector readout and the priced BOQ
 // item both call this, so the number on screen is the number in the Cost Plan.
@@ -14460,7 +14466,7 @@ function _euPricingBasis(s, inp) {
     if (hi) {
       var hkw = (hi.description||'').match(/\((\d+)kW\)/);
       if (hkw) pb.push('Design load: '+hkw[1]+'kW at '+euFlowTemp(_em)+'°C flow — '+((inp.hli||0) > 0
-        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' — same basis as the SEAI technical assessment' : '')
+        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' — ' + HP_SIZING_BASIS : '')
         : 'area-banded — add the provisional BER HLI'));
     }
     pb.push('Emitters: '+euLabel(_em, 'emitterType') + (_em === 'keep-rads' ? ' — assumed to work at 45°C flow' : ''));
