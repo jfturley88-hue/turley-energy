@@ -5593,13 +5593,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             </div>
           </div>
 
-          <div class="ao-bundle" data-pct="5" data-bundle="contingency">
-            <input type="checkbox" id="ao-eu-contingency" checked>
-            <div class="ao-bundle-main">
-              <label for="ao-eu-contingency">Contingency <span class="ao-pct">+10% of net works</span> <span class="ao-default-tag">recommended</span></label>
-            </div>
-          </div>
-
           <div class="ao-bundle">
             <input type="checkbox" id="ao-eu-pro-fees">
             <div class="ao-bundle-main">
@@ -5757,7 +5750,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
       <div>
         <div class="report-total-label">Total Budget Guide</div>
         <div class="report-total-value" id="rpt-total">—</div>
-        <div class="report-total-sub" id="rpt-total-sub">Prelims · Contingency · VAT 13.5% incl.</div>
+        <div class="report-total-sub" id="rpt-total-sub">Prelims · VAT 13.5% incl.</div>
       </div>
     </div>
   </div>
@@ -5917,7 +5910,13 @@ function sectionVatRate(s) {
   if (s && s.vatRate != null) return s.vatRate;
   return 0.135;
 }
-function sectionLoad(s) { return 1.22 * (1 + sectionVatRate(s)); }
+// Loading on every priced section: contractor's overhead & profit at 12%, then the
+// section's own VAT rate. NO contingency — this plan is a baseline benchmark to judge
+// quotes against, and a contractor's quote carries no contingency either. Adding one here
+// would put the baseline ~10% above a fair quote, so every honest quote would read as
+// "under budget" and a padded one as "on budget". Unknowns are handled explicitly instead:
+// the Not Included items carry their own guide prices.
+function sectionLoad(s) { return 1.12 * (1 + sectionVatRate(s)); }
 window.sectionVatRate = sectionVatRate;
 window.sectionLoad = sectionLoad;
 
@@ -7959,7 +7958,7 @@ function buildBOQRenovation(inputs, projName, county, dwellingType, grantScheme,
 // and ticking an item there moves it INTO its measure's priced section. One catalogue,
 // four surfaces — they cannot disagree.
 // qty is a function of the survey inputs. Guide price = (materials + county-adjusted
-// labour) loaded exactly like the plan: O&P 12% + contingency 10% + VAT 13.5%.
+// labour) loaded exactly like the plan: O&P 12% + VAT 13.5%.
 function _x(id, item, detail, unit, qty, mat, hrs, trade, when) {
   return { id: id, item: item, detail: detail, unit: unit, qty: qty, mat: mat, hrs: hrs, trade: trade, when: when };
 }
@@ -8126,7 +8125,7 @@ function euExclMat(e) {
   return e.mat;
 }
 function euExclRate(e, mult) {
-  return Math.round((euExclMat(e) + Math.round(e.hrs * (TRADE_RATES[e.trade] || 45) * (mult || 1))) * 1.22 * 1.135);
+  return Math.round((euExclMat(e) + Math.round(e.hrs * (TRADE_RATES[e.trade] || 45) * (mult || 1))) * 1.12 * 1.135);
 }
 
 // ── RETROFIT BOQ BUILDER ──────────────────────────────────────────────────────
@@ -8200,7 +8199,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       'walltite':     { mat: 20, lab:  4 }   // €28/m² total [LOW CONFIDENCE — verify with Foam Master contractor]
     },
     // EWI: base insulation + render addon. Scaffold priced separately as EWI.SCAF.
-    // These are BASE rates — O&P, contingency and VAT are applied on top, so compare the
+    // These are BASE rates — O&P and VAT are applied on top, so compare the
     // LOADED figure to a market quote, not this one. 150mm EPS + silicone + scaffold works
     // out at ~€103/m² base → ~€155/m² loaded, against an Irish installed market of
     // €110–160/m² (most jobs €100–140). That sits at the top of the band: sound for a
@@ -13370,8 +13369,8 @@ function readAdvancedOptions(mode) {
   if (mode === 'Energy Upgrade') {
     return {
       prelims:             cb('ao-eu-prelims')     ? 0.12  : null,
-      // 10% matches the loading stated on every EU report (O&P 12% + contingency 10% + VAT)
-      contingency:         cb('ao-eu-contingency') ? 0.10  : 0,
+      // The retrofit plan is a benchmark to judge quotes against and carries no contingency
+      contingency:         0,
       proFees:             cb('ao-eu-pro-fees')    ? 0.08  : null,
       includePrelimSection: false,
     };
@@ -14106,7 +14105,7 @@ function buildReport() {
   }
   document.getElementById('rpt-total').textContent = fmt(_hdrTotal);
   document.getElementById('rpt-total-sub').textContent = su.grantsTotal>0
-    ? `Prelims · Contingency · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ${fmt(_hdrNet)}`
+    ? `Prelims · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ${fmt(_hdrNet)}`
     : 'Contingency · Plant · VAT 13.5% incl.';
 
   // Inject "independent estimate" badge into report meta for EU/Refurb
@@ -14728,7 +14727,7 @@ function planTotals(b) {
   var isEU = mode === 'Energy Upgrade';
   var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
   var grants = b.grants || [];
-  // Loading is per section: prelims/O&P 12% + contingency 10%, then the section's
+  // Loading is per section: prelims/O&P 12%, then the section's
   // own VAT rate — 13.5% works, 9% heat pumps, 0% solar PV. See sectionVatRate().
 
   var byKey = {};
@@ -14843,7 +14842,6 @@ var EU_ESTIMATE_TERMS = {
   includes: [
     'VAT at 13.5% (heat pumps at 9% under Finance Act 2024; solar PV at 0% under the Revenue ruling of May 2023)',
     'The contractor\'s overhead and profit, at 12%',
-    'A 10% contingency for the unexpected',
     'Plant and equipment hire',
   ],
   notLead: 'What it is not:',
@@ -18539,7 +18537,7 @@ function exportEUPDF(mode) {
     var appendixHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
       '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:8px;">Appendix — Itemised Measurements &amp; Rates</h2>' +
       '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
-        labMultNote + ' Contractor\'s O&amp;P (12%), contingency (10%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
+        labMultNote + ' Contractor\'s O&amp;P (12%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above. No contingency is added: this is a benchmark to judge quotes against, and a quote carries none either.</p>' +
       appxSections +
       exclusionsHTML +
       // The cost-per-m2 check belongs here rather than on the homeowner's plan page: it is a
@@ -18565,7 +18563,6 @@ function exportEUPDF(mode) {
         '<li><strong>Materials</strong>: Irish merchant pricing Q1–Q2 2026 (SCSI Cost Supplement Aug 2025)</li>' +
         '<li><strong>Labour</strong>: SEO National Wage Agreement 2024 rates, adjusted for Co. '+(pi.county||'—')+' (×'+(pi.labourMultiplier||1).toFixed(2)+')</li>' +
         '<li><strong>Contractor\'s Overhead &amp; Profit</strong>: 12% on base cost</li>' +
-        '<li><strong>Contingency</strong>: 10% on base cost</li>' +
         '<li><strong>VAT</strong>: 13.5% on works; 9% on heat pump supply &amp; installation (Finance Act 2024); 0% on Solar PV (Revenue ruling May 2023)</li>' +
       '</ul>' +
       '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Measure-by-Measure Pricing Breakdown</h3>' +
@@ -19530,7 +19527,7 @@ function renderAccordionReport() {
       if (_tEl) _tEl.textContent = fmt(BOQ._euTableTotal);
       var _sEl = document.getElementById('rpt-total-sub');
       if (_sEl && (BOQ.grants || []).length) {
-        _sEl.textContent = 'Prelims · Contingency · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ' + fmt(BOQ._euTableNet);
+        _sEl.textContent = 'Prelims · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ' + fmt(BOQ._euTableNet);
       }
     }
     _updateEUPDFBtns(true);
@@ -23808,7 +23805,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (mode === 'Energy Upgrade') {
       aoItems = [
         { id: 'ao-eu-prelims',     label: 'Overhead & Profit', pct: '+12%' },
-        { id: 'ao-eu-contingency', label: 'Contingency',       pct: '+5%'  },
         { id: 'ao-eu-pro-fees',    label: 'Professional Fees', pct: '+8%'  },
       ];
     } else {
