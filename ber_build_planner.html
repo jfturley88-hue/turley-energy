@@ -6480,6 +6480,21 @@ function updateCountyBadge() {
 }
 
 // ── SUMMARY COMPUTATION HELPER ────────────────────────────────────────────────
+// NOT the authoritative total. planTotals() is — see the note on its definition.
+//
+// Every cost field this returns is computed on two assumptions that no longer hold:
+//   1. One flat 13.5% VAT rate across the whole subtotal. Air-to-water heat pumps are
+//      9% (Finance Act 2024) and solar PV is 0% (Revenue ruling, May 2023), so anything
+//      here overstates VAT on those measures. On the pack's worked example that is €546.
+//   2. No post-works BER assessment line, which planTotals() carries at BER_COST.
+// The two errors run opposite ways and partly cancel, which is why the fork went
+// unnoticed for so long: the paths agree exactly on any project priced entirely at
+// 13.5%, and only diverge once a 9% or 0% measure enters the mix.
+//
+// The non-cost fields (elementsCost, prelimsPct, pvElements, prelimsLabel, profFees)
+// are still sound and still read. Do not reintroduce a reader of gross / total /
+// netTotal / netConstruction / totalProjectCost / netProjectCost — take those from
+// planTotals(BOQ).totalEst / .grantTotal / .net instead.
 function computeSummary(sections, projType, fa, grants, grantScheme, ao) {
   // Elements cost from all sections
   const el = sections.reduce(function(acc, s) { return acc + (s.subtotal || 0); }, 0);
@@ -6581,21 +6596,21 @@ function computeSummary(sections, projType, fa, grants, grantScheme, ao) {
     siteInv:          siteInvAllow,
     substructure:     substructureAllow,
     externals:        externalsAllow,
-    subTotal:         subTotal,
-    vatRate:          0.135,
-    vat:              vat,
+    subTotal:         subTotal,        // NOT AUTHORITATIVE — flat 13.5% VAT, no BER row
+    vatRate:          0.135,           // NOT AUTHORITATIVE — see sectionVatRate()
+    vat:              vat,             // NOT AUTHORITATIVE — flat 13.5% VAT
     pvElements:       pvElements,
-    gross:            gross,
-    total:            gross,           // alias kept for backward-compat
-    grantsTotal:      grantsTotal,
-    netConstruction:  netConstruction,
-    netTotal:         netConstruction, // alias kept for backward-compat
+    gross:            gross,           // NOT AUTHORITATIVE — use planTotals(b).totalEst
+    total:            gross,           // NOT AUTHORITATIVE — use planTotals(b).totalEst
+    grantsTotal:      grantsTotal,     // agrees with planTotals(b).grantTotal
+    netConstruction:  netConstruction, // NOT AUTHORITATIVE — use planTotals(b).net
+    netTotal:         netConstruction, // NOT AUTHORITATIVE — use planTotals(b).net
     prelimsLabel:     prelimsLabel,
     profFees:         profFees,
     feesTotal:        feesTotal,
     feesVat:          feesVat,
-    totalProjectCost: totalProjectCost,
-    netProjectCost:   netProjectCost,
+    totalProjectCost: totalProjectCost, // NOT AUTHORITATIVE — use planTotals(b).totalEst
+    netProjectCost:   netProjectCost,   // NOT AUTHORITATIVE — use planTotals(b).net
   };
 }
 
@@ -14101,16 +14116,14 @@ function buildReport() {
     var existingSummary = document.getElementById('rpt-scope-summary');
     if (existingSummary) existingSummary.remove();
   }
-  // Header must match the measure table below it — the table appends a €300 BER
-  // assessment row (engine berFee) whenever the standalone BER grant is present.
-  var _hdrTotal = su.total, _hdrNet = su.netTotal;
-  if (pi.type === 'Energy Upgrade') {
-    if ((BOQ.grants || []).some(function(g){ return g.measureKey === 'ber' && !g.ossExclusive; })) _hdrTotal += 300;
-    _hdrTotal += euSchemeFee(pi.grantScheme, BOQ.grants, _hdrTotal).amount;
-    _hdrNet = Math.max(0, _hdrTotal - (su.grantsTotal || 0));
-  }
+  // Header must match the measure table below it, so it comes from planTotals() — the
+  // same call renderEUTable() prices from. This used to patch computeSummary's flat-VAT
+  // total by hand (+€300 BER, + scheme fee), which reproduced the BER row but not the
+  // per-section VAT, leaving the header €546 over on any project with a 9% heat pump.
+  var _pt = planTotals(b);
+  var _hdrTotal = _pt.totalEst, _hdrNet = _pt.net;
   document.getElementById('rpt-total').textContent = fmt(_hdrTotal);
-  document.getElementById('rpt-total-sub').textContent = su.grantsTotal>0
+  document.getElementById('rpt-total-sub').textContent = _pt.grantTotal>0
     ? `Prelims · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ${fmt(_hdrNet)}`
     : 'Contingency · Plant · VAT 13.5% incl.';
 
@@ -14727,6 +14740,12 @@ window.restorePlanLive = restorePlanLive;
 // Which grants attach to which section, what each section costs loaded, and the four
 // figures the totals block prints. The table reads from here rather than adding up as
 // it draws, so the comparison strip and the table cannot disagree.
+// The single source of truth for what a project costs. Everything the homeowner or the
+// contractor ever sees — the report header, the Cost Plan, the Pricing Schedule — comes
+// from here, because this is the only path that charges each section its own statutory
+// VAT rate (sectionVatRate: 13.5% works, 9% heat pumps, 0% solar PV) and the only one
+// that includes the post-works BER assessment the homeowner actually pays for.
+// computeSummary()'s cost fields are the older, flat-13.5% path and are not authoritative.
 function planTotals(b) {
   var pi = b.projectInfo || {};
   var mode = (pi.type || '').toString();
@@ -20048,20 +20067,28 @@ function recalcTotals() {
   }
 
   // ── 5. Grand total header ─────────────────────────────────────────────────
-  var hasGrants  = BOQ.summary.grantsTotal > 0;
+  // Header from planTotals(), not from the summary this function just recomputed —
+  // BOQ.summary's cost fields are the flat-13.5% path and would contradict the Cost Plan
+  // printed from the same screen. (This block is currently unreachable: every caller of
+  // recalcTotals is wired from markup inside buildCostSummaryRows, which renderAccordionReport
+  // returns before reaching. It is corrected rather than deleted so that restoring that path
+  // cannot quietly reopen the fork.)
+  var _rt        = planTotals(BOQ);
+  var hasGrants  = _rt.grantTotal > 0;
   var rptTotalEl = document.getElementById('rpt-total');
   var rptSubEl   = document.getElementById('rpt-total-sub');
-  if (rptTotalEl) rptTotalEl.textContent = fmt(hasGrants ? BOQ.summary.netTotal : BOQ.summary.total);
+  if (rptTotalEl) rptTotalEl.textContent = fmt(_rt.totalEst);
   if (rptSubEl)   rptSubEl.innerHTML = hasGrants
-    ? 'Gross €' + Math.round(BOQ.summary.total).toLocaleString('en-IE') +
-      ' · <span style="color:#10B981;font-weight:700;">SEAI Grants −' + fmt(BOQ.summary.grantsTotal) + '</span>'
-    : 'Contingency · Plant · VAT 13.5% incl.';
+    ? 'Prelims · VAT incl. (13.5% · heat pumps 9%) · Net after SEAI grants: ' + fmt(_rt.net)
+    : 'Prelims · VAT incl. (13.5% · heat pumps 9%)';
 
   // ── 6. Summary sidebar box (guarded) ─────────────────────────────────────
   var srEl = document.getElementById('summary-rows');
-  if (srEl) srEl.innerHTML = buildCostSummaryHTML(BOQ.summary);
+  // buildCostSummaryHTML is not defined anywhere in this file — proof of how long this
+  // branch has been unreachable. Guarded rather than called blind.
+  if (srEl && typeof buildCostSummaryHTML === 'function') srEl.innerHTML = buildCostSummaryHTML(BOQ.summary);
   var sumTotalEl = document.getElementById('sum-total');
-  if (sumTotalEl) sumTotalEl.textContent = fmt(hasGrants ? BOQ.summary.netTotal : BOQ.summary.total);
+  if (sumTotalEl) sumTotalEl.textContent = fmt(hasGrants ? _rt.net : _rt.totalEst);
 
   // ── 7. Accordion section estimated + item-est cells ───────────────────────
   BOQ.sections.forEach(function(sec) {
