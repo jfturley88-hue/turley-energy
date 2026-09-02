@@ -345,12 +345,12 @@ EX_HOUSE = (f'a {EX_AREA}&thinsp;m&sup2; 3-bed semi in Mullingar, Co. Westmeath,
 
 def notes(n, title, lead, blocks, foot_pages='1'):
     body = ''.join(
-        f'<p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.6mm;">'
+        f'<p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.4mm;">'
         f'<strong>{h}</strong> {t}</p>' for h, t in blocks)
     return f'''<div class="sheet">
   {strip(n)}
   <h2 style="font-size:21pt;margin-bottom:3.5mm;">{title}</h2>
-  <p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.6mm;">{lead}</p>
+  <p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.4mm;">{lead}</p>
   {body}
   <div class="fine">{FINE1}</div>
   {footer(n, '1', foot_pages)}
@@ -361,19 +361,21 @@ doc2 = notes(2, 'The Cost Plan', (
     f'&mdash; with an attic top-up, a cavity fill, new windows and external doors, an air-to-water heat '
     f'pump with its cylinder, and decentralised ventilation with its air-tightness test. It follows in '
     f'full, exactly as the software prints it.'), [
-  ('The three figures.',
-   f'The baseline benchmark for those works is <strong>&euro;{EX_TOTAL}</strong> &mdash; the whole job, '
-   f'VAT and the contractor&rsquo;s overhead included, before any contractor is asked for a price. '
-   f'SEAI grants of <strong>&euro;{EX_GRANTS}</strong> are named beside the measures that earn them, '
-   f'leaving <strong>&euro;{EX_NET}</strong> as what the work costs in the end.'),
-  ('What the household actually has to raise.',
-   f'On {EX_SCHEME} the grants are paid <em>after</em> the works. The homeowner pays the contractor in '
-   f'full and claims back once the job is complete and compliant, so it is the whole '
-   f'<strong>&euro;{EX_TOTAL}</strong> that has to be available first, not the &euro;{EX_NET}. Being '
-   f'asked to find the gross before seeing any of the grant back is one of the reasons a retrofit is hard '
-   f'to commit to, and the plan says so on the face of the document rather than leaving it to be '
-   f'discovered. Both figures are named because both are needed: one to borrow against, one to judge '
-   f'the job by.'),
+  ('The benchmark is on every row, not at the bottom.',
+   'This is the part that does the work. Each measure carries its own measured scope and its own '
+   'figure &mdash; the attic top-up, the cavity fill, the windows and doors, the heat pump, the '
+   'ventilation &mdash; and that figure is the benchmark for <em>that measure</em>. A quote is judged '
+   'line by line against it. A contractor pricing the attic at twice the benchmark has to account for '
+   'the attic, on that line, where the homeowner can see it; there is nowhere to lose it inside a single '
+   'total. That is why the plan is set out measure by measure, and why the scope sits beside every '
+   'figure: the two are read together or neither means anything.'),
+  ('The totals, and what has to be raised.',
+   f'Those rows add to <strong>&euro;{EX_TOTAL}</strong> &mdash; the whole job, VAT and the '
+   f'contractor&rsquo;s overhead included. SEAI grants of <strong>&euro;{EX_GRANTS}</strong> are named '
+   f'beside the measures that earn them, leaving <strong>&euro;{EX_NET}</strong> as what the work costs '
+   f'in the end. On {EX_SCHEME} the grants are paid <em>after</em> the works, so it is the whole '
+   f'&euro;{EX_TOTAL} that has to be available first and claimed back once the job is done. Both are '
+   f'named because both are needed: one to borrow against, one to judge the job by.'),
   ('Where the figures come from.',
    f'Quantities are taken from the standard BER survey the provisional certificate is built from &mdash; '
    f'nothing is measured twice. Every rate comes from the published rate book &mdash; {RATE_BOOK} &mdash; '
