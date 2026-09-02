@@ -302,11 +302,11 @@ doc1 = f'''<div class="sheet">
 
   {vk('The workflow &mdash; document 05')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
-    homeowner, provisional report, works, post-works BER. One step is added: the plan.</p>
+    homeowner, provisional report, works, post-works BER. One step is added: the three documents.</p>
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
-    selected, the plan prints, and the grant route can be switched at the moment of download. Behind it a
+    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it a
     rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
     the weak ones marked as weak.</p>
 
@@ -471,7 +471,7 @@ doc5 = f'''<div class="sheet">
     'the blank Pricing Schedule and the Appendix. They go to the homeowner with the provisional BER.',
     note='New &middot; minutes at a desk', add=True)}
   {wfstep('5', 'Variations and prices agreed with the contractor',
-    'With the baseline and the guide prices for what it leaves out, the homeowner tenders properly: the same '
+    'With the benchmark and the guide prices for what it leaves out, the homeowner tenders properly: the same '
     'measured scope to every contractor, quotes that compare like with like, and any variation priced and agreed '
     '<strong>before work starts</strong>.',
     note='Same step, new terms')}
@@ -519,7 +519,7 @@ doc6 = f'''<div class="sheet">
   </div>
   <div class="arrowrow">{DOWN_ARROW}</div>
   {appfig('appplan', '162mm', '4 &middot; The plan on screen.',
-    'The baseline fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
+    'The benchmark fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '2', '4')}
