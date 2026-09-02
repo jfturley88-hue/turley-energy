@@ -397,27 +397,25 @@ doc2 = notes(2, 'The Cost Plan', (
 
 # ── 03 · THE PRICING SCHEDULE ────────────────────────────────────────────────
 doc3 = notes(3, 'The Pricing Schedule', (
-    'The same house and the same measured scope with every figure removed &mdash; no estimate, no grant '
-    'amounts, no totals. One goes to each contractor asked to quote. It follows in full, exactly as the '
-    'software prints it.'), [
-  ('Why the figures are taken out.',
+    'The same measured scope with every figure removed &mdash; no estimate, no grant amounts, no totals. '
+    'One goes to each contractor asked to quote. It follows in full, exactly as the software prints it.'), [
+  ('It keeps the tender an open market.',
    'A contractor who can see the homeowner&rsquo;s budget prices against the budget. With the figures '
-   'gone they price the work, and because every contractor is pricing the same measured scope, the '
-   'quotes that come back can be laid side by side &mdash; and against the Cost Plan.'),
+   'gone they price the work. Every contractor quotes the same measured scope with no sight of the '
+   'homeowner&rsquo;s figure, so the job goes to the best price for the same work rather than to whoever '
+   'guesses the budget closest &mdash; and a small firm competes on equal terms with a large one. When '
+   'the quotes come back the homeowner lays them side by side, against each other and against their own '
+   'plan: tendering the way a business does.'),
   ('The exclusions are still named.',
-   'The same shaded boxes appear here, so a contractor can see exactly what sits outside the scope. '
-   'Without that, an honest one assumes the item is included and pads the quote, and a sharp one prices '
-   'without it and raises a variation later &mdash; either way the tenders stop being comparable. '
-   'Their guide prices stay in the homeowner&rsquo;s Appendix and off this document: a figure here would '
-   'stop being a benchmark and become a floor to quote up to.'),
-  ('The Variations column.',
-   'Open space beside every measure. Anything the contractor&rsquo;s own survey finds beyond the scope '
-   'goes there, itemised with its price, rather than surfacing mid-job. The homeowner weighs it against '
-   'the guide price they already hold, and agrees it before work starts.'),
-  ('The fair contractor gains too.',
-   'Measured quantities rather than a survey of their own, variations put in writing rather than argued '
-   'on site, and a customer who has already decided to go ahead &mdash; simpler quotations, fewer '
-   'disputes, more work.'),
+   'The same shaded boxes appear here, so a contractor sees exactly what sits outside the scope. Without '
+   'that an honest one assumes the item is included and pads the quote, a sharp one prices without it and '
+   'raises a variation later, and the tenders stop being comparable. The guide prices stay in the '
+   'homeowner&rsquo;s Appendix: a figure here would become a floor to quote up to.'),
+  ('The Variations column is where site knowledge goes.',
+   'A contractor&rsquo;s own survey will find things an assessor could not &mdash; a lintel, a threshold, '
+   'a cavity that will not take the fill. This is where they price them: explicitly, itemised, at tender '
+   'rather than mid-job. That is where variations come from, and putting them in writing before work '
+   'starts keeps it open and honest on both sides.'),
 ])
 
 # ── 04 · THE APPENDIX ────────────────────────────────────────────────────────
