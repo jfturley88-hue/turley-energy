@@ -284,9 +284,10 @@ doc1 = f'''<div class="sheet">
     figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
     nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
     before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The fair contractor gains too.</strong> Measured quantities rather than
-    a survey of their own, variations in writing rather than argued on site, and customers who have
-    already decided to go ahead.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The homeowner proceeds with confidence.</strong> Holding a figure for
+    every measure and a guide price for anything beyond it, they can see whether a quote is fair before
+    they accept it. A retrofit that looked like a leap becomes a decision made on evidence &mdash; and a
+    decision they are far more likely to make.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
     consultancy fee for the plan, earned at the moment the retrofit decision is being made. The
     workflow does not change &mdash; the same survey, the same provisional BER &mdash; that data now
