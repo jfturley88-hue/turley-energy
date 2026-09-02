@@ -1,9 +1,9 @@
 # The SEAI pack
 
-Everything that builds the six-PDF pack. It used to live in a session scratchpad, which
+Everything that builds the seven-PDF pack. It used to live in a session scratchpad, which
 is ephemeral — this directory is the source of record.
 
-## The six documents
+## The seven documents
 
 | | Document | Made from |
 |---|---|---|
@@ -13,6 +13,7 @@ is ephemeral — this directory is the source of record.
 | 04 | The Appendix | `pack_04.html` + `ex_appx.pdf` |
 | 05 | The Workflow | `pack_05.html` |
 | 06 | The Software | `pack_06.html` |
+| 07 | The Engine | `pack_07.html` |
 
 Documents 02–04 are the software's own output bound whole, each behind one page of notes
 saying who it is for and how long it lives. They are printed by `gen_ex_pdfs.js` driving
@@ -39,6 +40,7 @@ the folder was assembled by hand from the previous run.
 
 ## Screenshots
 
+`shot_engine.js` regenerates the Rate Settings tabs used by documents 06 and 07.
 `refresh_app_shots.js` regenerates the app screenshots in document 06 (`app_plan`,
 `app_routes`, `app_selector`). `pack_shots.js` regenerates the Cost Plan / Schedule /
 grants shots.

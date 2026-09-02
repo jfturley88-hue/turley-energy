@@ -5,6 +5,7 @@
 #   04 The Appendix          — notes, then the workings, itemised rates and guide prices
 #   05 The Workflow          — the six agreed steps, provisional BER to post-works BER
 #   06 The Software          — live screenshots + where every number comes from
+#   07 The Engine            — how the rate book is sourced, versioned and inspected
 # 02-04 are one house printed three ways; each binds the software's own output whole.
 import base64, html as H
 
@@ -20,6 +21,7 @@ IMG = {k: b64(f) for k, f in {
     'grants':  'app_grants.png',   'routes':  'app_routes.png',
     'preview': 'app_preview_dialog.png',
     'routedl': 'shot_routedl.png',
+    'eurates': 'app_eurates.png', 'regional': 'app_regional.png',
 }.items()}
 
 GLOBE = '''<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="globe">
@@ -193,7 +195,7 @@ CSS = FONTS + '''
   .appshot .ac { font-size: 7.2pt; color: #475569; line-height: 1.4; margin-top: 1.2mm; }
   .appshot .ac strong { color: #1E293B; }
   ul.src { margin: 0; padding-left: 0; list-style: none; columns: 2; column-gap: 8mm; }
-  ul.src li { font-size: 8pt; line-height: 1.5; color: #2B3648; padding-left: 4.5mm; position: relative;
+  ul.src li { font-size: 8pt; line-height: 1.45; color: #2B3648; padding-left: 4.5mm; position: relative;
               margin-bottom: 1.4mm; break-inside: avoid; }
   ul.src li::before { content: ''; position: absolute; left: 0; top: 1.5mm; width: 2.2mm; height: 2.2mm;
                       border-radius: 50%; background: #B07D1A; }
@@ -236,7 +238,7 @@ CSS = FONTS + '''
 # behind a short page of notes saying who it is for and how long it lives; the other three
 # are the argument, the workflow and the software itself.
 DOCS = ['The Value Proposition', 'The Cost Plan', 'The Pricing Schedule',
-        'The Appendix', 'The Workflow', 'The Software']
+        'The Appendix', 'The Workflow', 'The Software', 'The Engine']
 NDOC = len(DOCS)
 
 def strip(n):
@@ -258,7 +260,7 @@ FINE1 = ('PlanitBER V1 &middot; '
 
 # ── 01 · THE VALUE PROPOSITION — text only, one page, references the other three ─
 def vk(t):
-    return f'<div class="kick" style="margin-top:1.8mm;">{t}</div>'
+    return f'<div class="kick" style="margin-top:1.5mm;">{t}</div>'
 
 doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
@@ -272,11 +274,11 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9pt;color:#64748B;margin-bottom:2mm;">A tender document built to put
     <strong style="color:#1E293B;">transparency and trust</strong> into retrofit pricing &mdash; and, in
     turn, more retrofits. Six documents: this value proposition; the three the software prints for one
-    house &mdash; the Cost Plan, the Pricing Schedule and the Appendix; then the workflow and the
-    software behind it.</p>
+    house &mdash; the Cost Plan, the Pricing Schedule and the Appendix; then the workflow, the
+    software, and the engine that prices it.</p>
 
   {vk('What it is')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;">Built from data the provisional BER already holds, it sets a
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">Built from data the provisional BER already holds, it sets a
     <strong>baseline benchmark</strong> for the retrofit: a Cost Plan pricing every agreed measure on
     published rates, stating what each one includes and what it leaves out, with a blank Pricing Schedule
     for every contractor who quotes and an Appendix carrying the evidence. A baseline is not an estimate &mdash; it is this house&rsquo;s measured geometry at
@@ -284,25 +286,25 @@ doc1 = f'''<div class="sheet">
     is settled in the open, so the homeowner tenders the way a business does.</p>
 
   {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;"><strong>The common belief is that grants inflate the price.</strong> When every
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>The common belief is that grants inflate the price.</strong> When every
     figure a homeowner sees comes from the contractors quoting for the work, the grant becomes invisible
     margin &mdash; a figure the trade can price against, with no way for the household to tell either
     way. Nobody can currently show whether it happens, and while that is true, raising grant levels
     cannot be relied on to lift uptake. The missing piece is not more money: it is a benchmark that
     exists before any contractor names a price, against which the question can be answered.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;"><strong>The homeowner has nothing to judge a quote against.</strong> With the
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>The homeowner has nothing to judge a quote against.</strong> With the
     baseline they hold the scope, the estimated cost, the grants named beside their measures and the net
     figure to plan around. A fair variation is agreed in minutes against the guide price; a padded one is
     visible in the same minutes. <strong>The fair contractor gains too</strong> &mdash; measured
     quantities, variations in writing, and customers who have decided to go ahead.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;"><strong>Nobody at the table is independent.</strong> The assessor sells no
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>Nobody at the table is independent.</strong> The assessor sells no
     installation and takes no commission, and prices the plan from a dated, published rate book, so the
     figure does not move with who wins the work. It also puts the assessor in a <strong>paid advisory
     role</strong> at the moment the retrofit decision is being made &mdash; a consultancy fee for the
     plan, with {ASSESSOR_ASK}.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;">One house, three readers: a {EX_AREA}&thinsp;m&sup2; 3-bed semi in
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">One house, three readers: a {EX_AREA}&thinsp;m&sup2; 3-bed semi in
     Mullingar, {EX_BER}, on {EX_SCHEME} &mdash; attic top-up, cavity fill, windows and doors, a heat pump
     sized from the provisional BER&rsquo;s Heat Loss Indicator, and ventilation. <strong>&euro;{EX_TOTAL}
     total &middot; &euro;{EX_GRANTS} in grants &middot; &euro;{EX_NET} to fund.</strong> The
@@ -313,20 +315,21 @@ doc1 = f'''<div class="sheet">
     starts</strong> rather than argued once the job is open.</p>
 
   {vk('The workflow &mdash; document 05')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;">The workflow already happens &mdash; assessment, measures agreed with the
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">The workflow already happens &mdash; assessment, measures agreed with the
     homeowner, provisional report, works, post-works BER. One step is added: the plan. A small change to
     the assessor&rsquo;s day, a decisive one for everything that follows.</p>
 
-  {vk('The software &mdash; document 06')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;">Live and running: the survey goes in, the intended measures are
-    selected, the plan prints, every rate is visible and editable, and the grant route can be switched
-    at the moment of download.</p>
+  {vk('The software and the engine &mdash; documents 06 and 07')}
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">Live and running: the survey goes in, the intended measures are
+    selected, the plan prints, and the grant route can be switched at the moment of download. Behind it a
+    rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
+    the weak ones marked as weak.</p>
 
   {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
     of plans, with recorded spend measured against the accuracy band. SEAI observes with full access,
     and the outturns refine the rate book.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.44;margin-bottom:1.65mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
+  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
     through an API, so the three documents can be produced for any home on the register &mdash; not only
     the house surveyed today. The goal is SEAI&rsquo;s own: <strong>more retrofits.</strong></p>
 
@@ -596,24 +599,62 @@ doc6 = f'''<div class="sheet">
   <div class="kick" style="margin-top:2mm;">Where every number comes from</div>
   <ul class="src">
     <li>SCSI Tender Price Index &amp; House Rebuilding Guide 2025&ndash;26 &mdash; base rates</li>
-    <li>SEO Construction Sector 2024 &mdash; labour at the second-phase rates of 1 August 2026</li>
+    <li>SEO Construction Sector 2024 &mdash; labour, second-phase rates of 1 August 2026</li>
     <li>SCSI Regional Cost Supplement, August 2025 &mdash; county multipliers</li>
     <li>SEAI grant rates effective 3 February and 4 March 2026</li>
-    <li>VAT as it applies &mdash; 13.5% works &middot; 9% heat pumps (Finance Act 2024) &middot; 0% solar PV</li>
+    <li>VAT as applied &mdash; 13.5% works &middot; 9% heat pumps (Finance Act 2024) &middot; 0% solar PV</li>
     <li>Irish merchant pricing, Q2&ndash;Q3 2026</li>
   </ul>
-  <p class="body" style="font-size:8pt;color:#64748B;margin-top:1.5mm;">Every document is stamped with the
-    rate book version it was priced on &mdash; currently {RATE_BOOK} &mdash; so any
-    figure can be traced to a dated, named source.</p>
+  <p class="body" style="font-size:8pt;color:#64748B;margin-top:1.2mm;">Every document is stamped with the
+    rate book version it was priced on &mdash; currently {RATE_BOOK} &mdash; so any figure traces to a
+    dated, named source.</p>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '4', '4')}
+</div>'''
+
+# ── 07 · THE ENGINE — how the rate book is sourced, versioned and inspected ───
+doc7 = f'''<div class="sheet">
+  {strip(7)}
+  <h2 style="font-size:21pt;margin-bottom:3mm;">The engine</h2>
+  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;">A benchmark is
+    only worth what its rates are worth. Every figure in a plan comes from a rate book with a version
+    number and an effective date, and an assessor can open it, read where each rate came from, and change
+    any of it. This is that panel.</p>
+
+  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;"><strong>Where
+    the rates come from.</strong> Base rates from the SCSI Tender Price Index and House Rebuilding Guide;
+    labour from the SEO Construction Sector wage agreement, at the second-phase rates effective 1 August
+    2026; the county multiplier from the SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published
+    amounts; VAT as Revenue applies it. Each block in the panel names its own source beneath it, and the
+    on-cost that turns a base wage into an all-in rate &mdash; PRSI, pension, sick pay, public liability,
+    tools and transport, overhead &mdash; is written out rather than assumed.</p>
+
+  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;"><strong>Nothing
+    is hidden, and nothing is fixed.</strong> Every rate is an editable field showing the published default;
+    a category uplift scales a whole trade at once; <em>Reset All</em> restores the book. Where the
+    underlying data is thin, the panel says so rather than presenting it with the same authority as a
+    merchant price &mdash; the ventilation ductwork rate is marked <strong>low confidence, reverse-engineered
+    from system totals</strong>. A rate book that flags its own weak points can be corrected; one that does
+    not, cannot.</p>
+
+  <div class="appshot" style="width:158mm;margin:0 auto;">
+    <img src="{IMG['eurates']}" alt="">
+    <div class="ac" style="font-size:8pt;"><strong>The retrofit rates, with their sources and their
+      overrides.</strong> Supply-only material cost per item, the published figure in every box, and the
+      source named under each group. Change one and every plan priced afterwards uses it; the document
+      carries the rate book version it was priced on, so an outturn can always be traced back.</div>
+  </div>
+
+  <div class="fine">{FINE1}</div>
+  {footer(7, '1', '1')}
 </div>'''
 
 TPL = '''<!doctype html><html><head><meta charset="utf-8"><title>%s</title>
 <style>%s</style></head><body>%s</body></html>'''
 
 for name, content in [('pack_01', doc1), ('pack_02', doc2), ('pack_03', doc3),
-                      ('pack_04', doc4), ('pack_05', doc5), ('pack_06', doc6)]:
+                      ('pack_04', doc4), ('pack_05', doc5), ('pack_06', doc6),
+                      ('pack_07', doc7)]:
     open(name + '.html', 'w').write(TPL % ('PlanitBER — ' + name, CSS, content))
     print('wrote', name + '.html')

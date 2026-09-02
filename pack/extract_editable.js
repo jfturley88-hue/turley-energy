@@ -11,6 +11,7 @@ const DOCS = [
   ['04', 'The Appendix — notes page'],
   ['05', 'The Workflow'],
   ['06', 'The Software'],
+  ['07', 'The Engine'],
 ];
 
 (async () => {
