@@ -14906,11 +14906,11 @@ var EU_HOW_TO_USE =
   'all the quotes you get price the same work. ' +
   // Without this the homeowner never learns the other two documents exist — and the
   // schedule only works if it reaches the contractors.
-  'This is the first of three documents. The <strong>Appendix</strong> sets out how every figure ' +
-  'was calculated and what each of the items shaded "not included" would cost if it turns out ' +
-  'to be needed. The <strong>Contractor Pricing Schedule</strong> is this same scope with every ' +
-  'figure removed — send one to each contractor you ask, so they all price the same work without ' +
-  'seeing your budget. ' +
+  'This is the first of three documents. The <strong>Contractor Pricing Schedule</strong> is this ' +
+  'same scope with every figure removed — send one to each contractor you ask, so they all price the ' +
+  'same work without seeing your budget. The <strong>Appendix</strong> sets out how every figure was ' +
+  'calculated and what each of the items shaded "not included" would cost if it turns out to be ' +
+  'needed. ' +
   'When the quotes come back, compare them with each other and with the Budget Est. ' +
   'column. Record each quote in Variation Notes, and what you actually pay in the Actual ' +
   'column, as the job goes on.';
@@ -18221,8 +18221,8 @@ function _updateEUPDFBtns(isPlan, mode) {
       '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:8px;">' +
         '<span style="font-size:10px;color:#4ade80;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;">The three documents</span>' +
         '<button onclick="exportEUPDF(\'detailed\')" title="Document 1 of 3 — the homeowner works from this for the length of the job. Measure table, scope, and what each measure does not include." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; 1 &middot; '+planLabel+'</button>' +
-        '<button onclick="exportEUPDF(\'appendix\')" title="Document 2 of 3 — the reference behind the plan: how it was calculated, itemised measurements and rates, and guide prices for everything not included." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128209; 2 &middot; Appendix &amp; Not-Included Costings (PDF)</button>' +
-        '<button onclick="exportContractorSchedule()" title="Document 3 of 3 — goes out to contractors. Same measured scope and the same exclusions, with every figure removed." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; 3 &middot; Contractor Pricing Schedule (PDF)</button>' +
+        '<button onclick="exportContractorSchedule()" title="Document 2 of 3 — goes out to contractors. Same measured scope and the same exclusions, with every figure removed." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; 2 &middot; Contractor Pricing Schedule (PDF)</button>' +
+        '<button onclick="exportEUPDF(\'appendix\')" title="Document 3 of 3 — the reference behind the plan: how it was calculated, itemised measurements and rates, and guide prices for everything not included." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128209; 3 &middot; Appendix &amp; Not-Included Costings (PDF)</button>' +
       '</span>' +
       formBtn;
   } else {
@@ -18715,7 +18715,7 @@ function exportEUPDF(mode) {
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
       '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — '+(isEUmode?'Energy Upgrade':pmode)+(isAppendix?' Appendix':' Cost Plan')+
-        EU_DOC_SET(isAppendix ? 2 : 1)+'</div>' +
+        EU_DOC_SET(isAppendix ? 3 : 1)+'</div>' +
       '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
       '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:2px;">' +
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
@@ -18887,7 +18887,7 @@ function exportContractorSchedule() {
 
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
-      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Contractor Pricing Schedule'+EU_DOC_SET(3)+'</div>' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Contractor Pricing Schedule'+EU_DOC_SET(2)+'</div>' +
       '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
       '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:6px;">' +
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
