@@ -22,6 +22,7 @@ IMG = {k: b64(f) for k, f in {
     'preview': 'app_preview_dialog.png',
     'routedl': 'shot_routedl.png',
     'eurates': 'app_eurates.png', 'regional': 'app_regional.png',
+    'eng_a': 'app_eng_a.png', 'eng_b': 'app_eng_b.png', 'eng_c': 'app_eng_c.png',
 }.items()}
 
 GLOBE = '''<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="globe">
@@ -587,39 +588,60 @@ doc6 = f'''<div class="sheet">
   {footer(6, '4', '4')}
 </div>'''
 
-# ── 07 · THE ENGINE — how the rate book is sourced, versioned and inspected ───
+# ── 07 · THE ENGINE — the EU rate book, top to bottom, on three pages ─────────
+# One capture of the whole EU Rates tab, cut on section boundaries so no table is split.
+# The third page is the not-included guide rates: the engine behind the figures the
+# homeowner holds for variations, which is the part of the message document 04 makes.
+ENG_P = 'font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;'
+def engfig(key, w, lead, rest):
+    return f'''<div class="appshot" style="width:{w};margin:0 auto 2mm;">
+      <img src="{IMG[key]}" alt="">
+      <div class="ac" style="font-size:8pt;"><strong>{lead}</strong> {rest}</div>
+    </div>'''
+
 doc7 = f'''<div class="sheet">
   {strip(7)}
   <h2 style="font-size:21pt;margin-bottom:3mm;">The engine</h2>
-  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;">A benchmark is
-    only worth what its rates are worth. Every figure in a plan comes from a rate book with a version
-    number and an effective date, and an assessor can open it, read where each rate came from, and change
-    any of it. This is that panel.</p>
-
-  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;"><strong>Where
-    the rates come from.</strong> Base rates from the SCSI Tender Price Index and House Rebuilding Guide;
-    labour from the SEO Construction Sector wage agreement, at the second-phase rates effective 1 August
-    2026; the county multiplier from the SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published
-    amounts; VAT as Revenue applies it. Each block in the panel names its own source beneath it.</p>
-
-  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;"><strong>Nothing
-    is hidden, and nothing is fixed.</strong> Every rate is an editable field showing the published default;
-    a category uplift scales a whole trade at once; <em>Reset All</em> restores the book. Where the
-    underlying data is thin, the panel says so rather than presenting it with the same authority as a
-    merchant price &mdash; the ventilation ductwork rate is marked <strong>low confidence, reverse-engineered
-    from system totals</strong>. A rate book that flags its own weak points can be corrected; one that does
-    not, cannot.</p>
-
-  <div class="appshot" style="width:158mm;margin:0 auto;">
-    <img src="{IMG['eurates']}" alt="">
-    <div class="ac" style="font-size:8pt;"><strong>The retrofit rates, with their sources and their
-      overrides.</strong> Supply-only material cost per item, the published figure in every box, and the
-      source named under each group. Change one and every plan priced afterwards uses it; the document
-      carries the rate book version it was priced on, so an outturn can always be traced back.</div>
-  </div>
-
+  <p class="body" style="{ENG_P}">A benchmark is only worth what its rates are worth. Every figure in a plan
+    comes from a rate book with a version number and an effective date, and an assessor can open it, read
+    where each rate came from, and change any of it. These three pages are the retrofit rate book, top to
+    bottom, exactly as it appears on screen.</p>
+  <p class="body" style="{ENG_P}"><strong>Where the rates come from.</strong> Base rates from the SCSI
+    Tender Price Index and House Rebuilding Guide; labour from the SEO Construction Sector wage agreement,
+    at the second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
+    Supplement; grants at SEAI&rsquo;s published amounts; VAT as Revenue applies it. Each block names its
+    own source beneath it.</p>
+  <p class="body" style="{ENG_P}"><strong>Nothing is hidden, and nothing is fixed.</strong> Every rate is
+    an editable field showing the published default; a category uplift scales a whole trade at once;
+    <em>Reset All</em> restores the book. Where the data is thin the panel says so &mdash; the ventilation
+    ductwork rate is marked <strong>low confidence</strong> &mdash; rather than presenting it with the
+    authority of a merchant price. A rate book that flags its own weak points can be corrected.</p>
+  {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
+    'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
-  {footer(7, '1', '1')}
+  {footer(7, '1', '3')}
+</div>
+
+<div class="sheet">
+  {strip(7)}
+  {engfig('eng_b', '172mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
+    'The frame and style multipliers for windows are written out under the table, so a triple-glazed alu-clad sash window can be traced from the base rate. The attic ancillaries are the items every attic top-up carries as standard: the tank jacket, the pipe lagging, the walkway and the storage deck.')}
+  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  {footer(7, '2', '3')}
+</div>
+
+<div class="sheet">
+  {strip(7)}
+  <h2 style="font-size:16pt;margin-bottom:2mm;">The not-included rates</h2>
+  <p class="body" style="{ENG_P}">This is the engine behind the guide prices in the Appendix. Every item a
+    measure leaves out is priced here, per unit, with the measure it belongs to named beside it. When a
+    contractor proposes a variation, the figure the homeowner holds against it comes from this table; and
+    when an item is ticked into a plan after the survey, its priced line uses the same rate. One number, in
+    one place, feeding both.</p>
+  {engfig('eng_c', '172mm', 'Variations &mdash; not included guide rates.',
+    'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The low-confidence flag at the foot applies to items with limited Irish market data, which the panel says should be verified with a specialist before use in a formal estimate.')}
+  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  {footer(7, '3', '3')}
 </div>'''
 
 TPL = '''<!doctype html><html><head><meta charset="utf-8"><title>%s</title>

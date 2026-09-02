@@ -1,0 +1,45 @@
+{
+ "height": 3438,
+ "heads": [
+  {
+   "t": "Rate overrides",
+   "y": 191
+  },
+  {
+   "t": "Category uplift %",
+   "y": 209
+  },
+  {
+   "t": "📈 Category Uplift %",
+   "y": 266
+  },
+  {
+   "t": "Wall Insulation (€/m²)",
+   "y": 285
+  },
+  {
+   "t": "MVHR Unit (€/unit × tier 0.8/1.0/1.3)",
+   "y": 591
+  },
+  {
+   "t": "EWI Render / Finish (€/m² add-on)",
+   "y": 723
+  },
+  {
+   "t": "MEV (Mechanical Extract Ventilation)",
+   "y": 858
+  },
+  {
+   "t": "DMEV & Trickle Vent (€/nr)",
+   "y": 1175
+  },
+  {
+   "t": "Windows & Doors (supply only)",
+   "y": 1557
+  },
+  {
+   "t": "Attic Bundle — standard ancillaries (supply only)",
+   "y": 2230
+  }
+ ]
+}
