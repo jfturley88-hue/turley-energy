@@ -18661,16 +18661,6 @@ function exportEUPDF(mode) {
         labMultNote + ' Contractor\'s O&amp;P (12%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
       appxSections +
       exclusionsHTML +
-      // The cost-per-m2 check belongs here rather than on the homeowner's plan page: it is a
-      // quantity surveyor's sanity test, and this is the technical half of the document.
-      (planPerM2Note(_T)
-        ? '<div style="font-size:8.5pt;color:#334155;border:1px solid #E2E8F0;background:#F8FAFC;' +
-          'border-radius:4px;padding:8px 10px;margin-top:12px;line-height:1.5;">' +
-            '<strong>Cost benchmark.</strong> This plan works out at <strong>' + planPerM2Note(_T) +
-            '</strong>. Dividing the total by the floor area is the quickest way to compare this house ' +
-            'against another, or to see whether a single measure is out of line with the rest.' +
-          '</div>'
-        : '') +
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:10px;">' +
         'All rates above are drawn from <strong style="color:#334155;">' + rateBookStamp() + '</strong>.' +
       '</div>' +
