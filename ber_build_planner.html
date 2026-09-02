@@ -14666,15 +14666,6 @@ function planDifferenceWords(diffTotal, anyActual) {
   if (!anyActual || !diffTotal) return '';
   return fmt(Math.abs(diffTotal)) + (diffTotal > 0 ? ' under budget estimate' : ' over budget estimate');
 }
-// "€361/m² of floor area · €165/m² after grants" — the sanity check a homeowner can
-// carry to any other quote, and the fastest way to spot a measure that is out of line.
-function planPerM2Note(t) {
-  if (!t || !t.perM2) return '';
-  return '€' + t.perM2.toLocaleString() + '/m² of floor area' +
-         (t.showGrants ? ' · €' + t.netPerM2.toLocaleString() + '/m² after grants' : '') +
-         ' · ' + t.floorArea + ' m²';
-}
-window.planPerM2Note = planPerM2Note;
 window.planDifference = planDifference;
 window.planDifferenceWords = planDifferenceWords;
 
@@ -14824,8 +14815,6 @@ function planTotals(b) {
     totalEst: totalEst, grantTotal: grantTotal,
     net: Math.max(0, totalEst - grantTotal),
     floorArea: _fa,
-    perM2:    _fa > 0 ? Math.round(totalEst / _fa) : 0,
-    netPerM2: _fa > 0 ? Math.round(Math.max(0, totalEst - grantTotal) / _fa) : 0,
   };
 }
 window.planTotals = planTotals;
@@ -18457,11 +18446,6 @@ function exportEUPDF(mode) {
 
   // TOTAL + actual rows. Difference totals only the rows that carry an actual — see _d().
   var netCost = Math.max(0, totalEst - totalGrts);
-  // Same benchmark the screen prints, from this document's own totals.
-  var _faPdf = parseFloat(pi.floorArea || inp.floorArea || 0) || 0;
-  var _T = { floorArea: _faPdf, showGrants: showGrants,
-             perM2:    _faPdf > 0 ? Math.round(totalEst / _faPdf) : 0,
-             netPerM2: _faPdf > 0 ? Math.round(netCost / _faPdf) : 0 };
   var _diffCol   = pdfAnyActual
     ? (pdfDiffSum > 0 ? DIFF_COLOURS.print.under : pdfDiffSum < 0 ? DIFF_COLOURS.print.over : DIFF_COLOURS.print.muted)
     : DIFF_COLOURS.print.muted;
@@ -18562,8 +18546,8 @@ function exportEUPDF(mode) {
       methFeeRow = '<tr style="border-bottom:1px solid #E2E8F0;">' +
         '<td style="padding:5px 6px;font-size:8pt;border:1px solid #E2E8F0;">Scheme management &amp; grant administration</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;">'+
-          (pdfFee.derived ? 'Allowance within the provider\'s all-in price — provisional, no O&amp;P or contingency applied'
-                          : 'Professional fee, VAT included — no O&amp;P or contingency applied')+'</td>' +
+          (pdfFee.derived ? 'Allowance within the provider\'s all-in price — provisional, charged as billed'
+                          : 'Professional fee, VAT included — charged as billed')+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">—</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;">'+fmt(pdfFee.amount)+'</td>' +
@@ -22831,13 +22815,17 @@ function _ufType(t) {
 = (Qty &times; MatRate &times; WasteFactor)
 + (Qty &times; LabHrs &times; TradeRate &times; CountyMultiplier)
 
-&Sigma; LINE ITEMS = ELEMENTS COST
-+ PLANT ALLOWANCE (4% of elements)
-+ PRELIMS (New Build 15% / Refurb 18% / Energy Upgrade 12%)
-+ CONTINGENCY (New Build 8% / Refurb 12% / Energy Upgrade 10%)
-= SUB-TOTAL
-&times; 1.135 VAT (13.5% Irish Construction Rate)
-= <span class="mdb-out">GROSS CONSTRUCTION COST</span>
+&Sigma; LINE ITEMS = SECTION BASE COST
+
+Each section is then loaded on its own:
+&times; 1.12  CONTRACTOR'S OVERHEAD &amp; PROFIT (12%)
+&times; VAT   13.5% works &middot; 9% heat pump supply &amp; install (Finance Act 2024)
+              &middot; 0% solar PV (Revenue ruling, May 2023)
+= <span class="mdb-out">SECTION TOTAL</span>
+
+  &#8627; <em>Energy Upgrade adds no contingency and no plant allowance: the plan is a baseline
+     benchmark for judging quotes, and a contractor's quote carries neither.
+     New Build and Refurbishment offer both under Advanced Options, off by default.</em>
 + PROFESSIONAL FEES (Architect 10% / Structural Engineer scaled / BER &#8364;300 / BCMS 0.15%)
   &#8627; <em>Refurb: fees already itemised in Works Selector BOQ are tagged (feeType) and suppressed here to prevent double-count</em>
 = <span class="mdb-out">TOTAL PROJECT COST</span>
@@ -23489,7 +23477,7 @@ function toggleMatOverlay() {
   (function(){
     var host=document.getElementById('eur-vars-section');
     if(!host||typeof EU_EXCL==='undefined')return;
-    var h='<div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:16px 0 8px;">&#128683; Variations &mdash; Not Included guide rates (&#8364; material per unit &middot; labour from Labour Rates tab &middot; loaded like the plan: O&amp;P + contingency + VAT 13.5%)</div>'+
+    var h='<div style="font-size:10px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:0.07em;margin:16px 0 8px;">&#128683; Variations &mdash; Not Included guide rates (&#8364; material per unit &middot; labour from Labour Rates tab &middot; loaded like the plan: O&amp;P 12% + VAT 13.5%)</div>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px 18px;">';
     Object.keys(EU_EXCL).forEach(function(mk){EU_EXCL[mk].forEach(function(e){
       if(typeof e.mat==='function')return; // fascia is edited via its own EWI input above
