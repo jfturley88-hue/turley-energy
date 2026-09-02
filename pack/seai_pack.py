@@ -261,7 +261,7 @@ FINE1 = ('PlanitBER V1 &middot; '
 
 # ── 01 · THE VALUE PROPOSITION — text only, one page, references the other three ─
 def vk(t):
-    return f'<div class="kick" style="margin-top:1.7mm;">{t}</div>'
+    return f'<div class="kick" style="margin-top:2.3mm;">{t}</div>'
 
 doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
@@ -271,29 +271,23 @@ doc1 = f'''<div class="sheet">
       <div>Co. Monaghan &middot; info@turleyenergy.ie</div><div>[Date]</div>
     </div>
   </div>
-  <h1 style="font-size:17.5pt;line-height:1.18;margin:3.4mm 0 1.5mm;">Empowering homeowners with tender documents to engage in the retrofit process with confidence</h1>
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">PlanitBER is a
-    <strong>bespoke cost plan</strong> for one house&rsquo;s retrofit, issued with the provisional BER
-    and built from the same survey. Every agreed measure carries its own <strong>benchmark</strong>: an
-    estimate at published rates, with what it includes and what it leaves out stated beside it. A blank
-    <strong>pricing schedule</strong> carries that scope to every contractor asked to quote, so each
-    prices the same work and the quotes compare like with like. An <strong>appendix</strong> gives the
-    homeowner a guide price for every item left out, so a variation is agreed against a figure they
-    already hold rather than argued once the job is open. Three documents. They empower the homeowner
-    to tender for their retrofit the way a business would, and they level the playing field for every
-    contractor who quotes.</p>
+  <h1 style="font-size:17.5pt;line-height:1.18;margin:4mm 0 2mm;">Empowering homeowners with tender documents to engage in the retrofit process with confidence</h1>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Three bespoke documents,
+    issued with the provisional BER. Each measure carries a <strong>benchmark</strong> &mdash; an
+    estimate with what&rsquo;s included and what&rsquo;s not. Contractors price that scope on the
+    <strong>schedule</strong>, so quotes compare like with like. Variations get agreed rather than argued,
+    because the homeowner already holds guide prices for the not-included items in the
+    <strong>appendix</strong>. That empowers the homeowner and levels the playing field.</p>
 
   {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The common belief is that grants inflate the price.</strong> When every
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When every
     figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
     nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
     before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The homeowner is empowered to tender.</strong> For each measure they
-    hold the scope and what it should cost; for each item left out, what it should cost if needed; and
-    every contractor prices the same scope. A quote is judged measure by measure, and a variation against
-    a guide price. The fair contractor gains too: measured quantities, variations in writing, and
-    customers who have decided to go ahead.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The fair contractor gains too.</strong> Measured quantities rather than
+    a survey of their own, variations in writing rather than argued on site, and customers who have
+    already decided to go ahead.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
     consultancy fee for the plan, earned at the moment the retrofit decision is being made. The
     workflow does not change &mdash; the same survey, the same provisional BER &mdash; that data now
     also produces the three documents. The assessor sells no installation and takes no commission, and
@@ -301,26 +295,26 @@ doc1 = f'''<div class="sheet">
     work.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
     <strong>Pricing Schedule</strong> their contractors quote on, and the <strong>Appendix</strong>
     behind both &mdash; each bound in full behind a page of notes, exactly as the software prints it.
     Every figure traces to this house rather than a house of its type.</p>
 
   {vk('The workflow &mdash; document 05')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">The workflow already happens &mdash; assessment, measures agreed with the
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
     homeowner, provisional report, works, post-works BER. One step is added: the plan.</p>
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
     selected, the plan prints, and the grant route can be switched at the moment of download. Behind it a
     rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
     the weak ones marked as weak.</p>
 
   {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
     of plans, with recorded spend measured against the accuracy band. SEAI observes throughout, and the
     outturns refine the rate book.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
     through an API, so the three documents can be produced for any home on the register. The goal is
     SEAI&rsquo;s own: <strong>more retrofits.</strong></p>
 
