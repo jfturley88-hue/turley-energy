@@ -15143,7 +15143,7 @@ function renderEUTable(b) {
           '<div style="font-size:9px;color:#6B7280;margin-top:2px;">Required to release all SEAI grants</div>' +
           (showGrants ? planGrantNote([berGrant]) : '') +
         '</td>' +
-        '<td class="eu-c-basis"><ul class="eu-pb-list"><li>SEAI registered BER assessor</li><li>Post-upgrade energy rating</li><li>Certificate issued before grants released</li></ul></td>' +
+        '<td class="eu-c-basis"><ul class="eu-pb-list"><li>BER certificate</li></ul></td>' +
         '<td class="eu-c-est plan-edge">'+fmt(BER_ASSESS_COST)+'</td>' +
         '<td class="eu-c-notes"><textarea id="eu-note-ber" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="eu-act-ber" class="eu-act-input" min="0" step="10" placeholder="—" ' +
@@ -18359,7 +18359,7 @@ function exportEUPDF(mode) {
         '<tr style="border-bottom:'+B+';">' +
           '<td style="padding:5px 4px;text-align:center;font-size:8pt;border:'+B+';color:#94a3b8;">☑</td>' +
           '<td style="padding:5px 6px;font-size:9pt;color:#1E293B;border:'+B+';">BER Assessment (post-works)<br><span style="font-size:7pt;color:#94a3b8;">Required to release all SEAI grants</span>'+_gNote([berGrant])+'</td>' +
-          '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• SEAI registered BER assessor<br>• Post-upgrade energy rating<br>• Certificate issued before grants released</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:'+B+';">• BER certificate</td>' +
           '<td style="padding:5px 6px;text-align:right;font-weight:700;color:#E8A020;border:'+B+';'+_pdfEdge+'">'+fmt(PDF_BER_COST)+'</td>' +
           '<td style="border:'+B+';"></td>' +
           '<td style="padding:5px 6px;text-align:right;color:#38bdf8;border:'+B+';">'+(berActual>0?fmt(berActual):'')+'</td>' +
