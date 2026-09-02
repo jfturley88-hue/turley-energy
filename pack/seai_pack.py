@@ -272,28 +272,26 @@ doc1 = f'''<div class="sheet">
   </div>
   <h1 style="font-size:17.5pt;line-height:1.18;margin:3.4mm 0 1.5mm;">Empowering homeowners with tender documents to engage in the retrofit process with confidence</h1>
   <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">PlanitBER is a
-    <strong>bespoke cost plan</strong> for one house&rsquo;s retrofit, issued with a blank pricing
-    schedule for contractors to price and an appendix carrying the workings &mdash; three documents,
-    built from the survey the provisional BER is already based on. Every agreed measure is priced on
-    published rates, with what it includes and what it leaves out stated on the face of it. It is not an
-    estimate of what a house like this costs: it is this house&rsquo;s measured geometry at published
-    rates. It empowers the homeowner with a scope and a figure of their own before any contractor names a
-    price, so they engage the tender process for their retrofit the way a business would &mdash; every
-    quote coming back comparable, every extra settled in the open.</p>
+    <strong>bespoke cost plan</strong> for one house&rsquo;s retrofit, issued with the provisional BER
+    and built from the same survey. Every agreed measure carries its own <strong>benchmark</strong>: an
+    estimate at published rates, with what it includes and what it leaves out stated beside it. A blank
+    <strong>pricing schedule</strong> carries that scope to every contractor asked to quote, so each
+    prices the same work and the quotes compare like with like. An <strong>appendix</strong> gives the
+    homeowner a guide price for every item left out, so a variation is agreed against a figure they
+    already hold rather than argued once the job is open. Three documents. They empower the homeowner
+    to tender for their retrofit the way a business would, and they level the playing field for every
+    contractor who quotes.</p>
 
   {vk('Why it is needed')}
   <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The common belief is that grants inflate the price.</strong> When every
-    figure a homeowner sees comes from the contractors quoting for the work, the grant becomes invisible
-    margin &mdash; a figure the trade can price against, with no way for the household to tell. Nobody
-    can show whether it happens, and while that is so, raising grant levels cannot be relied on to lift
-    uptake. The missing piece is not more money but a benchmark that exists before any contractor names
-    a price, against which the question can be answered.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The homeowner is empowered to tender.</strong> The baseline
-    benchmark gives them the scope and what it should cost; the appendix gives them a guide price for
-    anything a contractor finds beyond it; the pricing schedule puts every contractor who quotes on the
-    same measured scope. A fair variation is agreed in minutes against the guide price, a padded one is
-    visible in the same minutes. The fair contractor gains too: measured quantities, variations in
-    writing, and customers who have decided to go ahead.</p>
+    figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
+    nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
+    before any contractor names a price.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The homeowner is empowered to tender.</strong> For each measure they
+    hold the scope and what it should cost; for each item left out, what it should cost if needed; and
+    every contractor prices the same scope. A quote is judged measure by measure, and a variation against
+    a guide price. The fair contractor gains too: measured quantities, variations in writing, and
+    customers who have decided to go ahead.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
     consultancy fee for the plan, earned at the moment the retrofit decision is being made. The
     workflow does not change &mdash; the same survey, the same provisional BER &mdash; that data now
@@ -302,13 +300,10 @@ doc1 = f'''<div class="sheet">
     work.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">All three are built bespoke from the provisional BER: the
-    <strong>Cost Plan</strong> the homeowner works from, the blank <strong>Pricing Schedule</strong> their
-    contractors quote on, and the <strong>Appendix</strong> behind both. The survey that produces the
-    certificate produces the measured scope, so nothing is measured twice and every figure traces to this
-    house rather than a house of its type. Every measure names what it leaves out, and the Appendix
-    carries a guide price for each, so a variation is <strong>agreed against the benchmark before work
-    starts</strong> rather than argued once the job is open.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
+    <strong>Pricing Schedule</strong> their contractors quote on, and the <strong>Appendix</strong>
+    behind both &mdash; each bound in full behind a page of notes, exactly as the software prints it.
+    Every figure traces to this house rather than a house of its type.</p>
 
   {vk('The workflow &mdash; document 05')}
   <p class="body" style="font-size:9.2pt;line-height:1.47;margin-bottom:1.7mm;">The workflow already happens &mdash; assessment, measures agreed with the
@@ -364,11 +359,13 @@ doc2 = notes(2, 'The Cost Plan', (
   ('The benchmark is on every row, not at the bottom.',
    'This is the part that does the work. Each measure carries its own measured scope and its own '
    'figure &mdash; the attic top-up, the cavity fill, the windows and doors, the heat pump, the '
-   'ventilation &mdash; and that figure is the benchmark for <em>that measure</em>. A quote is judged '
-   'line by line against it. A contractor pricing the attic at twice the benchmark has to account for '
-   'the attic, on that line, where the homeowner can see it; there is nowhere to lose it inside a single '
-   'total. That is why the plan is set out measure by measure, and why the scope sits beside every '
-   'figure: the two are read together or neither means anything.'),
+   'ventilation &mdash; and that figure is the benchmark for <em>that measure</em>. Beside it sits what '
+   'the figure covers, the scope and the measured quantities, and under that, shaded, what it leaves '
+   'out. Cavity fill, for instance: pump 90&thinsp;m&sup2; of 50&thinsp;mm bonded bead, making good '
+   'included; not included, the room-by-room air intake vents a filled cavity makes necessary. A quote '
+   'is judged line by line against all three. A contractor pricing the attic at twice the benchmark has '
+   'to account for the attic, on that line, where the homeowner can see it; there is nowhere to lose it '
+   'inside a single total.'),
   ('The totals, and what has to be raised.',
    f'Those rows add to <strong>&euro;{EX_TOTAL}</strong> &mdash; the whole job, VAT and the '
    f'contractor&rsquo;s overhead included. SEAI grants of <strong>&euro;{EX_GRANTS}</strong> are named '
@@ -380,25 +377,19 @@ doc2 = notes(2, 'The Cost Plan', (
    f'Quantities are taken from the standard BER survey the provisional certificate is built from &mdash; '
    f'nothing is measured twice. Every rate comes from the published rate book &mdash; {RATE_BOOK} &mdash; '
    f'with the Co. Westmeath labour multiplier applied, and the contractor&rsquo;s overhead and VAT added '
-   f'on top. It is a baseline price before any variation is considered on site.'),
+   f'on top. The guide prices for the items left out are in the Appendix, document 04.'),
   ('How the heat pump is sized.',
-   f'The Heat Loss Indicator is read off the provisional BER &mdash; {EX_HLI}&thinsp;W/m&sup2;K here, '
-   f'inside SEAI&rsquo;s &le;2.3 threshold for the grant. HLI &times; floor area is the heat loss '
-   f'coefficient, so {EX_HLI} &times; {EX_AREA}&thinsp;m&sup2; &times; 23&thinsp;K gives a '
-   f'<strong>{EX_KW}&thinsp;kW design load at {EX_FLOW}&deg;C flow</strong> &mdash; {SIZING_BASIS}. '
-   f'The derivation is printed on the plan for any contractor to check, and the installer&rsquo;s own '
-   f'room-by-room calculation confirms the unit, sizes the emitters and prices any variation.'),
-  ('What each measure does and does not cover.',
-   'Every measure carries its scope and its measured quantities, and under them a shaded box naming what '
-   'that measure leaves out &mdash; unpriced here. Cavity fill, for instance: pump 90&thinsp;m&sup2; of '
-   '50&thinsp;mm bonded bead, making good included; not included, the room-by-room air intake vents that '
-   'a filled cavity makes necessary. The guide prices for those items are in the Appendix, document 04.'),
+   f'From the provisional BER&rsquo;s Heat Loss Indicator &mdash; {EX_HLI}&thinsp;W/m&sup2;K here &mdash; '
+   f'giving a <strong>{EX_KW}&thinsp;kW design load at {EX_FLOW}&deg;C flow</strong>. The sum is printed '
+   f'on the plan for any contractor to check; the installer&rsquo;s room-by-room calculation confirms the '
+   f'unit and prices any variation.'),
 ])
 
 # ── 03 · THE PRICING SCHEDULE ────────────────────────────────────────────────
 doc3 = notes(3, 'The Pricing Schedule', (
-    'The same measured scope with every figure removed &mdash; no estimate, no grant amounts, no totals. '
-    'One goes to each contractor asked to quote. It follows in full, exactly as the software prints it.'), [
+    'The benchmark&rsquo;s scope, measure by measure, with every figure removed &mdash; no estimate, no '
+    'grant amounts, no totals. What each measure includes and what it leaves out stays. One goes to each '
+    'contractor asked to quote, so each prices the same work the benchmark priced.'), [
   ('It keeps the tender an open market.',
    'A contractor who can see the homeowner&rsquo;s budget prices against the budget. With the figures '
    'gone they price the work. Every contractor quotes the same measured scope with no sight of the '
@@ -426,9 +417,8 @@ doc4 = notes(4, 'The Appendix', (
   ('How the estimate &mdash; the benchmark &mdash; was calculated.',
    'The estimate on the Cost Plan is the benchmark; this is the arithmetic behind it. '
    'Measure by measure: the inputs used, the base cost of materials and labour, the contractor&rsquo;s '
-   'overhead and profit, and the VAT that applies to that measure &mdash; 13.5% on works, 9% on heat pump '
-   'supply and installation under the Finance Act 2024, 0% on solar PV under the Revenue ruling of May '
-   '2023. The loaded column ties back to the Cost Plan line for line. Each measure also repeats what it '
+   'overhead and profit, and the VAT that applies to that measure. The loaded column ties back to the '
+   'Cost Plan line for line. Each measure also repeats what it '
    'leaves out, so what a figure covers and what it does not can be read together.'),
   ('The itemised index.',
    'Beneath every bundled measure, the individual items at base rates &mdash; quantity, unit, material '
@@ -508,10 +498,9 @@ def appfig(key, w, lead, rest):
 doc6 = f'''<div class="sheet">
   {strip(6)}
   <h2>The software behind it</h2>
-  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">PlanitBER is not a concept &mdash; it is live, working
-    software. These screens are the whole journey, in order: the survey goes in, the grant route is
-    chosen with the figures on display, and the finished document comes out the far end, ready to
-    print.</p>
+  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Live software, as it runs. These screens are the
+    whole journey, in order: the survey goes in, the grant route is chosen with the figures on display,
+    and the three documents print at the far end.</p>
 
   {appfig('home', '152mm', '1 &middot; Choose the project type.',
     'New Build, Refurbishment and Energy Upgrade share one engine and one rate base.')}
@@ -591,18 +580,8 @@ doc6 = f'''<div class="sheet">
   {appfig('grants', '134mm', '7 &middot; The SEAI grant table the plans draw from.',
     'Every amount dated, visible and editable &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
 
-  <div class="kick" style="margin-top:2mm;">Where every number comes from</div>
-  <ul class="src">
-    <li>SCSI Tender Price Index &amp; House Rebuilding Guide 2025&ndash;26 &mdash; base rates</li>
-    <li>SEO Construction Sector 2024 &mdash; labour, second-phase rates of 1 August 2026</li>
-    <li>SCSI Regional Cost Supplement, August 2025 &mdash; county multipliers</li>
-    <li>SEAI grant rates effective 3 February and 4 March 2026</li>
-    <li>VAT as applied &mdash; 13.5% works &middot; 9% heat pumps (Finance Act 2024) &middot; 0% solar PV</li>
-    <li>Irish merchant pricing, Q2&ndash;Q3 2026</li>
-  </ul>
-  <p class="body" style="font-size:8pt;color:#64748B;margin-top:1.2mm;">Every document is stamped with the
-    rate book version it was priced on &mdash; currently {RATE_BOOK} &mdash; so any figure traces to a
-    dated, named source.</p>
+  <p class="body" style="font-size:8pt;color:#64748B;margin-top:2mm;">Where each rate comes from, and how the
+    book is versioned and inspected, is document 07.</p>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '4', '4')}
@@ -621,9 +600,7 @@ doc7 = f'''<div class="sheet">
     the rates come from.</strong> Base rates from the SCSI Tender Price Index and House Rebuilding Guide;
     labour from the SEO Construction Sector wage agreement, at the second-phase rates effective 1 August
     2026; the county multiplier from the SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published
-    amounts; VAT as Revenue applies it. Each block in the panel names its own source beneath it, and the
-    on-cost that turns a base wage into an all-in rate &mdash; PRSI, pension, sick pay, public liability,
-    tools and transport, overhead &mdash; is written out rather than assumed.</p>
+    amounts; VAT as Revenue applies it. Each block in the panel names its own source beneath it.</p>
 
   <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3.2mm;"><strong>Nothing
     is hidden, and nothing is fixed.</strong> Every rate is an editable field showing the published default;
