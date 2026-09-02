@@ -260,7 +260,7 @@ FINE1 = ('PlanitBER V1 &middot; '
 
 # ── 01 · THE VALUE PROPOSITION — text only, one page, references the other three ─
 def vk(t):
-    return f'<div class="kick" style="margin-top:1.5mm;">{t}</div>'
+    return f'<div class="kick" style="margin-top:2.3mm;">{t}</div>'
 
 doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
@@ -271,40 +271,36 @@ doc1 = f'''<div class="sheet">
     </div>
   </div>
   <h1 style="font-size:18pt;margin:4mm 0 1.5mm;">Turning provisional BERs into retrofit projects</h1>
-  <p class="body" style="font-size:9pt;color:#64748B;margin-bottom:2mm;">A tender document built to put
-    <strong style="color:#1E293B;">transparency and trust</strong> into retrofit pricing &mdash; and, in
-    turn, more retrofits. Six documents: this value proposition; the three the software prints for one
-    house &mdash; the Cost Plan, the Pricing Schedule and the Appendix; then the workflow, the
-    software, and the engine that prices it.</p>
-
-  {vk('What it is')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">Built from data the provisional BER already holds, it sets a
-    <strong>baseline benchmark</strong> for the retrofit: a Cost Plan pricing every agreed measure on
-    published rates, stating what each one includes and what it leaves out, with a blank Pricing Schedule
-    for every contractor who quotes and an Appendix carrying the evidence. A baseline is not an estimate &mdash; it is this house&rsquo;s measured geometry at
-    published rates, not a typical cost for its type. Every quote comes back comparable and every extra
-    is settled in the open, so the homeowner tenders the way a business does.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">PlanitBER is a
+    <strong>bespoke cost plan</strong> for one house&rsquo;s retrofit, issued with a blank pricing
+    schedule for contractors to price and an appendix carrying the workings &mdash; three documents,
+    built from the survey the provisional BER is already based on. Every agreed measure is priced on
+    published rates, with what it includes and what it leaves out stated on the face of it. It is not an
+    estimate of what a house like this costs: it is this house&rsquo;s measured geometry at published
+    rates. The homeowner holds a scope and a figure of their own before any contractor names a price, and
+    can engage the tender process for their retrofit the way a business would &mdash; every quote coming
+    back comparable, every extra settled in the open.</p>
 
   {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>The common belief is that grants inflate the price.</strong> When every
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When every
     figure a homeowner sees comes from the contractors quoting for the work, the grant becomes invisible
     margin &mdash; a figure the trade can price against, with no way for the household to tell either
     way. Nobody can currently show whether it happens, and while that is true, raising grant levels
     cannot be relied on to lift uptake. The missing piece is not more money: it is a benchmark that
     exists before any contractor names a price, against which the question can be answered.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>The homeowner has nothing to judge a quote against.</strong> With the
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The homeowner has nothing to judge a quote against.</strong> With the
     baseline they hold the scope, the estimated cost, the grants named beside their measures and the net
     figure to plan around. A fair variation is agreed in minutes against the guide price; a padded one is
     visible in the same minutes. <strong>The fair contractor gains too</strong> &mdash; measured
     quantities, variations in writing, and customers who have decided to go ahead.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>Nobody at the table is independent.</strong> The assessor sells no
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Nobody at the table is independent.</strong> The assessor sells no
     installation and takes no commission, and prices the plan from a dated, published rate book, so the
     figure does not move with who wins the work. It also puts the assessor in a <strong>paid advisory
     role</strong> at the moment the retrofit decision is being made &mdash; a consultancy fee for the
     plan, with {ASSESSOR_ASK}.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">One house, three readers: a {EX_AREA}&thinsp;m&sup2; 3-bed semi in
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">One house, three readers: a {EX_AREA}&thinsp;m&sup2; 3-bed semi in
     Mullingar, {EX_BER}, on {EX_SCHEME} &mdash; attic top-up, cavity fill, windows and doors, a heat pump
     sized from the provisional BER&rsquo;s Heat Loss Indicator, and ventilation. <strong>&euro;{EX_TOTAL}
     total &middot; &euro;{EX_GRANTS} in grants &middot; &euro;{EX_NET} to fund.</strong> The
@@ -315,21 +311,21 @@ doc1 = f'''<div class="sheet">
     starts</strong> rather than argued once the job is open.</p>
 
   {vk('The workflow &mdash; document 05')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">The workflow already happens &mdash; assessment, measures agreed with the
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
     homeowner, provisional report, works, post-works BER. One step is added: the plan. A small change to
     the assessor&rsquo;s day, a decisive one for everything that follows.</p>
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;">Live and running: the survey goes in, the intended measures are
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running: the survey goes in, the intended measures are
     selected, the plan prints, and the grant route can be switched at the moment of download. Behind it a
     rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
     the weak ones marked as weak.</p>
 
   {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
     of plans, with recorded spend measured against the accuracy band. SEAI observes with full access,
     and the outturns refine the rate book.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.43;margin-bottom:1.5mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
     through an API, so the three documents can be produced for any home on the register &mdash; not only
     the house surveyed today. The goal is SEAI&rsquo;s own: <strong>more retrofits.</strong></p>
 
