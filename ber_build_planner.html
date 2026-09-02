@@ -15252,7 +15252,7 @@ function renderEUTable(b) {
       // right of it is filled in as the job runs. Saying so above the headings is what makes
       // this a baseline document rather than another estimate.
       '<tr class="eu-baseline-band">' +
-        '<th colspan="'+nFixed+'" class="plan-edge">Baseline &mdash; fixed at date of issue</th>' +
+        '<th colspan="'+nFixed+'" class="plan-edge">Benchmark &mdash; fixed at date of issue</th>' +
         '<th colspan="3">Live &mdash; recorded as the job runs</th>' +
       '</tr>' +
       '<tr>' +
@@ -18625,7 +18625,7 @@ function exportEUPDF(mode) {
         'names what it does not cover in a shaded box under its scope. This is the same list, with the costings attached. ' +
         'The prices are here and not on the Schedule on purpose: a contractor who can see your figure treats it as a floor, ' +
         'whereas you need it to judge what comes back.</p>' +
-      '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">The baseline above prices each measure itself. The items below are deliberately outside it — ' +
+      '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">The benchmark above prices each measure itself. The items below are deliberately outside it — ' +
         'they are only needed on some houses, and pricing them into every plan would pad every budget. If your contractor finds one is needed, ' +
         'this is roughly what it should cost. Agree the figure before work starts and record it under <strong>Variation Notes</strong> — ' +
         'a variation adjusts the budget, it never silently replaces it. Guide prices include VAT at 13.5%. ' +
@@ -18635,7 +18635,7 @@ function exportEUPDF(mode) {
         '<colgroup><col style="width:24%"/><col style="width:48%"/><col style="width:28%"/></colgroup>' +
         '<thead><tr style="background:#F1F5F9;">' +
           '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Measure</th>' +
-          '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Not included in the baseline</th>' +
+          '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Not included in the benchmark</th>' +
           '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;color:#1E293B;">Guide price (incl. VAT)</th>' +
         '</tr></thead><tbody>' + exRows + '</tbody></table>';
 
@@ -18705,7 +18705,7 @@ function exportEUPDF(mode) {
     '</div>';
 
   var _bandRow = '<tr style="background:#FFF7ED;color:#92400E;">' +
-      '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
+      '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Benchmark &mdash; fixed at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
     '</tr>';
   // Same pairing as on screen: Pricing Basis equals Variation Notes, and Budget Est.,
@@ -18727,7 +18727,7 @@ function exportEUPDF(mode) {
     '<col style="width:25%"/><col style="width:13%"/><col style="width:13%"/></colgroup>';
   var thead6 = '<thead>' +
     '<tr style="background:#FFF7ED;color:#92400E;">' +
-      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
+      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Benchmark &mdash; fixed at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
     '</tr>' +
     '<tr style="background:#F1F5F9;color:#1E293B;">' +
@@ -22823,7 +22823,7 @@ Each section is then loaded on its own:
               &middot; 0% solar PV (Revenue ruling, May 2023)
 = <span class="mdb-out">SECTION TOTAL</span>
 
-  &#8627; <em>Energy Upgrade adds no contingency and no plant allowance: the plan is a baseline
+  &#8627; <em>Energy Upgrade adds no contingency and no plant allowance: the plan is a
      benchmark for judging quotes, and a contractor's quote carries neither.
      New Build and Refurbishment offer both under Advanced Options, off by default.</em>
 + PROFESSIONAL FEES (Architect 10% / Structural Engineer scaled / BER &#8364;300 / BCMS 0.15%)
@@ -23167,14 +23167,14 @@ Each section is then loaded on its own:
                 </tbody>
               </table>
               <div style="font-size:10px;color:#64748b;margin-top:5px;line-height:1.45;">Cavity: SEAI 2025 (47k upgrades), saveonheat.ie 2026<br>EWI: SEAI 2025 median, trade quotes, osber.ie<br>IWI: trade installer quotes 2025<br><span style="color:#f59e0b;">&#9888; Walltite: LOW CONFIDENCE (limited published contractor rates)</span></div>
-              <div style="font-size:10px;font-weight:600;color:#E8A020;margin:8px 0 5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">EWI Variation Guide — Fascia &amp; Soffit (&#8364;/m linear — excluded from the baseline, feeds the appendix guide price)</div>
+              <div style="font-size:10px;font-weight:600;color:#E8A020;margin:8px 0 5px;border-bottom:1px solid #2e3d52;padding-bottom:3px;">EWI Variation Guide — Fascia &amp; Soffit (&#8364;/m linear — excluded from the benchmark, feeds the appendix guide price)</div>
               <table class="mdb-tbl" style="margin-bottom:4px;">
                 <thead><tr><th>Item</th><th style="width:85px;">Rate</th></tr></thead>
                 <tbody>
                   <tr><td>UPVC fascia &amp; soffit (supply, fix, vent strip)</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_fascia" class="mdb-pi" type="number" min="10" step="1" value="38" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
                 </tbody>
               </table>
-              <div style="font-size:10px;color:#64748b;margin-top:3px;">Excluded from the baseline &mdash; feeds the guide price in the appendix and the Variations tab; qty estimated from ground-floor perimeter</div>
+              <div style="font-size:10px;color:#64748b;margin-top:3px;">Excluded from the benchmark &mdash; feeds the guide price in the appendix and the Variations tab; qty estimated from ground-floor perimeter</div>
             </div>
 
             <!-- Heat + Vent -->
