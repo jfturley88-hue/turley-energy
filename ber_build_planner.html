@@ -14836,6 +14836,38 @@ function _planPricingBasis(s, inp, mode) {
 }
 window._planPricingBasis = _planPricingBasis;
 
+// What a measure deliberately does NOT cover, shown inside the measure's own scope box on
+// both the Cost Plan and the Contractor Pricing Schedule — shaded, and with no price.
+//
+// It belongs in the scope because that is where it changes behaviour. A contractor who
+// cannot see the exclusion either assumes it is included and pads the quote, or prices
+// without it and raises a variation later; either way the tenders come back on different
+// bases and cannot be compared. Naming it at the point of pricing puts every contractor on
+// the same footing.
+//
+// The guide price is deliberately withheld here and printed only in the homeowner's
+// Appendix. A figure on the contractor's copy stops being a benchmark and becomes a floor.
+function _planExclusionLines(s) {
+  return (s && s.exclusions || []).map(function(e) { return e.item; });
+}
+function _planExclusionBand(s, opt) {
+  var lines = _planExclusionLines(s);
+  if (!lines.length) return '';
+  opt = opt || {};
+  var fs = opt.font || '7pt';
+  // The on-screen plan is dark; the printed documents are white paper.
+  var bg  = opt.dark ? 'rgba(148,163,184,.10)' : '#F1F5F9';
+  var bar = opt.dark ? '#3d4f66' : '#CBD5E1';
+  var ink = opt.dark ? '#8FA0B8' : '#64748B';
+  return '<div style="margin-top:5px;padding:4px 6px;background:' + bg + ';border-left:2px solid ' + bar + ';' +
+      'border-radius:2px;line-height:1.45;">' +
+    '<div style="font-size:' + fs + ';font-weight:700;color:' + ink + ';text-transform:uppercase;' +
+      'letter-spacing:.05em;margin-bottom:1px;">Not included in this measure</div>' +
+    '<div style="font-size:' + fs + ';color:' + ink + ';font-weight:400;">' + lines.join(' · ') + '</div>' +
+  '</div>';
+}
+window._planExclusionBand = _planExclusionBand;
+
 // Renders the EU-specific measure table into #boq-accordion-wrap
 // The Retrofit Cost Plan is written for the homeowner. Other parties read it — a lender
 // files it, a contractor prices against it — but it addresses the person who has to pay.
@@ -14848,10 +14880,13 @@ var EU_HOW_TO_USE =
   'The Net Cost figure above is roughly what this work should leave you to pay once grants ' +
   'are applied. Ask each contractor to quote against the scope listed under every measure, so ' +
   'all the quotes you get price the same work. ' +
-  // Without this the homeowner never learns the second document exists, and the schedule
-  // only works if it reaches the contractors.
-  'Your assessor can also give you a Contractor Pricing Schedule — the same list of work with ' +
-  'the prices left blank — to send to each contractor you ask. ' +
+  // Without this the homeowner never learns the other two documents exist — and the
+  // schedule only works if it reaches the contractors.
+  'This is the first of three documents. The <strong>Appendix</strong> sets out how every figure ' +
+  'was calculated and what each of the items shaded "not included" would cost if it turns out ' +
+  'to be needed. The <strong>Contractor Pricing Schedule</strong> is this same scope with every ' +
+  'figure removed — send one to each contractor you ask, so they all price the same work without ' +
+  'seeing your budget. ' +
   'When the quotes come back, compare them with each other and with the Budget Est. ' +
   'column. Record each quote in Variation Notes, and what you actually pay in the Actual ' +
   'column, as the job goes on.';
@@ -15062,7 +15097,7 @@ function renderEUTable(b) {
       '<tr class="eu-row">' +
         '<td class="eu-c-num">'+rowNum+'</td>' +
         '<td class="eu-c-measure"><span class="eu-measure-name">'+s.title+'</span>'+grantNote+'</td>' +
-        '<td class="eu-c-basis">'+pbHtml+'</td>' +
+        '<td class="eu-c-basis">'+pbHtml+_planExclusionBand(s, {font:'9px', dark:true})+'</td>' +
         '<td class="eu-c-est plan-edge">'+(est>0?fmt(est):'—')+'</td>' +
         '<td class="eu-c-notes"><textarea id="'+nid+'" class="eu-note-input" placeholder="Add note…"></textarea></td>' +
         '<td class="eu-c-act"><input type="number" id="'+rid+'" class="eu-act-input" min="0" step="100" placeholder="—" ' +
@@ -18156,8 +18191,15 @@ function _updateEUPDFBtns(isPlan, mode) {
     }
     wrap.innerHTML =
       routeSel +
-      '<button onclick="exportEUPDF(\'detailed\')" title="Customer summary on page 1, methodology and itemised pricing behind it" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; '+planLabel+'</button>' +
-      '<button onclick="exportContractorSchedule()" title="Blank pricing schedule — same measured scope, no estimate, no grants, no totals" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; Contractor Pricing Schedule (PDF)</button>' +
+      // Three documents, printed one at a time. Each is a separate Save-as-PDF from the
+      // browser's own print dialog, so they cannot be bundled into one download here —
+      // and printing them separately is the point: they go to different people.
+      '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:8px;">' +
+        '<span style="font-size:10px;color:#4ade80;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;">The three documents</span>' +
+        '<button onclick="exportEUPDF(\'detailed\')" title="Document 1 of 3 — the homeowner works from this for the length of the job. Measure table, scope, and what each measure does not include." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; 1 &middot; '+planLabel+'</button>' +
+        '<button onclick="exportEUPDF(\'appendix\')" title="Document 2 of 3 — the reference behind the plan: how it was calculated, itemised measurements and rates, and guide prices for everything not included." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128209; 2 &middot; Appendix &amp; Not-Included Costings (PDF)</button>' +
+        '<button onclick="exportContractorSchedule()" title="Document 3 of 3 — goes out to contractors. Same measured scope and the same exclusions, with every figure removed." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; 3 &middot; Contractor Pricing Schedule (PDF)</button>' +
+      '</span>' +
       formBtn;
   } else {
     wrap.innerHTML =
@@ -18166,7 +18208,16 @@ function _updateEUPDFBtns(isPlan, mode) {
   }
 }
 
-// Export the EU measure table as a PDF (mode: 'customer' | 'detailed')
+// The plan is issued as three separate documents because they have three different readers
+// and three different lifespans: the Cost Plan is live for the length of the job, the
+// Appendix is fixed at issue, and the Schedule goes out blank to several contractors at
+// once. Each prints on its own, so each says which of the three it is — a document that
+// arrives alone can still be placed.
+var EU_DOC_SET = function(n) {
+  return '<span style="color:#94a3b8;font-weight:400;letter-spacing:.04em;"> &nbsp;·&nbsp; Document ' + n + ' of 3</span>';
+};
+
+// Export the EU measure table as a PDF (mode: 'customer' | 'detailed' | 'appendix')
 function exportEUPDF(mode) {
   if (!BOQ) return;
   var b   = BOQ;
@@ -18176,7 +18227,14 @@ function exportEUPDF(mode) {
   var sections = (b.sections || []).filter(function(s){ return !s.isExtras; });
   var grants   = b.grants || [];
   var dateStr  = new Date().toLocaleDateString('en-IE', {day:'numeric',month:'long',year:'numeric'});
-  var isDetailed = (mode === 'detailed');
+  // Three documents, three readers, three lifespans — printed separately so each can travel
+  // on its own. 'detailed' is the Cost Plan the homeowner works from for the length of the
+  // job; 'appendix' is the fixed reference behind it (how it was calculated, the itemised
+  // rates, and the guide prices for everything not included); the Contractor Pricing
+  // Schedule prints from exportContractorSchedule(). The homeowner's copy of the whole set
+  // is the three PDFs together — see EU_DOC_SET.
+  var isAppendix = (mode === 'appendix');
+  var isDetailed = (mode === 'detailed') || isAppendix;
   var B = '1px solid #E2E8F0'; // border shorthand
 
   // Same rules as the on-screen table: no Grant column, the grant printed under the measure
@@ -18241,7 +18299,7 @@ function exportEUPDF(mode) {
         '<tr style="border-bottom:'+B+';page-break-inside:avoid;">' +
           '<td style="padding:5px 4px;color:#94a3b8;text-align:center;font-size:8pt;width:22px;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
           '<td style="padding:5px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+grantStr+'</td>' +
-          '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;">'+pbStr+'</td>' +
+          '<td style="padding:5px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;">'+pbStr+_planExclusionBand(s, {font:'7pt'})+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-weight:700;font-size:9pt;color:#E8A020;white-space:nowrap;vertical-align:top;border:'+B+';'+_pdfEdge+'">'+(est>0?fmt(est):'—')+'</td>' +
           '<td style="padding:5px 6px;font-size:8pt;color:#64748B;vertical-align:top;border:'+B+';">'+note+'</td>' +
           '<td style="padding:5px 6px;text-align:right;font-size:9pt;color:#38bdf8;vertical-align:top;border:'+B+';">'+(actAmt>0?fmt(actAmt):'')+'</td>' +
@@ -18545,6 +18603,10 @@ function exportEUPDF(mode) {
     });
     var exclusionsHTML = !exRows ? '' :
       '<h3 style="font-size:10pt;color:#1E293B;margin:14px 0 6px;">Not Included — Variation Guide Prices</h3>' +
+      '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">Every measure on your Cost Plan, and on the Pricing Schedule your contractors quote from, ' +
+        'names what it does not cover in a shaded box under its scope. This is the same list, with the costings attached. ' +
+        'The prices are here and not on the Schedule on purpose: a contractor who can see your figure treats it as a floor, ' +
+        'whereas you need it to judge what comes back.</p>' +
       '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">The baseline above prices each measure itself. The items below are deliberately outside it — ' +
         'they are only needed on some houses, and pricing them into every plan would pad every budget. If your contractor finds one is needed, ' +
         'this is roughly what it should cost. Agree the figure before work starts and record it under <strong>Variation Notes</strong> — ' +
@@ -18580,7 +18642,9 @@ function exportEUPDF(mode) {
       '</div>' +
     '</div>';
 
-    methodHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
+    // Printed on its own, the Appendix opens on this page — no leading break, or the
+    // document starts with a blank sheet.
+    methodHTML = '<div style="' + (isAppendix ? '' : 'page-break-before:always;') + 'margin:0 15mm;font-family:sans-serif;">' +
       '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:12px;">How Your Estimate Was Calculated</h2>' +
       '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What\'s Included in Each Budget Est. Figure</h3>' +
       '<p style="font-size:9pt;color:#334155;margin-bottom:8px;">Every Budget Est. figure in the table above is a fully-loaded cost that includes:</p>' +
@@ -18616,7 +18680,8 @@ function exportEUPDF(mode) {
   // Compact header band — no separate cover page, no page-break, no gap
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
-      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — '+(isEUmode?'Energy Upgrade':pmode)+' Cost Plan</div>' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — '+(isEUmode?'Energy Upgrade':pmode)+(isAppendix?' Appendix':' Cost Plan')+
+        EU_DOC_SET(isAppendix ? 2 : 1)+'</div>' +
       '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
       '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:2px;">' +
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
@@ -18626,7 +18691,9 @@ function exportEUPDF(mode) {
         (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
         '<span>BER basis: <strong style="color:#1E293B;">'+planBerBasis(pi)+' BER</strong></span>' +
       '</div>' +
-      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · '+rateBookStamp()+(isDetailed?' · Detailed':'')+'</div>' +
+      // The document names itself in the eyebrow above, so the old ' · Detailed' mode tag
+      // would only be a second, competing label for the same thing.
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · '+rateBookStamp()+'</div>' +
     '</div>';
 
   var _bandRow = '<tr style="background:#FFF7ED;color:#92400E;">' +
@@ -18722,7 +18789,12 @@ function exportEUPDF(mode) {
   var printDiv = document.getElementById('pdf-print-view');
   if (!printDiv) { printDiv = document.createElement('div'); printDiv.id = 'pdf-print-view'; document.body.appendChild(printDiv); }
   printDiv.style.cssText = 'display:block;background:white;';
-  printDiv.innerHTML = headerHTML + summaryHTML + tableHTML + methodHTML;
+  // The Cost Plan carries the measure table and nothing behind it; the Appendix carries the
+  // evidence and nothing in front of it. Both open with the same header so a stray document
+  // can be traced back to the house and the issue date it belongs to.
+  printDiv.innerHTML = isAppendix
+    ? (headerHTML + methodHTML)
+    : (headerHTML + summaryHTML + tableHTML);
   var _prevBodyBg = document.body.style.background;
   document.body.style.background = 'white';
   printDiv.scrollIntoView();
@@ -18763,7 +18835,7 @@ function exportContractorSchedule() {
       '<tr style="page-break-inside:avoid;">' +
         '<td style="padding:7px 4px;color:#94a3b8;text-align:center;font-size:8pt;vertical-align:top;border:'+B+';">'+rowNum+'</td>' +
         '<td style="padding:7px 6px;font-weight:700;font-size:9pt;color:#1E293B;vertical-align:top;border:'+B+';">'+s.title+'</td>' +
-        '<td style="padding:7px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;line-height:1.5;">'+pbStr+'</td>' +
+        '<td style="padding:7px 6px;font-size:8pt;color:#475569;vertical-align:top;border:'+B+';white-space:normal;line-height:1.5;">'+pbStr+_planExclusionBand(s, {font:'7pt'})+'</td>' +
         // The contractor's column, mirroring the Cost Plan's Variation Notes: anything their
         // own survey shows beyond this scope goes here, item and price, where the homeowner
         // can weigh it against the guide prices in their plan's appendix.
@@ -18781,7 +18853,7 @@ function exportContractorSchedule() {
 
   var headerHTML =
     '<div style="font-family:sans-serif;padding:5mm 10mm 3mm;border-bottom:3px solid #E8A020;background:#fff;">' +
-      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Contractor Pricing Schedule</div>' +
+      '<div style="font-size:8pt;color:#E8A020;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;">PlanitBER — Contractor Pricing Schedule'+EU_DOC_SET(3)+'</div>' +
       '<div style="font-size:17pt;font-weight:900;color:#1E293B;line-height:1.2;margin-bottom:4px;">'+(pi.name||'Energy Upgrade Project')+'</div>' +
       '<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;font-size:8pt;color:#475569;margin-bottom:6px;">' +
         '<span>⚡ Energy Upgrade &nbsp;·&nbsp; '+(pi.dwellingType||'')+'</span>' +
