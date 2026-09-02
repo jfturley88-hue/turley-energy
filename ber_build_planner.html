@@ -2731,7 +2731,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                   <div class="ws-sub-field">
                     <label>Insulation type</label>
                     <select id="ref-eu-roof-ceiling-type">
-                      <option value="mw-300">Mineral Wool 300mm (quilt between joists)</option>
+                      <option value="mw-300" selected>Mineral Wool 300mm (quilt between joists)</option>
+                      <option value="mw-200-topup">Mineral Wool 200mm top-up (over existing quilt)</option>
                       <option value="mw-400">Mineral Wool 400mm (quilt + over-joist)</option>
                       <option value="cell-300">Cellulose blown 300mm</option>
                       <option value="pir-150">PIR boards 150mm (boarded floor)</option>
@@ -2879,6 +2880,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                     <label>Fill type</label>
                     <select id="ref-eu-cavity-type" onchange="const w=document.getElementById('ref-eu-cavity-warn');if(w)w.style.display=this.value==='walltite'?'':'none'">
                       <option value="eps-bead" selected>Blown EPS bead</option>
+                      <option value="bonded-bead">Blown bonded bead (bead + adhesive)</option>
                       <option value="mineral-wool">Blown mineral wool (fire-rated)</option>
                       <option value="walltite">Walltite spray foam</option>
                     </select>
@@ -4041,7 +4043,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                   <div class="ws-sub-field">
                     <label>Insulation type</label>
                     <select id="eu-roof-ceiling-type">
-                      <option value="mw-300">Mineral Wool 300mm (quilt between joists)</option>
+                      <option value="mw-300" selected>Mineral Wool 300mm (quilt between joists)</option>
+                      <option value="mw-200-topup">Mineral Wool 200mm top-up (over existing quilt)</option>
                       <option value="mw-400">Mineral Wool 400mm (quilt + over-joist)</option>
                       <option value="cell-300">Cellulose blown 300mm</option>
                       <option value="pir-150">PIR boards 150mm (boarded floor)</option>
@@ -4189,12 +4192,23 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
                     <label>Fill type</label>
                     <select id="eu-cavity-type" onchange="const w=document.getElementById('eu-cavity-warn');if(w)w.style.display=this.value==='walltite'?'':'none'">
                       <option value="eps-bead" selected>Blown EPS bead</option>
+                      <option value="bonded-bead">Blown bonded bead (bead + adhesive)</option>
                       <option value="mineral-wool">Blown mineral wool (fire-rated)</option>
                       <option value="walltite">Walltite spray foam</option>
                     </select>
                   </div>
                   <div id="eu-cavity-warn" style="display:none;margin-top:4px;padding:5px 8px;border-radius:5px;background:rgba(220,50,50,0.1);border:1px solid rgba(220,50,50,0.3);font-size:10px;color:#e05555;">
                     &#9888; Spray foam may affect mortgage eligibility. Advise client to confirm with lender first.
+                  </div>
+                  <div class="ws-sub-field" style="margin-top:6px;">
+                    <label>Cavity width</label>
+                    <select id="eu-cavity-width">
+                      <option value="40">40mm</option>
+                      <option value="50" selected>50mm</option>
+                      <option value="60">60mm</option>
+                      <option value="75">75mm</option>
+                      <option value="100">100mm</option>
+                    </select>
                   </div>
                   <div class="ws-sub-field" style="margin-top:6px;">
                     <label><input type="checkbox" id="eu-cavity-makegood" checked/> Include making good at reveals &amp; cold bridges</label>
@@ -7989,7 +8003,7 @@ var _xFASCIA_MAT = function(){ try { var ov = JSON.parse(localStorage.getItem('e
 
 var EU_EXCL = {
   wall_cavity: [
-    _x('cav_vents','Room ventilation','Wall vents to habitable rooms brought up to current ventilation standards once the cavity is filled — per vent','nr',_xROOMS,30,1,'craft'),
+    _x('cav_vents','Room ventilation & air intake vents','Filling the cavity closes the existing wall vents. Room-by-room air intake vents reinstated to current ventilation standards — per vent','nr',_xROOMS,30,1,'craft'),
   ],
   wall_ewi: [
     _x('ewi_fascia','Fascia & soffit over the thickened wall','Eaves extended over the new insulation — uPVC fascia, vented soffit, gutters refixed','m',function(i){ return Math.round(4 * Math.sqrt(_xGFA(i)) * 1.1); },_xFASCIA_MAT,0.35,'craft'),
@@ -8210,6 +8224,8 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     // Source: SEAI 2025 median (47k upgrades); saveonheat.ie 2026. Walltite LOW CONFIDENCE.
     cavity: {
       'eps-bead':     { mat:  6, lab:  2 },  // €10/m² total
+      // Bonded bead carries the adhesive as well as the bead; labour is the same pump.
+      'bonded-bead':  { mat:  8, lab:  2 },  // €12/m² total
       'mineral-wool': { mat:  8, lab:  2 },  // €12/m² total
       'walltite':     { mat: 20, lab:  4 }   // €28/m² total [LOW CONFIDENCE — verify with Foam Master contractor]
     },
@@ -8253,6 +8269,9 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   var ROOF_BUNDLE_RATES = {
     // Ceiling: scaffold not required. Source: blog.retrofitdublin.ie, SEAI 2025 median.
     'ceiling': {
+      // A top-up is laid over existing quilt rather than replacing it — less material than a
+      // full 300mm lay and less labour, because nothing is lifted out first.
+      'mw-200-topup': { mat: 12, lab:  3 },  // €15/m² total
       'mw-300':   { mat: 18, lab:  4 },  // €26/m² total
       'mw-400':   { mat: 22, lab:  9 },  // €40/m² total
       'cell-300': { mat: 24, lab:  2 },  // €28/m² total
@@ -8330,6 +8349,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     function r(k,d,c){return((ov[k]!=null&&ov[k]!=='')?+ov[k]:d)*(1+(+cat[c]||0)/100);}
     var wm=1+(+cat.wall||0)/100,rm=1+(+cat.roof||0)/100,fm=1+(+cat.floor||0)/100;
     WALL_BUNDLE_RATES.cavity['eps-bead'].mat=r('cav_eps',6,'wall');
+    WALL_BUNDLE_RATES.cavity['bonded-bead'].mat=r('cav_bond',8,'wall');
     WALL_BUNDLE_RATES.cavity['mineral-wool'].mat=r('cav_mw',8,'wall');
     WALL_BUNDLE_RATES.cavity.walltite.mat=r('cav_wt',20,'wall');
     WALL_BUNDLE_RATES.ewi_insulation_base.eps.mat=r('ewi_eps',30,'wall');
@@ -8342,6 +8362,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     WALL_BUNDLE_RATES.ewi_render_addon['brick-slip'].mat=r('ewi_rend_bsl',48,'wall');
     WALL_BUNDLE_RATES.ewi_render_addon.stone.mat=r('ewi_rend_stn',62,'wall');
     WALL_BUNDLE_RATES.iwi['pir-dab'].mat=38*wm;WALL_BUNDLE_RATES.iwi['pir-mech'].mat=42*wm;WALL_BUNDLE_RATES.iwi['mineral-board'].mat=32*wm;
+    ROOF_BUNDLE_RATES.ceiling['mw-200-topup'].mat=12*rm;
     ROOF_BUNDLE_RATES.ceiling['mw-300'].mat=18*rm;ROOF_BUNDLE_RATES.ceiling['mw-400'].mat=22*rm;
     ROOF_BUNDLE_RATES.ceiling['cell-300'].mat=24*rm;ROOF_BUNDLE_RATES.ceiling['pir-150'].mat=32*rm;
     ROOF_BUNDLE_RATES.rafter['between-below'].mat=38*rm;ROOF_BUNDLE_RATES.rafter['above-deck'].mat=55*rm;ROOF_BUNDLE_RATES.rafter['sloped-board'].mat=42*rm;
@@ -8473,7 +8494,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     rcItems.push(mkItem('RI-C.3', 'Insulating jacket to cold water storage tank & lid', 'nr', 1, _EU_ATTIC_ANC.tank, lM(1, L.craft), 'Tank sits above the new insulation and must be protected from frost'));
     rcItems.push(mkItem('RI-C.4', 'Insulation to attic pipework — foam lagging', 'm', Math.max(8, Math.round(Math.sqrt(rcArea) * 1.5)), _EU_ATTIC_ANC.pipe, lM(0.25, L.craft), 'All accessible CW & HW runs above the new insulation'));
     rcItems.push(mkItem('RI-C.5', 'Raised access walkway — hatch to tank (loft legs & boards)', 'm', rcWalk, _EU_ATTIC_ANC.walk, lM(0.5, L.craft), 'Access across the attic without compressing the new insulation'));
-    rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 10m² over loft legs', 'm²', 10, _EU_ATTIC_ANC.store, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
+    rcItems.push(mkItem('RI-C.6', 'Raised storage platform — 8m² over loft legs', 'm²', 8, _EU_ATTIC_ANC.store, lM(0.4, L.craft), 'Storage retained at full insulation depth'));
     var EXrc = exApply('roof_ceiling', 'RI-C');
     sections.push({ id: String(sid++), title: 'ROOF INSULATION — CEILING LEVEL', part: 'A',
       items: rcItems.concat(EXrc.items), exclusions: EXrc.excl });
@@ -13575,6 +13596,7 @@ function readEUSelector() {
     doors_dispose:       cb('eu-doors-dispose'),
     // Wall bundle fields (Chunk 6)
     cavity_type:          sv('eu-cavity-type') || 'eps-bead',
+    cavity_width:         sv('eu-cavity-width') || '50',
     cavity_area:          nv('eu-cavity-area') || netWallArea,
     cavity_makegood:      cb('eu-cavity-makegood'),
     ewi_insulation:       sv('eu-ewi-insulation') || 'eps',
@@ -14283,7 +14305,7 @@ function _euMeasureKey(s) {
 // costings. Only the text on the right is printed.
 var EU_OPTION_LABELS = {
   // Cavity fill
-  'eps-bead':'Blown EPS bead', 'mineral-wool':'Blown mineral wool', 'walltite':'Walltite spray foam',
+  'eps-bead':'Blown EPS bead', 'bonded-bead':'Blown bonded bead', 'mineral-wool':'Blown mineral wool', 'walltite':'Walltite spray foam',
   // External wall insulation — boards and renders
   'eps':'EPS', 'pir':'PIR', 'phenolic':'Phenolic foam', 'mineral':'Mineral render',
   'silicone':'Silicone render', 'acrylic':'Acrylic render', 'brick-slip':'Brick slip feature',
@@ -14292,6 +14314,7 @@ var EU_OPTION_LABELS = {
   'pir-dab':'PIR board, dab-fixed', 'pir-mech':'PIR board, mechanically fixed',
   'mineral-board':'Mineral wool board, dab-fixed',
   // Roof — ceiling level
+  'mw-200-topup':'Mineral wool 200mm top-up over existing',
   'mw-300':'Mineral wool 300mm', 'mw-400':'Mineral wool 400mm', 'cell-300':'Cellulose blown 300mm',
   // Roof — rafter level / room in roof
   'between-below':'Between and below rafters', 'above-deck':'Above-deck warm roof',
@@ -14387,7 +14410,8 @@ function _euPricingBasis(s, inp) {
     pb.push('Programme: ~'+Math.max(6,Math.round((inp.floorArea||100)/15))+' weeks');
   } else if (t.indexOf('CAVITY FILL') >= 0) {
     var cq = firstItemQty('cavity fill'); if (cq) pb.push('Wall area: '+cq+'m²');
-    pb.push('Fill: '+euLabel(inp.cavity_type||'eps-bead', 'cavity_type'));
+    pb.push('Fill: '+euLabel(inp.cavity_type||'eps-bead', 'cavity_type')+
+      (inp.cavity_width ? ' \u2014 '+inp.cavity_width+'mm cavity' : ''));
     if (inp.cavity_makegood) pb.push('Making good: included');
   } else if (t.indexOf('EXTERNAL WALL') >= 0 || t.indexOf('EWI') >= 0) {
     var ewiPk = inp.ewi_peaks || 0;
@@ -14479,7 +14503,7 @@ function _euPricingBasis(s, inp) {
     if (hi) {
       var hkw = (hi.description||'').match(/\((\d+)kW\)/);
       if (hkw) pb.push('Design load: '+hkw[1]+'kW at '+euFlowTemp(_em)+'°C flow — '+((inp.hli||0) > 0
-        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'+(inp.hliFromBER ? ' — ' + HP_SIZING_BASIS : '')
+        ? 'HLI × '+(inp.floorArea||'—')+'m² × '+HP_DESIGN_DT+'K'
         : 'area-banded — add the provisional BER HLI'));
     }
     pb.push('Emitters: '+euLabel(_em, 'emitterType') + (_em === 'keep-rads' ? ' — assumed to work at 45°C flow' : ''));
@@ -18505,9 +18529,19 @@ function exportEUPDF(mode) {
   if (isDetailed) {
     var methRows = sections.map(function(s) {
       var pb = _planPricingBasis(s, inp, pmode);
+      // The inputs a figure was built from are only half the picture — what the figure
+      // deliberately leaves out is the other half, and this is the document where the
+      // homeowner checks one against the other.
+      var mx = _planExclusionLines(s);
+      var mxHTML = mx.length
+        ? '<div style="margin-top:4px;padding-top:3px;border-top:1px dotted #CBD5E1;font-size:7pt;color:#64748B;">' +
+            '<span style="font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Not included: </span>' +
+            mx.join(' · ') +
+          '</div>'
+        : '';
       return '<tr style="border-bottom:1px solid #E2E8F0;">' +
         '<td style="padding:5px 6px;font-weight:700;font-size:8pt;border:1px solid #E2E8F0;vertical-align:top;">'+s.title+'</td>' +
-        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;white-space:pre-line;">'+pb.join('\n')+'</td>' +
+        '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;"><span style="white-space:pre-line;">'+pb.join('\n')+'</span>'+mxHTML+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(s.subtotal||0)+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*1.22))+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*sectionLoad(s)))+'</td>' +
