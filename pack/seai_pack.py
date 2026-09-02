@@ -288,27 +288,26 @@ doc1 = f'''<div class="sheet">
     way. Nobody can currently show whether it happens, and while that is true, raising grant levels
     cannot be relied on to lift uptake. The missing piece is not more money: it is a benchmark that
     exists before any contractor names a price, against which the question can be answered.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The homeowner has nothing to judge a quote against.</strong> With the
-    baseline they hold the scope, the estimated cost, the grants named beside their measures and the net
-    figure to plan around. A fair variation is agreed in minutes against the guide price; a padded one is
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The homeowner is equipped to tender.</strong> The baseline
+    benchmark gives them the scope and what it should cost; the appendix gives them a guide price for
+    anything a contractor finds beyond it; the pricing schedule puts every contractor who quotes on the
+    same measured scope. A fair variation is agreed in minutes against the guide price, a padded one is
     visible in the same minutes. <strong>The fair contractor gains too</strong> &mdash; measured
     quantities, variations in writing, and customers who have decided to go ahead.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Nobody at the table is independent.</strong> The assessor sells no
-    installation and takes no commission, and prices the plan from a dated, published rate book, so the
-    figure does not move with who wins the work. It also puts the assessor in a <strong>paid advisory
-    role</strong> at the moment the retrofit decision is being made &mdash; a consultancy fee for the
-    plan, with {ASSESSOR_ASK}.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
+    consultancy fee for the plan, earned at the moment the retrofit decision is being made, with
+    {ASSESSOR_ASK}. The assessor sells no installation and takes no commission, and prices the plan from
+    a dated, published rate book, so the figure does not move with who wins the work.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">One house, three readers: a {EX_AREA}&thinsp;m&sup2; 3-bed semi in
-    Mullingar, {EX_BER}, on {EX_SCHEME} &mdash; attic top-up, cavity fill, windows and doors, a heat pump
-    sized from the provisional BER&rsquo;s Heat Loss Indicator, and ventilation. <strong>&euro;{EX_TOTAL}
-    total &middot; &euro;{EX_GRANTS} in grants &middot; &euro;{EX_NET} to fund.</strong> The
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">All three are built bespoke from the provisional BER: the
     <strong>Cost Plan</strong> the homeowner works from, the blank <strong>Pricing Schedule</strong> their
-    contractors quote on, and the <strong>Appendix</strong> behind both &mdash; each in full, exactly as
-    the software prints it. Every measure names what it leaves out, and the Appendix carries a guide
-    price for each of those items, so a variation is <strong>agreed against the benchmark before work
-    starts</strong> rather than argued once the job is open.</p>
+    contractors quote on, and the <strong>Appendix</strong> behind both. The survey that produces the
+    certificate produces the measured scope, so nothing is measured twice and every figure traces to this
+    house rather than to a house of its type. Each follows in full, exactly as the software prints it.
+    Every measure names what it leaves out, and the Appendix carries a guide price for each of those
+    items, so a variation is <strong>agreed against the benchmark before work starts</strong> rather than
+    argued once the job is open.</p>
 
   {vk('The workflow &mdash; document 05')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
@@ -316,7 +315,7 @@ doc1 = f'''<div class="sheet">
     the assessor&rsquo;s day, a decisive one for everything that follows.</p>
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running: the survey goes in, the intended measures are
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
     selected, the plan prints, and the grant route can be switched at the moment of download. Behind it a
     rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
     the weak ones marked as weak.</p>
