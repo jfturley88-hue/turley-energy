@@ -1,8 +1,11 @@
-# The SEAI pack: four connected A4 PDFs sharing one design system.
+# The SEAI pack: six connected A4 PDFs sharing one design system.
 #   01 The Value Proposition — text only: what it is, why, and where each other document fits
-#   02 The Example           — the Mullingar semi-D on BEH; real Cost Plan + Schedule bound behind
-#   03 The Workflow          — the six agreed steps, provisional BER to post-works BER
-#   04 The Software          — live screenshots + where every number comes from
+#   02 The Cost Plan         — a page of notes, then the Mullingar semi-D's plan bound behind
+#   03 The Pricing Schedule  — notes, then the same measured scope with every figure removed
+#   04 The Appendix          — notes, then the workings, itemised rates and guide prices
+#   05 The Workflow          — the six agreed steps, provisional BER to post-works BER
+#   06 The Software          — live screenshots + where every number comes from
+# 02-04 are one house printed three ways; each binds the software's own output whole.
 import base64, html as H
 
 def b64(path):
@@ -422,7 +425,8 @@ doc4 = notes(4, 'The Appendix', (
     'The reference behind the Cost Plan, fixed at the date of issue. How every figure was reached, the '
     'itemised measurements and rates beneath each measure, and the guide prices for everything the plan '
     'leaves out. It follows in full, exactly as the software prints it.'), [
-  ('How your estimate was calculated.',
+  ('How the estimate &mdash; the benchmark &mdash; was calculated.',
+   'The estimate on the Cost Plan is the benchmark; this is the arithmetic behind it. '
    'Measure by measure: the inputs used, the base cost of materials and labour, the contractor&rsquo;s '
    'overhead and profit, and the VAT that applies to that measure &mdash; 13.5% on works, 9% on heat pump '
    'supply and installation under the Finance Act 2024, 0% on solar PV under the Revenue ruling of May '
@@ -432,14 +436,12 @@ doc4 = notes(4, 'The Appendix', (
    'Beneath every bundled measure, the individual items at base rates &mdash; quantity, unit, material '
    'and labour per unit. This is the level a quantity surveyor would work at, and it is what makes the '
    'headline figure checkable rather than merely stated.'),
-  ('Not included &mdash; variation guide prices.',
+  ('Not included &mdash; variation guide prices. The part that matters most at tender.',
    'Every item shaded &ldquo;not included&rdquo; on the Cost Plan and the Schedule, with a guide price '
-   'attached. These are for the homeowner, not the contractor. When a contractor proposes a variation, '
-   'a fair one is agreed in minutes and a padded one is visible in the same minutes.'),
-  ('The cost benchmark.',
-   'The plan&rsquo;s cost per square metre of floor area &mdash; the first check a quantity surveyor '
-   'makes, and the quickest way to see whether one measure is out of line with the rest, or this house '
-   'out of line with another.'),
+   'attached. These are the homeowner&rsquo;s figures, not the contractor&rsquo;s, and they are what '
+   'turns a benchmark into a position to tender from: the homeowner already knows what the work should '
+   'cost <em>and</em> what anything beyond it should cost. A fair variation is agreed in minutes and a '
+   'padded one is visible in the same minutes &mdash; before work starts, not once the job is open.'),
 ])
 
 # ── 05 · THE WORKFLOW — where the one new step sits ───────────────────────────
@@ -480,10 +482,10 @@ doc5 = f'''<div class="sheet">
   {wfstep('3', 'The provisional BER report',
     'The surveyed geometry, the total heat loss and the post-works Heat Loss Indicator &mdash; the one document everything after it is built from.',
     note='Already happens')}
-  {wfstep('4', 'The Cost Plan is produced and issued',
+  {wfstep('4', 'The three documents are produced and issued',
     'At a desk, after the survey. The geometry and Heat Loss Indicator are taken from the provisional report, the '
-    'agreed measures are selected, the grant route is set, and the Cost Plan prints with the blank Contractor '
-    'Pricing Schedule behind it. It goes to the homeowner with the provisional BER.',
+    'agreed measures are selected, the grant route is set, and the three documents print &mdash; the Cost Plan, '
+    'the blank Pricing Schedule and the Appendix. They go to the homeowner with the provisional BER.',
     note='New &middot; minutes at a desk', add=True)}
   {wfstep('5', 'Variations and prices agreed with the contractor',
     'With the baseline and the guide prices for what it leaves out, the homeowner tenders properly: the same '
@@ -545,10 +547,9 @@ doc6 = f'''<div class="sheet">
   {strip(6)}
   <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
   <h2 style="font-size:14pt;"><span style="color:#B07D1A;">5 &middot;</span> All the way to print</h2>
-  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">One click, and the browser&rsquo;s own print
-    preview opens with the finished Cost Plan &mdash; the summary in front, the methodology and
-    itemised appendix behind it &mdash; ready to print on paper or save as a PDF for the homeowner&rsquo;s
-    inbox. The Contractor Pricing Schedule prints from the button beside it.</p>
+  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Three buttons, one for each document. Each
+    opens the browser&rsquo;s own print dialog on its own, ready to print on paper or save as a PDF &mdash;
+    they go to different people, so they never print as one bundle.</p>
   <div class="appshot">
     <img src="{IMG['routedl']}" alt="">
     <div class="ac" style="font-size:8pt;"><strong>The grant route, switchable at the moment of download.</strong>
@@ -564,16 +565,20 @@ doc6 = f'''<div class="sheet">
   </div>
 
   <div class="kick" style="margin-top:4mm;">What prints from this screen</div>
-  <div class="big3" style="grid-template-columns:repeat(2,1fr);">
+  <div class="big3">
     <div class="pt asr">
       <div class="pt-t" style="font-size:9.5pt;">The Retrofit Cost Plan</div>
-      <div class="pt-b">The homeowner&rsquo;s summary in front, the methodology and the itemised
-        appendix down to unit rates behind it. Issued with the BER.</div>
+      <div class="pt-b">For the homeowner, issued with the BER and worked from for the length of
+        the job.</div>
     </div>
     <div class="pt ho">
       <div class="pt-t" style="font-size:9.5pt;">The Contractor Pricing Schedule</div>
-      <div class="pt-b">The same measured scope with every figure removed &mdash; printed from the button
-        beside this one, one copy for each contractor asked to quote.</div>
+      <div class="pt-b">One copy for each contractor asked to quote, priced and returned.</div>
+    </div>
+    <div class="pt se">
+      <div class="pt-t" style="font-size:9.5pt;">The Appendix</div>
+      <div class="pt-b">The homeowner&rsquo;s reference, fixed at issue &mdash; the workings behind
+        every figure.</div>
     </div>
   </div>
 
@@ -601,7 +606,7 @@ doc6 = f'''<div class="sheet">
     rate book version it was priced on &mdash; currently {RATE_BOOK} &mdash; so any
     figure can be traced to a dated, named source.</p>
 
-  <div class="fine">Screenshots taken from the live software, 27 August 2026, unedited.</div>
+  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '4', '4')}
 </div>'''
 
