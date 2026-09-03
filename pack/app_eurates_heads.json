@@ -1,5 +1,5 @@
 {
- "height": 3438,
+ "height": 3408,
  "heads": [
   {
    "t": "Rate overrides",
@@ -27,19 +27,19 @@
   },
   {
    "t": "MEV (Mechanical Extract Ventilation)",
-   "y": 858
+   "y": 843
   },
   {
    "t": "DMEV & Trickle Vent (€/nr)",
-   "y": 1175
+   "y": 1161
   },
   {
    "t": "Windows & Doors (supply only)",
-   "y": 1557
+   "y": 1542
   },
   {
    "t": "Attic Bundle — standard ancillaries (supply only)",
-   "y": 2230
+   "y": 2216
   }
  ]
 }

@@ -304,7 +304,7 @@ doc1 = f'''<div class="sheet">
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
-    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it sits a rate book with a version and an effective date, sourced line by line and held in one place, with its weak rates marked as weak.</p>
+    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it sits a rate book with a version and an effective date, sourced line by line and held in one place, with any rate still to be calibrated marked as such.</p>
 
   {vk('The proposition')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
@@ -603,9 +603,8 @@ doc7 = f'''<div class="sheet">
     Supplement; grants at SEAI&rsquo;s published amounts; VAT as Revenue applies it. Each block names its
     own source beneath it.</p>
   <p class="body" style="{ENG_P}"><strong>Held in one place.</strong> Every rate shows its published value and
-    its source. A change is made once, centrally, and every plan priced afterwards follows. Where the
-    data is thin the panel says so &mdash; the ventilation ductwork rate is marked <strong>low
-    confidence</strong> &mdash; so it can be corrected rather than trusted.</p>
+    its source. A change is made once, centrally, and every plan priced afterwards follows. The panel
+    marks any rate still to be calibrated, so the outturns recorded through a pilot settle it.</p>
   {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
@@ -629,7 +628,7 @@ doc7 = f'''<div class="sheet">
     when an item is ticked into a plan after the survey, its priced line uses the same rate. One number, in
     one place, feeding both.</p>
   {engfig('eng_c', '172mm', 'Variations &mdash; not included guide rates.',
-    'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The low-confidence flag at the foot applies to items with limited Irish market data, which the panel says should be verified with a specialist before use in a formal estimate.')}
+    'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outturns.')}
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(7, '3', '3')}
 </div>'''
