@@ -284,13 +284,15 @@ doc1 = f'''<div class="sheet">
     figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
     nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
     before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The homeowner proceeds with confidence.</strong> Holding a figure for
-    every measure and a guide price for anything beyond it, they can see whether a quote is fair before
-    they accept it. A retrofit that looked like a leap becomes a decision made on evidence &mdash; and a
-    decision they are far more likely to make.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> The assessor earns a consultancy fee for the plan, at the moment the retrofit decision is being made. The workflow does not change: the same survey and the same provisional BER now also produce the three documents. The software is for BER assessors to use and for SEAI to regulate:
-    the assessor prices from the rate book and cannot change it; SEAI holds the book. The assessor sells no
-    installation and takes no commission, so the figure does not move with who wins the work.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Trust between homeowner and contractor has nowhere to
+    start.</strong> A quote today is one number, with no way to tell what it assumes or how it compares
+    with another&rsquo;s. A shared benchmark gives both sides the same starting figure, so a quote is
+    judged against the work &mdash; and the honest contractor is judged on the same terms as everyone
+    else quoting.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A fee
+    for helping the homeowner create the document, earned at the moment the retrofit decision is being
+    made &mdash; not for selling installation or taking commission, so the figure does not move with who
+    wins the work. The same survey and the same provisional BER now also produce the three documents.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
