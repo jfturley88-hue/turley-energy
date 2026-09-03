@@ -291,9 +291,9 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
     consultancy fee for the plan, earned at the moment the retrofit decision is being made. The
     workflow does not change &mdash; the same survey, the same provisional BER &mdash; that data now
-    also produces the three documents. The assessor sells no installation and takes no commission, and
-    prices the plan from a dated, published rate book, so the figure does not move with who wins the
-    work.</p>
+    also produces the three documents. The software is for BER assessors to use and for SEAI to regulate:
+    the assessor prices from the rate book and cannot change it; SEAI holds the book. The assessor sells no
+    installation and takes no commission, so the figure does not move with who wins the work.</p>
 
   {vk('The three documents &mdash; 02, 03 and 04')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
@@ -308,7 +308,7 @@ doc1 = f'''<div class="sheet">
   {vk('The software and the engine &mdash; documents 06 and 07')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
     selected, the three documents print, and the grant route can be switched at the moment of download. Behind it a
-    rate book with a version and an effective date, sourced line by line, every rate editable &mdash; and
+    rate book with a version and an effective date, sourced line by line and held in one place &mdash; and
     the weak ones marked as weak.</p>
 
   {vk('The proposition')}
@@ -572,9 +572,9 @@ doc6 = f'''<div class="sheet">
 <div class="sheet">
   {strip(6)}
   {appfig('rates', '134mm', '6 &middot; Rate Settings, open to inspection.',
-    'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible and editable. Nothing is a black box.')}
+    'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible, with its source. Nothing is a black box.')}
   {appfig('grants', '134mm', '7 &middot; The SEAI grant table the plans draw from.',
-    'Every amount dated, visible and editable &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
+    'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
 
   <p class="body" style="font-size:8pt;color:#64748B;margin-top:2mm;">Where each rate comes from, and how the
     book is versioned and inspected, is document 07.</p>
@@ -597,20 +597,19 @@ def engfig(key, w, lead, rest):
 doc7 = f'''<div class="sheet">
   {strip(7)}
   <h2 style="font-size:21pt;margin-bottom:3mm;">The engine</h2>
-  <p class="body" style="{ENG_P}">A benchmark is only worth what its rates are worth. Every figure in a plan
-    comes from a rate book with a version number and an effective date, and an assessor can open it, read
-    where each rate came from, and change any of it. These three pages are the retrofit rate book, top to
-    bottom, exactly as it appears on screen.</p>
+  <p class="body" style="{ENG_P}">Every figure in a plan comes from a rate book with a version number and
+    an effective date. The assessor prices from it and cannot change it: the book is held in one place and
+    published by one administrator &mdash; under the pilot, SEAI &mdash; so every plan is priced on the
+    same rates. These three pages are that book, top to bottom, exactly as it appears on screen.</p>
   <p class="body" style="{ENG_P}"><strong>Where the rates come from.</strong> Base rates from the SCSI
     Tender Price Index and House Rebuilding Guide; labour from the SEO Construction Sector wage agreement,
     at the second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
     Supplement; grants at SEAI&rsquo;s published amounts; VAT as Revenue applies it. Each block names its
     own source beneath it.</p>
-  <p class="body" style="{ENG_P}"><strong>Nothing is hidden, and nothing is fixed.</strong> Every rate is
-    an editable field showing the published default; a category uplift scales a whole trade at once;
-    <em>Reset All</em> restores the book. Where the data is thin the panel says so &mdash; the ventilation
-    ductwork rate is marked <strong>low confidence</strong> &mdash; rather than presenting it with the
-    authority of a merchant price. A rate book that flags its own weak points can be corrected.</p>
+  <p class="body" style="{ENG_P}"><strong>Held in one place.</strong> Every rate shows its published value and
+    its source. A change is made once, centrally, and every plan priced afterwards follows. Where the
+    data is thin the panel says so &mdash; the ventilation ductwork rate is marked <strong>low
+    confidence</strong> &mdash; so it can be corrected rather than trusted.</p>
   {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
