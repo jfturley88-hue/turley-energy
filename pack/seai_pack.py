@@ -285,10 +285,10 @@ doc1 = f'''<div class="sheet">
     nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
     before any contractor names a price.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Trust between homeowner and contractor has nowhere to
-    start.</strong> A quote today is one number, with no way to tell what it assumes or how it compares
-    with another&rsquo;s. A shared benchmark gives both sides the same starting figure, so a quote is
-    judged against the work &mdash; and the honest contractor is judged on the same terms as everyone
-    else quoting.</p>
+    start.</strong> A quote today is one number, with nothing to check it against. The homeowner is
+    empowered with the scope each measure includes and a guide price for what it leaves out &mdash; both
+    held before a contractor is asked to price anything. A quote is judged against that scope, and the
+    honest contractor is judged on the same terms as everyone else quoting.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A fee
     for helping the homeowner create the document, earned at the moment the retrofit decision is being
     made &mdash; not for selling installation or taking commission, so the figure does not move with who
