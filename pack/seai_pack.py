@@ -288,10 +288,7 @@ doc1 = f'''<div class="sheet">
     every measure and a guide price for anything beyond it, they can see whether a quote is fair before
     they accept it. A retrofit that looked like a leap becomes a decision made on evidence &mdash; and a
     decision they are far more likely to make.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A
-    consultancy fee for the plan, earned at the moment the retrofit decision is being made. The
-    workflow does not change &mdash; the same survey, the same provisional BER &mdash; that data now
-    also produces the three documents. The software is for BER assessors to use and for SEAI to regulate:
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> The assessor earns a consultancy fee for the plan, at the moment the retrofit decision is being made. The workflow does not change: the same survey and the same provisional BER now also produce the three documents. The software is for BER assessors to use and for SEAI to regulate:
     the assessor prices from the rate book and cannot change it; SEAI holds the book. The assessor sells no
     installation and takes no commission, so the figure does not move with who wins the work.</p>
 
@@ -307,9 +304,7 @@ doc1 = f'''<div class="sheet">
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
-    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it a
-    rate book with a version and an effective date, sourced line by line and held in one place &mdash; and
-    the weak ones marked as weak.</p>
+    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it sits a rate book with a version and an effective date, sourced line by line and held in one place, with its weak rates marked as weak.</p>
 
   {vk('The proposition')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
@@ -356,10 +351,11 @@ doc2 = notes(2, 'The Cost Plan', (
    'This is the part that does the work. Each measure carries its own measured scope and its own '
    'figure &mdash; the attic top-up, the cavity fill, the windows and doors, the heat pump, the '
    'ventilation &mdash; and that figure is the benchmark for <em>that measure</em>. Beside it sits what '
-   'the figure covers, the scope and the measured quantities, and under that, shaded, what it leaves '
+   'the figure covers &mdash; the scope and the measured quantities &mdash; and under that, shaded, what it leaves '
    'out. Cavity fill, for instance: pump 90&thinsp;m&sup2; of 50&thinsp;mm bonded bead, making good '
    'included; not included, the room-by-room air intake vents a filled cavity makes necessary. A quote '
-   'is judged line by line against all three. A contractor pricing the attic at twice the benchmark has '
+   'is judged line by line against all three: the figure, the scope, and what is left out. A contractor '
+   'pricing the attic at twice the benchmark has '
    'to account for the attic, on that line, where the homeowner can see it; there is nowhere to lose it '
    'inside a single total.'),
   ('The totals, and what has to be raised.',
@@ -367,7 +363,7 @@ doc2 = notes(2, 'The Cost Plan', (
    f'contractor&rsquo;s overhead included. SEAI grants of <strong>&euro;{EX_GRANTS}</strong> are named '
    f'beside the measures that earn them, leaving <strong>&euro;{EX_NET}</strong> as what the work costs '
    f'in the end. On {EX_SCHEME} the grants are paid <em>after</em> the works, so it is the whole '
-   f'&euro;{EX_TOTAL} that has to be available first and claimed back once the job is done. Both are '
+   f'&euro;{EX_TOTAL} that has to be available first; the &euro;{EX_GRANTS} comes back once the job is done. Both are '
    f'named because both are needed: one to borrow against, one to judge the job by.'),
   ('Where the figures come from.',
    f'Quantities are taken from the standard BER survey the provisional certificate is built from &mdash; '
@@ -384,8 +380,8 @@ doc2 = notes(2, 'The Cost Plan', (
 # ── 03 · THE PRICING SCHEDULE ────────────────────────────────────────────────
 doc3 = notes(3, 'The Pricing Schedule', (
     'The benchmark&rsquo;s scope, measure by measure, with every figure removed &mdash; no estimate, no '
-    'grant amounts, no totals. What each measure includes and what it leaves out stays. One goes to each '
-    'contractor asked to quote, so each prices the same work the benchmark priced.'), [
+    'grant amounts, no totals. Each measure keeps what it includes and what it leaves out. One goes to each '
+    'contractor asked to quote, so every contractor prices the same work the benchmark priced.'), [
   ('It keeps the tender an open market.',
    'A contractor who can see the homeowner&rsquo;s budget prices against the budget. With the figures '
    'gone they price the work. Every contractor quotes the same measured scope with no sight of the '
@@ -393,7 +389,7 @@ doc3 = notes(3, 'The Pricing Schedule', (
    'guesses the budget closest &mdash; and a small firm competes on equal terms with a large one. When '
    'the quotes come back the homeowner lays them side by side, against each other and against their own '
    'plan: tendering the way a business does.'),
-  ('The exclusions are still named.',
+  ('What&rsquo;s not included is still named.',
    'The same shaded boxes appear here, so a contractor sees exactly what sits outside the scope. Without '
    'that an honest one assumes the item is included and pads the quote, a sharp one prices without it and '
    'raises a variation later, and the tenders stop being comparable. The guide prices stay in the '
@@ -402,7 +398,7 @@ doc3 = notes(3, 'The Pricing Schedule', (
    'A contractor&rsquo;s own survey will find things an assessor could not &mdash; a lintel, a threshold, '
    'a cavity that will not take the fill. This is where they price them: explicitly, itemised, at tender '
    'rather than mid-job. That is where variations come from, and putting them in writing before work '
-   'starts keeps it open and honest on both sides.'),
+   'starts keeps the process open and honest on both sides.'),
 ])
 
 # ── 04 · THE APPENDIX ────────────────────────────────────────────────────────
@@ -464,7 +460,7 @@ doc5 = f'''<div class="sheet">
     'Around the table, measure by measure: what the house needs, what each measure includes, and what it leaves out. The homeowner decides the scope.',
     note='Already happens')}
   {wfstep('3', 'The provisional BER report',
-    'The surveyed geometry, the total heat loss and the post-works Heat Loss Indicator &mdash; the one document everything after it is built from.',
+    'The surveyed geometry, the total heat loss and the post-works Heat Loss Indicator, in the one document everything after it is built from.',
     note='Already happens')}
   {wfstep('4', 'The three documents are produced and issued',
     'At a desk, after the survey. The geometry and Heat Loss Indicator are taken from the provisional report, the '
@@ -515,7 +511,7 @@ doc6 = f'''<div class="sheet">
     <img src="{IMG['routes']}" alt="">
     <div class="ac" style="font-size:8pt;"><strong>3 &middot; The grant route, chosen on the figures.</strong>
       Three tiles, one per SEAI route &mdash; the same measured works in each, the scheme fee and the grants
-      changing, and the net to fund badged where it is least. The homeowner picks a route knowing exactly
+      changing, and the route that leaves least to fund marked. The homeowner picks a route knowing exactly
       what each one leaves them to pay &mdash; before the plan is issued.</div>
   </div>
   <div class="arrowrow">{DOWN_ARROW}</div>
@@ -572,12 +568,12 @@ doc6 = f'''<div class="sheet">
 <div class="sheet">
   {strip(6)}
   {appfig('rates', '134mm', '6 &middot; Rate Settings, open to inspection.',
-    'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible, with its source. Nothing is a black box.')}
+    'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
   {appfig('grants', '134mm', '7 &middot; The SEAI grant table the plans draw from.',
     'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
 
   <p class="body" style="font-size:8pt;color:#64748B;margin-top:2mm;">Where each rate comes from, and how the
-    book is versioned and inspected, is document 07.</p>
+    book is versioned and inspected, is in document 07.</p>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '4', '4')}
