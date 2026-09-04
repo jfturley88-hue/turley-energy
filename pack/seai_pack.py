@@ -454,7 +454,7 @@ def wfstep(n, title, body, note='', last=False, add=False):
 
 doc5 = f'''<div class="sheet">
   {strip(5)}
-  <h2>The workflow &mdash; where the one new step sits</h2>
+  <h2>The workflow &mdash; where the three documents come in</h2>
   <div style="margin-top:4mm;">
   {wfstep('1', 'The dwelling survey',
     'Part of the technical assessment for a heat pump or window measures. Geometry, fabric and services recorded on site.',
@@ -607,7 +607,7 @@ doc7 = f'''<div class="sheet">
     own source beneath it.</p>
   <p class="body" style="{ENG_P}"><strong>Held in one place.</strong> Every rate shows its published value and
     its source. A change is made once, centrally, and every plan priced afterwards follows. The panel
-    marks any rate still to be calibrated, so the outturns recorded through a pilot settle it.</p>
+    marks any rate still to be calibrated, so the pilot&rsquo;s recorded outturns can settle it.</p>
   {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
