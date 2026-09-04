@@ -302,7 +302,8 @@ doc1 = f'''<div class="sheet">
 
   {vk('The workflow &mdash; document 05')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
-    homeowner, provisional report, works, post-works BER. One step is added: the three documents.</p>
+    homeowner, provisional report, works, post-works BER. The provisional report stage is expanded: it now
+    also produces the three documents, issued to the homeowner together with the report.</p>
 
   {vk('The software and the engine &mdash; documents 06 and 07')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
