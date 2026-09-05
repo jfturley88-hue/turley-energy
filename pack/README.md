@@ -25,6 +25,9 @@ software actually prints.
 ```sh
 npm i docx playwright          # docx for the editable Word files
 pip install pypdf pillow       # pypdf assembles, pillow crops the print-dialog shot
+# If `import pypdf` dies with a pyo3 panic about _cffi_backend, the image's system
+# `cryptography` is broken; this repairs it in the user site:
+pip install --user --force-reinstall cffi cryptography
 
 node gen_ex_pdfs.js            # 1. the three documents, from the live app
 python3 seai_pack.py           # 2. pack_01..06.html
