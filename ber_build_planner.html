@@ -7384,6 +7384,10 @@ function applyOverrides(parsed, ov) {
 
 // ── MODE MANAGEMENT ───────────────────────────────────────────────────────────
 function selectProjectType(mode) {
+  // A change of project type is a different house. restoreSnapshot calls this before it
+  // applies any field, so a restore is unaffected; a same-mode call is a no-op.
+  if (window._planitMode && window._planitMode !== mode && typeof resetAllInputs === 'function') resetAllInputs();
+  window._planitMode = mode;
   const sel = document.getElementById('t0-projType');
   if (sel) sel.value = mode;
 
@@ -10695,6 +10699,8 @@ function onVentChange() {
 
 // __ LOAD EXAMPLE (Monaghan detached 148m2 new build) ______________________
 function loadNewBuildExample() {
+  if (typeof resetAllInputs === 'function') resetAllInputs();
+  selectProjectType('New Build');
   const s = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
   s('t0-projName',        '14 Oak Avenue, Monaghan');
   s('t0-projType',        'New Build');
@@ -10747,7 +10753,7 @@ function loadNewBuildExample() {
   });
   if (typeof addFloorCard === 'function') {
     addFloorCard();
-    setTimeout(function() {
+    (function() {
       const l1 = document.getElementById('fc-t1-level-1');
       const ar1 = document.getElementById('fc-t1-area-1');
       const pe1 = document.getElementById('fc-t1-perim-1');
@@ -10757,53 +10763,53 @@ function loadNewBuildExample() {
       if (pe1) pe1.value = '36';
       if (ht1) ht1.value = '2.4';
       addFloorCard();
-      setTimeout(function() {
+      (function() {
         const l2 = document.getElementById('fc-t1-level-2');
         const ar2 = document.getElementById('fc-t1-area-2');
         const ht2 = document.getElementById('fc-t1-height-2');
         if (l2) l2.value = 'First Floor';
         if (ar2) ar2.value = '74';
         if (ht2) ht2.value = '2.4';
-      }, 30);
-    }, 30);
+      })();
+    })();
   }
   if (typeof addWallCard === 'function') {
     addWallCard();
-    setTimeout(function() {
+    (function() {
       const ar1 = document.getElementById('fc-t2-area-1');
       if (ar1) ar1.value = '182';
-    }, 30);
+    })();
   }
   if (typeof addRoofCard === 'function') {
     addRoofCard();
-    setTimeout(function() {
+    (function() {
       const ty1 = document.getElementById('fc-t3-type-1');
       const ar1 = document.getElementById('fc-t3-area-1');
       if (ty1) ty1.value = 'ceiling';
       if (ar1) ar1.value = '74';
-    }, 30);
+    })();
   }
   if (typeof addWindowCard === 'function') {
     addWindowCard();
-    setTimeout(function() {
+    (function() {
       const co1 = document.getElementById('fc-t4-count-1');
       const ar1 = document.getElementById('fc-t4-area-1');
       if (co1) co1.value = '10';
       if (ar1) ar1.value = '28.4';
-    }, 30);
+    })();
   }
   if (typeof addHeatingCard === 'function') {
     addHeatingCard();
-    setTimeout(function() {
+    (function() {
       const sys1 = document.getElementById('fc-t6-sys-1');
       const em1  = document.getElementById('fc-t6-emit-1');
       const hw1  = document.getElementById('fc-t6-hw-1');
       if (sys1) sys1.value = 'ASHP';
       if (em1)  em1.value  = 'UFH Ground Floor + Radiators Upper';
       if (hw1)  hw1.value  = 'HP Cylinder 210L';
-    }, 30);
+    })();
   }
-  setTimeout(function() {
+  (function() {
     if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
     if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
     s('spec-cavity-ins',  'PIR Board 100mm');
@@ -10813,12 +10819,14 @@ function loadNewBuildExample() {
     s('spec-heating',     'ashp-ufh-rads');
     s('spec-ventilation', 'MVHR');
     s('t8-pvArea',        '12');
-  }, 200);
+  })();
   selectProjectType('New Build');
   if (typeof openProjectSections === 'function') openProjectSections();
 }
 
 function loadRefurbExample() {
+  if (typeof resetAllInputs === 'function') resetAllInputs();
+  selectProjectType('Refurbishment');
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
   s('t0-projName',        'Sample Project \u2014 Refurbishment, Galway');
@@ -10901,6 +10909,8 @@ function loadRefurbExample() {
 }
 
 function loadRefurbExample2() {
+  if (typeof resetAllInputs === 'function') resetAllInputs();
+  selectProjectType('Refurbishment');
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
   s('t0-projName',        '4 Tuam Road, Headford, Co. Galway');
@@ -10995,9 +11005,9 @@ function loadRefurbExample2() {
   if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
   if (typeof refurbDeriveAreas === 'function') refurbDeriveAreas();
   // Add 45m² kitchen/dining extension — flat GRP roof, triple glazed
-  setTimeout(function() {
+  (function() {
     addExtension();
-    setTimeout(function() {
+    (function() {
       const se = function(id, val) { const el = document.getElementById(id); if(el) el.value = val; };
       // Geometry
       se('ext1-fa',      '45');
@@ -11030,13 +11040,13 @@ function loadRefurbExample2() {
       se('ext1-emitters',     'rads');
       se('ext1-rads',         '2');
       extDeriveAreas(1);
-    }, 200);
-  }, 100);
-  setTimeout(function() {
+    })();
+  })();
+  (function() {
     if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
     if (typeof refurbDeriveAreas === 'function') refurbDeriveAreas();
     if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
-  }, 400);
+  })();
   selectProjectType('Refurbishment');
   if (typeof openProjectSections === 'function') openProjectSections();
 }
@@ -11058,6 +11068,8 @@ function euResetSelectorFields() {
 }
 
 function loadEUExample1() {
+  if (typeof resetAllInputs === 'function') resetAllInputs();
+  selectProjectType('Energy Upgrade');
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
   const lk = (id)          => { const el = document.getElementById(id); if(el) el.dataset.userEdited = 'true'; };
@@ -11111,7 +11123,7 @@ function loadEUExample1() {
   });
   if (typeof addFloorCard === 'function') {
     addFloorCard();
-    setTimeout(function() {
+    (function() {
       const l1 = document.getElementById('fc-t1-level-1');
       const ar1 = document.getElementById('fc-t1-area-1');
       const pe1 = document.getElementById('fc-t1-perim-1');
@@ -11120,42 +11132,44 @@ function loadEUExample1() {
       if (ar1) ar1.value = '88';
       if (pe1) pe1.value = '38';
       if (ht1) ht1.value = '2.4';
-    }, 30);
+    })();
   }
   if (typeof addWallCard === 'function') {
     addWallCard();
-    setTimeout(function() {
+    (function() {
       const ar1 = document.getElementById('fc-t2-area-1');
       if (ar1) ar1.value = '95';
-    }, 30);
+    })();
   }
   if (typeof addRoofCard === 'function') {
     addRoofCard();
-    setTimeout(function() {
+    (function() {
       const ty1 = document.getElementById('fc-t3-type-1');
       const ar1 = document.getElementById('fc-t3-area-1');
       if (ty1) ty1.value = 'ceiling';
       if (ar1) ar1.value = '88';
-    }, 30);
+    })();
   }
   if (typeof addWindowCard === 'function') {
     addWindowCard();
-    setTimeout(function() {
+    (function() {
       const co1 = document.getElementById('fc-t4-count-1');
       const ar1 = document.getElementById('fc-t4-area-1');
       if (co1) co1.value = '6';
       if (ar1) ar1.value = '16';
-    }, 30);
+    })();
   }
-  setTimeout(function() {
+  (function() {
     if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
     if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
-  }, 200);
+  })();
   selectProjectType('Energy Upgrade');
   if (typeof openProjectSections === 'function') openProjectSections();
 }
 
 function loadEUExample2() {
+  if (typeof resetAllInputs === 'function') resetAllInputs();
+  selectProjectType('Energy Upgrade');
   const s  = (id, val)     => { const el = document.getElementById(id); if(el) el.value = val; };
   const ck = (id, checked) => { const el = document.getElementById(id); if(el) { el.checked = checked; el.dispatchEvent(new Event('change')); } };
   const lk = (id)          => { const el = document.getElementById(id); if(el) el.dataset.userEdited = 'true'; };
@@ -11215,7 +11229,7 @@ function loadEUExample2() {
   });
   if (typeof addFloorCard === 'function') {
     addFloorCard();
-    setTimeout(function() {
+    (function() {
       const l1 = document.getElementById('fc-t1-level-1');
       const ar1 = document.getElementById('fc-t1-area-1');
       const pe1 = document.getElementById('fc-t1-perim-1');
@@ -11224,37 +11238,37 @@ function loadEUExample2() {
       if (ar1) ar1.value = '112';
       if (pe1) pe1.value = '43';
       if (ht1) ht1.value = '2.4';
-    }, 30);
+    })();
   }
   if (typeof addWallCard === 'function') {
     addWallCard();
-    setTimeout(function() {
+    (function() {
       const ar1 = document.getElementById('fc-t2-area-1');
       if (ar1) ar1.value = '145';
-    }, 30);
+    })();
   }
   if (typeof addRoofCard === 'function') {
     addRoofCard();
-    setTimeout(function() {
+    (function() {
       const ty1 = document.getElementById('fc-t3-type-1');
       const ar1 = document.getElementById('fc-t3-area-1');
       if (ty1) ty1.value = 'ceiling';
       if (ar1) ar1.value = '60';
-    }, 30);
+    })();
   }
   if (typeof addWindowCard === 'function') {
     addWindowCard();
-    setTimeout(function() {
+    (function() {
       const co1 = document.getElementById('fc-t4-count-1');
       const ar1 = document.getElementById('fc-t4-area-1');
       if (co1) co1.value = '10';
       if (ar1) ar1.value = '22';
-    }, 30);
+    })();
   }
-  setTimeout(function() {
+  (function() {
     if (typeof mirrorDynamicToLegacy === 'function') mirrorDynamicToLegacy();
     if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
-  }, 200);
+  })();
   selectProjectType('Energy Upgrade');
   openProjectSections();
 }
@@ -21123,6 +21137,9 @@ function buildSnapshot(code) {
     // Persist card counts so restoreSnapshot can recreate them before applying values
     dynCounts: (typeof _dynCount === 'object' && _dynCount) ? Object.assign({}, _dynCount) : {},
     boq: (typeof BOQ !== 'undefined' && BOQ) ? BOQ : null,
+    // Actual and Variation Notes live in the table, not on BOQ; without this a saved
+    // project came back with every recorded figure blank.
+    live: (typeof capturePlanLive === 'function') ? capturePlanLive() : null,
   };
 }
 
@@ -21179,6 +21196,9 @@ function restoreSnapshot(snap) {
     BOQ = snap.boq;
     if (typeof buildReport === 'function') {
       try { buildReport(); } catch(e) { console.warn('Could not rebuild report:', e); }
+      if (snap.live && typeof restorePlanLive === 'function') {
+        try { restorePlanLive(snap.live); if (typeof updateEUActuals === 'function') updateEUActuals(); } catch(e) { console.warn('Could not restore recorded figures:', e); }
+      }
     }
   }
 }
@@ -21211,35 +21231,57 @@ async function saveProject() {
   }
 }
 
-function newProject() {
-  if (!confirm('Clear all current inputs and start a new project?\n\nUnsaved changes will be lost.')) return;
+// Clears every input, every dynamic card and the generated plan. No confirm, no navigation:
+// callers decide those. newProject() asks first; the example loaders and a change of
+// project type call it outright, because both are explicitly a different house.
+// The pristine state of every field, taken once before anything can touch it. A reset goes
+// back to THIS, not to defaultValue: an example loader that writes the value attribute
+// also rewrites defaultValue, and a reset that trusted it restored the previous house.
+var _planitPristine = null;
+function _capturePristine() {
+  if (_planitPristine) return;
+  _planitPristine = {};
+  document.body.querySelectorAll('#screen-home input, #screen-home select, #screen-home textarea, #screen-input input, #screen-input select, #screen-input textarea').forEach(function(el) {
+    if (!el.id) return;
+    _planitPristine[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? { checked: el.checked } : { value: el.value };
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _capturePristine); else _capturePristine();
+
+function resetAllInputs() {
+  _capturePristine();
   const fields = document.body.querySelectorAll(
     '#screen-home input, #screen-home select, #screen-input input, #screen-input select, #screen-input textarea'
   );
   fields.forEach(function(el) {
     // Clear auto-fill locks so age-band/geometry can re-populate derived fields (e.g. eu-hli)
     if (el.dataset && el.dataset.userEdited) delete el.dataset.userEdited;
-    if (el.type === 'checkbox' || el.type === 'radio') { el.checked = el.defaultChecked; }
+    const p = el.id && _planitPristine[el.id];
+    if (el.type === 'checkbox' || el.type === 'radio') { el.checked = p ? p.checked : el.defaultChecked; }
     else if (el.type === 'file') { /* skip */ }
     else if (el.tagName === 'SELECT') {
-      const def = el.querySelector('option[selected]');
-      if (def) { el.value = def.value; } else if (el.options.length) { el.selectedIndex = 0; }
-    } else { el.value = el.defaultValue || ''; }
+      if (p) { el.value = p.value; }
+      else { const def = el.querySelector('option[selected]'); if (def) { el.value = def.value; } else if (el.options.length) { el.selectedIndex = 0; } }
+    } else { el.value = p ? p.value : (el.defaultValue || ''); }
   });
   var hld = document.getElementById('eu-heat-load-display'); if (hld) hld.textContent = '—';
-  ['t1-cards','t2-cards','t3-cards','t4-cards','t6-cards'].forEach(function(id) {
+  ['t1-cards','t2-cards','t3-cards','t4-cards','t5r-cards','t6-cards'].forEach(function(id) {
     const c = document.getElementById(id); if (c) c.innerHTML = '';
   });
   if (typeof _dynCount === 'object' && _dynCount) {
     Object.keys(_dynCount).forEach(function(k) { _dynCount[k] = 0; });
   }
-  ['t1','t2','t3','t4','t6'].forEach(function(t) {
+  ['t1','t2','t3','t4','t5r','t6'].forEach(function(t) {
     if (typeof _dynEmpty === 'function') _dynEmpty(t);
   });
   if (typeof BOQ !== 'undefined') BOQ = null;
   if (window.syncHomeToTab0) window.syncHomeToTab0();
   if (window.evaluateGenerateBarGate) window.evaluateGenerateBarGate();
   if (window.refreshConditionalItems) window.refreshConditionalItems();
+}
+function newProject() {
+  if (!confirm('Clear all current inputs and start a new project?\n\nUnsaved changes will be lost.')) return;
+  resetAllInputs();
   if (typeof goHome === 'function') goHome();
   if (typeof showToast === 'function') showToast('New project started.');
 }
@@ -23814,7 +23856,6 @@ if (logoUploadEl) {
 }
 </script>
 <script>
-function loadDetachedExample(){ loadExample(); }
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

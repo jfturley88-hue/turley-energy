@@ -1,0 +1,22 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const p = await b.newPage(); const errs=[]; p.on('pageerror', e => errs.push(e.message));
+  await p.goto('file://' + require('path').resolve(__dirname, '..', '..', 'ber_build_planner.html')); await p.evaluate(()=>{window.print=()=>{}}); await p.waitForTimeout(500);
+  await p.evaluate(() => { selectProjectType('Energy Upgrade'); loadEUExample1(); }); await p.evaluate(() => generate()); await p.waitForTimeout(1800);
+  const before = await p.evaluate(() => ({ total: planTotals(BOQ).totalEst, excl: BOQ.sections.map(s=>[s.title.slice(0,28), (s.exclusions||[]).map(e=>e.item)]) }));
+  const pick = await p.evaluate(() => { document.getElementById('screen-report').style.display='none'; document.getElementById('screen-input').style.display='flex'; euBuildExclTab();
+    const cbs=[...document.querySelectorAll('#eu-excl-tab input[type=checkbox], [id^=eu-excl-] input[type=checkbox]')]; if(!cbs.length) return {n:0};
+    const cb = cbs.find(c => /attic|vent/i.test(c.id + ' ' + (c.closest('label,tr,div')||{}).textContent)) || cbs[0];
+    cb.checked=true; cb.dispatchEvent(new Event('change',{bubbles:true})); return { n: cbs.length, id: cb.id, label: (cb.closest('label,tr,div')||{}).textContent.trim().slice(0,80) }; });
+  await p.evaluate(() => generate()); await p.waitForTimeout(1800);
+  const after = await p.evaluate(() => { const added=[]; BOQ.sections.forEach(s=>(s.items||[]).forEach(i=>{ if(/Not Included checklist/.test(i.note||'')) added.push([s.title.slice(0,28), i.description.slice(0,60), Math.round((i.quantity||0)*((i.matRate||0)+(i.labRate||0)))]); }));
+    return { total: planTotals(BOQ).totalEst, added, excl: BOQ.sections.map(s=>[s.title.slice(0,28), (s.exclusions||[]).map(e=>e.item)]) }; });
+  const addedNames = after.added.map(a=>a[1].toLowerCase());
+  const stillExcluded = after.excl.flatMap(([t,items]) => items.filter(it => addedNames.some(n => n.includes(it.toLowerCase().slice(0,10)))).map(it => t+' :: '+it));
+  console.log('picked:', JSON.stringify(pick)); console.log('total before/after:', before.total, '->', after.total);
+  console.log('added to priced sections:', JSON.stringify(after.added)); console.log('still listed as excluded:', JSON.stringify(stillExcluded));
+  console.log('page errors:', errs.length ? errs : 'none');
+  console.log('VERDICT:', (after.added.length && !stillExcluded.length && after.total > before.total) ? 'PASS' : 'FAIL');
+  await b.close();
+})().catch(e => { console.error('CRASH', e); process.exit(1); });
