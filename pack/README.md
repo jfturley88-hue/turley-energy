@@ -43,7 +43,12 @@ the folder was assembled by hand from the previous run.
 
 ## Screenshots
 
-`shot_engine.js` regenerates the Rate Settings tabs used by documents 06 and 07.
+`shot_engine.js` regenerates the Rate Settings tabs. `shot_engine_full.js` captures the whole
+EU Rates panel, and `crop_engine_figs.py` cuts that one capture into the three figures document
+05 uses. Those three used to be hand-cropped with no script, so every change to the panel left
+them quietly stale. The slices are anchored from the bottom, because the panel grows at the top:
+the first figure absorbs the growth and the other two stay identical. Scale the first figure down
+in `seai_pack.py` if page 5 then overflows.
 `refresh_app_shots.js` regenerates the app screenshots in document 06 (`app_plan`,
 `app_routes`, `app_selector`). `pack_shots.js` regenerates the Cost Plan / Schedule /
 grants shots.

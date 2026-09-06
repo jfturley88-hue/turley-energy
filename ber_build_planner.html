@@ -369,6 +369,11 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .eu-measure-table .plan-edge{border-right:2px solid rgba(232,160,32,.55);}
 .eu-baseline-band th{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 8px 4px;color:#8090A8;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
 .eu-baseline-band th:last-child{color:#38bdf8;}
+/* BASELINE sits a level below FIXED, over the two columns it governs: the scope
+   and the estimate. Larger than the band above it, because it is the load-bearing
+   word on the document. */
+.eu-baseline-band th{border-bottom:0;}
+.eu-baseline-sub th{font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:0 8px 5px;color:#C8D0DC;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
 .eu-howto{font-size:10px;color:#94A3B8;padding:9px 12px;margin-top:10px;line-height:1.6;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.14);border-radius:5px;}
 .eu-howto strong{color:#C8D0DC;}
 /* Homeowner-facing terms. Was #4B5563 when this held a dense grey paragraph; as a bullet
@@ -15266,13 +15271,18 @@ function renderEUTable(b) {
       // right of it is filled in as the job runs. Saying so above the headings is what makes
       // this a baseline document rather than another estimate.
       '<tr class="eu-baseline-band">' +
-        '<th colspan="'+nFixed+'" class="plan-edge">Baseline scope &amp; budget estimate &mdash; fixed at date of issue</th>' +
+        '<th colspan="'+nFixed+'" class="plan-edge">Fixed &mdash; at date of issue</th>' +
         '<th colspan="3">Live &mdash; recorded as the job runs</th>' +
+      '</tr>' +
+      '<tr class="eu-baseline-sub">' +
+        '<th colspan="2"></th>' +
+        '<th colspan="2" class="plan-edge">Baseline</th>' +
+        '<th colspan="3"></th>' +
       '</tr>' +
       '<tr>' +
       '<th class="eu-r">#</th>' +
       '<th>Measure</th>' +
-      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;white-space:normal;">Baseline scope <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
+      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;white-space:normal;">Scope &amp; Quantities <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
       '<th class="eu-r plan-edge" style="color:#E8A020;">Budget Est.</th>' +
       '<th>Variation Notes</th>' +
       '<th class="eu-r" style="color:#38bdf8;">Actual ✏</th>' +
@@ -18684,7 +18694,7 @@ function exportEUPDF(mode) {
       '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;margin-bottom:12px;">' +
         '<thead><tr style="background:#F1F5F9;">' +
           '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Measure</th>' +
-          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Measured inputs</th>' +
+          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Scope &amp; Quantities</th>' +
           '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Materials + labour</th>' +
           '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">+ Overhead &amp; profit (12%)</th>' +
           '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Total incl. VAT</th>' +
@@ -18723,8 +18733,13 @@ function exportEUPDF(mode) {
     '</div>';
 
   var _bandRow = '<tr style="background:#FFF7ED;color:#92400E;">' +
-      '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline scope &amp; budget estimate &mdash; fixed at date of issue</th>' +
+      '<th colspan="'+_nFixed+'" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Fixed &mdash; at date of issue</th>' +
       '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
+    '</tr>' +
+    '<tr style="background:#FFF7ED;color:#92400E;">' +
+      '<th colspan="2" style="padding:2px 6px;border:1px solid #CBD5E1;"></th>' +
+      '<th colspan="2" style="padding:2px 6px;text-align:left;font-size:8.5pt;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline</th>' +
+      '<th colspan="3" style="padding:2px 6px;border:1px solid #CBD5E1;"></th>' +
     '</tr>';
   // Same pairing as on screen: Scope equals Variation Notes, and Budget Est.,
   // Actual and Difference are all one width.
@@ -18733,7 +18748,7 @@ function exportEUPDF(mode) {
   var thead7 = '<thead>' + _bandRow + '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
-    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Baseline scope</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope &amp; Quantities</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+_pdfEdge+'">Budget Est.</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +

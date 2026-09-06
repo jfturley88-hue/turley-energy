@@ -548,7 +548,7 @@ doc7 = f'''<div class="sheet">
   <p class="body" style="{ENG_P}"><strong>Held in one place.</strong> Every rate shows its published value and
     its source. A change is made once, centrally, and every plan priced afterwards follows. The panel
     marks any rate still to be calibrated, so the pilot&rsquo;s recorded outturns can settle it.</p>
-  {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
+  {engfig('eng_a', '156mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
   {footer(5, '5', '7')}
