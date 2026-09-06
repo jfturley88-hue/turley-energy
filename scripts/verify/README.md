@@ -20,3 +20,28 @@ python3 scripts/verify/static_scan.py   # syntax on every script block; calls to
 `drive_all` reports one error on reload in a sandbox that blocks Google Fonts; that is the
 proxy, not the app. `static_scan` flags names it cannot see defined -- destructured helpers
 (`merge: m1`) show up as false positives; anything else is real.
+
+## On Windows
+
+There is no container here, so nothing is preinstalled and the paths above do not exist.
+Node and Python install per-user with no admin rights: unzip the official Node build, and
+run the python.org installer with `/quiet InstallAllUsers=0 PrependPath=0 TargetDir=...`.
+
+Do not `npm i` into the repo when it sits on a Google Drive letter — Drive's filesystem
+truncates files mid-write and npm leaves a `package.json` that Node rejects with
+`ERR_INVALID_PACKAGE_CONFIG`. Install into a directory on the real disk and point
+`NODE_PATH` at its `node_modules`.
+
+Playwright's own Chromium download fails behind some connections. It is not needed:
+these scripts already take `$CHROME`, so aim it at an installed Chrome.
+
+```sh
+export NODE_PATH=".../planitber-deps/node_modules"
+export CHROME="C:/Program Files/Google/Chrome/Application/chrome.exe"
+export NODE="C:/Users/<you>/.local/node/node.exe"   # static_scan spawns this
+node scripts/verify/drive2.js
+PYTHONUTF8=1 python scripts/verify/static_scan.py
+```
+
+`static_scan` reads the app as UTF-8 explicitly; without `PYTHONUTF8=1` the rest of the
+Python toolchain still defaults to cp1252 on this platform.

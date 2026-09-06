@@ -1,12 +1,12 @@
 import re, subprocess, os, builtins
-src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'ber_build_planner.html')).read()
+src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'ber_build_planner.html'), encoding='utf-8').read()
 blocks = re.findall(r'<script(?![^>]*type=["\']module)[^>]*>(.*?)</script>', src, re.S)
 sp = os.path.dirname(os.path.abspath(__file__))
 bad = 0
 for i, b in enumerate(blocks):
     if not b.strip(): continue
-    f = f'{sp}/_chk{i}.js'; open(f, 'w').write(b)
-    r = subprocess.run(['/opt/node22/bin/node', '--check', f], capture_output=True, text=True)
+    f = f'{sp}/_chk{i}.js'; open(f, 'w', encoding='utf-8').write(b)
+    r = subprocess.run([os.environ.get('NODE', 'node'), '--check', f], capture_output=True, text=True)
     if r.returncode: bad += 1; print('SYNTAX FAIL block', i, r.stderr.strip().splitlines()[-1][:160])
     os.remove(f)
 print(f'syntax: {len([b for b in blocks if b.strip()])} blocks, {bad} failed')
