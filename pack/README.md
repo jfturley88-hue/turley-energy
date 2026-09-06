@@ -68,3 +68,28 @@ anywhere else in the prose: the same figure appearing twice is how they drift ap
 
 Take them from `planTotals()`, never from `BOQ.summary` — the summary path applies a flat
 13.5% VAT (heat pumps are 9%) and omits the post-works BER.
+
+## On Windows
+
+The scripts no longer carry the container's paths. Every one that launches a browser takes
+`$CHROME`, the way the verify drivers already did, and the app is located from `__dirname`
+rather than an absolute `/home/user` path, so the build runs wherever the repo sits.
+
+Install Node and Python per-user; neither needs admin. Do not `npm i` into the repo while
+it lives on a Google Drive letter — Drive truncates the writes and Node then rejects the
+package. Install into a directory on the real disk and point `NODE_PATH` at its
+`node_modules`. Playwright's own Chromium download is not needed; aim `$CHROME` at an
+installed Chrome.
+
+```sh
+export NODE_PATH=".../planitber-deps/node_modules"   # docx + playwright, off Drive
+export CHROME="C:/Program Files/Google/Chrome/Application/chrome.exe"
+```
+
+Prefix every `python` step with `PYTHONUTF8=1`; the platform default is cp1252 and the
+prose is full of typographic characters that it cannot decode.
+
+The six rebuild steps all run this way. `shot_preview.js` does not: it needs a real X
+display, and there is no Xvfb here. That figure has to be recaptured on Linux, or left as
+the committed `app_preview_dialog.png` — it is captioned as unedited, so it must never be
+composited to work around this.

@@ -37,7 +37,7 @@ const KILDARE = {
 
 const fresh = async (b, w, h) => {
   const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
-  await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+  await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
   await p.evaluate(() => { window.print = () => {}; });
   await p.waitForTimeout(400);
   return p;
@@ -69,7 +69,7 @@ const trimToPage1 = p => p.evaluate(() => {
 });
 
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errs = [];
   const totals = {};
 

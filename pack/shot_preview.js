@@ -18,13 +18,13 @@ const CFG = {
 
 (async () => {
   const b = await chromium.launch({
-    executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
     headless: false,
     args: ['--no-sandbox', '--window-size=1560,1160', '--window-position=0,0'],
   });
   const p = await b.newPage({ viewport: { width: 1560, height: 1000 } });
   p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+  await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
   await p.waitForTimeout(600);
   await p.evaluate(c => {
     selectProjectType('Energy Upgrade');

@@ -15,7 +15,7 @@ const DOCS = [
 ];
 
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const out = {};
   for (const [n, title] of DOCS) {
     const p = await b.newPage();

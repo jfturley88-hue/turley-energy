@@ -5,11 +5,11 @@ const { chromium } = require('playwright');
 const TABS = [['Labour Rates','app_rates.png',820], ['EU Rates','app_eurates.png',980],
               ['Regional Multipliers','app_regional.png',760]];
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   for (const [tab, out, h] of TABS) {
     const p = await b.newPage({ viewport:{width:1240, height:h}, deviceScaleFactor:2 });
     p.on('pageerror', e => console.log('ERR', tab, e.message));
-    await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+    await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
     await p.waitForTimeout(500);
     await p.evaluate(() => { toggleMatOverlay(); });
     await p.waitForTimeout(350);

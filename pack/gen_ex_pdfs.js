@@ -48,12 +48,12 @@ const build = (p, cfg) => p.evaluate(c => {
 }, cfg);
 
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   for (const [key, cfg] of Object.entries(HOUSES)) {
     for (const [doc, trigger] of [['plan', 'exportEUPDF'], ['appx', 'exportEUAppendix'], ['sched', 'exportContractorSchedule']]) {
       const p = await b.newPage({ viewport: { width: 1100, height: 900 } });
       p.on('pageerror', e => console.log('ERR', key, e.message));
-      await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+      await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
       await p.evaluate(() => { window.print = () => {}; });
       await p.waitForTimeout(400);
       await build(p, cfg);

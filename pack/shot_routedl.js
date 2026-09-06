@@ -8,10 +8,10 @@ const CFG = { addr:'3 Bed Semi, Mullingar, Co. Westmeath', dwelling:'Semi-Detach
   measures:['eu-cavity','eu-roof-ceiling','eu-windows','eu-doors','eu-ashp','eu-hw-cyl','eu-dmev'],
   atticType:'mw-200-topup', cavityType:'bonded-bead', cavityWidth:'50', glazing:'double', hli:2.2 };
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const p = await b.newPage({ viewport:{width:1500,height:900}, deviceScaleFactor:2 });
   p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+  await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
   await p.evaluate(() => { window.print = () => {}; });
   await p.waitForTimeout(400);
   await p.evaluate(c => {

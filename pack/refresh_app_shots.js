@@ -34,14 +34,14 @@ const build = (p, cfg) => p.evaluate(c => {
 
 const fresh = async (b, w, h) => {
   const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
-  await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+  await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
   await p.evaluate(() => { window.print = () => {}; });
   await p.waitForTimeout(400);
   return p;
 };
 
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const errs = [];
 
   // 2 · the survey screen — project tab with the status sidebar filled

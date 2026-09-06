@@ -5,10 +5,10 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const b = await chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const p = await b.newPage({ viewport:{width:1240, height:900}, deviceScaleFactor:2 });
   p.on('pageerror', e => console.log('ERR', e.message));
-  await p.goto('file:///home/user/turley-energy/ber_build_planner.html');
+  await p.goto(require('url').pathToFileURL(require('path').resolve(__dirname, '..', 'ber_build_planner.html')).href);
   await p.waitForTimeout(500);
   await p.evaluate(() => toggleMatOverlay());
   await p.waitForTimeout(300);
