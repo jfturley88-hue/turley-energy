@@ -229,7 +229,7 @@ function main() {
   // !== false)`.
   const ao = {
     prelims: 0.12,              // 'ao-eu-prelims' ships checked -> 12% overhead & profit
-    contingency: 0,             // the plan is a benchmark; no contingency in the loading
+    contingency: 0,             // the plan is a baseline; no contingency in the loading
     proFees: null,              // 'ao-eu-pro-fees' ships unchecked
     includePrelimSection: false,
   };

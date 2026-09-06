@@ -37,7 +37,7 @@ The result is alignment: advice, quote, budget, loan file and grant all referenc
 | **PRODUCES THE COST PLAN** | |
 | **BER Assessors** | Add a costed plan to the advice they already give, issued with the BER documentation. Uses the survey already carried out; no return visit. |
 | **RELIES ON IT** | |
-| **Homeowners and Project Coordinators** | Homeowners see the real cost before engaging anyone and can judge a quote against an independent benchmark. Coordinators price and pre-qualify projects on that same basis — under CEG, where several contractors price one project, a shared scope is what makes them comparable. |
+| **Homeowners and Project Coordinators** | Homeowners see the real cost before engaging anyone and can judge a quote against an independent baseline. Coordinators price and pre-qualify projects on that same basis — under CEG, where several contractors price one project, a shared scope is what makes them comparable. |
 | **Contractors quoting for Better Energy Homes, CEG and One Stop Shop** | The same defined scope in front of every competitor pricing the job. Fewer wasted site visits, fewer scope disputes, and no losing work to a quote that only looks cheaper. |
 | **Better Energy Homes, CEG and One Stop Shop** | One scope and one set of rates sitting behind an application, whichever route the homeowner takes. |
 | **Banks & Credit Unions** | A consistent, contractor-independent cost document for green loan applications. |

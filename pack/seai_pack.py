@@ -273,7 +273,7 @@ doc1 = f'''<div class="sheet">
   </div>
   <h1 style="font-size:17.5pt;line-height:1.18;margin:4mm 0 2mm;">Empowering homeowners with tender documents to engage in the retrofit process with confidence</h1>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Three bespoke documents,
-    issued with the provisional BER. Each measure carries a <strong>benchmark</strong> &mdash; an
+    issued with the provisional BER. Each measure carries a <strong>baseline</strong> &mdash; an
     estimate with what&rsquo;s included and what&rsquo;s not. Contractors price that scope on the
     <strong>schedule</strong>, so quotes compare like with like. Variations get agreed rather than argued,
     because the homeowner already holds guide prices for the not-included items in the
@@ -282,7 +282,7 @@ doc1 = f'''<div class="sheet">
   {vk('Why it is needed')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When every
     figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
-    nobody can show whether it happens. The missing piece is not more money but a benchmark that exists
+    nobody can show whether it happens. The missing piece is not more money but a baseline that exists
     before any contractor names a price.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Trust between homeowner and contractor has nowhere to
     start.</strong> A quote today is one number, with nothing to check it against. The homeowner is
@@ -350,15 +350,15 @@ doc2 = notes(2, 'The Cost Plan', (
     f'&mdash; with an attic top-up, a cavity fill, new windows and external doors, an air-to-water heat '
     f'pump with its cylinder, and decentralised ventilation with its air-tightness test. It follows in '
     f'full, exactly as the software prints it.'), [
-  ('The benchmark is on every row, not at the bottom.',
+  ('The baseline is on every row, not at the bottom.',
    'This is the part that does the work. Each measure carries its own measured scope and its own '
    'figure &mdash; the attic top-up, the cavity fill, the windows and doors, the heat pump, the '
-   'ventilation &mdash; and that figure is the benchmark for <em>that measure</em>. Beside it sits what '
+   'ventilation &mdash; and that figure is the baseline for <em>that measure</em>. Beside it sits what '
    'the figure covers &mdash; the scope and the measured quantities &mdash; and under that, shaded, what it leaves '
    'out. Cavity fill, for instance: pump 90&thinsp;m&sup2; of 50&thinsp;mm bonded bead, making good '
    'included; not included, the room-by-room air intake vents a filled cavity makes necessary. A quote '
    'is judged line by line against all three: the figure, the scope, and what is left out. A contractor '
-   'pricing the attic at twice the benchmark has '
+   'pricing the attic at twice the baseline has '
    'to account for the attic, on that line, where the homeowner can see it; there is nowhere to lose it '
    'inside a single total.'),
   ('The totals, and what has to be raised.',
@@ -382,9 +382,9 @@ doc2 = notes(2, 'The Cost Plan', (
 
 # ── 03 · THE PRICING SCHEDULE ────────────────────────────────────────────────
 doc3 = notes(3, 'The Pricing Schedule', (
-    'The benchmark&rsquo;s scope, measure by measure, with every figure removed &mdash; no estimate, no '
+    'The baseline&rsquo;s scope, measure by measure, with every figure removed &mdash; no estimate, no '
     'grant amounts, no totals. Each measure keeps what it includes and what it leaves out. One goes to each '
-    'contractor asked to quote, so every contractor prices the same work the benchmark priced.'), [
+    'contractor asked to quote, so every contractor prices the same work the baseline priced.'), [
   ('It keeps the tender an open market.',
    'A contractor who can see the homeowner&rsquo;s budget prices against the budget. With the figures '
    'gone they price the work. Every contractor quotes the same measured scope with no sight of the '
@@ -409,8 +409,8 @@ doc4 = notes(4, 'The Appendix', (
     'The reference behind the Cost Plan, fixed at the date of issue. How every figure was reached, the '
     'itemised measurements and rates beneath each measure, and the guide prices for everything the plan '
     'leaves out. It follows in full, exactly as the software prints it.'), [
-  ('How the estimate &mdash; the benchmark &mdash; was calculated.',
-   'The estimate on the Cost Plan is the benchmark; this is the arithmetic behind it. '
+  ('How the estimate &mdash; the baseline &mdash; was calculated.',
+   'The estimate on the Cost Plan is the baseline; this is the arithmetic behind it. '
    'Measure by measure: the inputs used, the base cost of materials and labour, the contractor&rsquo;s '
    'overhead and profit, and the VAT that applies to that measure. The loaded column ties back to the '
    'Cost Plan line for line. Each measure also repeats what it '
@@ -471,7 +471,7 @@ doc5 = f'''<div class="sheet">
     'the blank Pricing Schedule and the Appendix. They go to the homeowner with the provisional BER.',
     note='New &middot; minutes at a desk', add=True)}
   {wfstep('5', 'Variations and prices agreed with the contractor',
-    'With the benchmark and the guide prices for what it leaves out, the homeowner tenders properly: the same '
+    'With the baseline and the guide prices for what it leaves out, the homeowner tenders properly: the same '
     'measured scope to every contractor, quotes that compare like with like, and any variation priced and agreed '
     '<strong>before work starts</strong>.',
     note='Same step, new terms')}
@@ -519,7 +519,7 @@ doc6 = f'''<div class="sheet">
   </div>
   <div class="arrowrow">{DOWN_ARROW}</div>
   {appfig('appplan', '162mm', '4 &middot; The plan on screen.',
-    'The benchmark fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
+    'The baseline fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(6, '2', '4')}
