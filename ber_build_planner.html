@@ -18625,12 +18625,14 @@ function exportEUPDF(mode) {
     var exRows = '';
     sections.forEach(function(s) {
       (s.exclusions || []).forEach(function(e) {
-        var guide = (e.qty || 1) > 1
-          ? fmt(e.rate) + ' per ' + e.unit + ' &nbsp;·&nbsp; assessor estimate ' + e.qty + ' ' + e.unit + ' &asymp; ' + fmt(e.rate * e.qty)
-          : '&asymp; ' + fmt(Math.round(e.rate * (e.qty || 1)));
+        // The assessor does not guess how many are needed. Every not-included item is
+        // priced at one unit; the contractor's own survey states the quantity, and the
+        // homeowner multiplies. A guessed quantity here read as a commitment.
+        var perUnit = (e.unit === 'nr' || e.unit === 'item') ? '' : ' per ' + e.unit;
+        var guide = '&asymp; ' + fmt(Math.round(e.rate)) + perUnit;
         exRows += '<tr style="border-bottom:1px solid #EEF2F7;page-break-inside:avoid;">' +
           '<td style="padding:4px 6px;font-size:7.5pt;font-weight:700;color:#1E293B;border:1px solid #E2E8F0;vertical-align:top;">' + s.title + '</td>' +
-          '<td style="padding:4px 6px;font-size:7.5pt;color:#334155;border:1px solid #E2E8F0;vertical-align:top;"><strong>' + e.item + '</strong> — ' + e.detail + '</td>' +
+          '<td style="padding:4px 6px;font-size:7.5pt;color:#334155;border:1px solid #E2E8F0;vertical-align:top;"><strong>' + e.item + ' &times;1</strong> — ' + e.detail + '</td>' +
           '<td style="padding:4px 6px;font-size:7.5pt;text-align:right;border:1px solid #E2E8F0;vertical-align:top;">' + guide + '</td>' +
         '</tr>';
       });
@@ -23200,7 +23202,7 @@ Each section is then loaded on its own:
                   <tr><td>UPVC fascia &amp; soffit (supply, fix, vent strip)</td><td><span style="color:#8090A8;margin-right:2px;">&#8364;</span><input id="eur-ewi_fascia" class="mdb-pi" type="number" min="10" step="1" value="38" oninput="euRatesSave()" style="width:58px;"><span style="color:#8090A8;font-size:10px;">/m</span></td></tr>
                 </tbody>
               </table>
-              <div style="font-size:10px;color:#64748b;margin-top:3px;">Excluded from the baseline &mdash; feeds the guide price in the appendix and the Variations tab; qty estimated from ground-floor perimeter</div>
+              <div style="font-size:10px;color:#64748b;margin-top:3px;">Excluded from the baseline &mdash; this rate is the appendix guide price, quoted per linear metre. The estimated quantity from the ground-floor perimeter is used only if the item is ticked into the plan.</div>
             </div>
 
             <!-- Heat + Vent -->
