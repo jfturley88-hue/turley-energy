@@ -423,7 +423,7 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Participation in the NAS Trusted Partner API trial.</strong> We
     would apply to join as a Trusted Partner, with a registered BER assessor named as the requestor of BER
     data for each request, as the trial requires. The scope we would work to: dwellings this practice
-    assessed itself, which Regulation 27(4)(c)(i) of S.I. 243/2012 already provides for, and any other
+    assessed itself, which Regulation 27(4)(c)(i) of S.I. 243/2012 already contemplates, and any other
     dwelling where the homeowner&rsquo;s consent has been captured before the request is made, which is
     the route the Trusted Partner Agreement sets out. One question we would put to SEAI before applying:
     whether issuing a pricing schedule for the homeowner to tender meets stage 2 of the home upgrade
