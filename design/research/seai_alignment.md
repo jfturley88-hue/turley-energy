@@ -3,6 +3,11 @@
 Compiled 6 September 2026, for wording the PlanitBER proposal (pack document 01) against
 verified fact rather than assumption.
 
+**Amended 6 September 2026 after a second pass over the same sources.** Two statements in
+the first version were wrong and are corrected below, marked CORRECTION. Four findings were
+missing and are added. The corrections matter: bulk use *is* expressly prohibited, not
+merely impractical, and Regulation 27(4)(c) is a weaker instrument than first described.
+
 **Method note.** `seai.ie` and `irishstatutebook.ie` both return HTTP 403 to automated
 fetching. Everything below marked *first-hand* was read in a real browser session against
 the live page or a downloaded PDF, not from search snippets or memory. Where something
@@ -66,6 +71,23 @@ Schedule does. The wording does not settle it. **Do not assert eligibility in th
 Ask SEAI whether an assessor practice issuing a schedule for the homeowner to tender
 satisfies stage 2.
 
+**AMBIGUOUS — a second one, on legal form.** The Agreement's party block presupposes a
+company:
+
+> "(2) ______________, a private company limited by shares registered in Ireland with
+> company number _______ and located at ________________________( "Trusted Partner")"
+
+while clause 1.2.4 of the same document reads:
+
+> "a reference to a person shall include a reference to a firm, a body corporate, an
+> unincorporated association, a partnership or to an individual's executors or
+> administrators;"
+
+and Schedule 2 says "any entities or partnerships". Either the party block is boilerplate
+to be adapted, or it is substantive and excludes unincorporated practices. The documents do
+not resolve it. If this practice is not a company limited by shares, add it to the
+questions for SEAI.
+
 **Application mechanism.** In writing, by email:
 
 > "Prospective Trusted Partners need to submit in writing to nastpapi@seai.ie evidence of
@@ -88,9 +110,38 @@ satisfies stage 2.
 So all three are confirmed: JSON datafile retrieval, submission of modified files to DEAP,
 and return of estimated uplifts.
 
-**What it does not provide.** There is no statement anywhere granting bulk or register-wide
-access, and bulk retrospective use is precluded in practice rather than by an explicit
-prohibition. Schedule 2 criterion 3.4 requires, per request:
+**What it does not provide.**
+
+**CORRECTION.** The first version of this file said bulk use was precluded in practice
+rather than by explicit prohibition. That was wrong. The Terms and Conditions prohibit it
+in terms, at paragraph 10 — first-hand, from
+<https://www.seai.ie/sites/default/files/pilot-projects/Trusted-Partner-Terms-and-Conditions.pdf>
+(note the canonical path; the shorter `/pilot-projects/…` URL redirects here):
+
+> "10. You agree not to use the Service and Data:
+> • In a way that could or does negatively impact the performance of the system or network
+> for us or other users (for example, bulk calls to the Service);
+> • Download or transit any viruses, Trojan horses or any other programs that are designed
+> to, or reasonably could be expected to, interfere or damage the Service and Data; and
+> • For any commercial purposes other than as set out in these Terms and Conditions."
+
+The prohibition is framed around system performance rather than as a data-protection rule,
+so quote it as written. The same paragraph also limits commercial use, which is worth
+knowing before a commercial product is described to SEAI. Paragraph 20 adds:
+
+> "We do not endorse or recommend for public use any specific Application developed for the
+> use of its APIs, and any statements implying or claiming that we have made such an
+> endorsement are strictly prohibited."
+
+**ADDITION — the API does not return the address.** Agreement Schedule 1, first-hand:
+
+> "The property address, client details, and BER Assessor details will not be returned to
+> the Trusted Partner."
+
+Any workflow that assumes an address-identified record comes back from the API is wrong.
+The MPRN is the identifier.
+
+On top of those, the per-request gate. Schedule 2 criterion 3.4 requires, per request:
 
 > "The Trusted Party shall upload evidence of ownership and/or occupancy when submitting a
 > request to the Service (e.g. utility bill with MPRN, details of the relevant BER
@@ -147,11 +198,18 @@ Article 6(1) and Regulation 27(4)(c) of SI 243/2012".
 > (iii) the relevant owner of the building, or an agent acting on behalf of the owner, via
 > a BER assessor;"
 
-**What this means for our page-2 claim.** Sub-paragraph (i) is the important one and it is
-already ours: a practice may work from the data files of assessments **it carried out**,
-with no API and no new permission. Sub-paragraph (iii) is the consented route for any other
-dwelling, and it is the route the trial itself is built on. Anything beyond those two is
-outside the regulation.
+**CORRECTION — read the word "normally".** The first version of this file said
+sub-paragraph (i) "is already ours". That overstated it. The provision reads "shall
+**normally** only be made available to", which constrains SEAI's disclosure practice and
+sets a default; it does not confer a right of access on the assessor. So: sub-paragraph (i)
+covers a practice working from the data files of assessments **it carried out**, and is the
+ordinary course rather than a guarantee. Sub-paragraph (iii) is the consented route for any
+other dwelling, and is the route the trial is built on — note "via a BER assessor", which
+makes the assessor the required conduit and is exactly what Schedule 2 criteria 5 to 7
+operationalise. Anything beyond those two is outside the regulation.
+
+SEAI's own page cites this as "Article 27(4c) (iii) of S.I. 243". The instrument says
+"Regulation" and "(4)(c)(iii)"; cite it the instrument's way.
 
 ---
 
@@ -198,10 +256,38 @@ requires cost information.
 "a document setting out the scope, the sequence and the cost of bringing one dwelling to a
 target rating". The word "cost" there overstates Annex VIII. Fix in Part 2.
 
-**Ireland's national scheme — NOT VERIFIED FIRST-HAND.** No dated status claim is made
-here. The SEAI EPBD Programme Development (Building Renovation Passports) candidate
-booklet was not retrieved in this session. Do not put an Irish status claim in the pack
-until it is read directly.
+**Ireland's position — one verified source, and it is favourable.** SEAI's own *Domestic
+Technical Standards and Specifications, Version 4.0, July 2026*, section 2.8, read
+first-hand from
+<https://www.seai.ie/sites/default/files/publications/Domestic-Technical-Standards-and-Specifications.pdf>:
+
+> "Building Renovation Passport (BRP) is a dwelling-specific, homeowner-facing renovation
+> Roadmap that builds on the published BER / DEAP baseline. The BRP Roadmap sets out a
+> staged pathway of clear actionable step-by-step measures for improving the dwelling's
+> energy performance over time, taking account of the dwelling's current condition,
+> available evidence, technical risks, homeowner context and sequencing dependencies."
+
+> "When a Building Energy Rating (BER) is published there is flexibility for separate
+> issuance of a Building Renovation Passport (BRP). The BER remains the baseline energy
+> assessment of the energy performance of a building. The BRP does not replace the BER."
+
+So SEAI's current domestic standards already contemplate a BRP issued separately from a
+BER, building on the DEAP baseline. That is close to the shape of our three documents.
+
+**Transposition — no statutory scheme found, with a caveat.** The Article 12 deadline of
+29 May 2026 has passed. A second pass found no Irish statutory instrument transposing
+Article 12 or Annex VIII: the EU's national implementing measures register for the
+directive lists only S.I. 642/2024 and S.I. 749/2024, and neither, nor S.I. 168/2026 nor
+S.I. 195/2026, contains the phrase "renovation passport". **Caveat: that register can lag
+notification, and the Irish Statute Book year indexes could not be enumerated, so treat
+this as "none found", not "none exists".** Do not put a transposition-failure claim in the
+pack; it reads as a jab at the body being addressed and needs legal advice first.
+
+**A friction to note.** Article 12(4) requires a passport to be issued "by a qualified or
+certified expert". Nothing in the directive says that credential is BER assessor
+registration, and Ireland has not defined it. So BER registration alone should not be
+assumed to authorise issuing an Article 12 passport. This is a further reason to say the
+documents *carry the cost layer a passport needs* rather than that we can produce one.
 
 ---
 
