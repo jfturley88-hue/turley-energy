@@ -333,7 +333,7 @@ doc1 = f'''<div class="sheet">
   </ul>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '1', '3')}
+  {footer(1, '1', '4')}
 </div>
 
 <div class="sheet">
@@ -377,7 +377,7 @@ doc1 = f'''<div class="sheet">
     both halves.</p>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '2', '3')}
+  {footer(1, '2', '4')}
 </div>
 
 <div class="sheet">
@@ -406,10 +406,33 @@ doc1 = f'''<div class="sheet">
     'The final BER follows the works, as now, and the grants are claimed against it.',
     last=True)}
 
+  <div class="fine">{FINE1}</div>
+  {footer(1, '3', '4')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
   {vk('The proposition')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed
-    number of plans, with recorded spend measured against the accuracy band. SEAI observes throughout, and
-    the outturns refine the rate book.</p>
+    number of plans, with recorded spend measured against the accuracy band. That measurement is the
+    trial&rsquo;s own third objective &mdash; to <em>evaluate and measure the benefit of providing BER data
+    to home upgrade service providers &hellip; in a format that can be applied to assist homeowner decision
+    making on home retrofit investment</em>. SEAI observes throughout, and the outturns refine the rate
+    book.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Participation in the NAS Trusted Partner API trial.</strong> We
+    would apply to join as a Trusted Partner, with a registered BER assessor named as the requestor of BER
+    data for each request, as the trial requires. The scope we would work to: dwellings this practice
+    assessed itself, which Regulation 27(4)(c)(i) of S.I. 243/2012 already provides for, and any other
+    dwelling where the homeowner&rsquo;s consent has been captured before the request is made, which is
+    the route the Trusted Partner Agreement sets out. One question we would put to SEAI before applying:
+    whether issuing a pricing schedule for the homeowner to tender meets stage 2 of the home upgrade
+    customer journey, or whether that stage requires the partner to organise the quotes itself.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The renovation passport.</strong> Article 12 of the recast Energy
+    Performance of Buildings Directive requires a renovation passport scheme, on the common framework in
+    Annex VIII, issued by a qualified expert after an on-site visit. Annex VIII requires the energy,
+    the sequencing and the signposting, and places the estimated cost of each step among the elements a
+    passport <em>may</em> include. These three documents carry the cost layer a passport needs.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">[Name] &middot; Turley Energy Consultants</span>
@@ -417,7 +440,7 @@ doc1 = f'''<div class="sheet">
   </div>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '3', '3')}
+  {footer(1, '4', '4')}
 </div>'''
 
 # ── 05 · THE SOFTWARE — part one, the journey on screen ──────────────────────
