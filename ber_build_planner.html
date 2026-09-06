@@ -15272,7 +15272,7 @@ function renderEUTable(b) {
       '<tr>' +
       '<th class="eu-r">#</th>' +
       '<th>Measure</th>' +
-      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;white-space:normal;">Scope <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
+      '<th style="font-size:10px;font-weight:600;text-transform:none;letter-spacing:0;white-space:normal;">Baseline scope <span style="color:#4B5563;font-weight:400;">— contractor measurement reference</span></th>' +
       '<th class="eu-r plan-edge" style="color:#E8A020;">Budget Est.</th>' +
       '<th>Variation Notes</th>' +
       '<th class="eu-r" style="color:#38bdf8;">Actual ✏</th>' +
@@ -18541,7 +18541,7 @@ function exportEUPDF(mode) {
         '<td style="padding:5px 6px;font-weight:700;font-size:8pt;border:1px solid #E2E8F0;vertical-align:top;">'+s.title+'</td>' +
         '<td style="padding:5px 6px;font-size:8pt;color:#475569;border:1px solid #E2E8F0;"><span style="white-space:pre-line;">'+pb.join('\n')+'</span>'+mxHTML+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(s.subtotal||0)+'</td>' +
-        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*1.22))+'</td>' +
+        '<td style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*1.12))+'</td>' +
         '<td style="padding:5px 6px;text-align:right;font-size:8pt;font-weight:700;border:1px solid #E2E8F0;white-space:nowrap;">'+fmt(Math.round((s.subtotal||0)*sectionLoad(s)))+'</td>' +
       '</tr>';
     }).join('');
@@ -18551,7 +18551,7 @@ function exportEUPDF(mode) {
     sections.forEach(function(s) {
       var sub = s.subtotal || 0;
       mBase += sub;
-      mOp   += Math.round(sub * 1.22);
+      mOp   += Math.round(sub * 1.12);
       mLoad += Math.round(sub * sectionLoad(s));
     });
     var methFeeRow = '';
@@ -18634,7 +18634,7 @@ function exportEUPDF(mode) {
       });
     });
     var exclusionsHTML = !exRows ? '' :
-      '<h3 style="font-size:10pt;color:#1E293B;margin:14px 0 6px;">Not Included — Variation Guide Prices</h3>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin:14px 0 6px;">Not included in the baseline — guide prices</h3>' +
       '<p style="font-size:8pt;color:#475569;margin-bottom:8px;">Every measure on your Cost Plan, and on the Pricing Schedule your contractors quote from, ' +
         'names what it does not cover in a shaded box under its scope. This is the same list, with the costings attached. ' +
         'The prices are here and not on the Schedule on purpose: a contractor who can see your figure treats it as a floor, ' +
@@ -18654,9 +18654,9 @@ function exportEUPDF(mode) {
         '</tr></thead><tbody>' + exRows + '</tbody></table>';
 
     var appendixHTML = '<div style="page-break-before:always;margin:0 15mm;font-family:sans-serif;">' +
-      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:8px;">Appendix — Itemised Measurements &amp; Rates</h2>' +
+      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:8px;">Itemised measurements and rates</h2>' +
       '<p style="font-size:8pt;color:#475569;margin-bottom:10px;">Line items behind each bundled measure, at <strong>base rates</strong> (materials + labour, before loading). ' +
-        labMultNote + ' Contractor\'s O&amp;P (12%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the Measure-by-Measure table above.</p>' +
+        labMultNote + ' Contractor\'s O&amp;P (12%) and VAT (13.5%; heat pumps 9%; Solar PV 0%) are applied to these base sub-totals in the measure pricing table above.</p>' +
       appxSections +
       exclusionsHTML +
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;margin-top:10px;">' +
@@ -18667,27 +18667,27 @@ function exportEUPDF(mode) {
     // Printed on its own, the Appendix opens on this page — no leading break, or the
     // document starts with a blank sheet.
     methodHTML = '<div style="' + (isAppendix ? '' : 'page-break-before:always;') + 'margin:0 15mm;font-family:sans-serif;">' +
-      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:12px;">How Your Estimate Was Calculated</h2>' +
-      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What\'s Included in Each Budget Est. Figure</h3>' +
-      '<p style="font-size:9pt;color:#334155;margin-bottom:8px;">Every Budget Est. figure in the table above is a fully-loaded cost that includes:</p>' +
+      '<h2 style="font-size:12pt;color:#1E293B;border-bottom:2px solid #E8A020;padding-bottom:6px;margin-bottom:12px;">How the budget estimate was calculated</h2>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What every Budget Est. figure includes</h3>' +
+      '<p style="font-size:9pt;color:#334155;margin-bottom:8px;">Every Budget Est. figure on the Cost Plan is a fully-loaded cost that includes:</p>' +
       '<ul style="font-size:9pt;color:#334155;margin-bottom:12px;">' +
         '<li><strong>Materials</strong>: Irish merchant pricing Q1–Q2 2026 (SCSI Cost Supplement Aug 2025)</li>' +
         '<li><strong>Labour</strong>: SEO National Wage Agreement 2024 rates, adjusted for Co. '+(pi.county||'—')+' (×'+(pi.labourMultiplier||1).toFixed(2)+')</li>' +
-        '<li><strong>Contractor\'s Overhead &amp; Profit</strong>: 12% on base cost</li>' +
+        '<li><strong>Contractor\'s Overhead &amp; Profit</strong>: 12% on materials + labour</li>' +
         '<li><strong>VAT</strong>: 13.5% on works; 9% on heat pump supply &amp; installation (Finance Act 2024); 0% on Solar PV (Revenue ruling May 2023)</li>' +
       '</ul>' +
-      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Measure-by-Measure Pricing Breakdown</h3>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">How each measure was priced</h3>' +
       '<table style="width:100%;border-collapse:collapse;font-family:sans-serif;margin-bottom:12px;">' +
         '<thead><tr style="background:#F1F5F9;">' +
           '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Measure</th>' +
-          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Inputs Used</th>' +
-          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Base (mat+lab)</th>' +
-          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">+O&amp;P+Cont</th>' +
-          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Loaded (incl. VAT)</th>' +
+          '<th style="padding:5px 6px;text-align:left;font-size:8pt;border:1px solid #E2E8F0;">Measured inputs</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Materials + labour</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">+ Overhead &amp; profit (12%)</th>' +
+          '<th style="padding:5px 6px;text-align:right;font-size:8pt;border:1px solid #E2E8F0;">Total incl. VAT</th>' +
         '</tr></thead>' +
         '<tbody>'+methRows+'</tbody>' +
       '</table>' +
-      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Data Sources &mdash; ' + rateBookStamp() + '</h3>' +
+      '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">Data sources &mdash; ' + rateBookStamp() + '</h3>' +
       '<ul style="font-size:8pt;color:#475569;margin-bottom:12px;">' +
         RATE_BOOK.sources.map(function(src){ return '<li>'+src+'</li>'; }).join('') +
         '<li>Floor area: '+pi.floorArea+'m² · County: '+(pi.county||'—')+' · Dwelling: '+(pi.dwellingType||'—')+'</li>' +
@@ -18729,7 +18729,7 @@ function exportEUPDF(mode) {
   var thead7 = '<thead>' + _bandRow + '<tr style="background:#F1F5F9;color:#1E293B;">' +
     '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
-    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope</th>' +
+    '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Baseline scope</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+_pdfEdge+'">Budget Est.</th>' +
     '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
