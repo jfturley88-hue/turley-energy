@@ -235,11 +235,11 @@ CSS = FONTS + '''
   ul.tick strong { color: #1E293B; }
 '''
 
-# Six documents. Three of them (02-04) are the software's own output bound in whole, each
-# behind a short page of notes saying who it is for and how long it lives; the other three
-# are the argument, the workflow and the software itself.
-DOCS = ['The Value Proposition', 'The Cost Plan', 'The Pricing Schedule',
-        'The Appendix', 'The Workflow', 'The Software', 'The Engine']
+# Five documents. Three of them (02-04) are the software's own output, bound whole and with
+# nothing in front of them: document 01 says what each is for, so the notes pages that used
+# to front them are gone. Document 05 is the software and the rate book behind it.
+DOCS = ['The Value Proposition', 'The Baseline Cost Plan', 'The Pricing Schedule',
+        'The Appendix', 'The Software']
 NDOC = len(DOCS)
 
 def strip(n):
@@ -258,6 +258,31 @@ FINE1 = ('PlanitBER V1 &middot; '
          f'Worked example throughout: {EX_ADDR} &mdash; {EX_AREA}&thinsp;m&sup2; semi-detached, {EX_BER}, '
          f'{EX_SCHEME} route &middot; All figures produced by the software on rate book {RATE_BOOK} '
          '&middot; Independent estimate &mdash; not prepared by any contractor.')
+
+# ── the workflow steps, drawn for document 01 ────────────────────────────────
+# A numbered timeline: number in a disc, title left, status right, body left-aligned
+# beneath. Left alignment because these are sentences, not captions — centred prose makes
+# the eye hunt for each line start. The one new step is tinted and darker-edged so the
+# page makes its argument at a glance.
+def wfstep(n, title, body, note='', last=False, add=False):
+    arrow = '' if last else f'<div style="padding:1mm 0 0.6mm;">{DOWN_ARROW}</div>'
+    # The existing steps are context, so they recede: grey discs, no accent edge. Gold is
+    # spent on the one step being proposed, which is what the page is for.
+    edge  = '#B07D1A' if add else '#D8D2C4'
+    bg    = '#FFFAF0' if add else '#FFFFFF'
+    disc  = '#B07D1A' if add else '#AEB4BE'
+    ncol  = '#B07D1A' if add else '#A0A8B4'
+    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:3.4mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
+      <div style="display:flex;align-items:center;gap:3mm;margin-bottom:1.6mm;">
+        <span style="flex-shrink:0;width:6.4mm;height:6.4mm;border-radius:50%;background:{disc};color:#fff;
+                     font-family:'Fraunces',Georgia,serif;font-size:9.5pt;font-weight:800;
+                     display:inline-flex;align-items:center;justify-content:center;">{n}</span>
+        <span class="wft" style="flex:1;font-family:'Fraunces',Georgia,serif;font-size:{'12.8pt' if add else '12pt'};font-weight:800;color:#1E293B;line-height:1.15;">{title}</span>
+        <span style="flex-shrink:0;font-size:7.4pt;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:{ncol};white-space:nowrap;">{note}</span>
+      </div>
+      <div class="wfb" style="font-size:9.9pt;color:#3F4A5A;line-height:1.6;padding-left:9.4mm;">{body}</div>
+    </div>
+    {arrow}'''
 
 # ── 01 · THE VALUE PROPOSITION — text only, one page, references the other three ─
 def vk(t):
@@ -294,28 +319,97 @@ doc1 = f'''<div class="sheet">
     made &mdash; not for selling installation or taking commission, so the figure does not move with who
     wins the work. The same survey and the same provisional BER now also produce the three documents.</p>
 
-  {vk('The three documents &mdash; 02, 03 and 04')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Cost Plan</strong> the homeowner works from, the blank
-    <strong>Pricing Schedule</strong> their contractors quote on, and the <strong>Appendix</strong>
-    behind both &mdash; each bound in full behind a page of notes, exactly as the software prints it.
-    Every figure traces to this house rather than a house of its type.</p>
+  <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
+    <li style="margin-bottom:1.3mm;">The one- to two-page bespoke <strong>Baseline Cost Plan</strong> and
+      <strong>Pricing Schedule</strong> give the homeowner and the contractor a basis on which to
+      negotiate a price.</li>
+    <li style="margin-bottom:1.3mm;">The not-included estimates in the <strong>Appendix</strong> empower the
+      homeowner in agreeing variations with the contractor.</li>
+    <li style="margin-bottom:1.3mm;">The three documents prime the homeowner for what the work is likely to
+      cost. That means fewer site visits and fewer quotations that are never acted on, because the
+      homeowner comes to a contractor having already come to grips with the likely cost.</li>
+    <li>They are generated entirely by the energy assessor, from a standard dwelling details report out of
+      DEAP and by selecting the measures. It is not a long process.</li>
+  </ul>
 
-  {vk('The workflow &mdash; document 05')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The workflow already happens &mdash; assessment, measures agreed with the
-    homeowner, provisional report, works, post-works BER. The provisional report stage is expanded: it now
-    also produces the three documents, issued to the homeowner together with the report.</p>
+  <div class="fine">{FINE1}</div>
+  {footer(1, '1', '3')}
+</div>
 
-  {vk('The software and the engine &mdash; documents 06 and 07')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in, the intended measures are
-    selected, the three documents print, and the grant route can be switched at the moment of download. Behind it sits a rate book with a version and an effective date, sourced line by line and held in one place, with any rate still to be calibrated marked as such.</p>
+<div class="sheet">
+  {strip(1)}
+
+  {vk('What each document is for')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>02 &middot; The Baseline Cost Plan.</strong> The document the
+    homeowner works from for the length of the job. Every measure carries its scope, the grant it earns
+    and a budget estimate, all fixed at the date of issue, and beside them a live half left blank for
+    quotes, variations and what was actually paid. It is the reference the homeowner keeps, not a quote
+    and not a tender return.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>03 &middot; The Pricing Schedule.</strong> The same measured scope
+    with every figure removed, issued to each contractor asked to quote. Because they all price the same
+    scope and the same quantities, the returns compare like with like, and anything a contractor&rsquo;s
+    own survey finds beyond that scope is entered as a variation rather than buried in a single number.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>04 &middot; The Appendix.</strong> The arithmetic behind the plan and
+    the guide prices for what it deliberately leaves out. Materials and labour, the contractor&rsquo;s
+    overhead and profit, and the VAT band, measure by measure &mdash; so the homeowner can see how a figure
+    was reached, and holds a guide price before a variation is ever discussed.</p>
+
+  {vk('The homes already surveyed')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Nothing here needs a new
+    survey. The inputs are the dwelling details report and the list of measures, and both already exist
+    for the <strong>1.37 million dwellings</strong> that hold a published BER. An assessor can produce
+    the three documents for any dwelling they assessed themselves, from the file they already hold. For
+    a homeowner who took a BER, was told what to do and then stalled at the point of pricing it, that is
+    the missing piece arriving after the fact.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">At any wider scale the
+    route already exists rather than needing to be invented. The <strong>NAS Trusted Partner API</strong>
+    was built to give providers a dwelling&rsquo;s BER data and the DEAP engine with the homeowner&rsquo;s
+    consent, under the stated objective of making better use of BER data. Separately, the Energy
+    Performance of Buildings Directive requires a voluntary <strong>renovation passport</strong> scheme,
+    which SEAI is developing: a document setting out the scope, the sequence and the cost of bringing one
+    dwelling to a target rating. That is close to what these three documents already are.</p>
+
+  {vk('The software &mdash; document 05')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in,
+    the intended measures are selected, the three documents print, and the grant route can be switched at
+    the moment of download. Behind it sits a rate book with a version and an effective date, sourced line
+    by line and held in one place, with any rate still to be calibrated marked as such. Document 05 shows
+    both halves.</p>
+
+  <div class="fine">{FINE1}</div>
+  {footer(1, '2', '3')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
+  {vk('The workflow we are proposing')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">This is a new workflow, not what happens today. The survey, the DEAP
+    assessment and the two BERs already exist; what is new is that the provisional stage also produces
+    the three documents, and that the assessor is paid for the advisory work.</p>
+  {wfstep('1', 'Survey and agree the measures',
+    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
+  {wfstep('2', 'The dwelling goes into DEAP',
+    'The house as it stands is entered, then the agreed measures are added until the heat loss indicator '
+    'comes down to where the intended heating system will work.')}
+  {wfstep('3', 'The dwelling details report goes into PlanitBER',
+    'The standard DEAP report, downloaded as it is issued today. The upgraded measures are selected '
+    'and the three documents are produced.',
+    note='Today the assessor types the geometry and the heat loss indicator from that report into '
+         'the software. Uploading the report so those figures read across is the one piece of '
+         'development this proposal asks for.', add=True)}
+  {wfstep('4', 'Issued to the homeowner',
+    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice. The '
+    'homeowner understands their heat loss indicator, holds the scope and the guide prices, and can '
+    'tender with confidence &mdash; and the assessor has been paid for advisory input.')}
+  {wfstep('5', 'The works happen and the final BER is issued',
+    'The final BER follows the works, as now, and the grants are claimed against it.',
+    last=True)}
 
   {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed number
-    of plans, with recorded spend measured against the accuracy band. SEAI observes throughout, and the
-    outturns refine the rate book.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A trusted partnership.</strong> Plans generated from BER data
-    through an API, so the three documents can be produced for any home on the register. The goal is
-    SEAI&rsquo;s own: <strong>more retrofits.</strong></p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed
+    number of plans, with recorded spend measured against the accuracy band. SEAI observes throughout, and
+    the outturns refine the rate book.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">[Name] &middot; Turley Energy Consultants</span>
@@ -323,167 +417,10 @@ doc1 = f'''<div class="sheet">
   </div>
 
   <div class="fine">{FINE1}</div>
-  {footer(1)}
+  {footer(1, '3', '3')}
 </div>'''
 
-# ── 02 · THE COST PLAN — notes, then the real document bound behind ──────────
-# One house priced three ways. Each of documents 02-04 opens with a page of notes saying
-# who that document is for and how long it lives, then binds in the software's own print.
-EX_HOUSE = (f'a {EX_AREA}&thinsp;m&sup2; 3-bed semi in Mullingar, Co. Westmeath, built {EX_BUILT}, '
-            f'{EX_BER}, on {EX_SCHEME}')
-
-def notes(n, title, lead, blocks, foot_pages='1'):
-    body = ''.join(
-        f'<p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.4mm;">'
-        f'<strong>{h}</strong> {t}</p>' for h, t in blocks)
-    return f'''<div class="sheet">
-  {strip(n)}
-  <h2 style="font-size:21pt;margin-bottom:3.5mm;">{title}</h2>
-  <p class="body" style="font-size:11.0pt;line-height:1.62;max-width:172mm;margin-bottom:3.4mm;">{lead}</p>
-  {body}
-  <div class="fine">{FINE1}</div>
-  {footer(n, '1', foot_pages)}
-</div>'''
-
-doc2 = notes(2, 'The Cost Plan', (
-    f'The document the homeowner works from for the length of the job. One house &mdash; {EX_HOUSE} '
-    f'&mdash; with an attic top-up, a cavity fill, new windows and external doors, an air-to-water heat '
-    f'pump with its cylinder, and decentralised ventilation with its air-tightness test. It follows in '
-    f'full, exactly as the software prints it.'), [
-  ('The baseline is on every row, not at the bottom.',
-   'This is the part that does the work. Each measure carries its own measured scope and its own '
-   'figure &mdash; the attic top-up, the cavity fill, the windows and doors, the heat pump, the '
-   'ventilation &mdash; and that figure is the baseline for <em>that measure</em>. Beside it sits what '
-   'the figure covers &mdash; the scope and the measured quantities &mdash; and under that, shaded, what it leaves '
-   'out. Cavity fill, for instance: pump 90&thinsp;m&sup2; of 50&thinsp;mm bonded bead, making good '
-   'included; not included, the room-by-room air intake vents a filled cavity makes necessary. A quote '
-   'is judged line by line against all three: the figure, the scope, and what is left out. A contractor '
-   'pricing the attic at twice the baseline has '
-   'to account for the attic, on that line, where the homeowner can see it; there is nowhere to lose it '
-   'inside a single total.'),
-  ('The totals, and what has to be raised.',
-   f'Those rows add to <strong>&euro;{EX_TOTAL}</strong> &mdash; the whole job, VAT and the '
-   f'contractor&rsquo;s overhead included. SEAI grants of <strong>&euro;{EX_GRANTS}</strong> are named '
-   f'beside the measures that earn them, leaving <strong>&euro;{EX_NET}</strong> as what the work costs '
-   f'in the end. On {EX_SCHEME} the grants are paid <em>after</em> the works, so it is the whole '
-   f'&euro;{EX_TOTAL} that has to be available first; the &euro;{EX_GRANTS} comes back once the job is done. Both are '
-   f'named because both are needed: one to borrow against, one to judge the job by.'),
-  ('Where the figures come from.',
-   f'Quantities are taken from the standard BER survey the provisional certificate is built from &mdash; '
-   f'nothing is measured twice. Every rate comes from the published rate book &mdash; {RATE_BOOK} &mdash; '
-   f'with the Co. Westmeath labour multiplier applied, and the contractor&rsquo;s overhead and VAT added '
-   f'on top. The guide prices for the items left out are in the Appendix, document 04.'),
-  ('How the heat pump is sized.',
-   f'From the provisional BER&rsquo;s Heat Loss Indicator &mdash; {EX_HLI}&thinsp;W/m&sup2;K here &mdash; '
-   f'giving a <strong>{EX_KW}&thinsp;kW design load at {EX_FLOW}&deg;C flow</strong>. The sum is printed '
-   f'on the plan for any contractor to check; the installer&rsquo;s room-by-room calculation confirms the '
-   f'unit and prices any variation.'),
-])
-
-# ── 03 · THE PRICING SCHEDULE ────────────────────────────────────────────────
-doc3 = notes(3, 'The Pricing Schedule', (
-    'The baseline&rsquo;s scope, measure by measure, with every figure removed &mdash; no estimate, no '
-    'grant amounts, no totals. Each measure keeps what it includes and what it leaves out. One goes to each '
-    'contractor asked to quote, so every contractor prices the same work the baseline priced.'), [
-  ('It keeps the tender an open market.',
-   'A contractor who can see the homeowner&rsquo;s budget prices against the budget. With the figures '
-   'gone they price the work. Every contractor quotes the same measured scope with no sight of the '
-   'homeowner&rsquo;s figure, so the job goes to the best price for the same work rather than to whoever '
-   'guesses the budget closest &mdash; and a small firm competes on equal terms with a large one. When '
-   'the quotes come back the homeowner lays them side by side, against each other and against their own '
-   'plan: tendering the way a business does.'),
-  ('What&rsquo;s not included is still named.',
-   'The same shaded boxes appear here, so a contractor sees exactly what sits outside the scope. Without '
-   'that an honest one assumes the item is included and pads the quote, a sharp one prices without it and '
-   'raises a variation later, and the tenders stop being comparable. The guide prices stay in the '
-   'homeowner&rsquo;s Appendix: a figure here would become a floor to quote up to.'),
-  ('The Variations column is where site knowledge goes.',
-   'A contractor&rsquo;s own survey will find things an assessor could not &mdash; a lintel, a threshold, '
-   'a cavity that will not take the fill. This is where they price them: explicitly, itemised, at tender '
-   'rather than mid-job. That is where variations come from, and putting them in writing before work '
-   'starts keeps the process open and honest on both sides.'),
-])
-
-# ── 04 · THE APPENDIX ────────────────────────────────────────────────────────
-doc4 = notes(4, 'The Appendix', (
-    'The reference behind the Cost Plan, fixed at the date of issue. How every figure was reached, the '
-    'itemised measurements and rates beneath each measure, and the guide prices for everything the plan '
-    'leaves out. It follows in full, exactly as the software prints it.'), [
-  ('How the estimate &mdash; the baseline &mdash; was calculated.',
-   'The estimate on the Cost Plan is the baseline; this is the arithmetic behind it. '
-   'Measure by measure: the inputs used, the base cost of materials and labour, the contractor&rsquo;s '
-   'overhead and profit, and the VAT that applies to that measure. The loaded column ties back to the '
-   'Cost Plan line for line. Each measure also repeats what it '
-   'leaves out, so what a figure covers and what it does not can be read together.'),
-  ('The itemised index.',
-   'Beneath every bundled measure, the individual items at base rates &mdash; quantity, unit, material '
-   'and labour per unit. This is the level a quantity surveyor would work at, and it is what makes the '
-   'headline figure checkable rather than merely stated.'),
-  ('Not included &mdash; variation guide prices. The part that matters most at tender.',
-   'Every item shaded &ldquo;not included&rdquo; on the Cost Plan and the Schedule, with a guide price '
-   'attached. These are the homeowner&rsquo;s figures, not the contractor&rsquo;s, and they are what '
-   'empowers the homeowner at tender: they already know what the work should '
-   'cost <em>and</em> what anything beyond it should cost. A fair variation is agreed in minutes and a '
-   'padded one is visible in the same minutes &mdash; before work starts, not once the job is open.'),
-])
-
-# ── 05 · THE WORKFLOW — where the one new step sits ───────────────────────────
-# A numbered timeline: number in a disc, title left, status right, body left-aligned
-# beneath. Left alignment because these are sentences, not captions — centred prose makes
-# the eye hunt for each line start. The one new step is tinted and darker-edged so the
-# page makes its argument at a glance.
-def wfstep(n, title, body, note='', last=False, add=False):
-    arrow = '' if last else f'<div style="padding:1mm 0 0.6mm;">{DOWN_ARROW}</div>'
-    # The existing steps are context, so they recede: grey discs, no accent edge. Gold is
-    # spent on the one step being proposed, which is what the page is for.
-    edge  = '#B07D1A' if add else '#D8D2C4'
-    bg    = '#FFFAF0' if add else '#FFFFFF'
-    disc  = '#B07D1A' if add else '#AEB4BE'
-    ncol  = '#B07D1A' if add else '#A0A8B4'
-    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:3.4mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
-      <div style="display:flex;align-items:center;gap:3mm;margin-bottom:1.6mm;">
-        <span style="flex-shrink:0;width:6.4mm;height:6.4mm;border-radius:50%;background:{disc};color:#fff;
-                     font-family:'Fraunces',Georgia,serif;font-size:9.5pt;font-weight:800;
-                     display:inline-flex;align-items:center;justify-content:center;">{n}</span>
-        <span class="wft" style="flex:1;font-family:'Fraunces',Georgia,serif;font-size:{'12.8pt' if add else '12pt'};font-weight:800;color:#1E293B;line-height:1.15;">{title}</span>
-        <span style="flex-shrink:0;font-size:7.4pt;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:{ncol};white-space:nowrap;">{note}</span>
-      </div>
-      <div class="wfb" style="font-size:9.9pt;color:#3F4A5A;line-height:1.6;padding-left:9.4mm;">{body}</div>
-    </div>
-    {arrow}'''
-
-doc5 = f'''<div class="sheet">
-  {strip(5)}
-  <h2>The workflow &mdash; where the three documents come in</h2>
-  <div style="margin-top:4mm;">
-  {wfstep('1', 'The dwelling survey',
-    'Part of the technical assessment for a heat pump or window measures. Geometry, fabric and services recorded on site.',
-    note='Already happens')}
-  {wfstep('2', 'The measures, agreed with the homeowner',
-    'Around the table, measure by measure: what the house needs, what each measure includes, and what it leaves out. The homeowner decides the scope.',
-    note='Already happens')}
-  {wfstep('3', 'The provisional BER report',
-    'The surveyed geometry, the total heat loss and the post-works Heat Loss Indicator, in the one document everything after it is built from.',
-    note='Already happens')}
-  {wfstep('4', 'The three documents are produced and issued',
-    'At a desk, after the survey. The geometry and Heat Loss Indicator are taken from the provisional report, the '
-    'agreed measures are selected, the grant route is set, and the three documents print &mdash; the Cost Plan, '
-    'the blank Pricing Schedule and the Appendix. They go to the homeowner with the provisional BER.',
-    note='New &middot; minutes at a desk', add=True)}
-  {wfstep('5', 'Variations and prices agreed with the contractor',
-    'With the baseline and the guide prices for what it leaves out, the homeowner tenders properly: the same '
-    'measured scope to every contractor, quotes that compare like with like, and any variation priced and agreed '
-    '<strong>before work starts</strong>.',
-    note='Same step, new terms')}
-  {wfstep('6', 'The post-works BER',
-    'The assessor returns, completes the post-works BER and uploads it for the grant.',
-    note='Already happens', last=True)}
-  </div>
-  <div class="fine">{FINE1}</div>
-  {footer(5, '1', '1')}
-</div>'''
-
-# ── 06 · THE SOFTWARE — the journey on screen, survey to print (4 pages) ──────
+# ── 05 · THE SOFTWARE — part one, the journey on screen ──────────────────────
 def appfig(key, w, lead, rest):
     return f'''<div class="appshot" style="width:{w};margin:0 auto 2mm;">
       <img src="{IMG[key]}" alt="">
@@ -491,11 +428,13 @@ def appfig(key, w, lead, rest):
     </div>'''
 
 doc6 = f'''<div class="sheet">
-  {strip(6)}
+  {strip(5)}
   <h2>The software behind it</h2>
-  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Live software, as it runs. These screens are the
-    whole journey, in order: the survey goes in, the grant route is chosen with the figures on display,
-    and the three documents print at the far end.</p>
+  <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Live software, in two parts.
+    <strong>Part one</strong> is the journey on screen: the survey goes in, the grant route is chosen,
+    and the three documents print at the end. <strong>Part two</strong> is the rate book behind those
+    figures, which the assessor can open but not edit.</p>
+  <div class="kick" style="margin-top:3mm;">Part one &mdash; the journey on screen</div>
 
   {appfig('home', '152mm', '1 &middot; Choose the project type.',
     'New Build, Refurbishment and Energy Upgrade share one engine and one rate base.')}
@@ -504,11 +443,11 @@ doc6 = f'''<div class="sheet">
     'DEAP geometry, the measures the homeowner wants, the county and the grant scheme &mdash; the status bar and sidebar fill as it goes in, and nothing is measured twice.')}
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(6, '1', '4')}
+  {footer(5, '1', '7')}
 </div>
 
 <div class="sheet">
-  {strip(6)}
+  {strip(5)}
   <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
   <div class="appshot" style="margin-bottom:2mm;">
     <img src="{IMG['routes']}" alt="">
@@ -522,11 +461,11 @@ doc6 = f'''<div class="sheet">
     'The baseline fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(6, '2', '4')}
+  {footer(5, '2', '7')}
 </div>
 
 <div class="sheet">
-  {strip(6)}
+  {strip(5)}
   <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
   <h2 style="font-size:14pt;"><span style="color:#B07D1A;">5 &middot;</span> All the way to print</h2>
   <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Three buttons, one for each document. Each
@@ -565,11 +504,11 @@ doc6 = f'''<div class="sheet">
   </div>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(6, '3', '4')}
+  {footer(5, '3', '7')}
 </div>
 
 <div class="sheet">
-  {strip(6)}
+  {strip(5)}
   {appfig('rates', '134mm', '6 &middot; Rate Settings, open to inspection.',
     'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
   {appfig('grants', '134mm', '7 &middot; The SEAI grant table the plans draw from.',
@@ -579,10 +518,10 @@ doc6 = f'''<div class="sheet">
     book is versioned and inspected, is in document 07.</p>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(6, '4', '4')}
+  {footer(5, '4', '7')}
 </div>'''
 
-# ── 07 · THE ENGINE — the EU rate book, top to bottom, on three pages ─────────
+# ── 05 · THE SOFTWARE — part two, the rate book behind it ────────────────────
 # One capture of the whole EU Rates tab, cut on section boundaries so no table is split.
 # The third page is the not-included guide rates: the engine behind the figures the
 # homeowner holds for variations, which is the part of the message document 04 makes.
@@ -594,12 +533,13 @@ def engfig(key, w, lead, rest):
     </div>'''
 
 doc7 = f'''<div class="sheet">
-  {strip(7)}
-  <h2 style="font-size:21pt;margin-bottom:3mm;">The engine</h2>
+  {strip(5)}
+  <div class="kick">Part two &mdash; the rate book behind it</div>
+  <h2 style="font-size:21pt;margin-bottom:3mm;">Where the figures come from</h2>
   <p class="body" style="{ENG_P}">Every figure in a plan comes from a rate book with a version number and
     an effective date. The assessor prices from it and cannot change it: the book is held in one place and
     published by one administrator &mdash; under the pilot, SEAI &mdash; so every plan is priced on the
-    same rates. These three pages are that book, top to bottom, exactly as it appears on screen.</p>
+    same rates. The three pages that follow are that book, top to bottom, exactly as it appears on screen.</p>
   <p class="body" style="{ENG_P}"><strong>Where the rates come from.</strong> Base rates from the SCSI
     Tender Price Index and House Rebuilding Guide; labour from the SEO Construction Sector wage agreement,
     at the second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
@@ -611,19 +551,19 @@ doc7 = f'''<div class="sheet">
   {engfig('eng_a', '160mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
-  {footer(7, '1', '3')}
+  {footer(5, '5', '7')}
 </div>
 
 <div class="sheet">
-  {strip(7)}
+  {strip(5)}
   {engfig('eng_b', '172mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
     'The frame and style multipliers for windows are written out under the table, so a triple-glazed alu-clad sash window can be traced from the base rate. The attic ancillaries are the items every attic top-up carries as standard: the tank jacket, the pipe lagging, the walkway and the storage deck.')}
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(7, '2', '3')}
+  {footer(5, '6', '7')}
 </div>
 
 <div class="sheet">
-  {strip(7)}
+  {strip(5)}
   <h2 style="font-size:16pt;margin-bottom:2mm;">The not-included rates</h2>
   <p class="body" style="{ENG_P}">This is the engine behind the guide prices in the Appendix. Every item a
     measure leaves out is priced here, per unit, with the measure it belongs to named beside it. When a
@@ -633,14 +573,12 @@ doc7 = f'''<div class="sheet">
   {engfig('eng_c', '172mm', 'Variations &mdash; not included guide rates.',
     'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outturns.')}
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
-  {footer(7, '3', '3')}
+  {footer(5, '7', '7')}
 </div>'''
 
 TPL = '''<!doctype html><html><head><meta charset="utf-8"><title>%s</title>
 <style>%s</style></head><body>%s</body></html>'''
 
-for name, content in [('pack_01', doc1), ('pack_02', doc2), ('pack_03', doc3),
-                      ('pack_04', doc4), ('pack_05', doc5), ('pack_06', doc6),
-                      ('pack_07', doc7)]:
+for name, content in [('pack_01', doc1), ('pack_05', doc6 + doc7)]:
     open(name + '.html', 'w').write(TPL % ('PlanitBER — ' + name, CSS, content))
     print('wrote', name + '.html')

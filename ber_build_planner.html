@@ -18190,7 +18190,9 @@ function _updateEUPDFBtns(isPlan, mode) {
   if (!mode && typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) mode = (BOQ.projectInfo.type || '').toString();
   // "Retrofit" only where it is one. New Build and Refurbishment get the same two
   // documents under their own name.
-  var planLabel = mode === 'Energy Upgrade' ? 'Retrofit Cost Plan (PDF)' : 'Cost Plan (PDF)';
+  // One name across every mode, matching the band on the document itself and the
+  // pack's document 02.
+  var planLabel = 'Baseline Cost Plan (PDF)';
   if (isPlan) {
     // Two documents, for two different readers. The Cost Plan is the homeowner's — page 1 is
     // their summary and the evidence sits behind it. The Pricing Schedule is the same scope

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Assemble the six-PDF SEAI pack and the editable text, from the printed parts.
+"""Assemble the five-PDF SEAI pack and the editable text, from the printed parts.
 
 The pack used to be put together by hand, which is how it came to ship a stale set of
 figures: the prints were regenerated but the folder was not. Everything here is derived,
 so the only way to change the pack is to change its source.
 
-Order matters: documents 02-04 are the software's own output, each bound behind one page
-of notes saying who that document is for and how long it lives.
+Documents 02-04 are the software's own output, bound whole with nothing in front of them:
+document 01 explains what each is for, so they need no notes page.
 """
 import glob, os, re, shutil, zipfile
 import pypdf
@@ -17,13 +17,11 @@ EDIT = os.path.join(HERE, 'PlanitBER_Editable_Text')
 
 # (output name, [parts]) — a part is a printed pack page or a document from the software
 DOCS = [
-    ('PlanitBER_01_The_Value_Proposition.pdf', ['pack_01_print.pdf']),
-    ('PlanitBER_02_The_Cost_Plan.pdf',         ['pack_02_print.pdf', 'ex_plan.pdf']),
-    ('PlanitBER_03_The_Pricing_Schedule.pdf',  ['pack_03_print.pdf', 'ex_sched.pdf']),
-    ('PlanitBER_04_The_Appendix.pdf',          ['pack_04_print.pdf', 'ex_appx.pdf']),
-    ('PlanitBER_05_The_Workflow.pdf',          ['pack_05_print.pdf']),
-    ('PlanitBER_06_The_Software.pdf',          ['pack_06_print.pdf']),
-    ('PlanitBER_07_The_Engine.pdf',            ['pack_07_print.pdf']),
+    ('PlanitBER_01_The_Value_Proposition.pdf',  ['pack_01_print.pdf']),
+    ('PlanitBER_02_The_Baseline_Cost_Plan.pdf', ['ex_plan.pdf']),
+    ('PlanitBER_03_The_Pricing_Schedule.pdf',   ['ex_sched.pdf']),
+    ('PlanitBER_04_The_Appendix.pdf',           ['ex_appx.pdf']),
+    ('PlanitBER_05_The_Software.pdf',           ['pack_05_print.pdf']),
 ]
 
 def build():

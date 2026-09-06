@@ -4,14 +4,10 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 
+// Only 01 and 05 carry prose we write. 02-04 are the software's own output.
 const DOCS = [
   ['01', 'The Value Proposition'],
-  ['02', 'The Cost Plan — notes page'],
-  ['03', 'The Pricing Schedule — notes page'],
-  ['04', 'The Appendix — notes page'],
-  ['05', 'The Workflow'],
-  ['06', 'The Software'],
-  ['07', 'The Engine'],
+  ['05', 'The Software'],
 ];
 
 (async () => {
