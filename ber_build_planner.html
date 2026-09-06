@@ -18735,24 +18735,6 @@ function exportEUPDF(mode) {
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
     '<th style="padding:5px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
     '</tr></thead>';
-  // No Scope column in this one, so Variation Notes has no partner; the three
-  // money columns still match.
-  var colgroup6 = '<colgroup><col style="width:3%"/><col style="width:33%"/><col style="width:13%"/>' +
-    '<col style="width:25%"/><col style="width:13%"/><col style="width:13%"/></colgroup>';
-  var thead6 = '<thead>' +
-    '<tr style="background:#FFF7ED;color:#92400E;">' +
-      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;'+_pdfEdge+'">Baseline &mdash; fixed at date of issue</th>' +
-      '<th colspan="3" style="padding:3px 6px;text-align:left;font-size:6.5pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;border:1px solid #CBD5E1;color:#0369A1;">Live &mdash; recorded as the job runs</th>' +
-    '</tr>' +
-    '<tr style="background:#F1F5F9;color:#1E293B;">' +
-    '<th style="padding:4px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
-    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#E8A020;'+_pdfEdge+'">Budget Est.</th>' +
-    '<th style="padding:4px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variation Notes</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;white-space:nowrap;color:#38bdf8;">Actual</th>' +
-    '<th style="padding:4px 6px;text-align:right;font-size:7pt;border:1px solid #CBD5E1;">Difference</th>' +
-    '</tr></thead>';
-
   // Scheme note — how grants reach the homeowner differs materially by route,
   // and CEG figures are not fixed until the Project Coordinator confirms them.
   var _sk = seaiScheme(pi.grantScheme);
@@ -18788,8 +18770,8 @@ function exportEUPDF(mode) {
   var tableHTML =
     '<div style="margin:0 10mm;font-family:sans-serif;">' +
     '<table style="width:100%;table-layout:fixed;border-collapse:collapse;font-family:sans-serif;font-size:9pt;margin-top:4mm;word-wrap:break-word;">' +
-      (isDetailed ? colgroup7 : colgroup6) +
-      (isDetailed ? thead7 : thead6) +
+      colgroup7 +
+      thead7 +
       '<tbody>'+pdfRows+'</tbody>' +
     '</table>' +
     schemeNoteHTML +
