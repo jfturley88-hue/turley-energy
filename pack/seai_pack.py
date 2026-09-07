@@ -296,11 +296,13 @@ doc1 = f'''<div class="sheet">
       <div>Co. Monaghan &middot; info@turleyenergy.ie</div><div>[Date]</div>
     </div>
   </div>
-  <h1 style="font-size:10.8pt;line-height:1.45;font-weight:600;margin:4mm 0 2.4mm;">PlanitBER is
-    software that turns a provisional BER into homeowner tender documents. It takes the measured geometry
-    and the Heat Loss Indicator from a Dwelling Details Report and applies rates from the measures agreed
-    with the homeowner, producing a Baseline Cost Plan, a Contractors Pricing Schedule, and an Appendix of
-    guide prices.</h1>
+  <h1 style="font-size:16pt;line-height:1.2;margin:3.4mm 0 2.2mm;">Empowering homeowners with tender
+    documents to engage in the retrofit process with confidence</h1>
+  <p class="body" style="font-size:9.8pt;line-height:1.48;margin-bottom:2.3mm;font-weight:600;color:#1E293B;">PlanitBER
+    is software that turns a provisional BER into homeowner tender documents. It takes the measured
+    geometry and the Heat Loss Indicator from a Dwelling Details Report and applies rates to the measures
+    agreed with the homeowner, producing a Baseline Cost Plan, a Contractors Pricing Schedule, and an
+    Appendix of guide prices.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Three bespoke documents, issued with the provisional BER before a
     contractor has been contacted, designed to empower homeowners to engage with confidence in the
     retrofit process. Each measure on the <strong>Baseline Cost Plan</strong> carries a Baseline Scope
@@ -318,10 +320,18 @@ doc1 = f'''<div class="sheet">
     every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin,
     and nobody can show whether it happens. The missing piece is not an increase in grants, but a
     baseline that exists before any contractor names a price.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A quote is a single number.</strong> The homeowner has nothing to
+    check it against &mdash; no scope, no quantities, and no sense of what the work should cost &mdash; so
+    the decision to proceed rests on trust alone. That is the point at which homeowners stall, having
+    taken a BER and been told what to do, but with no way to price it.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The contractor carries that cost too.</strong> Site visits are made
+    and quotations prepared for homeowners who have not yet decided what they can afford, and much of that
+    work is never answered and never paid for.</p>
 
   {vk('How these tender documents generate trust in the market')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The Baseline Cost Plan, Pricing Schedule and Appendix act as a budgeting
-    guide for the homeowner throughout the retrofit.</p>
+    guide for the homeowner throughout the retrofit. Issued before a contractor is contacted, they put the
+    same scope and the same starting figure in front of both sides.</p>
 
   <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
     <li style="margin-bottom:1.3mm;">The one- to two-page bespoke <strong>Baseline Cost Plan</strong> and
@@ -337,6 +347,13 @@ doc1 = f'''<div class="sheet">
       produced is an independent one.</li>
   </ul>
 
+  <div class="fine">{FINE1}</div>
+  {footer(1, '1', '4')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
   {vk('What each document is for')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>02 &middot; The Baseline Cost Plan.</strong> The document the
     homeowner works from for the length of the job. Every measure carries its scope, the grant it earns
@@ -351,9 +368,30 @@ doc1 = f'''<div class="sheet">
     the guide prices for what it deliberately leaves out. Materials and labour, the contractor&rsquo;s
     overhead and profit, and the VAT band, measure by measure &mdash; so the homeowner can see how a figure
     was reached, and holds a guide price before a variation is ever discussed.</p>
+  {vk('The homes already surveyed')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Nothing here needs a new
+    survey. The inputs are the dwelling details report and the list of measures, and both already exist
+    for the <strong>1.37 million dwellings</strong> that hold a published BER. An assessor can produce
+    the three documents for any dwelling they assessed themselves, from the file they already hold. For
+    a homeowner who took a BER, was told what to do and then stalled at the point of pricing it, that is
+    the missing piece arriving after the fact.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">At any wider scale the
+    route already exists rather than needing to be invented. The <strong>NAS Trusted Partner API</strong>
+    was built to give providers a dwelling&rsquo;s BER data and the DEAP engine with the homeowner&rsquo;s
+    consent, under the stated objective of making better use of BER data. Separately, SEAI&rsquo;s own domestic
+    technical standards now describe a <strong>Building Renovation Passport</strong>: a staged roadmap
+    built on the published BER, which may be issued separately from it. These three documents carry the
+    cost layer such a roadmap needs.</p>
+
+  {vk('The software &mdash; document 05')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in,
+    the intended measures are selected, the three documents print, and the grant route can be switched at
+    the moment of download. Behind it sits a rate book with a version and an effective date, sourced line
+    by line and held in one place, with any rate still to be calibrated marked as such. Document 05 shows
+    both halves.</p>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '1', '3')}
+  {footer(1, '2', '4')}
 </div>
 
 <div class="sheet">
@@ -383,33 +421,11 @@ doc1 = f'''<div class="sheet">
     last=True)}
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '2', '3')}
+  {footer(1, '3', '4')}
 </div>
 
 <div class="sheet">
   {strip(1)}
-
-  {vk('The homes already surveyed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Nothing here needs a new
-    survey. The inputs are the dwelling details report and the list of measures, and both already exist
-    for the <strong>1.37 million dwellings</strong> that hold a published BER. An assessor can produce
-    the three documents for any dwelling they assessed themselves, from the file they already hold. For
-    a homeowner who took a BER, was told what to do and then stalled at the point of pricing it, that is
-    the missing piece arriving after the fact.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">At any wider scale the
-    route already exists rather than needing to be invented. The <strong>NAS Trusted Partner API</strong>
-    was built to give providers a dwelling&rsquo;s BER data and the DEAP engine with the homeowner&rsquo;s
-    consent, under the stated objective of making better use of BER data. Separately, SEAI&rsquo;s own domestic
-    technical standards now describe a <strong>Building Renovation Passport</strong>: a staged roadmap
-    built on the published BER, which may be issued separately from it. These three documents carry the
-    cost layer such a roadmap needs.</p>
-
-  {vk('The software &mdash; document 05')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in,
-    the intended measures are selected, the three documents print, and the grant route can be switched at
-    the moment of download. Behind it sits a rate book with a version and an effective date, sourced line
-    by line and held in one place, with any rate still to be calibrated marked as such. Document 05 shows
-    both halves.</p>
 
   {vk('The proposition')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A basic Trusted Partner pilot.</strong> We would like to take part
@@ -431,7 +447,7 @@ doc1 = f'''<div class="sheet">
   </div>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '3', '3')}
+  {footer(1, '4', '4')}
 </div>'''
 
 # ── 05 · THE SOFTWARE — part one, the journey on screen ──────────────────────
