@@ -296,28 +296,32 @@ doc1 = f'''<div class="sheet">
       <div>Co. Monaghan &middot; info@turleyenergy.ie</div><div>[Date]</div>
     </div>
   </div>
-  <h1 style="font-size:17.5pt;line-height:1.18;margin:4mm 0 2mm;">Empowering homeowners with tender documents to engage in the retrofit process with confidence</h1>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Three bespoke documents,
-    issued with the provisional BER. Each measure carries a <strong>baseline</strong> &mdash; an
-    estimate with what&rsquo;s included and what&rsquo;s not. Contractors price that scope on the
-    <strong>schedule</strong>, so quotes compare like with like. Variations get agreed rather than argued,
-    because the homeowner already holds guide prices for the not-included items in the
-    <strong>appendix</strong>. That empowers the homeowner and levels the playing field.</p>
+  <h1 style="font-size:10.8pt;line-height:1.45;font-weight:600;margin:4mm 0 2.4mm;">PlanitBER is
+    software that turns a provisional BER into homeowner tender documents. It takes the measured geometry
+    and the Heat Loss Indicator from a Dwelling Details Report and applies rates from the measures agreed
+    with the homeowner, producing a Baseline Cost Plan, a Contractors Pricing Schedule, and an Appendix of
+    guide prices.</h1>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Three bespoke documents, issued with the provisional BER before a
+    contractor has been contacted, designed to empower homeowners to engage with confidence in the
+    retrofit process. Each measure on the <strong>Baseline Cost Plan</strong> carries a Baseline Scope
+    &amp; Quantities and Budget Estimate column. Contractors then price against that same Baseline Scope
+    &amp; Quantities, which is in the <strong>Contractors Pricing Schedule</strong>, so quotes compare
+    like with like and include potential variations. The <strong>Appendix</strong> then serves the
+    homeowner in two ways. It puts a guide price on every item marked &lsquo;not included&rsquo;, so if a
+    contractor&rsquo;s survey finds one is needed, the homeowner already knows what it should cost before
+    agreeing it. It also shows how each Baseline Budget Estimate was built &mdash; from measured
+    quantities and published rates to the loaded figure &mdash; so no number on the plan is taken on
+    trust.</p>
 
   {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When every
-    figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and
-    nobody can show whether it happens. The missing piece is not more money but a baseline that exists
-    before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Trust between homeowner and contractor has nowhere to
-    start.</strong> A quote today is one number, with nothing to check it against. The homeowner is
-    empowered with the scope each measure includes and a guide price for what it leaves out &mdash; both
-    held before a contractor is asked to price anything. A quote is judged against that scope, and the
-    honest contractor is judged on the same terms as everyone else quoting.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The energy assessor becomes a paid consultant.</strong> A fee
-    for helping the homeowner create the document, earned at the moment the retrofit decision is being
-    made &mdash; not for selling installation or taking commission, so the figure does not move with who
-    wins the work. The same survey and the same provisional BER now also produce the three documents.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When
+    every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin,
+    and nobody can show whether it happens. The missing piece is not an increase in grants, but a
+    baseline that exists before any contractor names a price.</p>
+
+  {vk('How these tender documents generate trust in the market')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The Baseline Cost Plan, Pricing Schedule and Appendix act as a budgeting
+    guide for the homeowner throughout the retrofit.</p>
 
   <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
     <li style="margin-bottom:1.3mm;">The one- to two-page bespoke <strong>Baseline Cost Plan</strong> and
@@ -325,19 +329,13 @@ doc1 = f'''<div class="sheet">
       negotiate a price.</li>
     <li style="margin-bottom:1.3mm;">The not-included estimates in the <strong>Appendix</strong> empower the
       homeowner in agreeing variations with the contractor.</li>
-    <li style="margin-bottom:1.3mm;">The three documents prime the homeowner for what the work is likely to
-      cost. That means fewer site visits and fewer quotations that are never acted on, because the
-      homeowner comes to a contractor having already come to grips with the likely cost.</li>
-    <li>They are generated entirely by the energy assessor, from a standard dwelling details report out of
-      DEAP and by selecting the measures. It is not a long process.</li>
+    <li style="margin-bottom:1.3mm;">The three documents prime the homeowner for what the work should cost.
+      That means fewer wasted site visits and fewer quotations that die unanswered, because the contractor
+      meets a homeowner who has already decided they are comfortable with proceeding.</li>
+    <li>Produced by an independent energy assessor &mdash; on neither side of the deal. No installation
+      sold, no commission taken, and the figures priced from a published rate book, so the baseline
+      produced is an independent one.</li>
   </ul>
-
-  <div class="fine">{FINE1}</div>
-  {footer(1, '1', '4')}
-</div>
-
-<div class="sheet">
-  {strip(1)}
 
   {vk('What each document is for')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>02 &middot; The Baseline Cost Plan.</strong> The document the
@@ -354,6 +352,43 @@ doc1 = f'''<div class="sheet">
     overhead and profit, and the VAT band, measure by measure &mdash; so the homeowner can see how a figure
     was reached, and holds a guide price before a variation is ever discussed.</p>
 
+  <div class="fine">{FINE1}</div>
+  {footer(1, '1', '3')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
+  {vk('The workflow we are proposing')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">This is a new workflow, not what happens today. The survey, the DEAP
+    assessment and the two BERs already exist; what is new is that the provisional stage also produces
+    the three documents, and that the assessor is paid for it.</p>
+  {wfstep('1', 'Survey and agree the measures',
+    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
+  {wfstep('2', 'The dwelling goes into DEAP',
+    'The house as it stands is entered, then the agreed measures are added until the heat loss '
+    'indicator suits the intended heating system.')}
+  {wfstep('3', 'The dwelling details report goes into PlanitBER',
+    'The standard DEAP report, downloaded as it is issued today. The upgraded measures are selected '
+    'and the three documents are produced.',
+    note='Today the assessor types the geometry and the heat loss indicator from that report into '
+         'the software. Uploading the report so those figures read across is the one piece of '
+         'development this proposal asks for.', add=True)}
+  {wfstep('4', 'Issued to the homeowner',
+    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice. The '
+    'homeowner holds their heat loss indicator, the scope and the guide prices, and can tender with '
+    'confidence. The assessor has been paid for advisory input.')}
+  {wfstep('5', 'The works happen and the final BER is issued',
+    'The final BER follows the works, as now, and the grants are claimed against it.',
+    last=True)}
+
+  <div class="fine">{FINE1}</div>
+  {footer(1, '2', '3')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
   {vk('The homes already surveyed')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Nothing here needs a new
     survey. The inputs are the dwelling details report and the list of measures, and both already exist
@@ -364,10 +399,10 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">At any wider scale the
     route already exists rather than needing to be invented. The <strong>NAS Trusted Partner API</strong>
     was built to give providers a dwelling&rsquo;s BER data and the DEAP engine with the homeowner&rsquo;s
-    consent, under the stated objective of making better use of BER data. Separately, the Energy
-    Performance of Buildings Directive requires a voluntary <strong>renovation passport</strong> scheme,
-    which SEAI is developing: a document setting out the scope, the sequence and the cost of bringing one
-    dwelling to a target rating. That is close to what these three documents already are.</p>
+    consent, under the stated objective of making better use of BER data. Separately, SEAI&rsquo;s own domestic
+    technical standards now describe a <strong>Building Renovation Passport</strong>: a staged roadmap
+    built on the published BER, which may be issued separately from it. These three documents carry the
+    cost layer such a roadmap needs.</p>
 
   {vk('The software &mdash; document 05')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey goes in,
@@ -376,63 +411,19 @@ doc1 = f'''<div class="sheet">
     by line and held in one place, with any rate still to be calibrated marked as such. Document 05 shows
     both halves.</p>
 
-  <div class="fine">{FINE1}</div>
-  {footer(1, '2', '4')}
-</div>
-
-<div class="sheet">
-  {strip(1)}
-
-  {vk('The workflow we are proposing')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">This is a new workflow, not what happens today. The survey, the DEAP
-    assessment and the two BERs already exist; what is new is that the provisional stage also produces
-    the three documents, and that the assessor is paid for the advisory work.</p>
-  {wfstep('1', 'Survey and agree the measures',
-    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
-  {wfstep('2', 'The dwelling goes into DEAP',
-    'The house as it stands is entered, then the agreed measures are added until the heat loss indicator '
-    'comes down to where the intended heating system will work.')}
-  {wfstep('3', 'The dwelling details report goes into PlanitBER',
-    'The standard DEAP report, downloaded as it is issued today. The upgraded measures are selected '
-    'and the three documents are produced.',
-    note='Today the assessor types the geometry and the heat loss indicator from that report into '
-         'the software. Uploading the report so those figures read across is the one piece of '
-         'development this proposal asks for.', add=True)}
-  {wfstep('4', 'Issued to the homeowner',
-    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice. The '
-    'homeowner understands their heat loss indicator, holds the scope and the guide prices, and can '
-    'tender with confidence &mdash; and the assessor has been paid for advisory input.')}
-  {wfstep('5', 'The works happen and the final BER is issued',
-    'The final BER follows the works, as now, and the grants are claimed against it.',
-    last=True)}
-
-  <div class="fine">{FINE1}</div>
-  {footer(1, '3', '4')}
-</div>
-
-<div class="sheet">
-  {strip(1)}
-
   {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A pilot programme.</strong> A few registered assessors, a fixed
-    number of plans, with recorded spend measured against the accuracy band. That measurement is the
-    trial&rsquo;s own third objective &mdash; to <em>evaluate and measure the benefit of providing BER data
-    to home upgrade service providers &hellip; in a format that can be applied to assist homeowner decision
-    making on home retrofit investment</em>. SEAI observes throughout, and the outturns refine the rate
-    book.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>Participation in the NAS Trusted Partner API trial.</strong> We
-    would apply to join as a Trusted Partner, with a registered BER assessor named as the requestor of BER
-    data for each request, as the trial requires. The scope we would work to: dwellings this practice
-    assessed itself, which Regulation 27(4)(c)(i) of S.I. 243/2012 already contemplates, and any other
-    dwelling where the homeowner&rsquo;s consent has been captured before the request is made, which is
-    the route the Trusted Partner Agreement sets out. One question we would put to SEAI before applying:
-    whether issuing a pricing schedule for the homeowner to tender meets stage 2 of the home upgrade
-    customer journey, or whether that stage requires the partner to organise the quotes itself.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The renovation passport.</strong> Article 12 of the recast Energy
-    Performance of Buildings Directive requires a renovation passport scheme, on the common framework in
-    Annex VIII, issued by a qualified expert after an on-site visit. Annex VIII requires the energy,
-    the sequencing and the signposting, and places the estimated cost of each step among the elements a
-    passport <em>may</em> include. These three documents carry the cost layer a passport needs.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A basic Trusted Partner pilot.</strong> We would like to take part
+    in the NAS Trusted Partner API trial at a small scale &mdash; a handful of dwellings, with a
+    registered BER assessor named as the requestor for each request and the homeowner&rsquo;s consent
+    captured before any request is made. Nothing beyond what the Trusted Partner Agreement already sets
+    out.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">What it would show is the trial&rsquo;s own third objective: whether
+    providing BER data, with the DEAP recalculation behind it, changes what a homeowner decides. We would
+    record what the works actually cost against the plan, so the accuracy band is measured rather than
+    asserted, and the outturns refine the rate book.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">One question before applying: whether issuing a pricing schedule for the
+    homeowner to tender meets stage 2 of the home upgrade customer journey, or whether that stage means
+    the partner organises the quotes itself.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">[Name] &middot; Turley Energy Consultants</span>
@@ -440,7 +431,7 @@ doc1 = f'''<div class="sheet">
   </div>
 
   <div class="fine">{FINE1}</div>
-  {footer(1, '4', '4')}
+  {footer(1, '3', '3')}
 </div>'''
 
 # ── 05 · THE SOFTWARE — part one, the journey on screen ──────────────────────
