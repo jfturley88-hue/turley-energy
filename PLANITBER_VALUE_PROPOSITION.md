@@ -1,3 +1,6 @@
+> **Superseded.** The value proposition SEAI receives is document 01 of the pack, built from
+> `pack/seai_pack.py`. This file is an earlier draft kept for reference and is not maintained.
+
 # PlanitBER — Value Proposition
 
 **One cost language for Ireland's retrofit industry.**

@@ -502,7 +502,7 @@ doc6 = f'''<div class="sheet">
   <div class="kick" style="margin-top:4mm;">What prints from this screen</div>
   <div class="big3">
     <div class="pt asr">
-      <div class="pt-t" style="font-size:9.5pt;">The Retrofit Cost Plan</div>
+      <div class="pt-t" style="font-size:9.5pt;">The Baseline Cost Plan</div>
       <div class="pt-b">For the homeowner, issued with the BER and worked from for the length of
         the job.</div>
     </div>
@@ -529,7 +529,7 @@ doc6 = f'''<div class="sheet">
     'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
 
   <p class="body" style="font-size:8pt;color:#64748B;margin-top:2mm;">Where each rate comes from, and how the
-    book is versioned and inspected, is in document 07.</p>
+    book is versioned and inspected, is in part two of this document.</p>
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(5, '4', '7')}
