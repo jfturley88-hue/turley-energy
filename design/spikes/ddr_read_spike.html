@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>DDR spike</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>body{font-family:system-ui;padding:16px} pre{font-size:11px;white-space:pre-wrap} .ok{color:#0a0} .bad{color:#c00}</style>
+</head><body>
+<h3>Client-side DEAP report read — nothing leaves this browser</h3>
+<input type="file" id="f" accept="application/pdf">
+<div id="status"></div>
+<pre id="out"></pre>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// Rebuild lines from positioned text items: group by y (rounded), order by x.
+async function pageLines(page) {
+  const tc = await page.getTextContent();
+  const rows = new Map();
+  for (const it of tc.items) {
+    if (!it.str.trim()) continue;
+    const y = Math.round(it.transform[5] / 2) * 2;   // 2pt bands
+    if (!rows.has(y)) rows.set(y, []);
+    rows.get(y).push({ x: it.transform[4], s: it.str });
+  }
+  return [...rows.entries()]
+    .sort((a, b) => b[0] - a[0])                        // top to bottom
+    .map(([, items]) => items.sort((a, b) => a.x - b.x).map(i => i.s).join(' | '));
+}
+
+async function readPdf(buf) {
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const all = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const lines = await pageLines(await pdf.getPage(p));
+    all.push({ page: p, lines });
+  }
+  return all;
+}
+
+window.__result = null;
+document.getElementById('f').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  const buf = new Uint8Array(await file.arrayBuffer());
+  const pages = await readPdf(buf);
+  window.__result = pages;
+  document.getElementById('status').textContent = `${pages.length} pages read locally`;
+  document.getElementById('out').textContent = pages.map(p => `--- page ${p.page} ---\n` + p.lines.join('\n')).join('\n\n');
+});
+
+// allow a scripted load for the test harness
+window.__loadFromUrl = async url => {
+  const buf = new Uint8Array(await (await fetch(url)).arrayBuffer());
+  const pages = await readPdf(buf);
+  window.__result = pages;
+  return pages.length;
+};
+</script>
+</body></html>
