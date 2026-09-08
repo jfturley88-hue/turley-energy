@@ -316,43 +316,38 @@ doc1 = f'''<div class="sheet">
     quantities and published rates to the loaded figure &mdash; so no number on the plan is taken on
     trust.</p>
 
-  {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A homeowner deciding on a retrofit today faces four problems, and none of
-    them is solved by a bigger grant.</p>
-  <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
-    <li style="margin-bottom:1.3mm;">The common belief is that grants inflate the price. When every figure a homeowner sees
-      comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether
-      it happens.</li>
-    <li style="margin-bottom:1.3mm;">There is nothing to judge a quote against &mdash; no scope, no quantities, and no sense of
-      what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point
-      at which homeowners stall, having taken a BER and been told what to do, but with no way to price
-      it.</li>
-    <li style="margin-bottom:1.3mm;">When a contractor&rsquo;s survey finds work the quote did not cover, the homeowner has no idea
-      what it should cost, so every variation is argued rather than agreed.</li>
-    <li>The contractor carries that cost too. Site visits are made and quotations prepared for homeowners
-      who have not yet decided what they can afford, and much of that work is never answered and never
-      paid for.</li>
-  </ul>
-
-  {vk('How these tender documents generate trust in the market')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Baseline Cost Plan</strong>, <strong>Pricing Schedule</strong>
-    and <strong>Appendix</strong> act as a budgeting guide for the homeowner throughout the retrofit.
-    Issued before a contractor is contacted, they put the same scope and the same starting figure in front
-    of both sides.</p>
-  <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
-    <li style="margin-bottom:1.3mm;">The missing piece is not an increase in grants but a baseline that exists before any
-      contractor names a price &mdash; independently produced by the energy assessor from a published rate
-      book.</li>
-    <li style="margin-bottom:1.3mm;">The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner
-      and the contractor a basis on which to negotiate a price. Every contractor prices the same scope and
-      the same quantities, so quotes compare like with like.</li>
-    <li style="margin-bottom:1.3mm;">The <strong>Appendix</strong> puts a guide price on every item marked not included, so when a
-      contractor&rsquo;s survey finds one is needed, the homeowner agrees the variation from a figure they
-      already hold.</li>
-    <li>The three documents prime the homeowner for what the work should cost. That means fewer wasted
-      site visits and fewer quotations that die unanswered, because the contractor meets a homeowner who
-      has already decided they are comfortable with proceeding.</li>
-  </ul>
+  <table style="width:100%;border-collapse:collapse;margin-top:2.8mm;table-layout:fixed;">
+    <tr>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;">
+        <div class="kick" style="font-size:8pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#B07D1A;margin-bottom:1.4mm;">Why it is needed</div>
+        <p class="body" style="margin:0;">A homeowner deciding on a retrofit today faces a number of problems,
+          and none of them is solved by a bigger grant. These four are the main ones.</p>
+      </td>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;">
+        <div class="kick" style="font-size:8pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#B07D1A;margin-bottom:1.4mm;">How these tender documents generate trust in the market</div>
+        <p class="body" style="margin:0;">The <strong>Baseline Cost Plan</strong>, <strong>Pricing
+          Schedule</strong> and <strong>Appendix</strong> act as a budgeting guide for the homeowner
+          throughout the retrofit. Issued before a contractor is contacted, they put the same scope and the
+          same starting figure in front of both sides.</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">The common belief is that grants inflate the price. When every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether it happens.</td>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The missing piece is not an increase in grants but a baseline that exists before any contractor names a price &mdash; independently produced by the energy assessor from a published rate book.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">There is nothing to judge a quote against &mdash; no scope, no quantities, and no sense of what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point at which homeowners stall, having taken a BER and been told what to do, but with no way to price it.</td>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner and the contractor a basis on which to negotiate a price. Every contractor prices the same scope and the same quantities, so quotes compare like with like.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">When a contractor&rsquo;s survey finds work the quote did not cover, the homeowner has no idea what it should cost, so every variation is argued rather than agreed.</td>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The <strong>Appendix</strong> puts a guide price on every item marked not included, so when a contractor&rsquo;s survey finds one is needed, the homeowner agrees the variation from a figure they already hold.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">The contractor carries that cost too. Site visits are made and quotations prepared for homeowners who have not yet decided what they can afford, and much of that work is never answered and never paid for.</td>
+      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The three documents prime the homeowner for what the work should cost. That means fewer wasted site visits and fewer quotations that die unanswered, because the contractor meets a homeowner who has already decided they are comfortable with proceeding.</td>
+    </tr>
+  </table>
 
   <div class="fine">{FINE1}</div>
   {footer(1, '1', '3')}
