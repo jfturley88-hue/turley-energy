@@ -399,12 +399,9 @@ doc1 = f'''<div class="sheet">
     'The house as it stands is entered, then the agreed measures are added until the heat loss '
     'indicator suits the intended heating system.')}
   {wfstep('3', 'The report goes into PlanitBER',
-    'The standard DEAP dwelling details report, as issued today. The upgraded measures are selected '
-    'and the three documents are produced.',
-    note='One piece to build', add=True,
-    sub='Today the assessor types the geometry and the heat loss indicator from the report into the '
-        'software. Uploading the report so those figures read across is the one piece of development '
-        'this asks for.')}
+    'The standard DEAP dwelling details report, as issued today. Its geometry and heat loss indicator '
+    'fill the survey, the upgraded measures are selected, and the three documents are produced.',
+    add=True)}
   {wfstep('4', 'Issued to the homeowner',
     'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice for '
     'the advisory work. The homeowner holds their heat loss indicator, the scope and the guide prices, '
