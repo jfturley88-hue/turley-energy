@@ -299,11 +299,11 @@ doc1 = f'''<div class="sheet">
   </div>
   <h1 style="font-size:16pt;line-height:1.2;margin:3.4mm 0 2.2mm;">Empowering homeowners with tender
     documents to engage in the retrofit process with confidence</h1>
-  <p class="body" style="font-size:9.8pt;line-height:1.48;margin-bottom:2.3mm;font-weight:600;color:#1E293B;">PlanitBER
+  <p class="body" style="font-size:9.8pt;line-height:1.48;margin-bottom:2.3mm;color:#1E293B;">PlanitBER
     is software that turns a provisional BER into homeowner tender documents. It takes the measured
     geometry and the Heat Loss Indicator from a Dwelling Details Report and applies rates to the measures
-    agreed with the homeowner, producing a Baseline Cost Plan, a Contractors Pricing Schedule, and an
-    Appendix of guide prices.</p>
+    agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractors
+    Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">These three bespoke documents, issued with the provisional BER before a
     contractor has been contacted, designed to empower homeowners to engage with confidence in the
     retrofit process. Each measure on the <strong>Baseline Cost Plan</strong> carries a Baseline Scope
