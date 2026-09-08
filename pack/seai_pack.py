@@ -317,35 +317,41 @@ doc1 = f'''<div class="sheet">
     trust.</p>
 
   {vk('Why it is needed')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A homeowner deciding on a retrofit today faces three problems, and none of
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A homeowner deciding on a retrofit today faces four problems, and none of
     them is solved by a bigger grant.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When
-    every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin,
-    and nobody can show whether it happens. The missing piece is not an increase in grants, but a
-    baseline that exists before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>There is nothing to judge a quote against.</strong> No scope, no quantities,
-    and no sense of what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point at which homeowners stall, having
-    taken a BER and been told what to do, but with no way to price it.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The contractor carries that cost too.</strong> Site visits are made
-    and quotations prepared for homeowners who have not yet decided what they can afford, and much of that
-    work is never answered and never paid for.</p>
+  <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
+    <li style="margin-bottom:1.3mm;">The common belief is that grants inflate the price. When every figure a homeowner sees
+      comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether
+      it happens.</li>
+    <li style="margin-bottom:1.3mm;">There is nothing to judge a quote against &mdash; no scope, no quantities, and no sense of
+      what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point
+      at which homeowners stall, having taken a BER and been told what to do, but with no way to price
+      it.</li>
+    <li style="margin-bottom:1.3mm;">When a contractor&rsquo;s survey finds work the quote did not cover, the homeowner has no idea
+      what it should cost, so every variation is argued rather than agreed.</li>
+    <li>The contractor carries that cost too. Site visits are made and quotations prepared for homeowners
+      who have not yet decided what they can afford, and much of that work is never answered and never
+      paid for.</li>
+  </ul>
 
   {vk('How these tender documents generate trust in the market')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The Baseline Cost Plan, Pricing Schedule and Appendix act as a budgeting
-    guide for the homeowner throughout the retrofit. Issued before a contractor is contacted, they put the
-    same scope and the same starting figure in front of both sides.</p>
-
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The <strong>Baseline Cost Plan</strong>, <strong>Pricing Schedule</strong>
+    and <strong>Appendix</strong> act as a budgeting guide for the homeowner throughout the retrofit.
+    Issued before a contractor is contacted, they put the same scope and the same starting figure in front
+    of both sides.</p>
   <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
-    <li style="margin-bottom:1.3mm;"><strong>A baseline before any contractor names a price.</strong> Independently
-      produced by the energy assessor, from a published rate book.</li>
-    <li style="margin-bottom:1.3mm;"><strong>A reference point for every quote.</strong> The one- to two-page
-      bespoke <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner and
-      the contractor a basis on which to negotiate a price, and the not-included estimates in the
-      <strong>Appendix</strong> let the homeowner agree variations from a figure they already hold.</li>
-    <li><strong>Less wasted work for the contractor.</strong> The three documents prime the homeowner for what
-      the work should cost. That means fewer wasted site visits and fewer quotations that die unanswered,
-      because the contractor meets a homeowner who has already decided they are comfortable with
-      proceeding.</li>
+    <li style="margin-bottom:1.3mm;">The missing piece is not an increase in grants but a baseline that exists before any
+      contractor names a price &mdash; independently produced by the energy assessor from a published rate
+      book.</li>
+    <li style="margin-bottom:1.3mm;">The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner
+      and the contractor a basis on which to negotiate a price. Every contractor prices the same scope and
+      the same quantities, so quotes compare like with like.</li>
+    <li style="margin-bottom:1.3mm;">The <strong>Appendix</strong> puts a guide price on every item marked not included, so when a
+      contractor&rsquo;s survey finds one is needed, the homeowner agrees the variation from a figure they
+      already hold.</li>
+    <li>The three documents prime the homeowner for what the work should cost. That means fewer wasted
+      site visits and fewer quotations that die unanswered, because the contractor meets a homeowner who
+      has already decided they are comfortable with proceeding.</li>
   </ul>
 
   <div class="fine">{FINE1}</div>
