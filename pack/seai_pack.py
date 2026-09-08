@@ -335,17 +335,17 @@ doc1 = f'''<div class="sheet">
     same scope and the same starting figure in front of both sides.</p>
 
   <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
-    <li style="margin-bottom:1.3mm;">The one- to two-page bespoke <strong>Baseline Cost Plan</strong> and
-      <strong>Pricing Schedule</strong> give the homeowner and the contractor a basis on which to
-      negotiate a price.</li>
-    <li style="margin-bottom:1.3mm;">The not-included estimates in the <strong>Appendix</strong> empower the
-      homeowner in agreeing variations with the contractor.</li>
-    <li style="margin-bottom:1.3mm;">The three documents prime the homeowner for what the work should cost.
-      That means fewer wasted site visits and fewer quotations that die unanswered, because the contractor
-      meets a homeowner who has already decided they are comfortable with proceeding.</li>
-    <li>Produced by an independent energy assessor &mdash; on neither side of the deal. No installation
-      sold, no commission taken, and the figures priced from a published rate book, so the baseline
-      produced is an independent one.</li>
+    <li style="margin-bottom:1.3mm;"><strong>A baseline before any contractor names a price.</strong> Produced by
+      an independent energy assessor &mdash; on neither side of the deal. No installation sold, no commission
+      taken, and the figures priced from a published rate book, so the baseline is an independent one.</li>
+    <li style="margin-bottom:1.3mm;"><strong>Something to check a quote against.</strong> The one- to two-page
+      bespoke <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner and
+      the contractor a basis on which to negotiate a price, and the not-included estimates in the
+      <strong>Appendix</strong> let the homeowner agree variations from a figure they already hold.</li>
+    <li><strong>Less wasted work for the contractor.</strong> The three documents prime the homeowner for what
+      the work should cost. That means fewer wasted site visits and fewer quotations that die unanswered,
+      because the contractor meets a homeowner who has already decided they are comfortable with
+      proceeding.</li>
   </ul>
 
   <div class="fine">{FINE1}</div>
