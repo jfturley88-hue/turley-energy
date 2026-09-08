@@ -406,7 +406,7 @@ doc1 = f'''<div class="sheet">
     goes in, the intended measures are selected, the three documents print, and the grant route can be
     switched at the moment of download. Document 05 shows the journey on screen and, behind it, the rate
     book the figures come from.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The rate settings.</strong> Every figure in a plan comes from a rate
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Every figure in a plan comes from a rate
     book with a version number and an effective date. Base rates are taken from the SCSI Tender Price
     Index and House Rebuilding Guide; labour from the SEO construction sector wage agreement, at the
     second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
