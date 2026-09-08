@@ -317,13 +317,14 @@ doc1 = f'''<div class="sheet">
     trust.</p>
 
   {vk('Why it is needed')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A homeowner deciding on a retrofit today faces three problems, and none of
+    them is solved by a bigger grant.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The common belief is that grants inflate the price.</strong> When
     every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin,
     and nobody can show whether it happens. The missing piece is not an increase in grants, but a
     baseline that exists before any contractor names a price.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A quote is a single number.</strong> The homeowner has nothing to
-    check it against &mdash; no scope, no quantities, and no sense of what the work should cost &mdash; so
-    the decision to proceed rests on trust alone. That is the point at which homeowners stall, having
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>There is nothing to judge a quote against.</strong> No scope, no quantities,
+    and no sense of what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point at which homeowners stall, having
     taken a BER and been told what to do, but with no way to price it.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>The contractor carries that cost too.</strong> Site visits are made
     and quotations prepared for homeowners who have not yet decided what they can afford, and much of that
@@ -335,10 +336,9 @@ doc1 = f'''<div class="sheet">
     same scope and the same starting figure in front of both sides.</p>
 
   <ul class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-left:4.2mm;padding-left:0;">
-    <li style="margin-bottom:1.3mm;"><strong>A baseline before any contractor names a price.</strong> Produced by
-      an independent energy assessor &mdash; on neither side of the deal. No installation sold, no commission
-      taken, and the figures priced from a published rate book, so the baseline is an independent one.</li>
-    <li style="margin-bottom:1.3mm;"><strong>Something to check a quote against.</strong> The one- to two-page
+    <li style="margin-bottom:1.3mm;"><strong>A baseline before any contractor names a price.</strong> Independently
+      produced by the energy assessor, from a published rate book.</li>
+    <li style="margin-bottom:1.3mm;"><strong>A reference point for every quote.</strong> The one- to two-page
       bespoke <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner and
       the contractor a basis on which to negotiate a price, and the not-included estimates in the
       <strong>Appendix</strong> let the homeowner agree variations from a figure they already hold.</li>
