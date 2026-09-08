@@ -415,18 +415,15 @@ doc1 = f'''<div class="sheet">
     'against it.',
     last=True)}
 
-  {vk('The proposition')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;"><strong>A Trusted Partner pilot.</strong> We would like to take part in the
-    NAS Trusted Partner API trial as a pilot, with a registered BER assessor named as the requestor for
-    each request and the homeowner&rsquo;s consent captured before any request is made &mdash; the terms
-    the Trusted Partner Agreement already sets out.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The pilot would measure one thing: how many more homeowners commit to a
-    retrofit when they hold these documents, against those who do not. That is the trial&rsquo;s own
-    stated focus &mdash; the impact that providing BER data has on consumer decisions. The aim is that the
-    documents bring more homeowners into a retrofit, and in turn help SEAI reach its targets.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">One question before applying: whether issuing a pricing schedule for the
-    homeowner to tender meets stage 2 of the home upgrade customer journey, or whether that stage means
-    the partner organises the quotes itself.</p>
+  {vk('What we are asking for')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A meeting to demonstrate the software live. The measures go in, the
+    documents print, and every figure can be traced to its source on screen.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">From there, we would like to discuss a small pilot &mdash; a fixed number
+    of plans, with recorded spend measured against the estimates and SEAI holding full access to the data
+    &mdash; and, if the pilot shows what we expect, participation in the NAS Trusted Partner API trial.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The practice combines registered BER assessors, years of tendering
+    experience, and the software built for this purpose. More retrofits is the aim, and it is
+    SEAI&rsquo;s target as much as ours.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">[Name] &middot; Turley Energy Consultants</span>
