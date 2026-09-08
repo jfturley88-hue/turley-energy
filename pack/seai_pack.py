@@ -46,6 +46,9 @@ GLOBE = '''<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="
   <circle cx="60" cy="60" r="55" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1.5"/>
 </svg>'''
 
+RIGHT_ARROW = '''<svg viewBox="0 0 34 24" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:16px;display:block;margin:0 auto;">
+  <path d="M2 12 H24 M17 4 L27 12 L17 20" fill="none" stroke="#B07D1A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>'''
 DOWN_ARROW = '''<svg viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:24px;display:block;margin:0 auto;">
   <path d="M12 2 V24 M4 17 L12 27 L20 17" fill="none" stroke="#B07D1A" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>'''
@@ -297,9 +300,9 @@ doc1 = f'''<div class="sheet">
       <div>Co. Monaghan &middot; info@turleyenergy.ie</div><div>[Date]</div>
     </div>
   </div>
-  <h1 style="font-size:16pt;line-height:1.2;margin:3.4mm 0 2.2mm;">Empowering homeowners with tender
+  <h1 style="font-size:16pt;line-height:1.2;margin:2.6mm 0 1.6mm;">Empowering homeowners with tender
     documents to engage in the retrofit process with confidence</h1>
-  <p class="body" style="font-size:9.8pt;line-height:1.48;margin-bottom:2.3mm;color:#1E293B;">PlanitBER
+  <p class="body" style="font-size:9.8pt;line-height:1.46;margin-bottom:1.6mm;color:#1E293B;">PlanitBER
     is software that turns a provisional BER into homeowner tender documents. It takes the measured
     geometry and the Heat Loss Indicator from a Dwelling Details Report and applies rates to the measures
     agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractors
@@ -316,36 +319,36 @@ doc1 = f'''<div class="sheet">
     quantities and published rates to the loaded figure &mdash; so no number on the plan is taken on
     trust.</p>
 
-  <table style="width:100%;border-collapse:collapse;margin-top:2.8mm;table-layout:fixed;">
+  {vk('Some of the problems it solves')}
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
+    <strong>Pricing Schedule</strong> and <strong>Appendix</strong> put the same scope and the same
+    starting figure in front of both sides. A bigger grant solves none of what follows.</p>
+  <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:0.6mm;">
+    <colgroup><col style="width:47%"/><col style="width:6%"/><col style="width:47%"/></colgroup>
     <tr>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;">
-        <div class="kick" style="font-size:8pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#B07D1A;margin-bottom:1.4mm;">Why it is needed</div>
-        <p class="body" style="margin:0;">A homeowner deciding on a retrofit today faces a number of problems,
-          and none of them is solved by a bigger grant. These four are the main ones.</p>
-      </td>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;">
-        <div class="kick" style="font-size:8pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#B07D1A;margin-bottom:1.4mm;">How these tender documents generate trust in the market</div>
-        <p class="body" style="margin:0;">The <strong>Baseline Cost Plan</strong>, <strong>Pricing
-          Schedule</strong> and <strong>Appendix</strong> act as a budgeting guide for the homeowner
-          throughout the retrofit. Issued before a contractor is contacted, they put the same scope and the
-          same starting figure in front of both sides.</p>
-      </td>
+      <td style="font-size:7.6pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8090A8;padding:0 0 1.4mm;">The problem</td>
+      <td></td>
+      <td style="font-size:7.6pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8090A8;padding:0 0 1.4mm;">How the documents answer it</td>
     </tr>
     <tr>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">The common belief is that grants inflate the price. When every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether it happens.</td>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The missing piece is not an increase in grants but a baseline that exists before any contractor names a price &mdash; independently produced by the energy assessor from a published rate book.</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Grants look like they inflate the price</div>When every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether it happens.</div></td>
+      <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A baseline before any contractor names a price</div>The missing piece is not an increase in grants but a baseline that exists first &mdash; independently produced by the energy assessor from a published rate book.</div></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">There is nothing to judge a quote against &mdash; no scope, no quantities, and no sense of what the work should cost &mdash; so the decision to proceed rests on trust alone. That is the point at which homeowners stall, having taken a BER and been told what to do, but with no way to price it.</td>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give the homeowner and the contractor a basis on which to negotiate a price. Every contractor prices the same scope and the same quantities, so quotes compare like with like.</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Nothing to judge a quote against</div>No scope, no quantities, no sense of what the work should cost, so the decision rests on trust alone. That is where homeowners stall: told what to do, with no way to price it.</div></td>
+      <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A reference point for every quote</div>The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give both sides a basis to negotiate on. Every contractor prices the same scope and quantities, so quotes compare like with like.</div></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">When a contractor&rsquo;s survey finds work the quote did not cover, the homeowner has no idea what it should cost, so every variation is argued rather than agreed.</td>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The <strong>Appendix</strong> puts a guide price on every item marked not included, so when a contractor&rsquo;s survey finds one is needed, the homeowner agrees the variation from a figure they already hold.</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Variations are argued, not agreed</div>When a contractor&rsquo;s survey finds work the quote did not cover, the homeowner has no idea what it should cost.</div></td>
+      <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A guide price for everything not included</div>The <strong>Appendix</strong> prices every item marked not included, so when one is needed the homeowner agrees the variation from a figure they already hold.</div></td>
     </tr>
     <tr>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;border-right:0.6pt solid #E3DCCB;padding-right:3.6mm;border-top:0.6pt solid #E3DCCB;">The contractor carries that cost too. Site visits are made and quotations prepared for homeowners who have not yet decided what they can afford, and much of that work is never answered and never paid for.</td>
-      <td style="vertical-align:top;padding:2mm 3.2mm 2mm 0;font-size:9.2pt;line-height:1.48;color:#2B3648;width:50%;padding-left:3.6mm;padding-right:0;border-top:0.6pt solid #E3DCCB;">The three documents prime the homeowner for what the work should cost. That means fewer wasted site visits and fewer quotations that die unanswered, because the contractor meets a homeowner who has already decided they are comfortable with proceeding.</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">The contractor&rsquo;s work goes unpaid</div>Site visits are made and quotations prepared for homeowners who have not yet decided what they can afford, and much of that work is never answered.</div></td>
+      <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Fewer wasted visits, fewer dead quotations</div>The three documents prime the homeowner for what the work should cost, so the contractor meets someone who has already decided they are comfortable with proceeding.</div></td>
     </tr>
   </table>
 
