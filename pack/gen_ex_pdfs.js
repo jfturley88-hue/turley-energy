@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
 const OUT = __dirname;
 
 const HOUSES = {
-  ex: { addr: '3 Bed Semi, Mullingar, Co. Westmeath', dwelling: 'Semi-Detached', county: 'Westmeath',
+  ex: { addr: '3 Bed Semi, Co. Westmeath', dwelling: 'Semi-Detached', county: 'Westmeath',
         scheme: 'beh', ber: ['D', 'A'], age: '1983–1993', floor: [110, 34, '2.4'], wall: 90,
         roofs: [['ceiling', 55]], win: [12, 17], doors: 2, baths: 1, ensuites: 1,
         measures: ['eu-cavity', 'eu-roof-ceiling', 'eu-windows', 'eu-doors', 'eu-ashp', 'eu-hw-cyl', 'eu-dmev'],

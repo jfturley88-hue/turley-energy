@@ -1,6 +1,6 @@
 # The SEAI pack: six connected A4 PDFs sharing one design system.
 #   01 The Value Proposition — text only: what it is, why, and where each other document fits
-#   02 The Cost Plan         — a page of notes, then the Mullingar semi-D's plan bound behind
+#   02 The Cost Plan         — a page of notes, then the example semi-D's plan bound behind
 #   03 The Pricing Schedule  — notes, then the same measured scope with every figure removed
 #   04 The Appendix          — notes, then the workings, itemised rates and guide prices
 #   05 The Workflow          — the six agreed steps, provisional BER to post-works BER
@@ -59,7 +59,7 @@ DOWN_ARROW = '''<svg viewBox="0 0 24 34" xmlns="http://www.w3.org/2000/svg" styl
 # different wordings. Correct them here and every document follows.
 
 # The worked example
-EX_ADDR   = '3 Bed Semi, Mullingar, Co. Westmeath'
+EX_ADDR   = '3 Bed Semi, Co. Westmeath'
 EX_AREA   = '110'                       # m² floor area
 EX_BUILT  = '1983&ndash;93'
 EX_BER    = 'BER D&thinsp;&rarr;&thinsp;A'
@@ -359,6 +359,32 @@ doc1 = f'''<div class="sheet">
 <div class="sheet">
   {strip(1)}
 
+  {vk('The BER Assessor workflow')}
+  {wfstep('1', 'Survey and agree the measures',
+    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
+  {wfstep('2', 'The dwelling goes into DEAP',
+    'The house as it stands is entered, then the agreed measures are added until the heat loss '
+    'indicator suits the intended heating system.')}
+  {wfstep('3', 'The report goes into PlanitBER',
+    'The standard DEAP dwelling details report, as issued today. Its geometry and heat loss indicator '
+    'fill the survey, the upgraded measures are selected, and the three documents are produced.',
+    add=True)}
+  {wfstep('4', 'Issued to the homeowner',
+    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice for '
+    'the advisory work. The homeowner holds their heat loss indicator, the scope and the guide prices, '
+    'and can tender with confidence.')}
+  {wfstep('5', 'The works happen and the final BER is issued',
+    'The final BER is commissioned after the works, as it is today, and the grants are claimed '
+    'against it.',
+    last=True)}
+
+  <div class="fine">{FINE1}</div>
+  {footer(1, '2', '3')}
+</div>
+
+<div class="sheet">
+  {strip(1)}
+
   {vk('What each document is for')}
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The document the homeowner works from for the length of the job.
@@ -388,32 +414,6 @@ doc1 = f'''<div class="sheet">
     book names its own source beneath it. The book is held in one place &mdash; under the pilot, by SEAI
     &mdash; so the assessor prices from it and cannot change it, and every plan is priced on the same
     rates. Any rate still to be calibrated is marked as such, so recorded outturns can settle it.</p>
-
-  <div class="fine">{FINE1}</div>
-  {footer(1, '2', '3')}
-</div>
-
-<div class="sheet">
-  {strip(1)}
-
-  {vk('The BER Assessor workflow')}
-  {wfstep('1', 'Survey and agree the measures',
-    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
-  {wfstep('2', 'The dwelling goes into DEAP',
-    'The house as it stands is entered, then the agreed measures are added until the heat loss '
-    'indicator suits the intended heating system.')}
-  {wfstep('3', 'The report goes into PlanitBER',
-    'The standard DEAP dwelling details report, as issued today. Its geometry and heat loss indicator '
-    'fill the survey, the upgraded measures are selected, and the three documents are produced.',
-    add=True)}
-  {wfstep('4', 'Issued to the homeowner',
-    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice for '
-    'the advisory work. The homeowner holds their heat loss indicator, the scope and the guide prices, '
-    'and can tender with confidence.')}
-  {wfstep('5', 'The works happen and the final BER is issued',
-    'The final BER is commissioned after the works, as it is today, and the grants are claimed '
-    'against it.',
-    last=True)}
 
   {vk('What we are asking for')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A meeting to demonstrate the software live. The measures go in, the
