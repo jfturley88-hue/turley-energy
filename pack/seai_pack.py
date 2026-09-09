@@ -456,7 +456,7 @@ doc6 = f'''<div class="sheet">
   {appfig('sel', '152mm', '2 &middot; The measures go in.',
     'Every measure to be carried out is ticked. Quantities come from the DEAP geometry already entered, the sidebar fills as it goes in, and nothing is measured twice.')}
 
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '1', '7')}
 </div>
 
@@ -474,7 +474,7 @@ doc6 = f'''<div class="sheet">
   {appfig('appplan', '162mm', '4 &middot; The plan on screen.',
     'The baseline fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
 
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '2', '7')}
 </div>
 
@@ -517,21 +517,29 @@ doc6 = f'''<div class="sheet">
     </div>
   </div>
 
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '3', '7')}
 </div>
 
 <div class="sheet">
   {strip(5)}
-  {appfig('rates', '134mm', '6 &middot; Rate Settings, open to inspection.',
-    'Labour at the SEO August 2026 rates &mdash; every unit price, labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
-  {appfig('grants', '134mm', '7 &middot; The SEAI grant table the plans draw from.',
+  <div class="kick">Part two &mdash; the rate book behind it</div>
+  <h2 style="font-size:21pt;margin-bottom:3mm;">Where the figures come from</h2>
+  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;">Every figure in a plan comes from a rate book with a version number and
+    an effective date. The assessor prices from it and cannot change it: the book is held in one place and
+    published by one administrator &mdash; under the pilot, SEAI &mdash; so every plan is priced on the
+    same rates. Base rates come from the SCSI Tender Price Index and House Rebuilding Guide; labour from
+    the SEO Construction Sector wage agreement, at the second-phase rates effective 1 August 2026; the
+    county multiplier from the SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published amounts;
+    VAT as Revenue applies it. Each block names its own source beneath it, and any rate still to be
+    calibrated is marked, so the pilot&rsquo;s recorded outturns can settle it.</p>
+  <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;">The pages that follow are that book as it appears on screen: the labour
+    rates and the grant table first, then the unit rates, top to bottom.</p>
+  {appfig('rates', '104mm', 'Labour, at the SEO August 2026 rates.',
+    'Every labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
+  {appfig('grants', '104mm', 'The SEAI grant table the plans draw from.',
     'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
-
-  <p class="body" style="font-size:8pt;color:#64748B;margin-top:2mm;">Where each rate comes from, and how the
-    book is versioned and inspected, is in part two of this document.</p>
-
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">{FINE1}</div>
   {footer(5, '4', '7')}
 </div>'''
 
@@ -548,21 +556,7 @@ def engfig(key, w, lead, rest):
 
 doc7 = f'''<div class="sheet">
   {strip(5)}
-  <div class="kick">Part two &mdash; the rate book behind it</div>
-  <h2 style="font-size:21pt;margin-bottom:3mm;">Where the figures come from</h2>
-  <p class="body" style="{ENG_P}">Every figure in a plan comes from a rate book with a version number and
-    an effective date. The assessor prices from it and cannot change it: the book is held in one place and
-    published by one administrator &mdash; under the pilot, SEAI &mdash; so every plan is priced on the
-    same rates. The three pages that follow are that book, top to bottom, exactly as it appears on screen.</p>
-  <p class="body" style="{ENG_P}"><strong>Where the rates come from.</strong> Base rates from the SCSI
-    Tender Price Index and House Rebuilding Guide; labour from the SEO Construction Sector wage agreement,
-    at the second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
-    Supplement; grants at SEAI&rsquo;s published amounts; VAT as Revenue applies it. Each block names its
-    own source beneath it.</p>
-  <p class="body" style="{ENG_P}"><strong>Held in one place.</strong> Every rate shows its published value and
-    its source. A change is made once, centrally, and every plan priced afterwards follows. The panel
-    marks any rate still to be calibrated, so the pilot&rsquo;s recorded outturns can settle it.</p>
-  {engfig('eng_a', '156mm', 'Walls, heat pump and ventilation.',
+  {engfig('eng_a', '170mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
   {footer(5, '5', '7')}
@@ -572,7 +566,7 @@ doc7 = f'''<div class="sheet">
   {strip(5)}
   {engfig('eng_b', '172mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
     'The frame and style multipliers for windows are written out under the table, so a triple-glazed alu-clad sash window can be traced from the base rate. The attic ancillaries are the items every attic top-up carries as standard: the tank jacket, the pipe lagging, the walkway and the storage deck.')}
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '6', '7')}
 </div>
 
@@ -586,7 +580,7 @@ doc7 = f'''<div class="sheet">
     one place, feeding both.</p>
   {engfig('eng_c', '172mm', 'Variations &mdash; not included guide rates.',
     'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outturns.')}
-  <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
+  <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '7', '7')}
 </div>'''
 

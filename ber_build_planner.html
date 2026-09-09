@@ -18902,18 +18902,19 @@ function exportContractorSchedule() {
       // the same standing beside it that Variation Notes has on the plan. Proportional, so
       // the writing columns keep usable space at any page width.
       '<colgroup><col style="width:4%"/><col style="width:19%"/><col style="width:33%"/><col style="width:26%"/><col style="width:18%"/></colgroup>' +
-      '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
+      '<thead>' +
+      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
+        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity. ' +
+        'Anything your survey finds beyond this scope goes under Variations, itemised with its price, to be agreed ' +
+        'with the homeowner before work starts.' +
+      '</td></tr>' +
+      '<tr style="background:#F1F5F9;color:#1E293B;">' +
         '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Scope &amp; Quantities</th>' +
         '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Variations &mdash; your survey</th>' +
         '<th style="padding:5px 8px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Price</th>' +
-      '</tr>' +
-      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
-        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity. ' +
-        'Anything your survey finds beyond this scope goes under Variations, itemised with its price, to be agreed ' +
-        'with the homeowner before work starts.' +
-      '</td></tr></thead>' +
+      '</tr></thead>' +
       '<tbody>'+rows+'</tbody>' +
     '</table>' +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
