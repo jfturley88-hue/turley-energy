@@ -308,7 +308,7 @@ doc1 = f'''<div class="sheet">
     agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractors
     Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">These three bespoke documents, issued with the provisional BER before a
-    contractor has been contacted, designed to empower homeowners to engage with confidence in the
+    contractor has been contacted, are designed to empower homeowners to engage with confidence in the
     retrofit process. Each measure on the <strong>Baseline Cost Plan</strong> carries a Baseline Scope
     &amp; Quantities and Budget Estimate column. Contractors then price against that same Baseline Scope
     &amp; Quantities, which is in the <strong>Contractors Pricing Schedule</strong>, so quotes compare
@@ -322,7 +322,7 @@ doc1 = f'''<div class="sheet">
   {vk('Some of the problems it solves')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
     <strong>Pricing Schedule</strong> and <strong>Appendix</strong> put the same scope and the same
-    starting figure in front of both sides. A bigger grant solves none of what follows.</p>
+    starting figure in front of both sides.</p>
   <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:0.6mm;">
     <colgroup><col style="width:47%"/><col style="width:6%"/><col style="width:47%"/></colgroup>
     <tr>
@@ -331,12 +331,12 @@ doc1 = f'''<div class="sheet">
       <td style="font-size:7.6pt;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#8090A8;padding:0 0 1.4mm;">How the documents answer it</td>
     </tr>
     <tr>
-      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Grants look like they inflate the price</div>When every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin, and nobody can show whether it happens.</div></td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Grants look like they inflate the price</div>When every figure a homeowner sees comes from the contractors quoting, the grant becomes invisible margin and nobody can show whether it happens.</div></td>
       <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
       <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A baseline before any contractor names a price</div>The missing piece is not an increase in grants but a baseline that exists first &mdash; independently produced by the energy assessor from a published rate book.</div></td>
     </tr>
     <tr>
-      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Nothing to judge a quote against</div>No scope, no quantities, no sense of what the work should cost, so the decision rests on trust alone. That is where homeowners stall: told what to do, with no way to price it.</div></td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Nothing to judge a quote against</div>No scope, no quantities, no sense of what the work should cost, so the decision rests on trust alone. That is where homeowners stall: told what they should do but unsure of grants and what it could cost.</div></td>
       <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
       <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A reference point for every quote</div>The <strong>Baseline Cost Plan</strong> and <strong>Pricing Schedule</strong> give both sides a basis to negotiate on. Every contractor prices the same scope and quantities, so quotes compare like with like.</div></td>
     </tr>
@@ -352,7 +352,6 @@ doc1 = f'''<div class="sheet">
     </tr>
   </table>
 
-  <div class="fine">{FINE1}</div>
   {footer(1, '1', '3')}
 </div>
 
@@ -367,18 +366,18 @@ doc1 = f'''<div class="sheet">
     'indicator suits the intended heating system.')}
   {wfstep('3', 'The report goes into PlanitBER',
     'The standard DEAP dwelling details report, as issued today. Its geometry and heat loss indicator '
-    'fill the survey, the upgraded measures are selected, and the three documents are produced.',
+    'are taken from the report and used, along with the selected measures, to create three bespoke '
+    'documents for each house.',
     add=True)}
   {wfstep('4', 'Issued to the homeowner',
     'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice for '
-    'the advisory work. The homeowner holds their heat loss indicator, the scope and the guide prices, '
-    'and can tender with confidence.')}
+    'the advisory work. The homeowner holds their baseline scope, schedule and guide prices, so they '
+    'can tender with confidence.')}
   {wfstep('5', 'The works happen and the final BER is issued',
     'The final BER is commissioned after the works, as it is today, and the grants are claimed '
     'against it.',
     last=True)}
 
-  <div class="fine">{FINE1}</div>
   {footer(1, '2', '3')}
 </div>
 
@@ -388,9 +387,9 @@ doc1 = f'''<div class="sheet">
   {vk('What each document is for')}
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The document the homeowner works from for the length of the job.
-    Every measure carries its scope, the grant it earns and a budget estimate, all fixed at the date of
+    Every measure carries a baseline scope, the grant it earns and a budget estimate, all fixed at the date of
     issue, and beside them a live half left blank for quotes, variations and what was actually paid. It is
-    the reference the homeowner keeps, not a quote and not a tender return.</p>
+    a budgeting tool that keeps homeowners on track with their own budget during energy upgrades.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Pricing Schedule <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_03_The_Pricing_Schedule.pdf</span></div>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The same measured scope with every figure removed, issued to each
     contractor asked to quote. Because they all price the same scope and the same quantities, the returns
@@ -398,7 +397,7 @@ doc1 = f'''<div class="sheet">
     as a variation rather than buried in a single number.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Appendix <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_04_The_Appendix.pdf</span></div>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The arithmetic behind the plan and the guide prices for what it
-    deliberately leaves out. Materials and labour, the contractor&rsquo;s overhead and profit, and the VAT
+    deliberately leaves out. Materials and labour, the contractor&rsquo;s overhead and profit and the VAT
     band, measure by measure &mdash; so the homeowner can see how a figure was reached, and holds a guide
     price before a variation is ever discussed.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Software <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_05_The_Software.pdf</span></div>
@@ -411,14 +410,13 @@ doc1 = f'''<div class="sheet">
     Index and House Rebuilding Guide; labour from the SEO construction sector wage agreement, at the
     second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
     Supplement; grants at SEAI&rsquo;s published amounts; and VAT as Revenue applies it. Each block of the
-    book names its own source beneath it. The book is held in one place &mdash; under the pilot, by SEAI
-    &mdash; so the assessor prices from it and cannot change it, and every plan is priced on the same
-    rates. Any rate still to be calibrated is marked as such, so recorded outturns can settle it.</p>
+    book names its own source beneath it. The book is held in one place, by SEAI, so the assessor prices from it and cannot change it, and every plan is priced on the same
+    rates. Any rate still to be calibrated is marked as such, so recorded outcomes during a pilot can settle it.</p>
 
   {vk('What we are asking for')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A meeting to demonstrate the software live. The measures go in, the
     documents print, and every figure can be traced to its source on screen.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">From there, we would like to discuss a small pilot &mdash; a fixed number
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">From there, we would like to discuss a pilot &mdash; a fixed number
     of plans, with recorded spend measured against the estimates and SEAI holding full access to the data
     &mdash; and, if the pilot shows what we expect, participation in the NAS Trusted Partner API trial.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The practice combines registered BER assessors, years of tendering
@@ -430,7 +428,6 @@ doc1 = f'''<div class="sheet">
     <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; [Phone] &middot; info@turleyenergy.ie</span>
   </div>
 
-  <div class="fine">{FINE1}</div>
   {footer(1, '3', '3')}
 </div>'''
 
