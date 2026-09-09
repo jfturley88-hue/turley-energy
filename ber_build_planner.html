@@ -18903,11 +18903,6 @@ function exportContractorSchedule() {
       // the writing columns keep usable space at any page width.
       '<colgroup><col style="width:4%"/><col style="width:19%"/><col style="width:33%"/><col style="width:26%"/><col style="width:18%"/></colgroup>' +
       '<thead>' +
-      '<tr><td colspan="5" style="padding:4px 6px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;">' +
-        'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity. ' +
-        'Anything your survey finds beyond this scope goes under Variations, itemised with its price, to be agreed ' +
-        'with the homeowner before work starts.' +
-      '</td></tr>' +
       '<tr style="background:#F1F5F9;color:#1E293B;">' +
         '<th style="padding:5px 4px;text-align:center;font-size:7pt;border:1px solid #CBD5E1;">#</th>' +
         '<th style="padding:5px 6px;text-align:left;font-size:7pt;border:1px solid #CBD5E1;">Measure</th>' +
@@ -18917,6 +18912,14 @@ function exportContractorSchedule() {
       '</tr></thead>' +
       '<tbody>'+rows+'</tbody>' +
     '</table>' +
+    // The instruction sits at the foot, where a contractor reads it after the scope rather than
+    // as a preamble. A price is asked for where one can be given, and each variation is agreed
+    // before it is done - not before the job starts, since some are only found mid-job.
+    '<div style="margin-top:6px;padding:5px 8px;font-size:7pt;color:#475569;background:#F8FAFC;border:1px solid #CBD5E1;font-style:italic;line-height:1.5;">' +
+      'Quantities are the BER assessor\'s measurement. Please confirm, or amend and note the revised quantity. ' +
+      'Anything your survey finds beyond this scope goes under Variations, with a price where you can give one. ' +
+      'Each is agreed with the homeowner before it is done.' +
+    '</div>' +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
       'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
       ' · Scope prepared independently of any contractor.' +
