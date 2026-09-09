@@ -49,7 +49,17 @@ const fresh = async (b, w, h) => {
   p.on('pageerror', e => errs.push('selector: ' + e.message));
   await build(p, WESTPORT);
   await p.waitForTimeout(700);
-  await p.evaluate(() => switchTab(0));
+  // the measures, not the project form again: open the works selector and bring it to the top
+  await p.evaluate(() => {
+    const panel = document.getElementById('eu-works-panel');
+    if (panel && !panel.classList.contains('open')) panel.classList.add('open');
+    // open the first two groups so the ticked measures are on screen, not just in the sidebar
+    [...document.querySelectorAll('#eu-works-panel .ws-group-toggle')].slice(0, 2)
+      .forEach(b => { if (!b.classList.contains('open')) wsToggle(b); });
+    const btn = panel && panel.previousElementSibling;
+    (btn || panel).scrollIntoView({ block: 'start' });
+    window.scrollBy(0, -8);
+  });
   await p.waitForTimeout(400);
   await p.screenshot({ path: OUT + '/app_selector.png' });
   const measures = await p.evaluate(() =>

@@ -453,8 +453,8 @@ doc6 = f'''<div class="sheet">
   {appfig('home', '152mm', '1 &middot; Choose the project type.',
     'New Build, Refurbishment and Energy Upgrade share one engine and one rate base.')}
   <div class="arrowrow">{DOWN_ARROW}</div>
-  {appfig('sel', '152mm', '2 &middot; The survey becomes a project.',
-    'DEAP geometry, the measures the homeowner wants, the county and the grant scheme &mdash; the status bar and sidebar fill as it goes in, and nothing is measured twice.')}
+  {appfig('sel', '152mm', '2 &middot; The measures go in.',
+    'Every measure to be carried out is ticked. Quantities come from the DEAP geometry already entered, the sidebar fills as it goes in, and nothing is measured twice.')}
 
   <div class="fine">Screens from the live software, 2 September 2026, unedited.</div>
   {footer(5, '1', '7')}
