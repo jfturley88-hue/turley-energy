@@ -420,7 +420,7 @@ doc1 = f'''<div class="sheet">
     of plans, with recorded spend measured against the estimates and SEAI holding full access to the data
     &mdash; and, if the pilot shows what we expect, participation in the NAS Trusted Partner API trial.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The practice combines registered BER assessors, years of tendering
-    experience, and the software built for this purpose. More retrofits is the aim, and it is
+    experience and the software built for this purpose. More retrofits is the aim and it is
     SEAI&rsquo;s target as much as ours.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
