@@ -535,10 +535,8 @@ doc6 = f'''<div class="sheet">
     calibrated is marked, so the pilot&rsquo;s recorded outturns can settle it.</p>
   <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;">The pages that follow are that book as it appears on screen: the labour
     rates and the grant table first, then the unit rates, top to bottom.</p>
-  {appfig('rates', '104mm', 'Labour, at the SEO August 2026 rates.',
+  {appfig('rates', '140mm', 'Labour, at the SEO August 2026 rates.',
     'Every labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
-  {appfig('grants', '104mm', 'The SEAI grant table the plans draw from.',
-    'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
   <div class="fine">{FINE1}</div>
   {footer(5, '4', '7')}
 </div>'''
@@ -556,7 +554,9 @@ def engfig(key, w, lead, rest):
 
 doc7 = f'''<div class="sheet">
   {strip(5)}
-  {engfig('eng_a', '170mm', 'Walls, heat pump and ventilation.',
+  {appfig('grants', '140mm', 'The SEAI grant table the plans draw from.',
+    'Every amount dated and visible &mdash; when SEAI changes a rate, one number changes and every new plan follows.')}
+  {engfig('eng_a', '140mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
   {footer(5, '5', '7')}
@@ -564,7 +564,7 @@ doc7 = f'''<div class="sheet">
 
 <div class="sheet">
   {strip(5)}
-  {engfig('eng_b', '172mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
+  {engfig('eng_b', '140mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
     'The frame and style multipliers for windows are written out under the table, so a triple-glazed alu-clad sash window can be traced from the base rate. The attic ancillaries are the items every attic top-up carries as standard: the tank jacket, the pipe lagging, the walkway and the storage deck.')}
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '6', '7')}
@@ -578,7 +578,7 @@ doc7 = f'''<div class="sheet">
     contractor proposes a variation, the figure the homeowner holds against it comes from this table; and
     when an item is ticked into a plan after the survey, its priced line uses the same rate. One number, in
     one place, feeding both.</p>
-  {engfig('eng_c', '172mm', 'Variations &mdash; not included guide rates.',
+  {engfig('eng_c', '140mm', 'Variations &mdash; not included guide rates.',
     'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outturns.')}
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '7', '7')}

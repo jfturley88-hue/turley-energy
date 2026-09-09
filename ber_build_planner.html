@@ -7428,13 +7428,15 @@ function selectProjectType(mode) {
   const _eu1 = document.getElementById('demo-btn-eu1');
   if (_eu1) _eu1.style.display = mode === 'Energy Upgrade' ? '' : 'none';
 
-  // Selection forms exist for two of the three modes; Refurbishment has none.
+  // Only New Build has a client selection form. Energy Upgrade measures are agreed on the
+  // survey and put into DEAP for the provisional BER, then entered here; nothing is ticked
+  // on paper. Refurbishment never had one.
   const _frow = document.getElementById('form-btn-row');
-  if (_frow) _frow.style.display = mode === 'Refurbishment' ? 'none' : 'flex';
+  if (_frow) _frow.style.display = mode === 'New Build' ? 'flex' : 'none';
   const _fnb = document.getElementById('form-btn-nb');
   if (_fnb) _fnb.style.display = mode === 'New Build' ? '' : 'none';
   const _feu = document.getElementById('form-btn-eu');
-  if (_feu) _feu.style.display = mode === 'Energy Upgrade' ? '' : 'none';
+  if (_feu) _feu.style.display = 'none';
 
   const hints = {
     'New Build':      'New Build \u2014 8 measurement tabs will open',
@@ -18207,9 +18209,9 @@ function _updateEUPDFBtns(isPlan, mode) {
     // their summary and the evidence sits behind it. The Pricing Schedule is the same scope
     // with every figure removed, so a contractor prices it without seeing the estimate.
     var formBtn = '';
-    if (mode === 'Energy Upgrade' || mode === 'New Build') {
-      var formKind  = mode === 'Energy Upgrade' ? 'eu' : 'nb';
-      var formLabel = mode === 'Energy Upgrade' ? 'Survey Selection Form (PDF)' : 'Homeowner Selection Form (PDF)';
+    if (mode === 'New Build') {
+      var formKind  = 'nb';
+      var formLabel = 'Homeowner Selection Form (PDF)';
       formBtn = '<button onclick="exportSelectionForm(\'' + formKind + '\')" title="Reprint the blank client selection form" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128221; ' + formLabel + '</button>';
     }
     // Grant route selector at the moment of download — the same selectPlanRoute the
