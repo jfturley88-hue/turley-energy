@@ -418,7 +418,9 @@ doc1 = f'''<div class="sheet">
     documents print, and every figure can be traced to its source on screen.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">From there, we would like to discuss a pilot &mdash; a fixed number
     of plans, with recorded spend measured against the estimates and SEAI holding full access to the data
-    &mdash; and, if the pilot shows what we expect, participation in the NAS Trusted Partner API trial.</p>
+    &mdash; and, if the pilot shows what we expect, participation in the NAS Trusted Partner API trial, so
+    that households which already hold a BER and have not gone ahead can be offered the three documents
+    with their consent, and the trial can measure how many then commit.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The practice combines registered BER assessors, years of tendering
     experience and the software built for this purpose. More retrofits is the aim and it is
     SEAI&rsquo;s target as much as ours.</p>
