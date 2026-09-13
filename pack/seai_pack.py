@@ -268,14 +268,14 @@ FINE1 = ('PlanitBER V1 &middot; '
 # the eye hunt for each line start. The one new step is tinted and darker-edged so the
 # page makes its argument at a glance.
 def wfstep(n, title, body, note='', last=False, add=False, sub=''):
-    arrow = '' if last else f'<div style="padding:1mm 0 0.6mm;">{DOWN_ARROW}</div>'
+    arrow = '' if last else f'<div style="padding:0.5mm 0 0.2mm;">{DOWN_ARROW}</div>'
     # The existing steps are context, so they recede: grey discs, no accent edge. Gold is
     # spent on the one step being proposed, which is what the page is for.
     edge  = '#B07D1A' if add else '#D8D2C4'
     bg    = '#FFFAF0' if add else '#FFFFFF'
     disc  = '#B07D1A' if add else '#AEB4BE'
     ncol  = '#B07D1A' if add else '#A0A8B4'
-    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:3.4mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
+    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:2.9mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
       <div style="display:flex;align-items:center;gap:3mm;margin-bottom:1.6mm;">
         <span style="flex-shrink:0;width:6.4mm;height:6.4mm;border-radius:50%;background:{disc};color:#fff;
                      font-family:'Fraunces',Georgia,serif;font-size:9.5pt;font-weight:800;
@@ -307,17 +307,23 @@ doc1 = f'''<div class="sheet">
     geometry and the Heat Loss Indicator from a Dwelling Details Report and applies rates to the measures
     agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractors
     Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">These three bespoke documents, issued with the provisional BER before a
-    contractor has been contacted, are designed to empower homeowners to engage with confidence in the
-    retrofit process. Each measure on the <strong>Baseline Cost Plan</strong> carries a Baseline Scope
-    &amp; Quantities and Budget Estimate column. Contractors then price against that same Baseline Scope
-    &amp; Quantities, which is in the <strong>Contractors Pricing Schedule</strong>, so quotes compare
-    like with like and include potential variations. The <strong>Appendix</strong> then serves the
-    homeowner in two ways. It puts a guide price on every item marked &lsquo;not included&rsquo;, so if a
-    contractor&rsquo;s survey finds one is needed, the homeowner already knows what it should cost before
-    agreeing it. It also shows how each Baseline Budget Estimate was built &mdash; from measured
-    quantities and published rates to the loaded figure &mdash; so no number on the plan is taken on
-    trust.</p>
+  {vk('The three documents, and variations')}
+  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A priced bill of quantities with a defined scope for every measure, so
+    anything outside it is a variation rather than a surprise. For example: Cavity wall insulation &mdash; wall area 90&thinsp;m&sup2;, blown bonded bead to the 50&thinsp;mm cavity, making good included. Not included: room ventilation and air intake vents.</p>
+  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Pricing Schedule <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_03_The_Pricing_Schedule.pdf</span></div>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Tendered to the contractor. The same bill of quantities with the same
+    defined scope and every figure removed, so each contractor prices the same work. The example above
+    appears on it word for word, exclusion included.</p>
+  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">Variations</div>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Required measures that are not in the Baseline Cost Plan. After their
+    survey, the contractor adds any required variations to the Pricing Schedule, with a price.</p>
+  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Appendix <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_04_The_Appendix.pdf</span></div>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A list of priced variations, so the homeowner can finalise a deal with
+    the contractor from a figure they already hold. It also sets out the scope of every measure in the
+    Baseline Cost Plan, and how each figure was built.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:0.6mm;font-weight:600;color:#1E293B;">PlanitBER enables both parties to reach
+    agreement.</p>
 
   {vk('Some of the problems it solves')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
@@ -346,13 +352,13 @@ doc1 = f'''<div class="sheet">
       <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">A guide price for everything not included</div>The <strong>Appendix</strong> prices every item marked not included, so when one is needed the homeowner agrees the variation from a figure they already hold.</div></td>
     </tr>
     <tr>
-      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">The contractor&rsquo;s work goes unpaid</div>Site visits are made and quotations prepared for homeowners who have not yet decided what they can afford, and much of that work is never answered.</div></td>
+      <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFFFF;border-left:2.4pt solid #D8D2C4;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">The contractor&rsquo;s work goes unpaid</div>Site visits are made and quotations prepared for homeowners who do not yet know whether they can afford to proceed, because they do not know what it will cost and are guessing.</div></td>
       <td style="width:6%;vertical-align:middle;padding:0 0 1.4mm;">{RIGHT_ARROW}</td>
       <td style="width:47%;vertical-align:top;padding:0 0 1.4mm;"><div style="border:0.6pt solid #D8D2C4;border-radius:2pt;padding:1.8mm 3mm 1.9mm;font-size:8.4pt;line-height:1.36;color:#3F4A5A;background:#FFFAF0;border-left:3.6pt solid #B07D1A;"><div style="font-family:'Fraunces',Georgia,serif;font-size:9.9pt;font-weight:800;color:#1E293B;line-height:1.15;margin-bottom:1mm;">Fewer wasted visits, fewer dead quotations</div>The three documents prime the homeowner for what the work should cost, so the contractor meets someone who has already decided they are comfortable with proceeding.</div></td>
     </tr>
   </table>
 
-  {footer(1, '1', '3')}
+  {footer(1, '1', '2')}
 </div>
 
 <div class="sheet">
@@ -360,7 +366,7 @@ doc1 = f'''<div class="sheet">
 
   {vk('The BER Assessor workflow')}
   {wfstep('1', 'Survey and agree the measures',
-    'The assessor surveys the dwelling and agrees the intended measures with the homeowner.')}
+    'The assessor surveys the dwelling, counts the rooms on each floor, notes the roof form and its gables, and agrees the intended measures with the homeowner.')}
   {wfstep('2', 'The dwelling goes into DEAP',
     'The house as it stands is entered, then the agreed measures are added until the heat loss '
     'indicator suits the intended heating system.')}
@@ -370,40 +376,13 @@ doc1 = f'''<div class="sheet">
     'documents for each house.',
     add=True)}
   {wfstep('4', 'Issued to the homeowner',
-    'The three documents go out with the dwelling details report and the assessor&rsquo;s invoice for '
-    'the advisory work. The homeowner holds their baseline scope, schedule and guide prices, so they '
-    'can tender with confidence.')}
-  {wfstep('5', 'The works happen and the final BER is issued',
-    'The final BER is commissioned after the works, as it is today, and the grants are claimed '
-    'against it.',
+    'The three documents go out with the dwelling details report. The homeowner holds their '
+    'baseline scope, schedule and guide prices, so they can tender with confidence.',
     last=True)}
 
-  {footer(1, '2', '3')}
-</div>
-
-<div class="sheet">
-  {strip(1)}
-
-  {vk('What each document is for')}
-  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The document the homeowner works from for the length of the job.
-    Every measure carries a baseline scope, the grant it earns and a budget estimate, all fixed at the date of
-    issue, and beside them a live half left blank for quotes, variations and what was actually paid. It is
-    a budgeting tool that keeps homeowners on track with their own budget during energy upgrades.</p>
-  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Pricing Schedule <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_03_The_Pricing_Schedule.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The same measured scope with every figure removed, issued to each
-    contractor asked to quote. Because they all price the same scope and the same quantities, the returns
-    compare like with like, and anything a contractor&rsquo;s own survey finds beyond that scope is entered
-    as a variation rather than buried in a single number.</p>
-  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Appendix <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_04_The_Appendix.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The arithmetic behind the plan and the guide prices for what it
-    deliberately leaves out. Materials and labour, the contractor&rsquo;s overhead and profit and the VAT
-    band, measure by measure &mdash; so the homeowner can see how a figure was reached, and holds a guide
-    price before a variation is ever discussed.</p>
-  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:2.2mm 0 0.8mm;">The Software <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_05_The_Software.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running after close to a year in development: the survey
-    goes in, the intended measures are selected, the three documents print, and the grant route can be
-    switched at the moment of download. Document 05 shows the journey on screen and, behind it, the rate
+  <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:3.4mm 0 0.5mm;">The Software</div>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running: the survey goes in, the measures are selected, the
+    three documents print, and the grant route can be switched at the moment of download. Document 05 shows the journey on screen and, behind it, the rate
     book the figures come from.</p>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Every figure in a plan comes from a rate
     book with a version number and an effective date. Base rates are taken from the SCSI Tender Price
@@ -430,7 +409,7 @@ doc1 = f'''<div class="sheet">
     <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; [Phone] &middot; info@turleyenergy.ie</span>
   </div>
 
-  {footer(1, '3', '3')}
+  {footer(1, '2', '2')}
 </div>'''
 
 # ── 05 · THE SOFTWARE — part one, the journey on screen ──────────────────────
