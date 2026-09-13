@@ -309,21 +309,19 @@ doc1 = f'''<div class="sheet">
     Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
   {vk('The three documents, and variations')}
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A priced bill of quantities with a defined scope for every measure, so
-    anything outside it is a variation rather than a surprise. For example: Cavity wall insulation &mdash; wall area 90&thinsp;m&sup2;, blown bonded bead to the 50&thinsp;mm cavity, making good included. Not included: room ventilation and air intake vents.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is a priced bill of quantities, eliminating possible variations. e.g. Cavity wall insulation &mdash; 80&thinsp;m&sup2; of an additional 50&thinsp;mm of bonded bead added to the cavity and make good. Excluded: room ventilation requirement.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Pricing Schedule <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_03_The_Pricing_Schedule.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Tendered to the contractor. The same bill of quantities with the same
-    defined scope and every figure removed, so each contractor prices the same work. The example above
-    appears on it word for word, exclusion included.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is tendered to the contractor. It is a baseline bill of quantities with a
+    defined scope. e.g. Cavity wall insulation &mdash; 80&thinsp;m&sup2; of an additional 50&thinsp;mm of bonded bead added to the cavity and make good. Excluded: room ventilation requirement.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">Variations</div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Required measures that are not in the Baseline Cost Plan. After their
-    survey, the contractor adds any required variations to the Pricing Schedule, with a price.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Are required measures that are not included in the Baseline Cost Plan.
+    Post survey, the contractor can add required variations to the Pricing Schedule.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Appendix <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_04_The_Appendix.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A list of priced variations, so the homeowner can finalise a deal with
-    the contractor from a figure they already hold. It also sets out the scope of every measure in the
-    Baseline Cost Plan, and how each figure was built.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:0.6mm;font-weight:600;color:#1E293B;">PlanitBER enables both parties to reach
-    agreement.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is a list of priced variations which empowers the homeowner to finalise a
+    deal with the contractor. The Appendix also includes the scope of each measure included in the
+    Baseline Cost Plan.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;margin-bottom:0.6mm;font-weight:600;color:#1E293B;">PlanitBER enables both
+    parties to achieve mutual agreement.</p>
 
   {vk('Some of the problems it solves')}
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
