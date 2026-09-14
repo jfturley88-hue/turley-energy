@@ -309,7 +309,8 @@ doc1 = f'''<div class="sheet">
     Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
   {vk('The three documents, and variations')}
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is a priced bill of quantities, eliminating possible variations. e.g. Cavity wall insulation &mdash; wall area 90&thinsp;m&sup2;, blown bonded bead to the 50&thinsp;mm cavity, making good included. Excluded: room ventilation and air intake vents.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is a priced bill of quantities, eliminating possible variations. e.g. Cavity wall insulation &mdash; wall area 90&thinsp;m&sup2;, blown bonded bead to the 50&thinsp;mm cavity, making good included. Excluded: room ventilation and air intake vents. It also acts as a budget guide for the homeowner
+    throughout the works.</p>
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.4mm 0 0.5mm;">The Pricing Schedule <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_03_The_Pricing_Schedule.pdf</span></div>
   <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Is tendered to the contractor. It is a baseline bill of quantities with a
     defined scope. e.g. Cavity wall insulation &mdash; wall area 90&thinsp;m&sup2;, blown bonded bead to the 50&thinsp;mm cavity, making good included. Excluded: room ventilation and air intake vents.</p>
