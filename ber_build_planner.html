@@ -14910,7 +14910,7 @@ window._planExclusionBand = _planExclusionBand;
 // Schedule, so telling the homeowner to have contractors "quote against the Estimated
 // Spend" would hand over the very figure the schedule exists to withhold.
 var EU_HOW_TO_USE =
-  'The Net Cost figure above is roughly what this work should leave you to pay once grants ' +
+  'The Net to fund figure above is roughly what this work should leave you to pay once grants ' +
   'are applied. Ask each contractor to quote against the scope listed under every measure, so ' +
   'all the quotes you get price the same work. ' +
   // Without this the homeowner never learns the other two documents exist — and the
@@ -18686,7 +18686,7 @@ function exportEUPDF(mode) {
       '<h3 style="font-size:10pt;color:#1E293B;margin-bottom:6px;">What every Budget Est. figure includes</h3>' +
       '<p style="font-size:9pt;color:#334155;margin-bottom:8px;">Every Budget Est. figure on the Cost Plan is a fully-loaded cost that includes:</p>' +
       '<ul style="font-size:9pt;color:#334155;margin-bottom:12px;">' +
-        '<li><strong>Materials</strong>: Irish merchant pricing Q1–Q2 2026 (SCSI Cost Supplement Aug 2025)</li>' +
+        '<li><strong>Materials</strong>: Irish merchant pricing Q2–Q3 2026 (SCSI Cost Supplement Aug 2025)</li>' +
         '<li><strong>Labour</strong>: SEO National Wage Agreement 2024 rates, adjusted for Co. '+(pi.county||'—')+' (×'+(pi.labourMultiplier||1).toFixed(2)+')</li>' +
         '<li><strong>Contractor\'s Overhead &amp; Profit</strong>: 12% on materials + labour</li>' +
         '<li><strong>VAT</strong>: 13.5% on works; 9% on heat pump supply &amp; installation (Finance Act 2024); 0% on Solar PV (Revenue ruling May 2023)</li>' +
@@ -18783,7 +18783,7 @@ function exportEUPDF(mode) {
     schemeNoteHTML =
       '<div style="font-size:6.5pt;margin-top:6px;padding:5px 8px;border-radius:4px;line-height:1.5;background:#F8FAFC;border:1px solid #E2E8F0;color:#475569;">' +
       '<strong>Better Energy Homes — grants are paid after the works.</strong> ' +
-      'You pay the contractor the full Est. Spend and claim the grant back once the work is complete and compliant, so the gross figure is what you need available. ' +
+      'You pay the contractor the full Budget Est. and claim the grant back once the work is complete and compliant, so the gross figure is what you need available. ' +
       'Grant approval must be in place before work starts.' +
       '</div>';
   } else if (_sk === 'oss') {

@@ -305,7 +305,7 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9.8pt;line-height:1.46;margin-bottom:1.6mm;color:#1E293B;">PlanitBER
     is software that turns a provisional BER into homeowner tender documents. It takes the measured
     geometry and the Heat Loss Indicator from a Dwelling Details Report and applies rates to the measures
-    agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractors
+    agreed with the homeowner, producing a <strong>Baseline Cost Plan</strong>, a <strong>Contractor
     Pricing Schedule</strong> and an <strong>Appendix</strong> of guide prices.</p>
   {vk('The three documents, and variations')}
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:1.1mm 0 0.4mm;">The Baseline Cost Plan <span style="font-weight:400;font-size:7.8pt;color:#64748B;letter-spacing:.01em;">&nbsp;&middot;&nbsp; PlanitBER_02_The_Baseline_Cost_Plan.pdf</span></div>
@@ -504,12 +504,12 @@ doc6 = f'''<div class="sheet">
   <h2 style="font-size:21pt;margin-bottom:3mm;">Where the figures come from</h2>
   <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;">Every figure in a plan comes from a rate book with a version number and
     an effective date. The assessor prices from it and cannot change it: the book is held in one place and
-    published by one administrator &mdash; under the pilot, SEAI &mdash; so every plan is priced on the
+    published by one administrator, SEAI, so every plan is priced on the
     same rates. Base rates come from the SCSI Tender Price Index and House Rebuilding Guide; labour from
     the SEO Construction Sector wage agreement, at the second-phase rates effective 1 August 2026; the
     county multiplier from the SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published amounts;
     VAT as Revenue applies it. Each block names its own source beneath it, and any rate still to be
-    calibrated is marked, so the pilot&rsquo;s recorded outturns can settle it.</p>
+    calibrated is marked, so recorded outcomes during a pilot can settle it.</p>
   <p class="body" style="font-size:10.4pt;line-height:1.55;max-width:172mm;margin-bottom:3mm;">The pages that follow are that book as it appears on screen: the labour
     rates and the grant table first, then the unit rates, top to bottom.</p>
   {appfig('rates', '140mm', 'Labour, at the SEO August 2026 rates.',
@@ -556,7 +556,7 @@ doc7 = f'''<div class="sheet">
     when an item is ticked into a plan after the survey, its priced line uses the same rate. One number, in
     one place, feeding both.</p>
   {engfig('eng_c', '140mm', 'Variations &mdash; not included guide rates.',
-    'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outturns.')}
+    'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outcomes.')}
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
   {footer(5, '7', '7')}
 </div>'''
