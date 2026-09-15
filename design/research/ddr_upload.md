@@ -114,10 +114,12 @@ every table matches to the hundredth. A mismatch is shown, never hidden.
 
 What the samples showed, which the design had to take in:
 
-- **Existing and extension are told apart only by the assessor's description.** "EXISTING -",
+- **Existing and extension are told apart only by the assessor's description.** The author
+  labels floors, roofs and walls "Existing" or "Extension" only when the property has an
+  extension; anything unlabelled is the existing house as standard. "EXISTING -",
   "Extension:" and "Extension" all occur. "Dwelling Extension" on page 1 says Yes on one
-  report and N/A on another that is plainly an extension. An element with no label, in a
-  report that has labels, is taken as the existing house and said so.
+  report and N/A on another that is plainly an extension, so it is not relied on. Windows
+  have no description column and cannot be split.
 - **Upper floors are "Non-Heat Loss Floor" rows.** Ground floors are "Ground Floor - …". The
   split by storey comes from the dimension details on page 1, not the element rows.
 - **Windows are counted in the Count column.** Rows marked In Roof are roof lights and go
@@ -128,11 +130,16 @@ What the samples showed, which the design had to take in:
 
 ### Where the values go
 
+When the report labels an extension, its areas are kept apart from the existing house in
+all three modes: on an extension card in Refurbishment, and on floor, wall and roof cards
+captioned Existing or Extension in New Build and Energy Upgrade, each with its own ground
+floor perimeter to count.
+
 | From the report | New Build and Energy Upgrade | Refurbishment with extension rows |
 |---|---|---|
 | Address, dwelling type, county | Project details | Project details |
-| Floor area and height per storey | a floor card per storey | house floors on floor cards, extension floors on the extension card |
-| Walls, roofs | a card per element, captioned with its description | house elements on cards, extension totals on the extension card |
+| Floor area and height per storey | a floor card per storey; with an extension, existing and extension cards per storey | house floors on floor cards, extension floors on the extension card |
+| Walls, roofs | a card per element, captioned Existing or Extension and its description | house elements on cards, extension totals on the extension card |
 | Windows and roof lights | one card with count and area; roof light count | the same; the extension card is set to none |
 | Doors | door count and area | the same |
 | Heat Loss Indicator, year of construction | Energy Upgrade only: HLI and age band | not used |

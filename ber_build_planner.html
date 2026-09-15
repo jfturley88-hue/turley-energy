@@ -24250,7 +24250,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     clearGeometry();
     DDR.filled = []; DDR.flags = r.warnings.slice(); DDR.mode = mode;
-    var S = DDR.survey = { rooms: [], groundCard: null, extN: null, extGroundFc: null };
+    var S = DDR.survey = { rooms: [], groundCard: null, extGroundCard: null, extN: null, extGroundFc: null, parts: hasExtRows };
 
     // project details
     var addr = address(r.meta);
@@ -24289,16 +24289,23 @@ document.addEventListener('DOMContentLoaded', function() {
       var id = _dynCount.t1;
       var lv = $('fc-t1-level-' + id);
       if (lv) { lv.value = level; if (typeof togglePerimeter === 'function') togglePerimeter('fc-t1-perim-row-' + id, level); }
-      put('fc-t1-area-' + id, r2(area), level + ' area', 'Floors');
+      put('fc-t1-area-' + id, r2(area), level + ' area' + (cap ? ' (' + cap.toLowerCase() + ')' : ''), 'Floors');
       if (height > 0) put('fc-t1-height-' + id, r2(height), level + ' ceiling height', 'Floors');
       if (cap) caption('fc-t1-' + id, cap);
-      if (level === 'Ground Floor') S.groundCard = id;
+      if (level === 'Ground Floor' && !S.groundCard) S.groundCard = id;
       return id;
     }
     var gH = dim('Ground floor').height, uH = dim('First floor').height || dim('Second floor').height;
-    if (split) {
-      floorCard('Ground Floor', sumA(r.floors.rows, function (x) { return x.ground && notExt(x); }), gH, 'existing house, ground floor');
-      floorCard('First Floor',  sumA(r.floors.rows, function (x) { return !x.ground && notExt(x); }), uH, 'existing house, upper floors');
+    // Labels appear only when the property has an extension; anything unlabelled is the existing
+    // house. When they appear, existing and extension areas are kept apart in every mode:
+    // Refurbishment prices the extension on its own card, the other modes on cards of their own.
+    if (hasExtRows) {
+      floorCard('Ground Floor', sumA(r.floors.rows, function (x) { return x.ground && notExt(x); }), gH, 'Existing');
+      floorCard('First Floor',  sumA(r.floors.rows, function (x) { return !x.ground && notExt(x); }), uH, 'Existing');
+      if (!split) {
+        S.extGroundCard = floorCard('Ground Floor', sumA(r.floors.rows, function (x) { return x.ground && isExt(x); }), gH, 'Extension');
+        floorCard('First Floor', sumA(r.floors.rows, function (x) { return !x.ground && isExt(x); }), uH, 'Extension');
+      }
     } else {
       storeys.forEach(function (st) { floorCard(st.level, st.area, st.height); });
     }
@@ -24317,8 +24324,8 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!(w.area > 0) || typeof addWallCard !== 'function') return;
       addWallCard();
       var id = _dynCount.t2;
-      put('fc-t2-area-' + id, r2(w.area), 'Wall: ' + (w.type || 'external wall'), 'Walls');
-      caption('fc-t2-' + id, [w.type, w.desc].filter(Boolean).join(' · '));
+      put('fc-t2-area-' + id, r2(w.area), 'Wall: ' + (w.type || 'external wall') + (hasExtRows ? (isExt(w) ? ' (extension)' : ' (existing)') : ''), 'Walls');
+      caption('fc-t2-' + id, [hasExtRows ? (isExt(w) ? 'Extension' : 'Existing') : '', w.type, w.desc].filter(Boolean).join(' · '));
     });
 
     // roofs: one card per element, typed as the report types it
@@ -24328,8 +24335,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var id = _dynCount.t3;
       if (rf.kind) put('fc-t3-type-' + id, rf.kind, null);
       else DDR.flags.push('Roof "' + rf.type + '" is not a type this form knows; its card needs the roof type choosing.');
-      put('fc-t3-area-' + id, r2(rf.area), 'Roof: ' + (rf.type || 'roof'), 'Roof');
-      caption('fc-t3-' + id, [rf.type, rf.desc].filter(Boolean).join(' · '));
+      put('fc-t3-area-' + id, r2(rf.area), 'Roof: ' + (rf.type || 'roof') + (hasExtRows ? (isExt(rf) ? ' (extension)' : ' (existing)') : ''), 'Roof');
+      caption('fc-t3-' + id, [hasExtRows ? (isExt(rf) ? 'Extension' : 'Existing') : '', rf.type, rf.desc].filter(Boolean).join(' · '));
     });
 
     // windows and roof lights: the report's own counts; roof windows are the rows marked In Roof
@@ -24419,8 +24426,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!S) return '';
     var rooms = S.rooms.map(function (R) { return surveyInput('fc-t5r-total-' + R.id, 'Rooms \u00b7 ' + R.label, 'nr'); }).join('');
     var more = surveyInput('t5-wetRooms', 'Wet rooms, whole dwelling (incl. kitchen)', 'nr', '<span class="ddr-vent"></span>');
-    if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.extN ? 'House ground floor perimeter' : 'Ground floor exposed perimeter', 'm');
+    if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.parts ? 'Existing ground floor perimeter' : 'Ground floor exposed perimeter', 'm');
     if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Extension ground floor perimeter', 'm');
+    else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Extension ground floor perimeter', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
     return '<div class="ddr-h">Counted on survey</div>' +
       '<div class="ddr-sub">Not in the report. Wet rooms take the extract and every other room an air inlet. Each count goes straight into its tab.</div>' +

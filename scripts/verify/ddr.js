@@ -96,6 +96,15 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
           winCount: [...document.querySelectorAll('[id^="fc-t4-count-"]')].reduce((a, e) => a + (parseInt(e.value) || 0), 0),
           roofLights: parseInt((document.getElementById('t4-roofLights') || {}).value) || 0,
           doorText: (document.getElementById('t4-doorCount') || {}).value,
+          parts: (() => {
+            const ext = t => r[t].rows.filter(x => x.part === 'extension').reduce((a, x) => a + x.area, 0);
+            const onCards = tab => [...document.querySelectorAll(`[id^="fc-${tab}-"] .ddr-cap`)]
+              .filter(c => /^From the report: Extension/.test(c.textContent))
+              .reduce((a, c) => a + (parseFloat((document.getElementById(`fc-${tab}-area-` + c.parentElement.id.split('-').pop()) || {}).value) || 0), 0);
+            return { has: ['floors', 'walls', 'roofs'].some(t => ext(t) > 0), floors: ext('floors'), walls: ext('walls'), roofs: ext('roofs'),
+                     cFloors: onCards('t1'), cWalls: onCards('t2'), cRoofs: onCards('t3'),
+                     perim: !!document.querySelector('#ddr-result label.ddr-sf') && [...document.querySelectorAll('#ddr-result label.ddr-sf')].some(l => /Extension ground floor perimeter/.test(l.textContent)) };
+          })(),
           asked: [...document.querySelectorAll('#ddr-result input[data-ddr-target]')].map(i => i.dataset.ddrTarget),
           roomLabels: [...document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]')].map(i => i.closest('label').textContent.replace(/^Rooms · /, '').replace(/nr$/, '').trim()),
         };
@@ -125,6 +134,13 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
         ok(perim.box && perim.priced === 30, `[${tag}] Refurbishment: the surveyed extension perimeter is what pricing reads`, JSON.stringify(perim));
       }
       if (mode !== 'Refurbishment') ok(!got.split, `[${tag}] ${mode}: no extension card outside Refurbishment`);
+      if (got.parts.has) {
+        const P = got.parts;
+        const extF = got.ext ? got.ext.floors : P.cFloors, extW = got.ext ? got.ext.walls : P.cWalls, extR = got.ext ? got.ext.roofs : P.cRoofs;
+        ok(near(extF, P.floors) && near(extW, P.walls) && near(extR, P.roofs), `[${tag}] ${mode}: extension areas kept apart from the existing house`,
+           JSON.stringify({ floors: [extF, P.floors], walls: [extW, P.walls], roofs: [extR, P.roofs] }));
+        ok(P.perim, `[${tag}] ${mode}: the extension's ground floor perimeter is asked for separately`);
+      }
 
       // survey counts typed on the panel go through to the tabs
       const typed = await p.evaluate(() => {
