@@ -83,20 +83,89 @@ whether a browser-side reader would keep DEAP's table cells in order — and it 
    report, so the assessor sees what was filled and overrides in place.
 5. Anything the parser cannot find is left blank and listed, never guessed.
 
-## Two things to decide before building
+## Decided
 
-**Where pdf.js lives.** Loading it from cdnjs matches how the app already loads SheetJS,
-and sends no data anywhere. Inlining it makes the app fully self-contained at the cost of
-roughly 1.5 MB on a 1.4 MB file. Either satisfies the no-third-party rule; inline is the
-stronger answer if the file itself is ever handed to SEAI.
+**pdf.js is built into the file.** Version 3.11.174, Mozilla, Apache 2.0, the last release
+with a classic script build. Both parts sit at the foot of `ber_build_planner.html` as inert
+text (`type="application/x-pdfjs"`) and are started only when a report is chosen, so the app
+opens no slower. The worker code runs on the page's own thread, so there is no worker file
+and no URL to fetch. The file grows by about 1.4 MB.
 
-**The existing AI path.** The app already has a feature that sends a BER PDF to Anthropic
-for extraction, behind a user-entered key. Given the rule above, it should be removed or
-clearly fenced off from this feature, or the pack's claim is undermined by the software.
+**The AI paths are gone.** The old BER PDF upload, which sent the document to an AI service
+with a pasted key, and an energy upgrade generator that asked one for measures, were both
+removed with the code only they used. Neither was reachable from the screen any more.
 
-## Before it is built
+---
 
-Three provisionals for existing dwellings, one new-build report and one refurbishment with
-an extension, all from the author. The sample here is a single-storey new build; existing
-dwellings will show multi-storey floor tables, several wall constructions, and the
-"Dwelling Extension: Yes" case, which the parser has to handle before it is trusted.
+## As built, 15 September 2026
+
+Tested on five of the author's reports, none committed: three new-build provisionals (one
+single storey, two two-storey, one with a roof window), one refurbishment with an extension
+labelled in mixed case with an unlabelled wall, and one provisional of an existing house
+with an extension where the report itself says "Dwelling Extension: Yes".
+
+### Reading
+
+Each table row wraps over several text lines around the one line that carries its figures.
+The parser finds that line by the Area column, gives every wrapped fragment to the nearest
+such line, and splits text into Type and Description by the header positions. Every table
+is then added up and compared with the report's own "Total area" line; on all five reports
+every table matches to the hundredth. A mismatch is shown, never hidden.
+
+What the samples showed, which the design had to take in:
+
+- **Existing and extension are told apart only by the assessor's description.** "EXISTING -",
+  "Extension:" and "Extension" all occur. "Dwelling Extension" on page 1 says Yes on one
+  report and N/A on another that is plainly an extension. An element with no label, in a
+  report that has labels, is taken as the existing house and said so.
+- **Upper floors are "Non-Heat Loss Floor" rows.** Ground floors are "Ground Floor - …". The
+  split by storey comes from the dimension details on page 1, not the element rows.
+- **Windows have no count.** Each row is a glazing group by orientation with a count of 1.
+  Rows marked In Roof are roof windows and are kept out of the window card.
+- **Doors can be absent.** One report lists none; that is flagged, not filled.
+- **Rafter roof areas are sloped areas.** The rate book already prices rafter insulation on
+  the DEAP sloped area, so they go in unchanged.
+
+### Where the values go
+
+| From the report | New Build and Energy Upgrade | Refurbishment with extension rows |
+|---|---|---|
+| Address, dwelling type, county | Project details | Project details |
+| Floor area and height per storey | a floor card per storey | house floors on floor cards, extension floors on the extension card |
+| Walls, roofs | a card per element, captioned with its description | house elements on cards, extension totals on the extension card |
+| Windows | one card, area only | the same; the extension card is set to none and that is flagged |
+| Doors | door count and area | the same |
+| Heat Loss Indicator, year of construction | Energy Upgrade only: HLI and age band | not used |
+
+Every filled field is marked with a blue edge and a tooltip, and the mark goes when the
+assessor edits it. A room card is made for each storey found.
+
+### Counted on survey
+
+The report cannot give these, so the panel asks for them straight after reading and writes
+them into the tabs: rooms on each floor (house and extension), ground floor perimeter
+(house and extension), gable end peaks, the number of windows, roof lights where the report
+has roof windows, and external doors where it has none. Gable end peaks is a new field in the
+Roof tab for every project type, kept in step with the Energy Upgrade external wall
+insulation choice.
+
+Two small changes to the extension card came with this. Its window area and door count now
+take an entered zero as zero rather than replacing it with an estimate, and a measured
+ground floor perimeter is used in pricing instead of the estimate from area.
+
+### Checked by
+
+`scripts/verify/ddr.js` reads every report it is given in all three project types and checks
+the result against the report itself, so it holds no client figures: tables match their
+totals, the cards carry the areas whole, the HLI arrives, survey counts reach the tabs, a
+save and restore keeps it, the plan generates, and no request leaves the page. A PDF that is
+not a report is refused.
+
+### Open
+
+- A saved project does not bring back extension cards on restore. That was already so for
+  extensions entered by hand; the reader does not change it.
+- A table long enough to run onto a second page has not been seen. The parser follows it
+  across the page break, but no sample tests that.
+- No published BER for an existing dwelling has been read yet; all five samples are
+  provisional ratings.

@@ -1,6 +1,7 @@
 import re, subprocess, os, builtins
 src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'ber_build_planner.html'), encoding='utf-8').read()
-blocks = re.findall(r'<script(?![^>]*type=["\']module)[^>]*>(.*?)</script>', src, re.S)
+# module scripts and the built-in pdf.js (inert text until a report is read) are not app code
+blocks = re.findall(r'<script(?![^>]*type=["\'](?:module|application/x-pdfjs))[^>]*>(.*?)</script>', src, re.S)
 sp = os.path.dirname(os.path.abspath(__file__))
 bad = 0
 for i, b in enumerate(blocks):

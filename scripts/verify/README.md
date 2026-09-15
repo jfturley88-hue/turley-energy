@@ -14,6 +14,11 @@ node scripts/verify/drive2.js        # invariants: restore keeps actuals and fig
 node scripts/verify/determinism.js   # the same example prices the same across cold launches,
                                      #   a slow click, a double generate, and after another mode
 node scripts/verify/tick.js          # the not-included tick, in detail
+DDR_SAMPLES="dir;file.pdf" node scripts/verify/ddr.js
+                                     # the Dwelling Details Report reader: every report given,
+                                     #   in all three modes, checked against the report itself;
+                                     #   no request may leave the page. Reports are client data
+                                     #   and stay out of the repo; point DDR_SAMPLES at them.
 python3 scripts/verify/static_scan.py   # syntax on every script block; calls to undefined names
 ```
 
