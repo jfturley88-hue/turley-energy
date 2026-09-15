@@ -767,14 +767,16 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-rooms{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:end;padding:6px 0;border-bottom:1px solid rgba(46,61,82,.5);}
 .ddr-rl{font-size:11.5px;color:#E2E8F0;font-weight:600;padding-bottom:6px;}
 .ddr-rcs{display:grid;grid-template-columns:repeat(2,minmax(0,150px)) 1fr;gap:6px 10px;align-items:end;}
-.ddr-vent{font-size:11px;color:#7dd3fc;min-height:14px;}
+.ddr-vent{font-size:11px;color:#7dd3fc;}
+.ddr-vent:empty{display:none;}
+.ddr-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 16px;margin-top:10px;}
+.ddr-grid .unit-row input{min-width:0;}
 .ddr-vent.ddr-bad-note{color:#f87171;}
 .ddr-rc{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#8FA0B8;}
 .ddr-sfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px 14px;margin-top:10px;}
 .ddr-sf{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#c8d0dc;}
 .ddr-sf .unit-row{display:flex;align-items:center;gap:6px;}
 .ddr-sf .unit-label{font-size:11px;color:#8FA0B8;flex-shrink:0;}
-.ddr-panel input[type=number]{width:100%;min-width:0;box-sizing:border-box;background:#1a2332;border:1px solid #2e3d52;color:#fff;border-radius:5px;padding:5px 7px;font-size:12px;font-family:inherit;}
 .ddr-flags{margin:4px 0 0 16px;padding:0;font-size:11px;color:#fcd34d;line-height:1.5;}
 .ddr-d{margin-top:12px;font-size:11px;color:#8FA0B8;}
 .ddr-d summary{cursor:pointer;}
@@ -783,7 +785,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-t td{color:#c8d0dc;border-bottom:1px solid rgba(46,61,82,.5);padding:3px 6px;}
 .ddr-cap{font-size:10.5px;color:#7dd3fc;margin:-6px 0 10px;line-height:1.4;}
 input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
-@media (max-width:640px){.ddr-rooms{grid-template-columns:1fr;}.ddr-rcs{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:640px){.ddr-grid{grid-template-columns:1fr 1fr;}.ddr-rooms{grid-template-columns:1fr;}.ddr-rcs{grid-template-columns:repeat(2,minmax(0,1fr));}}
 </style>
 </head>
 <body>
@@ -24250,7 +24252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     clearGeometry();
     DDR.filled = []; DDR.flags = r.warnings.slice(); DDR.mode = mode;
-    var S = DDR.survey = { rooms: [], groundCard: null, extGroundCard: null, extN: null, extGroundFc: null, parts: hasExtRows };
+    var S = DDR.survey = { rooms: [], groundCard: null, extGroundCard: null, extN: null, extGroundFc: null, parts: false };
 
     // project details
     var addr = address(r.meta);
@@ -24264,6 +24266,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var rows = r.floors.rows.concat(r.roofs.rows, r.walls.rows);
     var hasExtRows = rows.some(function (x) { return x.part === 'extension'; });
+    S.parts = hasExtRows;
     var split = mode === 'Refurbishment' && hasExtRows;
     var isExt = function (x) { return x.part === 'extension'; };
     var notExt = function (x) { return x.part !== 'extension'; };
@@ -24418,21 +24421,22 @@ document.addEventListener('DOMContentLoaded', function() {
   function surveyInput(targetId, label, unit, extra) {
     var el = $(targetId);
     if (!el) return '';
-    return '<label class="ddr-sf"><span>' + esc(label) + '</span><span class="unit-row"><input type="number" min="0" step="' + (unit === 'm' ? '0.1' : '1') +
-      '" data-ddr-target="' + esc(targetId) + '" value="' + esc(el.value) + '"><span class="unit-label">' + unit + '</span></span>' + (extra || '') + '</label>';
+    return '<div class="tab-field"><label>' + esc(label) + '</label><div class="unit-row"><input type="number" min="0" step="' + (unit === 'm' ? '0.1' : '1') +
+      '" data-ddr-target="' + esc(targetId) + '" value="' + esc(el.value) + '"><span class="unit-label">' + unit + '</span></div>' + (extra || '') + '</div>';
   }
   function surveyHTML() {
     var S = DDR.survey;
     if (!S) return '';
-    var rooms = S.rooms.map(function (R) { return surveyInput('fc-t5r-total-' + R.id, 'Rooms \u00b7 ' + R.label, 'nr'); }).join('');
-    var more = surveyInput('t5-wetRooms', 'Wet rooms, whole dwelling (incl. kitchen)', 'nr', '<span class="ddr-vent"></span>');
-    if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.parts ? 'Existing ground floor perimeter' : 'Ground floor exposed perimeter', 'm');
-    if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Extension ground floor perimeter', 'm');
-    else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Extension ground floor perimeter', 'm');
+    var rooms = S.rooms.map(function (R) { return surveyInput('fc-t5r-total-' + R.id, 'Rooms, ' + R.label.toLowerCase(), 'nr'); }).join('');
+    var more = surveyInput('t5-wetRooms', 'Wet rooms, whole house (incl. kitchen)', 'nr', '<div class="ddr-vent"></div>');
+    if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.parts ? 'Ground floor perimeter, existing' : 'Ground floor perimeter', 'm');
+    if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Ground floor perimeter, extension', 'm');
+    else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Ground floor perimeter, extension', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
-    return '<div class="ddr-h">Counted on survey</div>' +
-      '<div class="ddr-sub">Not in the report. Wet rooms take the extract and every other room an air inlet. Each count goes straight into its tab.</div>' +
-      '<div class="ddr-sfs">' + rooms + '</div><div class="ddr-sfs">' + more + '</div>';
+    return '<div class="ddr-h">Count on the survey</div>' +
+      '<div class="ddr-sub">These are not in the report. Wet rooms get an extract and every other room an air inlet.</div>' +
+      '<div class="tab-grid ddr-grid">' + rooms + '</div>' +
+      '<div class="tab-grid ddr-grid">' + more + '</div>';
   }
 
   // ── the panel ────────────────────────────────────────────────────────────────
@@ -24443,9 +24447,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var r = DDR.report;
     if (!r) { box.innerHTML = ''; return; }
     var m = r.meta;
-    var head = '<div class="ddr-status">Read <strong>' + esc(DDR.file) + '</strong> · ' + DDR.pages + ' pages' +
-      (m.created ? ' · report created ' + esc(m.created) : '') + (m.ratingType ? ' · ' + esc(m.ratingType) : '') +
-      (m.extension ? ' · extension: ' + esc(m.extension) : '') + '</div>';
+    var head = '<div class="ddr-status">Report read: <strong>' + esc(DDR.file) + '</strong>, ' + DDR.pages + ' pages' +
+      (m.created ? ', created ' + esc(m.created) : '') + '.</div>';
     if (!DDR.applied) {
       box.innerHTML = head + '<button type="button" class="tab-load-example-btn ddr-go" onclick="ddrApplyReport()">Fill the ' +
         esc(($('t0-projType') || {}).value || 'New Build') + ' survey from this report</button>';
@@ -24463,9 +24466,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var flags = DDR.flags.length ? '<div class="ddr-h">To check</div><ul class="ddr-flags">' +
       DDR.flags.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>' : '';
     box.innerHTML = head +
-      '<div class="ddr-sub">Every table was added up against the report’s own total: ' + totals + '</div>' +
+      '<div class="ddr-sub">Areas match the report’s own totals: ' + totals + '</div>' +
+      (DDR.survey && DDR.survey.parts ? '<div class="ddr-sub">The report has an existing house and an extension, so their areas are kept apart.</div>' : '') +
       surveyHTML() + flags +
-      '<details class="ddr-d"><summary>' + DDR.filled.length + ' values filled. Every one can be edited in its tab.</summary>' + filled + '</details>';
+      '<details class="ddr-d"><summary>Show the ' + DDR.filled.length + ' values read from the report. Each one can be changed in its tab.</summary>' + filled + '</details>';
     ventNotes();
   }
 

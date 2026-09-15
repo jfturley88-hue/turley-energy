@@ -57,7 +57,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       await p.setInputFiles('#ddr-panel input[type=file]', file);
       await p.waitForFunction(() => {
         const t = (document.getElementById('ddr-result') || {}).textContent || '';
-        return /Counted on survey|could not be read|No dwelling details|not a PDF/.test(t);
+        return /Count on the survey|could not be read|No dwelling details|not a PDF/.test(t);
       }, null, { timeout: 60000 });
 
       if (file === NOT_A_REPORT) {
@@ -103,10 +103,10 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
               .reduce((a, c) => a + (parseFloat((document.getElementById(`fc-${tab}-area-` + c.parentElement.id.split('-').pop()) || {}).value) || 0), 0);
             return { has: ['floors', 'walls', 'roofs'].some(t => ext(t) > 0), floors: ext('floors'), walls: ext('walls'), roofs: ext('roofs'),
                      cFloors: onCards('t1'), cWalls: onCards('t2'), cRoofs: onCards('t3'),
-                     perim: !!document.querySelector('#ddr-result label.ddr-sf') && [...document.querySelectorAll('#ddr-result label.ddr-sf')].some(l => /Extension ground floor perimeter/.test(l.textContent)) };
+                     perim: [...document.querySelectorAll('#ddr-result .tab-field label')].some(l => /perimeter, extension/.test(l.textContent)) };
           })(),
           asked: [...document.querySelectorAll('#ddr-result input[data-ddr-target]')].map(i => i.dataset.ddrTarget),
-          roomLabels: [...document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]')].map(i => i.closest('label').textContent.replace(/^Rooms · /, '').replace(/nr$/, '').trim()),
+          roomLabels: [...document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]')].map(i => i.closest('.tab-field').querySelector('label').textContent.replace(/^Rooms, /, '')),
         };
       });
       ok(got.applied && got.bad === 0, `[${tag}] ${mode}: read and every table matches its report total`);
@@ -120,7 +120,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorText === '', `[${tag}] ${mode}: doors as the report counts them`);
       ok(got.winCount === got.rpt.winCount && got.roofLights === got.rpt.roofLights, `[${tag}] ${mode}: window and roof light counts from the report`, JSON.stringify({ w: got.winCount, rl: got.roofLights }));
       ok(!got.asked.some(t => /fc-t4-count|t4-roofLights|t4-doorCount/.test(t)), `[${tag}] ${mode}: the panel does not ask for windows, roof lights or doors`);
-      ok(JSON.stringify(got.roomLabels) === JSON.stringify(got.rpt.storeys), `[${tag}] ${mode}: a room count for exactly the storeys in the report`, JSON.stringify(got.roomLabels));
+      ok(JSON.stringify(got.roomLabels) === JSON.stringify(got.rpt.storeys.map(x => x.toLowerCase())), `[${tag}] ${mode}: a room count for exactly the storeys in the report`, JSON.stringify(got.roomLabels));
       if (mode === 'Energy Upgrade') ok(near(got.hli, got.rpt.hli) && got.hliSource === 'ber', `[${tag}] Energy Upgrade: Heat Loss Indicator from the report`, `${got.hli} (${got.hliSource})`);
       if (got.ext) ok(got.ext.read.windowArea === 0 && got.ext.read.doorCount === 0, `[${tag}] Refurbishment: extension carries no invented windows or doors`, JSON.stringify({ w: got.ext.read.windowArea, d: got.ext.read.doorCount }));
       if (got.ext) {
@@ -208,7 +208,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
     await p.goto(APP); await p.waitForTimeout(500);
     await p.evaluate(() => selectProjectType('New Build'));
     await p.setInputFiles('#ddr-panel input[type=file]', files[0]);
-    await p.waitForFunction(() => /Counted on survey/.test(document.getElementById('ddr-result').textContent), null, { timeout: 60000 });
+    await p.waitForFunction(() => /Count on the survey/.test(document.getElementById('ddr-result').textContent), null, { timeout: 60000 });
     await p.evaluate(() => selectProjectType('Energy Upgrade'));
     const btn = await p.evaluate(() => (document.querySelector('#ddr-result .ddr-go') || {}).textContent || '');
     ok(/Fill the Energy Upgrade survey/.test(btn), '[type change] the report waits to fill the new project type', btn);
