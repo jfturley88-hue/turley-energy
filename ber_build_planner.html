@@ -767,7 +767,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-rooms{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:end;padding:6px 0;border-bottom:1px solid rgba(46,61,82,.5);}
 .ddr-rl{font-size:11.5px;color:#E2E8F0;font-weight:600;padding-bottom:6px;}
 .ddr-rcs{display:grid;grid-template-columns:repeat(2,minmax(0,150px)) 1fr;gap:6px 10px;align-items:end;}
-.ddr-vent{font-size:11px;color:#7dd3fc;padding-bottom:7px;}
+.ddr-vent{font-size:11px;color:#7dd3fc;min-height:14px;}
 .ddr-vent.ddr-bad-note{color:#f87171;}
 .ddr-rc{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#8FA0B8;}
 .ddr-sfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px 14px;margin-top:10px;}
@@ -1622,6 +1622,13 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
           Add a room layout card for each floor. Ceiling heights are pulled from Tab&nbsp;1 floor cards to compute estimated <strong>internal wall area per floor</strong>.
           Totals drive: <strong>internal door count</strong>, <strong>electrical circuits</strong>, <strong>plumbing points</strong> and <strong>painting &amp; decoration</strong>. Internal doors = total rooms&nbsp;+&nbsp;1.
         </div>
+        <div class="tab-grid" style="margin-bottom:4px;">
+          <div class="tab-field">
+            <label>Wet Rooms, Whole Dwelling (incl. kitchen)</label>
+            <div class="unit-row"><input type="number" id="t5-wetRooms" placeholder="0" min="0"><span class="unit-label">nr</span></div>
+          </div>
+        </div>
+        <div class="ws-hint" style="margin-bottom:6px;">Wet rooms take the ventilation extract. Every other room counted on the floor cards takes an air inlet.</div>
         <div id="t5r-cards"></div>
         <p id="t5r-empty" class="dyn-empty">No floor room layouts added yet &mdash; click the button below to add a floor</p>
         <div style="text-align:center;margin-top:8px;">
@@ -9414,8 +9421,6 @@ function addExtRoomFloorCard(n) {
         '<select id="' + p + '-level" onchange="updateExtRoomFloorWalls(' + n + ',' + id + ')">' +
           '<option>Ground Floor</option><option>First Floor</option><option>Second Floor</option><option>Third Floor</option>' +
         '</select></div>' +
-      '<div class="tab-field"><label>Rooms (total)</label><div class="unit-row"><input type="number" id="' + p + '-total" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>' +
-      '<div class="tab-field"><label>Wet Rooms (incl. kitchen)</label><div class="unit-row"><input type="number" id="' + p + '-wet" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>Bedrooms</label><div class="unit-row"><input type="number" id="' + p + '-beds" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>Bathrooms</label><div class="unit-row"><input type="number" id="' + p + '-baths" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>En-suites</label><div class="unit-row"><input type="number" id="' + p + '-ens" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
@@ -21465,8 +21470,6 @@ function addRoomFloorCard() {
         </select></div>
       <div class="tab-field"><label>Rooms (total)</label>
         <div class="unit-row"><input type="number" id="fc-t5r-total-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
-      <div class="tab-field"><label>Wet Rooms (incl. kitchen)</label>
-        <div class="unit-row"><input type="number" id="fc-t5r-wet-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bedrooms</label>
         <div class="unit-row"><input type="number" id="fc-t5r-beds-${id}" placeholder="0" min="0" oninput="updateRoomFloorWalls(${id});syncRoomFloorTotals();"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bathrooms</label>
@@ -21750,7 +21753,8 @@ function getCurrentRoomCounts() {
   // Prefer per-floor room cards (t5r) when any have been added
   if (typeof _dynCount === 'object' && _dynCount && _dynCount.t5r > 0) {
     var g = function(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
-    var beds = 0, baths = 0, ens = 0, wc = 0, living = 0, extra = 0, rooms = 0, wet = 0, hasCard = false;
+    var beds = 0, baths = 0, ens = 0, wc = 0, living = 0, extra = 0, rooms = 0, hasCard = false;
+    var gv5 = function(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
     for (var i = 1; i <= _dynCount.t5r; i++) {
       if (!document.getElementById('fc-t5r-' + i)) continue;
       hasCard = true;
@@ -21761,11 +21765,10 @@ function getCurrentRoomCounts() {
       living += g('fc-t5r-living-' + i);
       extra  += g('fc-t5r-extra-'  + i);
       rooms  += g('fc-t5r-total-'  + i);
-      wet    += g('fc-t5r-wet-'    + i);
     }
     if (hasCard) {
       return { bedrooms: beds, bathrooms: baths, ensuites: ens, wc: wc,
-               livingAreas: living, additionalRooms: extra, rooms: rooms, wetRooms: wet };
+               livingAreas: living, additionalRooms: extra, rooms: rooms, wetRooms: gv5('t5-wetRooms') };
     }
   }
   // Fallback: legacy flat fields (old saves loaded before floor cards existed)
@@ -21777,7 +21780,7 @@ function getCurrentRoomCounts() {
     wc:              gv('t5-wc'),
     livingAreas:     gv('t5-livingAreas'),
     additionalRooms: gv('t5-additionalRooms'),
-    rooms: 0, wetRooms: 0
+    rooms: 0, wetRooms: gv('t5-wetRooms')
   };
 }
 window.getCurrentRoomCounts = getCurrentRoomCounts;
@@ -24247,7 +24250,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     clearGeometry();
     DDR.filled = []; DDR.flags = r.warnings.slice(); DDR.mode = mode;
-    var S = DDR.survey = { houseRooms: [], extRooms: [], groundCard: null, extN: null, windowCard: null, roofLights: false, doors: false };
+    var S = DDR.survey = { rooms: [], groundCard: null, extN: null, extGroundFc: null };
 
     // project details
     var addr = address(r.meta);
@@ -24271,7 +24274,15 @@ document.addEventListener('DOMContentLoaded', function() {
       DDR.flags.push('The report says the dwelling has an extension, but no element is labelled Extension, so every area went to the house.');
     }
 
-    // floors and their room cards
+    // floors
+    var LEVEL_OF = { 'Ground floor': 'Ground Floor', 'First floor': 'First Floor', 'Second floor': 'Second Floor', 'Third and other floors': 'Third Floor' };
+    var storeys = [], used = 0;
+    r.dims.forEach(function (d) {
+      if (!(d.area > 0)) return;
+      var level = d.level === 'Room in Roof' ? LEVELS[Math.min(used, LEVELS.length - 1)] : LEVEL_OF[d.level];
+      used = Math.max(used, LEVELS.indexOf(level) + 1);
+      storeys.push({ label: d.level, level: level, area: d.area, height: d.height });
+    });
     function floorCard(level, area, height, cap) {
       if (!(area > 0) || typeof addFloorCard !== 'function') return null;
       addFloorCard();
@@ -24282,13 +24293,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (height > 0) put('fc-t1-height-' + id, r2(height), level + ' ceiling height', 'Floors');
       if (cap) caption('fc-t1-' + id, cap);
       if (level === 'Ground Floor') S.groundCard = id;
-      if (typeof addRoomFloorCard === 'function') {
-        addRoomFloorCard();
-        var rid = _dynCount.t5r;
-        var rl = $('fc-t5r-level-' + rid);
-        if (rl) { rl.value = level; if (typeof updateRoomFloorWalls === 'function') updateRoomFloorWalls(rid); }
-        S.houseRooms.push({ level: level, id: rid });
-      }
       return id;
     }
     var gH = dim('Ground floor').height, uH = dim('First floor').height || dim('Second floor').height;
@@ -24296,19 +24300,17 @@ document.addEventListener('DOMContentLoaded', function() {
       floorCard('Ground Floor', sumA(r.floors.rows, function (x) { return x.ground && notExt(x); }), gH, 'existing house, ground floor');
       floorCard('First Floor',  sumA(r.floors.rows, function (x) { return !x.ground && notExt(x); }), uH, 'existing house, upper floors');
     } else {
-      var used = 0;
-      r.dims.forEach(function (d) {
-        if (!(d.area > 0)) return;
-        var level;
-        if (d.level === 'Room in Roof') {
-          level = LEVELS[Math.min(used, LEVELS.length - 1)];
-        } else {
-          level = { 'Ground floor': 'Ground Floor', 'First floor': 'First Floor', 'Second floor': 'Second Floor', 'Third and other floors': 'Third Floor' }[d.level];
-        }
-        floorCard(level, d.area, d.height);
-        used = Math.max(used, LEVELS.indexOf(level) + 1);
-      });
+      storeys.forEach(function (st) { floorCard(st.level, st.area, st.height); });
     }
+    // Rooms are counted per storey as the report lists them, house and extension together.
+    storeys.forEach(function (st) {
+      if (typeof addRoomFloorCard !== 'function') return;
+      addRoomFloorCard();
+      var rid = _dynCount.t5r;
+      var rl = $('fc-t5r-level-' + rid);
+      if (rl) { rl.value = st.level; if (typeof updateRoomFloorWalls === 'function') updateRoomFloorWalls(rid); }
+      S.rooms.push({ label: st.label, id: rid });
+    });
 
     // walls: one card per element
     r.walls.rows.filter(split ? notExt : function () { return true; }).forEach(function (w) {
@@ -24330,27 +24332,23 @@ document.addEventListener('DOMContentLoaded', function() {
       caption('fc-t3-' + id, [rf.type, rf.desc].filter(Boolean).join(' · '));
     });
 
-    // windows: the report groups glazing by orientation, so it gives area but not a count
+    // windows and roof lights: the report's own counts; roof windows are the rows marked In Roof
     var wins = r.windows.rows.filter(function (w) { return !w.inRoof; });
     var roofWins = r.windows.rows.filter(function (w) { return w.inRoof; });
+    var cnt = function (list) { return list.reduce(function (a, w) { return a + (w.count || 1); }, 0); };
     var winArea = sumA(wins, function () { return true; });
     if (winArea > 0 && typeof addWindowCard === 'function') {
       addWindowCard();
       var wid = _dynCount.t4;
-      put('fc-t4-area-' + wid, winArea, 'Windows (' + wins.length + ' groups by orientation)', 'Openings');
-      var wc = $('fc-t4-count-' + wid); if (wc) wc.value = '';
-      caption('fc-t4-' + wid, wins.length + ' glazing groups by orientation. The report gives no window count.');
-      S.windowCard = wid;
+      put('fc-t4-count-' + wid, cnt(wins), 'Windows', 'Openings');
+      put('fc-t4-area-' + wid, winArea, 'Window area', 'Openings');
     }
-    if (roofWins.length) S.roofLights = true;
+    if (roofWins.length) put('t4-roofLights', cnt(roofWins), 'Roof lights (' + fmtA(sumA(roofWins, function () { return true; })) + ')', 'Openings');
 
     // doors
     if (r.doors.rows.length) {
-      var dc = r.doors.rows.reduce(function (a, d) { return a + (d.count || 1); }, 0);
-      put('t4-doorCount', dc, 'External doors', 'Openings');
+      put('t4-doorCount', cnt(r.doors.rows), 'External doors', 'Openings');
       put('t4-doorArea', r2(r.doors.total != null ? r.doors.total : r.doors.sum), 'External door area', 'Openings');
-    } else {
-      S.doors = true;
     }
 
     // Energy Upgrade: the heat loss indicator, and the age band from the year of construction
@@ -24382,13 +24380,7 @@ document.addEventListener('DOMContentLoaded', function() {
         put('ext' + n + '-fl' + fc + '-area', L[1], 'Extension ' + L[0].toLowerCase() + ' area', 'Extension ' + n);
         if (L[2] > 0) put('ext' + n + '-fl' + fc + '-height', r2(L[2]), null);
         if (typeof extFloorTotals === 'function') extFloorTotals(n);
-        if (typeof addExtRoomFloorCard === 'function') {
-          addExtRoomFloorCard(n);
-          var erid = extRoomCounts[n];
-          var el = $('erf' + n + '-' + erid + '-level');
-          if (el) { el.value = L[0]; el.dispatchEvent(new Event('change', { bubbles: true })); }
-          S.extRooms.push({ level: L[0], n: n, id: erid, fc: fc });
-        }
+        if (L[0] === 'Ground Floor') S.extGroundFc = fc;
       });
       // The app estimates each floor's perimeter from its area as the areas go in. Perimeter is
       // measured on the survey, so the estimates come out once every floor is filled.
@@ -24416,41 +24408,23 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ── what the assessor counts on the survey ───────────────────────────────────
-  var ROOM_FIELDS = [['total', 'Rooms'], ['wet', 'Wet rooms (incl. kitchen)']];
-  function surveyTarget(kind, a, b) {
-    if (kind === 'room') return a.n ? $('erf' + a.n + '-' + a.id + '-' + b) : $('fc-t5r-' + b + '-' + a.id);
-    return $(a);
-  }
-  function surveyInput(targetId, label, unit) {
+  function surveyInput(targetId, label, unit, extra) {
     var el = $(targetId);
     if (!el) return '';
     return '<label class="ddr-sf"><span>' + esc(label) + '</span><span class="unit-row"><input type="number" min="0" step="' + (unit === 'm' ? '0.1' : '1') +
-      '" data-ddr-target="' + esc(targetId) + '" value="' + esc(el.value) + '"><span class="unit-label">' + unit + '</span></span></label>';
+      '" data-ddr-target="' + esc(targetId) + '" value="' + esc(el.value) + '"><span class="unit-label">' + unit + '</span></span>' + (extra || '') + '</label>';
   }
   function surveyHTML() {
     var S = DDR.survey;
     if (!S) return '';
-    var h = '';
-    var roomRow = function (who, R) {
-      var cells = ROOM_FIELDS.map(function (f) {
-        var t = R.n ? ('erf' + R.n + '-' + R.id + '-' + f[0]) : ('fc-t5r-' + f[0] + '-' + R.id);
-        var el = $(t);
-        return el ? '<label class="ddr-rc"><span>' + f[1] + '</span><input type="number" min="0" step="1" data-ddr-target="' + t + '" value="' + esc(el.value) + '"></label>' : '';
-      }).join('');
-      return '<div class="ddr-rooms"><div class="ddr-rl">' + esc(who + R.level) + '</div><div class="ddr-rcs">' + cells + '<span class="ddr-vent"></span></div></div>';
-    };
-    S.houseRooms.forEach(function (R) { h += roomRow(S.extN ? 'House · ' : '', R); });
-    S.extRooms.forEach(function (R) { h += roomRow('Extension · ', R); });
-    var more = '';
+    var rooms = S.rooms.map(function (R) { return surveyInput('fc-t5r-total-' + R.id, 'Rooms \u00b7 ' + R.label, 'nr'); }).join('');
+    var more = surveyInput('t5-wetRooms', 'Wet rooms, whole dwelling (incl. kitchen)', 'nr', '<span class="ddr-vent"></span>');
     if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.extN ? 'House ground floor perimeter' : 'Ground floor exposed perimeter', 'm');
-    S.extRooms.forEach(function (R) { if (R.level === 'Ground Floor') more += surveyInput('ext' + R.n + '-fl' + R.fc + '-perim', 'Extension ground floor perimeter', 'm'); });
+    if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Extension ground floor perimeter', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
-    if (S.windowCard) more += surveyInput('fc-t4-count-' + S.windowCard, 'Windows', 'nr');
-    if (S.roofLights) more += surveyInput('t4-roofLights', 'Roof lights', 'nr');
-    if (S.doors) more += surveyInput('t4-doorCount', 'External doors', 'nr');
     return '<div class="ddr-h">Counted on survey</div>' +
       '<div class="ddr-sub">Not in the report. Wet rooms take the extract and every other room an air inlet. Each count goes straight into its tab.</div>' +
-      h + '<div class="ddr-sfs">' + more + '</div>';
+      '<div class="ddr-sfs">' + rooms + '</div><div class="ddr-sfs">' + more + '</div>';
   }
 
   // ── the panel ────────────────────────────────────────────────────────────────
@@ -24487,16 +24461,16 @@ document.addEventListener('DOMContentLoaded', function() {
     ventNotes();
   }
 
-  // Beside each floor's counts: how many extracts and air inlets they make.
+  // Beside the wet rooms: how many extracts and air inlets the counts make.
   function ventNotes() {
-    document.querySelectorAll('#ddr-result .ddr-rooms').forEach(function (row) {
-      var ins = row.querySelectorAll('input');
-      var total = parseInt(ins[0] && ins[0].value, 10) || 0, wet = parseInt(ins[1] && ins[1].value, 10) || 0;
-      var note = row.querySelector('.ddr-vent');
-      if (!note) return;
-      note.textContent = total ? (wet + (wet === 1 ? ' extract' : ' extracts') + ' \u00b7 ' + Math.max(0, total - wet) + (total - wet === 1 ? ' air inlet' : ' air inlets')) : '';
-      note.classList.toggle('ddr-bad-note', wet > total);
-    });
+    var note = document.querySelector('#ddr-result .ddr-vent');
+    if (!note) return;
+    var total = 0;
+    document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]').forEach(function (i) { total += parseInt(i.value, 10) || 0; });
+    var wetIn = document.querySelector('#ddr-result input[data-ddr-target="t5-wetRooms"]');
+    var wet = parseInt(wetIn && wetIn.value, 10) || 0;
+    note.textContent = (total && wet) ? (wet + (wet === 1 ? ' extract' : ' extracts') + ' \u00b7 ' + Math.max(0, total - wet) + (total - wet === 1 ? ' air inlet' : ' air inlets') + ' from ' + total + ' rooms') : '';
+    note.classList.toggle('ddr-bad-note', wet > total);
   }
   // survey inputs on the panel write straight through to their fields
   document.addEventListener('input', function (e) {

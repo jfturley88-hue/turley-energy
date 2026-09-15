@@ -120,8 +120,8 @@ What the samples showed, which the design had to take in:
   report that has labels, is taken as the existing house and said so.
 - **Upper floors are "Non-Heat Loss Floor" rows.** Ground floors are "Ground Floor - …". The
   split by storey comes from the dimension details on page 1, not the element rows.
-- **Windows have no count.** Each row is a glazing group by orientation with a count of 1.
-  Rows marked In Roof are roof windows and are kept out of the window card.
+- **Windows are counted in the Count column.** Rows marked In Roof are roof lights and go
+  to the roof light count, not the window card.
 - **Doors can be absent.** One report lists none; that is flagged, not filled.
 - **Rafter roof areas are sloped areas.** The rate book already prices rafter insulation on
   the DEAP sloped area, so they go in unchanged.
@@ -133,7 +133,7 @@ What the samples showed, which the design had to take in:
 | Address, dwelling type, county | Project details | Project details |
 | Floor area and height per storey | a floor card per storey | house floors on floor cards, extension floors on the extension card |
 | Walls, roofs | a card per element, captioned with its description | house elements on cards, extension totals on the extension card |
-| Windows | one card, area only | the same; the extension card is set to none and that is flagged |
+| Windows and roof lights | one card with count and area; roof light count | the same; the extension card is set to none |
 | Doors | door count and area | the same |
 | Heat Loss Indicator, year of construction | Energy Upgrade only: HLI and age band | not used |
 
@@ -143,28 +143,26 @@ assessor edits it. A room card is made for each storey found.
 ### Counted on survey
 
 The report cannot give these, so the panel asks for them straight after reading and writes
-them into the tabs:
+them into the tabs. It shows nothing else.
 
-- **Rooms on each floor, as a total and the number of wet rooms, kitchen included.** These
-  are two new fields on every Rooms tab card, house and extension. Wet rooms take the
-  extract and every other room takes an air inlet, so a ground floor of 5 rooms with 1 wet
-  room makes 1 extract and 4 air inlets; the panel shows that beside each floor.
+- **Rooms on each storey the report lists**, house and extension together, onto a Rooms tab
+  card per storey ("Rooms (total)").
+- **Wet rooms for the whole dwelling, kitchen included**, a single field at the top of the
+  Rooms tab. Wet rooms take the extract and every other room an air inlet; the panel shows
+  the result, for example "1 extract · 4 air inlets from 5 rooms".
 - Ground floor perimeter, house and extension.
 - Gable end peaks, a new Roof tab field for every project type, kept in step with the
   Energy Upgrade external wall insulation choice.
-- The number of windows; roof lights where the report has roof windows; external doors
-  where it lists none.
 
-Once counted, the ventilation measures price from them, in Energy Upgrade and in the house
-measures of Refurbishment. MEV extract terminals and DMEV fans are one per wet room. Air
-inlets are a new line, one per remaining room, at the rate book's room air intake vent
-(the same rate as that Not Included item); MEV leaves them out when trickle vents are
-chosen instead. MVHR takes one terminal per room. With no count entered the older estimate
-from bathrooms, en-suites and an assumed kitchen stands, so existing plans price as before.
-The extension's counts are held on its card but its new-build pricing does not use them yet.
+Windows, roof lights and doors are not asked for: the report's Count column gives them. Rows
+marked In Roof are the roof lights.
 
-The panel no longer lists notes about how the report was split; it shows only what could
-not be filled.
+Once counted, the ventilation measures price from rooms and wet rooms, in Energy Upgrade and
+in the house measures of Refurbishment. MEV extract terminals and DMEV fans are one per wet
+room. Air inlets are a new line, one per remaining room, at the rate book's room air intake
+vent rate (the same rate as that Not Included item); MEV leaves them out when trickle vents
+are chosen. MVHR takes one terminal per room. With no count entered the older estimate from
+bathrooms, en-suites and an assumed kitchen stands, so existing plans price as before.
 
 Two small changes to the extension card came with this. Its window area and door count now
 take an entered zero as zero rather than replacing it with an estimate, and a measured

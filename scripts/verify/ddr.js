@@ -86,11 +86,18 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
             dims: r.dims.reduce((a, d) => a + d.area, 0), floors: r.floors.total, walls: r.walls.total, roofs: r.roofs.total,
             windows: r.windows.rows.filter(w => !w.inRoof).reduce((a, w) => a + w.area, 0),
             doors: r.doors.rows.reduce((a, d) => a + (d.count || 1), 0), hli: r.hli,
+            winCount: r.windows.rows.filter(w => !w.inRoof).reduce((a, w) => a + (w.count || 1), 0),
+            roofLights: r.windows.rows.filter(w => w.inRoof).reduce((a, w) => a + (w.count || 1), 0),
+            storeys: r.dims.filter(d => d.area > 0).map(d => d.level),
           },
           cards: { floors: cards('t1', 'area'), walls: cards('t2', 'area'), roofs: cards('t3', 'area'), windows: cards('t4', 'area') },
           doors: num('t4-doorCount'), hli: num('eu-hli'), hliSource: (document.getElementById('eu-hli-source') || {}).value,
           ext, flags: S.flags.slice(),
-          doorsAsked: !!document.querySelector('#ddr-result input[data-ddr-target="t4-doorCount"]'),
+          winCount: [...document.querySelectorAll('[id^="fc-t4-count-"]')].reduce((a, e) => a + (parseInt(e.value) || 0), 0),
+          roofLights: parseInt((document.getElementById('t4-roofLights') || {}).value) || 0,
+          doorText: (document.getElementById('t4-doorCount') || {}).value,
+          asked: [...document.querySelectorAll('#ddr-result input[data-ddr-target]')].map(i => i.dataset.ddrTarget),
+          roomLabels: [...document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]')].map(i => i.closest('label').textContent.replace(/^Rooms · /, '').replace(/nr$/, '').trim()),
         };
       });
       ok(got.applied && got.bad === 0, `[${tag}] ${mode}: read and every table matches its report total`);
@@ -101,7 +108,10 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       ok(near(w, got.rpt.walls), `[${tag}] ${mode}: wall areas carried whole`, `${w} vs ${got.rpt.walls}`);
       ok(near(rf, got.rpt.roofs), `[${tag}] ${mode}: roof areas carried whole`, `${rf} vs ${got.rpt.roofs}`);
       ok(near(got.cards.windows, got.rpt.windows), `[${tag}] ${mode}: window area carried, roof windows kept out`, `${got.cards.windows} vs ${got.rpt.windows}`);
-      ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorsAsked, `[${tag}] ${mode}: doors counted, or asked for on the survey`);
+      ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorText === '', `[${tag}] ${mode}: doors as the report counts them`);
+      ok(got.winCount === got.rpt.winCount && got.roofLights === got.rpt.roofLights, `[${tag}] ${mode}: window and roof light counts from the report`, JSON.stringify({ w: got.winCount, rl: got.roofLights }));
+      ok(!got.asked.some(t => /fc-t4-count|t4-roofLights|t4-doorCount/.test(t)), `[${tag}] ${mode}: the panel does not ask for windows, roof lights or doors`);
+      ok(JSON.stringify(got.roomLabels) === JSON.stringify(got.rpt.storeys), `[${tag}] ${mode}: a room count for exactly the storeys in the report`, JSON.stringify(got.roomLabels));
       if (mode === 'Energy Upgrade') ok(near(got.hli, got.rpt.hli) && got.hliSource === 'ber', `[${tag}] Energy Upgrade: Heat Loss Indicator from the report`, `${got.hli} (${got.hliSource})`);
       if (got.ext) ok(got.ext.read.windowArea === 0 && got.ext.read.doorCount === 0, `[${tag}] Refurbishment: extension carries no invented windows or doors`, JSON.stringify({ w: got.ext.read.windowArea, d: got.ext.read.doorCount }));
       if (got.ext) {
@@ -123,20 +133,20 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
         const per = document.querySelector('#ddr-result input[data-ddr-target^="fc-t1-perim-"]');
         if (per) { per.value = '41.5'; per.dispatchEvent(new Event('input', { bubbles: true })); }
         const tot = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-total-"]');
-        const wet = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-wet-"]');
+        const wet = document.querySelector('#ddr-result input[data-ddr-target="t5-wetRooms"]');
         if (tot) { tot.value = '5'; tot.dispatchEvent(new Event('input', { bubbles: true })); }
         if (wet) { wet.value = '1'; wet.dispatchEvent(new Event('input', { bubbles: true })); }
         const rc = getCurrentRoomCounts();
         return {
           g, gables: document.getElementById('t3-gablePeaks').value, eu: (document.getElementById('eu-ewi-peaks') || {}).value,
           perim: per ? document.getElementById(per.dataset.ddrTarget).value : null, sumPerim: getCurrentPerimeterSum(),
-          rooms: rc.rooms, wet: rc.wetRooms, note: (tot && tot.closest('.ddr-rooms').querySelector('.ddr-vent') || {}).textContent,
-          others: document.querySelectorAll('#ddr-result .ddr-rooms input').length === document.querySelectorAll('#ddr-result .ddr-rooms').length * 2,
+          rooms: rc.rooms, wet: rc.wetRooms, note: (document.querySelector('#ddr-result .ddr-vent') || {}).textContent,
+          others: !document.querySelector('#ddr-result input[data-ddr-target*="-wet-"]'),
         };
       });
       ok(typed.g && typed.gables === '2' && typed.eu === '2', `[${tag}] ${mode}: gable peaks reach the Roof tab and external wall insulation`, JSON.stringify(typed));
       ok(typed.perim === '41.5' && near(typed.sumPerim, 41.5), `[${tag}] ${mode}: ground floor perimeter reaches the Floors tab`);
-      ok(typed.rooms === 5 && typed.wet === 1 && typed.others, `[${tag}] ${mode}: rooms and wet rooms per floor reach the Rooms tab`, JSON.stringify({ r: typed.rooms, w: typed.wet }));
+      ok(typed.rooms === 5 && typed.wet === 1 && typed.others, `[${tag}] ${mode}: rooms per storey and wet rooms for the dwelling reach the Rooms tab`, JSON.stringify({ r: typed.rooms, w: typed.wet }));
       ok(/1 extract · 4 air inlets/.test(typed.note || ''), `[${tag}] ${mode}: the panel shows the extracts and air inlets they make`, typed.note);
 
       // save and restore keeps it
