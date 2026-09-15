@@ -96,6 +96,12 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
           winCount: [...document.querySelectorAll('[id^="fc-t4-count-"]')].reduce((a, e) => a + (parseInt(e.value) || 0), 0),
           roofLights: parseInt((document.getElementById('t4-roofLights') || {}).value) || 0,
           doorText: (document.getElementById('t4-doorCount') || {}).value,
+          project: {
+            line1: r.meta.address[0] || '', mprn: r.meta.mprn, assessor: r.meta.assessor,
+            names: (!r.meta.mprn || /^0+$/.test(r.meta.mprn)) && !/\d/.test(r.meta.address[0] || '') && r.meta.address.slice(1).some(Boolean),
+            client: document.getElementById('t0-clientName').value, site: document.getElementById('t0-projName').value,
+            prepared: document.getElementById('t0-preparedBy').value,
+          },
           parts: (() => {
             const ext = t => r[t].rows.filter(x => x.part === 'extension').reduce((a, x) => a + x.area, 0);
             const onCards = tab => [...document.querySelectorAll(`[id^="fc-${tab}-"] .ddr-cap`)]
@@ -110,6 +116,12 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
         };
       });
       ok(got.applied && got.bad === 0, `[${tag}] ${mode}: read and every table matches its report total`);
+      {
+        const J = got.project, low = x => String(x).toLowerCase();
+        ok(J.names ? (low(J.client) === low(J.line1) && low(J.site).indexOf(low(J.line1)) === -1) : (J.client === '' && low(J.site).indexOf(low(J.line1)) === 0),
+           `[${tag}] ${mode}: client name from address line 1 only when the dwelling has no MPRN`, JSON.stringify({ client: !!J.client, names: J.names }));
+        ok(J.prepared === J.assessor, `[${tag}] ${mode}: Prepared by is the assessor named on the report`);
+      }
       const f = got.cards.floors + (got.ext ? got.ext.floors : 0);
       const w = got.cards.walls + (got.ext ? got.ext.walls : 0);
       const rf = got.cards.roofs + (got.ext ? got.ext.roofs : 0);

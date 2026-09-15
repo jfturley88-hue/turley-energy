@@ -24189,8 +24189,25 @@ document.addEventListener('DOMContentLoaded', function() {
     if (y <= 2019) return '2011' + D + '2019';
     return '2020 onwards';
   }
+  // DEAP keeps its text as typed; lines typed in capitals read better in title case.
+  function titleCase(t) {
+    t = String(t || '').trim();
+    if (!t || t !== t.toUpperCase()) return t;
+    return t.toLowerCase().replace(/(^|[\s\-\/(])([a-z])/g, function (_, b, c) { return b + c.toUpperCase(); })
+      .replace(/\b(And|Of|The)\b/g, function (w, x, i) { return i ? w.toLowerCase() : w; });
+  }
+  // A dwelling with no MPRN yet has no address from the meter point, and the assessor puts the
+  // client's names on address line 1. That line, with no house number in it, is the client.
+  function clientName(m) {
+    var l1 = (m.address || [])[0];
+    var noMprn = !m.mprn || /^0+$/.test(String(m.mprn).trim());
+    if (!l1 || !noMprn || /\d/.test(l1) || !(m.address || []).slice(1).some(Boolean)) return '';
+    return titleCase(l1);
+  }
   function address(m) {
     var parts = (m.address || []).filter(Boolean);
+    if (clientName(m)) parts = parts.slice(1);
+    parts = parts.map(titleCase);
     var n = function (s) { return String(s).replace(/[^a-z0-9]/gi, '').toLowerCase(); };
     var county = m.county ? String(m.county) : '';
     if (county && !parts.some(function (p) { return n(p).indexOf(n(county.replace(/^co\.?\s*/i, ''))) >= 0; })) parts.push(county);
@@ -24259,6 +24276,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // project details
     var addr = address(r.meta);
     if (addr) put('t0-projName', addr, 'Site address', 'Project details');
+    var client = clientName(r.meta);
+    if (client) put('t0-clientName', client, 'Client name', 'Project details');
+    if (r.meta.assessor) put('t0-preparedBy', r.meta.assessor, 'Prepared by (assessor)', 'Project details');
     var dw = mapDwelling(r.meta.dwellingType);
     if (dw) put('t0-dwellingType', dw, 'Dwelling type', 'Project details');
     else if (r.meta.dwellingType) DDR.flags.push('Dwelling type "' + r.meta.dwellingType + '" has no match here; choose it in Project details.');
