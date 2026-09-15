@@ -99,7 +99,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
           parts: (() => {
             const ext = t => r[t].rows.filter(x => x.part === 'extension').reduce((a, x) => a + x.area, 0);
             const onCards = tab => [...document.querySelectorAll(`[id^="fc-${tab}-"] .ddr-cap`)]
-              .filter(c => /^From the report: Extension/.test(c.textContent))
+              .filter(c => /^Extension\b/.test(c.textContent))
               .reduce((a, c) => a + (parseFloat((document.getElementById(`fc-${tab}-area-` + c.parentElement.id.split('-').pop()) || {}).value) || 0), 0);
             return { has: ['floors', 'walls', 'roofs'].some(t => ext(t) > 0), floors: ext('floors'), walls: ext('walls'), roofs: ext('roofs'),
                      cFloors: onCards('t1'), cWalls: onCards('t2'), cRoofs: onCards('t3'),

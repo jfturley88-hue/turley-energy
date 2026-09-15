@@ -144,8 +144,12 @@ floor perimeter to count.
 | Doors | door count and area | the same |
 | Heat Loss Indicator, year of construction | Energy Upgrade only: HLI and age band | not used |
 
-Every filled field is marked with a blue edge and a tooltip, and the mark goes when the
-assessor edits it. A room card is made for each storey found.
+The report is chosen from a button beside the example buttons in Project Details, and what
+it read, with the additional survey counts, opens inside that same panel, so the home screen
+looks as it did before until a report is read. Filled fields carry a tooltip only; wall,
+roof and floor cards carry a grey caption naming Existing or Extension and the report's
+description. Wet rooms and gable end peaks sit at the foot of the Rooms and Roof tabs in the
+same form as External Doors and Roof Lights in Openings. A room card is made for each storey.
 
 ### Counted on survey
 
@@ -181,7 +185,8 @@ ground floor perimeter is used in pricing instead of the estimate from area.
 the result against the report itself, so it holds no client figures: tables match their
 totals, the cards carry the areas whole, the HLI arrives, survey counts reach the tabs, a
 save and restore keeps it, the plan generates, and no request leaves the page. A PDF that is
-not a report is refused.
+not a report is refused. `scripts/verify/ddr_journey.js` runs the whole journey as the
+assessor clicks it, through to all three documents printed.
 
 ### Open
 

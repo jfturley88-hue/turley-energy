@@ -19,6 +19,10 @@ DDR_SAMPLES="dir;file.pdf" node scripts/verify/ddr.js
                                      #   in all three modes, checked against the report itself;
                                      #   no request may leave the page. Reports are client data
                                      #   and stay out of the repo; point DDR_SAMPLES at them.
+DDR_SAMPLES="dir;file.pdf" node scripts/verify/ddr_journey.js [outDir]
+                                     # the whole journey as an assessor works it: project type card,
+                                     #   report, survey counts, Open, measures, generate, and all three
+                                     #   documents printed; outDir keeps each Cost Plan as a PDF
 python3 scripts/verify/static_scan.py   # syntax on every script block; calls to undefined names
 ```
 

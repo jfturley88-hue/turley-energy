@@ -752,7 +752,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ao-detail-slot .tab-grid{grid-template-columns:1fr 1fr;gap:10px 16px;}
 
 /* ── Dwelling Details Report reader ── */
-.ddr-panel{margin-bottom:14px;}
 .ddr-panel.ddr-over{outline:2px dashed #38bdf8;outline-offset:2px;}
 .ddr-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
 .ddr-pick{cursor:pointer;font-size:12px;padding:6px 14px;white-space:nowrap;}
@@ -761,15 +760,16 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-status.ddr-err{color:#f87171;}
 .ddr-go{margin-top:8px;font-size:12px;}
 .ddr-sub{font-size:11px;color:#8FA0B8;margin:6px 0 4px;line-height:1.5;}
-.ddr-chk{display:inline-block;margin:2px 6px 0 0;padding:1px 7px;border-radius:10px;background:rgba(16,185,129,.12);color:#6ee7b7;font-size:10.5px;white-space:nowrap;}
+.ddr-chk{display:inline-block;margin:2px 6px 0 0;color:#8FA0B8;font-size:11px;white-space:nowrap;}
 .ddr-chk.ddr-bad{background:rgba(248,113,113,.12);color:#fca5a5;}
 .ddr-h{font-size:10.5px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 2px;}
 .ddr-rooms{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:end;padding:6px 0;border-bottom:1px solid rgba(46,61,82,.5);}
 .ddr-rl{font-size:11.5px;color:#E2E8F0;font-weight:600;padding-bottom:6px;}
 .ddr-rcs{display:grid;grid-template-columns:repeat(2,minmax(0,150px)) 1fr;gap:6px 10px;align-items:end;}
-.ddr-vent{font-size:11px;color:#7dd3fc;}
+.ddr-vent{font-size:11px;color:#8FA0B8;}
 .ddr-vent:empty{display:none;}
-.ddr-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 16px;margin-top:10px;}
+.ddr-grid{grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px;}
+.ddr-divider{margin:14px 0 0;padding-top:12px;border-top:1px solid rgba(46,61,82,0.4);}
 .ddr-grid .unit-row input{min-width:0;}
 .ddr-vent.ddr-bad-note{color:#f87171;}
 .ddr-rc{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#8FA0B8;}
@@ -783,8 +783,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-t{width:100%;border-collapse:collapse;margin-top:6px;font-size:11px;}
 .ddr-t th{text-align:left;color:#8FA0B8;font-weight:600;border-bottom:1px solid #2e3d52;padding:3px 6px;}
 .ddr-t td{color:#c8d0dc;border-bottom:1px solid rgba(46,61,82,.5);padding:3px 6px;}
-.ddr-cap{font-size:10.5px;color:#7dd3fc;margin:-6px 0 10px;line-height:1.4;}
-input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
+.ddr-cap{font-size:10.5px;color:#8FA0B8;margin:-6px 0 10px;line-height:1.4;}
 @media (max-width:640px){.ddr-grid{grid-template-columns:1fr 1fr;}.ddr-rooms{grid-template-columns:1fr;}.ddr-rcs{grid-template-columns:repeat(2,minmax(0,1fr));}}
 </style>
 </head>
@@ -891,17 +890,7 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
   <div style="height:1px;background:linear-gradient(90deg,transparent,#2e3d52,transparent);margin:4px 0 16px;"></div>
 
   <!-- PROJECT DETAILS -->
-  <!-- DWELLING DETAILS REPORT: read in this page by the built-in PDF reader; nothing is uploaded -->
-  <div class="home-details-panel ddr-panel" id="ddr-panel" ondragover="event.preventDefault();this.classList.add('ddr-over')" ondragleave="this.classList.remove('ddr-over')" ondrop="this.classList.remove('ddr-over');ddrDrop(event)">
-    <div class="home-details-label">Dwelling Details Report</div>
-    <div class="ddr-row">
-      <label class="tab-load-example-btn ddr-pick">Choose report (PDF)<input type="file" accept="application/pdf,.pdf" onchange="ddrPick(this)" style="display:none"></label>
-      <span class="ddr-note">Choose the project type above, then the Dwelling Details Report downloaded from DEAP. It is read on this computer and is not sent anywhere.</span>
-    </div>
-    <div id="ddr-result"></div>
-  </div>
-
-  <div class="home-details-panel">
+  <div class="home-details-panel" id="ddr-panel" ondragover="event.preventDefault();this.classList.add('ddr-over')" ondragleave="this.classList.remove('ddr-over')" ondrop="this.classList.remove('ddr-over');ddrDrop(event)">
     <div class="home-details-label">Project Details</div>
     <div class="tab-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
 
@@ -1001,6 +990,8 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
     </div>
 
     <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(46,61,82,0.4);flex-wrap:wrap;">
+      <!-- Dwelling Details Report: read in this page by the built-in PDF reader; nothing is uploaded -->
+      <label class="tab-load-example-btn" style="font-size:10px;padding:4px 10px;cursor:pointer;" title="The report is read on this computer and is not sent anywhere">&#x1F4C4; Dwelling Details Report (PDF)<input type="file" accept="application/pdf,.pdf" onchange="ddrPick(this)" style="display:none"></label>
       <button id="demo-btn-nb"  class="tab-load-example-btn" onclick="loadNewBuildExample()"  style="font-size:10px;padding:4px 10px;">&#x1F4CB; NB — Monaghan</button>
       <button id="demo-btn-nb2" class="tab-load-example-btn" onclick="loadNewBuildExample2()" style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; NB Example 2 &#x2014; Dublin</button>
       <button id="demo-btn-rf1" class="tab-load-example-btn" onclick="loadRefurbExample()"    style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; Refurb — Galway</button>
@@ -1008,6 +999,7 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
       <button id="demo-btn-eu1" class="tab-load-example-btn" onclick="loadEUExample1()"       style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; EU — Kildare</button>
       <button id="demo-btn-eu2" class="tab-load-example-btn" onclick="loadEUExample2()"       style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; Deep Retrofit &#x2014; Monaghan</button>
     </div>
+    <div id="ddr-result"></div>
   </div>
 
   <!-- HIDDEN PROJECT TYPE SELECT -->
@@ -1530,17 +1522,19 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
           <button type="button" onclick="addRoofCard()" class="tab-load-example-btn">+ Add Roof Section</button>
         </div>
         <div style="margin-top:20px;padding-top:14px;border-top:1px solid #2d3f55;">
-          <div style="font-size:11px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Counted on survey</div>
+          <div style="font-size:11px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Gable End Peaks</div>
           <div class="tab-grid">
             <div class="tab-field">
-              <label>Gable End Peaks</label>
+              <label>Number of Gable End Peaks</label>
               <div class="unit-row">
                 <input type="number" id="t3-gablePeaks" placeholder="0" min="0" max="6" step="1" oninput="syncGablePeaks(this)">
                 <span class="unit-label">nr</span>
               </div>
             </div>
           </div>
-          <div class="ws-hint" style="margin-top:6px;">The triangle of wall above wall-plate level at each gable end. External wall insulation and its scaffold are priced on it.</div>
+          <div class="ws-hint" style="margin-top:6px;">
+            &#x1F4A1; Leave at 0 if there are no gable ends. Each peak is the triangle above wall-plate level and adds to the external wall insulation and scaffold area.
+          </div>
         </div>
         <div class="tab-nav-row">
           <button class="tab-nav-prev" onclick="switchTab(1)">&#8592; Prev</button>
@@ -1624,17 +1618,25 @@ input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
           Add a room layout card for each floor. Ceiling heights are pulled from Tab&nbsp;1 floor cards to compute estimated <strong>internal wall area per floor</strong>.
           Totals drive: <strong>internal door count</strong>, <strong>electrical circuits</strong>, <strong>plumbing points</strong> and <strong>painting &amp; decoration</strong>. Internal doors = total rooms&nbsp;+&nbsp;1.
         </div>
-        <div class="tab-grid" style="margin-bottom:4px;">
-          <div class="tab-field">
-            <label>Wet Rooms, Whole Dwelling (incl. kitchen)</label>
-            <div class="unit-row"><input type="number" id="t5-wetRooms" placeholder="0" min="0"><span class="unit-label">nr</span></div>
-          </div>
-        </div>
-        <div class="ws-hint" style="margin-bottom:6px;">Wet rooms take the ventilation extract. Every other room counted on the floor cards takes an air inlet.</div>
         <div id="t5r-cards"></div>
         <p id="t5r-empty" class="dyn-empty">No floor room layouts added yet &mdash; click the button below to add a floor</p>
         <div style="text-align:center;margin-top:8px;">
           <button type="button" onclick="addRoomFloorCard()" class="tab-load-example-btn">+ Add Floor Room Layout</button>
+        </div>
+        <div style="margin-top:20px;padding-top:14px;border-top:1px solid #2d3f55;">
+          <div style="font-size:11px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Wet Rooms</div>
+          <div class="tab-grid">
+            <div class="tab-field">
+              <label>Number of Wet Rooms (incl. kitchen)</label>
+              <div class="unit-row">
+                <input type="number" id="t5-wetRooms" placeholder="0" min="0">
+                <span class="unit-label">nr</span>
+              </div>
+            </div>
+          </div>
+          <div class="ws-hint" style="margin-top:6px;">
+            &#x1F4A1; Whole dwelling. Wet rooms take the ventilation extract; every other room on the floor cards takes an air inlet.
+          </div>
         </div>
         <div class="tab-nav-row">
           <button class="tab-nav-prev" onclick="switchTab(2)">&#8592; Prev</button>
@@ -21470,8 +21472,6 @@ function addRoomFloorCard() {
           <option>Ground Floor</option><option>First Floor</option><option>Second Floor</option>
           <option>Third Floor</option><option>Fourth Floor</option><option>Basement</option>
         </select></div>
-      <div class="tab-field"><label>Rooms (total)</label>
-        <div class="unit-row"><input type="number" id="fc-t5r-total-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bedrooms</label>
         <div class="unit-row"><input type="number" id="fc-t5r-beds-${id}" placeholder="0" min="0" oninput="updateRoomFloorWalls(${id});syncRoomFloorTotals();"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bathrooms</label>
@@ -21484,6 +21484,8 @@ function addRoomFloorCard() {
         <div class="unit-row"><input type="number" id="fc-t5r-living-${id}" placeholder="0" min="0" oninput="updateRoomFloorWalls(${id});syncRoomFloorTotals();"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Utility / Study / Other</label>
         <div class="unit-row"><input type="number" id="fc-t5r-extra-${id}" placeholder="0" min="0" oninput="updateRoomFloorWalls(${id});syncRoomFloorTotals();"><span class="unit-label">nr</span></div></div>
+      <div class="tab-field"><label>Rooms (total)</label>
+        <div class="unit-row"><input type="number" id="fc-t5r-total-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
     </div>
     <div style="margin-top:10px;padding:8px 12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;font-size:11px;color:#c8d0dc;">
       <span style="font-weight:700;color:#10b981;">Est. internal walls:</span>
@@ -24213,7 +24215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var title = card.querySelector('div');
     var cap = document.createElement('div');
     cap.className = 'ddr-cap';
-    cap.textContent = 'From the report: ' + text;
+    cap.textContent = text;
     if (title && title.nextSibling) card.insertBefore(cap, title.nextSibling); else card.appendChild(cap);
   }
 
@@ -24433,7 +24435,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Ground floor perimeter, extension', 'm');
     else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Ground floor perimeter, extension', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
-    return '<div class="ddr-h">Additional survey counts</div>' +
+    return '<div class="home-details-label ddr-divider">Additional survey counts</div>' +
       '<div class="tab-grid ddr-grid">' + rooms + '</div>' +
       '<div class="tab-grid ddr-grid">' + more + '</div>';
   }
@@ -24447,7 +24449,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!r) { box.innerHTML = ''; return; }
     var m = r.meta;
     var head = '<div class="ddr-status">Report read: <strong>' + esc(DDR.file) + '</strong>, ' + DDR.pages + ' pages' +
-      (m.created ? ', created ' + esc(m.created) : '') + '.</div>';
+      (m.created ? ', created ' + esc(m.created) : '') + '. Read on this computer; nothing was sent anywhere.</div>';
     if (!DDR.applied) {
       box.innerHTML = head + '<button type="button" class="tab-load-example-btn ddr-go" onclick="ddrApplyReport()">Fill the ' +
         esc(($('t0-projType') || {}).value || 'New Build') + ' survey from this report</button>';
