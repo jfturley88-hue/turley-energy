@@ -57,7 +57,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       await p.setInputFiles('#ddr-panel input[type=file]', file);
       await p.waitForFunction(() => {
         const t = (document.getElementById('ddr-result') || {}).textContent || '';
-        return /Count on the survey|could not be read|No dwelling details|not a PDF/.test(t);
+        return /Additional survey counts|could not be read|No dwelling details|not a PDF/.test(t);
       }, null, { timeout: 60000 });
 
       if (file === NOT_A_REPORT) {
@@ -208,7 +208,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
     await p.goto(APP); await p.waitForTimeout(500);
     await p.evaluate(() => selectProjectType('New Build'));
     await p.setInputFiles('#ddr-panel input[type=file]', files[0]);
-    await p.waitForFunction(() => /Count on the survey/.test(document.getElementById('ddr-result').textContent), null, { timeout: 60000 });
+    await p.waitForFunction(() => /Additional survey counts/.test(document.getElementById('ddr-result').textContent), null, { timeout: 60000 });
     await p.evaluate(() => selectProjectType('Energy Upgrade'));
     const btn = await p.evaluate(() => (document.querySelector('#ddr-result .ddr-go') || {}).textContent || '');
     ok(/Fill the Energy Upgrade survey/.test(btn), '[type change] the report waits to fill the new project type', btn);

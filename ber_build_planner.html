@@ -24433,8 +24433,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Ground floor perimeter, extension', 'm');
     else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Ground floor perimeter, extension', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
-    return '<div class="ddr-h">Count on the survey</div>' +
-      '<div class="ddr-sub">These are not in the report. Wet rooms get an extract and every other room an air inlet.</div>' +
+    return '<div class="ddr-h">Additional survey counts</div>' +
       '<div class="tab-grid ddr-grid">' + rooms + '</div>' +
       '<div class="tab-grid ddr-grid">' + more + '</div>';
   }
