@@ -766,7 +766,9 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-h{font-size:10.5px;font-weight:700;color:#E8A020;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 2px;}
 .ddr-rooms{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:end;padding:6px 0;border-bottom:1px solid rgba(46,61,82,.5);}
 .ddr-rl{font-size:11.5px;color:#E2E8F0;font-weight:600;padding-bottom:6px;}
-.ddr-rcs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;}
+.ddr-rcs{display:grid;grid-template-columns:repeat(2,minmax(0,150px)) 1fr;gap:6px 10px;align-items:end;}
+.ddr-vent{font-size:11px;color:#7dd3fc;padding-bottom:7px;}
+.ddr-vent.ddr-bad-note{color:#f87171;}
 .ddr-rc{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#8FA0B8;}
 .ddr-sfs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px 14px;margin-top:10px;}
 .ddr-sf{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#c8d0dc;}
@@ -781,7 +783,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 .ddr-t td{color:#c8d0dc;border-bottom:1px solid rgba(46,61,82,.5);padding:3px 6px;}
 .ddr-cap{font-size:10.5px;color:#7dd3fc;margin:-6px 0 10px;line-height:1.4;}
 input.ddr-from,select.ddr-from{box-shadow:inset 3px 0 0 #38bdf8;}
-@media (max-width:640px){.ddr-rooms{grid-template-columns:1fr;}.ddr-rcs{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media (max-width:640px){.ddr-rooms{grid-template-columns:1fr;}.ddr-rcs{grid-template-columns:repeat(2,minmax(0,1fr));}}
 </style>
 </head>
 <body>
@@ -8850,25 +8852,38 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const mvhrMat     = Math.round(mvhrBaseMat * mvhrMatMult);
     const ductLabel   = inputs.mvhr_duct === 'rigid' ? 'Galvanised rigid ductwork' : 'Semi-rigid radial ductwork';
     const unitLabel   = mvhrTier === 'premium' ? 'Zehnder ComfoAir 350' : mvhrTier === 'basic' ? 'Nuaire or equivalent' : 'Paul Novus / ComfoAir Q350';
-    // MEV wet room count — bathrooms + ensuites + kitchen (1)
+    // Wet rooms counted on the survey, kitchen included, set the extract points. Every other
+    // room counted gets an air inlet, priced at the rate book's room air intake vent. With no
+    // survey count the older estimate stands: bathrooms + en-suites + kitchen, no inlets.
+    const wetSurveyed = inputs.wetRooms || 0;
+    const inletsNr    = ((inputs.roomsSurveyed || 0) > 0 && wetSurveyed > 0) ? Math.max(0, inputs.roomsSurveyed - wetSurveyed) : 0;
+    const _inletX     = (EU_EXCL.wall_cavity || []).filter(function(e) { return e.id === 'cav_vents'; })[0];
+    const inletMat    = _inletX ? euExclMat(_inletX) : 30;
+    const inletHrs    = _inletX ? _inletX.hrs : 1;
+    const inletItem   = function(ref, humidity) {
+      return mkItem(ref, 'Air inlets \u2014 ' + (humidity ? 'humidity-sensitive, ' : '') + 'rooms without an extract', 'nr', inletsNr, inletMat, lM(inletHrs, L.craft),
+        inletsNr + ' of ' + inputs.roomsSurveyed + ' rooms counted on survey \u2014 core drill, sleeve and grilles');
+    };
     const mevBaths    = (inputs.bathrooms || 1) + (inputs.ensuites || 0);
-    const mevTerms    = Math.max(3, mevBaths + 1);
+    const mevTerms    = wetSurveyed > 0 ? wetSurveyed : Math.max(3, mevBaths + 1);
     const trickleNr   = winCount;
     const mevItems = [
       mkItem('8.1','MEV unit (whole house continuous extract)','nr',1,_EU_MEV[0],lM(6,L.craft),'Nuaire Drimaster or equivalent'),
       mkItem('8.2','Duct runs — extract to wet rooms','m',Math.round(fa*0.25),_EU_MEV[1],lM(0.3,L.craft),'Rigid or semi-rigid PVC duct — insulated'),
-      mkItem('8.3','Extract terminals — wet room grilles','nr',mevTerms,_EU_MEV[2],lM(1,L.craft),mevBaths + ' bath/ensuite + kitchen — ' + (inputs.mev_humidity ? 'humidistat' : 'timed') + ' controlled'),
+      mkItem('8.3','Extract terminals — wet room grilles','nr',mevTerms,_EU_MEV[2],lM(1,L.craft),(wetSurveyed > 0 ? wetSurveyed + ' wet rooms incl. kitchen, counted on survey' : mevBaths + ' bath/ensuite + kitchen') + ' — ' + (inputs.mev_humidity ? 'humidistat' : 'timed') + ' controlled'),
       ...(inputs.mev_trickle ? [mkItem('8.4','Trickle ventilators to habitable room windows','nr',trickleNr,_EU_TRICKLE,lM(0.5,L.craft),'Background ventilation — one per window opening — TrickleVent or equivalent')] : []),
+      ...(inletsNr > 0 && !inputs.mev_trickle ? [inletItem('8.5', inputs.mev_humidity)] : []),
     ];
     // DMEV — decentralised, one fan per wet room + kitchen; sized from Tab 5 room counts
     const dmevWetRooms  = (inputs.bathrooms || 1) + (inputs.ensuites || 0) + (inputs.wc || 0);
-    const dmevFanCount  = dmevWetRooms + 1; // + kitchen
+    const dmevFanCount  = wetSurveyed > 0 ? wetSurveyed : dmevWetRooms + 1; // + kitchen
     const dmevFanLabel  = inputs.dmev_fan === 'timer' ? 'Timer-controlled' : inputs.dmev_fan === 'continuous' ? 'Continuous low-rate' : 'Humidity-sensing';
     const dmevMountLbl  = inputs.dmev_mount === 'wall' ? 'through-wall' : 'ceiling-mounted';
     const dmevItems = [
-      mkItem('8.1','DMEV extract fans — ' + dmevFanLabel + ', ' + dmevMountLbl,'nr',dmevFanCount,_EU_DMEV[0],lM(1.5,L.electrician),dmevFanCount + ' units — ' + dmevWetRooms + ' wet rooms + kitchen — sized from Tab 5'),
+      mkItem('8.1','DMEV extract fans — ' + dmevFanLabel + ', ' + dmevMountLbl,'nr',dmevFanCount,_EU_DMEV[0],lM(1.5,L.electrician),dmevFanCount + ' units — ' + (wetSurveyed > 0 ? 'one per wet room incl. kitchen, counted on survey' : dmevWetRooms + ' wet rooms + kitchen — sized from Tab 5')),
       mkItem('8.2','Core drill, spigot duct & weatherproof external grille','nr',dmevFanCount,_EU_DMEV[1],lM(0.5,L.craft),'One core per fan — sleeve & grille included'),
       mkItem('8.3','Switched fused spur (13A) per fan','nr',dmevFanCount,_EU_DMEV[2],lM(0.75,L.electrician),'Independent fused spur — each fan'),
+      ...(inletsNr > 0 ? [inletItem('8.4', inputs.dmev_fan !== 'timer' && inputs.dmev_fan !== 'continuous')] : []),
     ];
     const ventTitle = vent === 'MVHR' ? 'MECHANICAL VENTILATION WITH HEAT RECOVERY (MVHR)'
                     : vent === 'DMEV' ? 'DECENTRALISED MECHANICAL EXTRACT VENTILATION (DMEV)'
@@ -8881,7 +8896,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     sections.push({id:String(sid++),title:ventTitle,part:'B',items:(vent==='MVHR'?[
       mkItem('8.1','MVHR unit — whole house (' + unitLabel + ')','nr',1,mvhrMat,lM(16,L.craft),unitLabel + ' — sized to ' + fa + 'm² floor area — airtightness n50 ≤3 ACH required for effective MVHR performance'),
       mkItem('8.2',ductLabel + ' — supply & extract runs','m',Math.round(fa*0.4),17,lM(0.9,L.craft),'Sealed, insulated runs — all habitable rooms'),
-      mkItem('8.3','Supply & extract terminals (valves/grilles)','nr',totalRooms*2,55,lM(1,L.craft),'One supply + one extract per habitable room'),
+      mkItem('8.3','Supply & extract terminals (valves/grilles)','nr',(inputs.roomsSurveyed > 0 && wetSurveyed > 0) ? inputs.roomsSurveyed : totalRooms*2,55,lM(1,L.craft),(inputs.roomsSurveyed > 0 && wetSurveyed > 0) ? 'Extract in each of ' + wetSurveyed + ' wet rooms, supply to the other ' + inletsNr + ' rooms \u2014 counted on survey' : 'One supply + one extract per habitable room'),
       mkItem('8.4','Commissioning & air balancing certificate','nr',1,0,lM(6,L.craft),'CIBSE commissioning flow rates — MVHR certification'),
     ]:vent==='DMEV'?dmevItems:mevItems).concat(ventAT)});
   }
@@ -9399,6 +9414,8 @@ function addExtRoomFloorCard(n) {
         '<select id="' + p + '-level" onchange="updateExtRoomFloorWalls(' + n + ',' + id + ')">' +
           '<option>Ground Floor</option><option>First Floor</option><option>Second Floor</option><option>Third Floor</option>' +
         '</select></div>' +
+      '<div class="tab-field"><label>Rooms (total)</label><div class="unit-row"><input type="number" id="' + p + '-total" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>' +
+      '<div class="tab-field"><label>Wet Rooms (incl. kitchen)</label><div class="unit-row"><input type="number" id="' + p + '-wet" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>Bedrooms</label><div class="unit-row"><input type="number" id="' + p + '-beds" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>Bathrooms</label><div class="unit-row"><input type="number" id="' + p + '-baths" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
       '<div class="tab-field"><label>En-suites</label><div class="unit-row"><input type="number" id="' + p + '-ens" placeholder="0" min="0" oninput="updateExtRoomFloorWalls(' + n + ',' + id + ');syncExtRoomTotals(' + n + ');"><span class="unit-label">nr</span></div></div>' +
@@ -12432,6 +12449,10 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
     const winAEU = inputs.windowArea || inputs.win_area || Math.round(fa * 0.15);
     const euPanelInputs = {
       floorArea:    fa,
+      // Counted on the survey (Rooms tab): every room on each floor, and how many are wet rooms,
+      // kitchen included. Wet rooms take the extract; every other room takes an air inlet.
+      roomsSurveyed:     (typeof getCurrentRoomCounts === 'function' ? (getCurrentRoomCounts().rooms || 0) : 0),
+      wetRooms:          (typeof getCurrentRoomCounts === 'function' ? (getCurrentRoomCounts().wetRooms || 0) : 0),
       wallArea:     wa,
       roofArea:     ra,
       groundFloor:  gfa,
@@ -13330,6 +13351,10 @@ function readEUSelector() {
     roomsDown:         rd,
     roomsUp:           ru,
     totalRooms:        totalRooms,
+    // Counted on the survey (Rooms tab): every room on each floor, and how many are wet rooms,
+    // kitchen included. Wet rooms take the extract; every other room takes an air inlet.
+    roomsSurveyed:     (typeof getCurrentRoomCounts === 'function' ? (getCurrentRoomCounts().rooms || 0) : 0),
+    wetRooms:          (typeof getCurrentRoomCounts === 'function' ? (getCurrentRoomCounts().wetRooms || 0) : 0),
     bathrooms:         parseInt(document.getElementById('t5-bathrooms')?.value) || 1,
     ensuites:          parseInt(document.getElementById('t5-ensuites')?.value)  || 0,
     wc:                parseInt(document.getElementById('t5-wc')?.value)         || 0,
@@ -14355,20 +14380,23 @@ function _euPricingBasis(s, inp) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     pb.push('System: MVHR (whole-house heat recovery)');
     if (inp.mvhr_unit) pb.push('Unit tier: '+euLabel(inp.mvhr_unit, 'mvhr_unit'));
-    pb.push('Rooms: '+((inp.roomsDown||4)+(inp.roomsUp||4))+' ('+((inp.roomsDown||4)+(inp.roomsUp||4))*2+' terminals)');
+    if (inp.roomsSurveyed > 0 && inp.wetRooms > 0) pb.push('Rooms: '+inp.roomsSurveyed+', of which '+inp.wetRooms+' wet rooms incl. kitchen ('+inp.roomsSurveyed+' terminals)');
+    else pb.push('Rooms: '+((inp.roomsDown||4)+(inp.roomsUp||4))+' ('+((inp.roomsDown||4)+(inp.roomsUp||4))*2+' terminals)');
     pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
       ? 'Air-tightness test: included'
       : 'Air-tightness test: priced under ' + (inp.includeAirTest ? 'Air Pressure Test' : 'Airtightness'));
   } else if (t.indexOf('DMEV') >= 0) {
     pb.push('System: DMEV (decentralised extract)');
-    pb.push('Wet rooms: '+((inp.bathrooms||1)+(inp.ensuites||0)+(inp.wc||0))+' + kitchen');
+    pb.push(inp.wetRooms > 0 ? 'Wet rooms: '+inp.wetRooms+' incl. kitchen' : 'Wet rooms: '+((inp.bathrooms||1)+(inp.ensuites||0)+(inp.wc||0))+' + kitchen');
+    if (inp.roomsSurveyed > 0 && inp.wetRooms > 0) pb.push('Air inlets: '+Math.max(0,inp.roomsSurveyed-inp.wetRooms)+' nr');
     pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
       ? 'Air-tightness test: included'
       : 'Air-tightness test: priced under ' + (inp.includeAirTest ? 'Air Pressure Test' : 'Airtightness'));
   } else if (t.indexOf('MECHANICAL EXTRACT') >= 0 || t.indexOf('MEV') >= 0) {
     pb.push('Floor area: '+(inp.floorArea||'—')+'m²');
     pb.push('System: MEV (centralised whole-house extract)');
-    pb.push('Extract terminals: '+Math.max(3,(inp.bathrooms||1)+(inp.ensuites||0)+1)+' nr');
+    pb.push('Extract terminals: '+(inp.wetRooms > 0 ? inp.wetRooms : Math.max(3,(inp.bathrooms||1)+(inp.ensuites||0)+1))+' nr');
+    if (inp.roomsSurveyed > 0 && inp.wetRooms > 0 && !inp.mev_trickle) pb.push('Air inlets: '+Math.max(0,inp.roomsSurveyed-inp.wetRooms)+' nr');
     if (inp.mev_trickle) pb.push('Trickle vents: '+(inp.windowCount||Math.round((inp.floorArea||100)*0.15/1.5))+' nr');
     pb.push((s.items||[]).some(function(i){return /air-tightness test/i.test(i.description||'');})
       ? 'Air-tightness test: included'
@@ -21435,6 +21463,10 @@ function addRoomFloorCard() {
           <option>Ground Floor</option><option>First Floor</option><option>Second Floor</option>
           <option>Third Floor</option><option>Fourth Floor</option><option>Basement</option>
         </select></div>
+      <div class="tab-field"><label>Rooms (total)</label>
+        <div class="unit-row"><input type="number" id="fc-t5r-total-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
+      <div class="tab-field"><label>Wet Rooms (incl. kitchen)</label>
+        <div class="unit-row"><input type="number" id="fc-t5r-wet-${id}" placeholder="0" min="0"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bedrooms</label>
         <div class="unit-row"><input type="number" id="fc-t5r-beds-${id}" placeholder="0" min="0" oninput="updateRoomFloorWalls(${id});syncRoomFloorTotals();"><span class="unit-label">nr</span></div></div>
       <div class="tab-field"><label>Bathrooms</label>
@@ -21718,7 +21750,7 @@ function getCurrentRoomCounts() {
   // Prefer per-floor room cards (t5r) when any have been added
   if (typeof _dynCount === 'object' && _dynCount && _dynCount.t5r > 0) {
     var g = function(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
-    var beds = 0, baths = 0, ens = 0, wc = 0, living = 0, extra = 0, hasCard = false;
+    var beds = 0, baths = 0, ens = 0, wc = 0, living = 0, extra = 0, rooms = 0, wet = 0, hasCard = false;
     for (var i = 1; i <= _dynCount.t5r; i++) {
       if (!document.getElementById('fc-t5r-' + i)) continue;
       hasCard = true;
@@ -21728,10 +21760,12 @@ function getCurrentRoomCounts() {
       wc     += g('fc-t5r-wc-'     + i);
       living += g('fc-t5r-living-' + i);
       extra  += g('fc-t5r-extra-'  + i);
+      rooms  += g('fc-t5r-total-'  + i);
+      wet    += g('fc-t5r-wet-'    + i);
     }
     if (hasCard) {
       return { bedrooms: beds, bathrooms: baths, ensuites: ens, wc: wc,
-               livingAreas: living, additionalRooms: extra };
+               livingAreas: living, additionalRooms: extra, rooms: rooms, wetRooms: wet };
     }
   }
   // Fallback: legacy flat fields (old saves loaded before floor cards existed)
@@ -21742,7 +21776,8 @@ function getCurrentRoomCounts() {
     ensuites:        gv('t5-ensuites'),
     wc:              gv('t5-wc'),
     livingAreas:     gv('t5-livingAreas'),
-    additionalRooms: gv('t5-additionalRooms')
+    additionalRooms: gv('t5-additionalRooms'),
+    rooms: 0, wetRooms: 0
   };
 }
 window.getCurrentRoomCounts = getCurrentRoomCounts;
@@ -24235,13 +24270,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (/^yes$/i.test(r.meta.extension || '') && !hasExtRows) {
       DDR.flags.push('The report says the dwelling has an extension, but no element is labelled Extension, so every area went to the house.');
     }
-    if (hasExtRows && !split) {
-      DDR.flags.push('The report separates the existing house and the extension. ' + mode + ' prices them together, so both are in the cards.');
-    }
-    if (split) {
-      var unl = rows.filter(function (x) { return !x.part; }).length;
-      if (unl) DDR.flags.push(unl + (unl === 1 ? ' element has' : ' elements have') + ' no Existing or Extension label and ' + (unl === 1 ? 'was' : 'were') + ' taken as the existing house.');
-    }
 
     // floors and their room cards
     function floorCard(level, area, height, cap) {
@@ -24267,8 +24295,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (split) {
       floorCard('Ground Floor', sumA(r.floors.rows, function (x) { return x.ground && notExt(x); }), gH, 'existing house, ground floor');
       floorCard('First Floor',  sumA(r.floors.rows, function (x) { return !x.ground && notExt(x); }), uH, 'existing house, upper floors');
-      var upperLevels = r.dims.filter(function (d) { return d.level !== 'Ground floor' && d.area > 0; }).length;
-      if (upperLevels > 1) DDR.flags.push('The report does not split upper floors by storey between house and extension, so each part’s upper floors are on one First Floor card.');
     } else {
       var used = 0;
       r.dims.forEach(function (d) {
@@ -24276,7 +24302,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var level;
         if (d.level === 'Room in Roof') {
           level = LEVELS[Math.min(used, LEVELS.length - 1)];
-          DDR.flags.push('The room in roof is entered as the ' + level + '.');
         } else {
           level = { 'Ground floor': 'Ground Floor', 'First floor': 'First Floor', 'Second floor': 'Second Floor', 'Third and other floors': 'Third Floor' }[d.level];
         }
@@ -24317,13 +24342,7 @@ document.addEventListener('DOMContentLoaded', function() {
       caption('fc-t4-' + wid, wins.length + ' glazing groups by orientation. The report gives no window count.');
       S.windowCard = wid;
     }
-    if (roofWins.length) {
-      DDR.flags.push('Roof windows total ' + fmtA(sumA(roofWins, function () { return true; })) + ' in the report and are not in the window card.');
-      S.roofLights = true;
-    }
-    if (split && winArea > 0) {
-      DDR.flags.push('The report does not say which windows are in the extension, so all the windows are in Openings and the extension card has none.');
-    }
+    if (roofWins.length) S.roofLights = true;
 
     // doors
     if (r.doors.rows.length) {
@@ -24331,7 +24350,6 @@ document.addEventListener('DOMContentLoaded', function() {
       put('t4-doorCount', dc, 'External doors', 'Openings');
       put('t4-doorArea', r2(r.doors.total != null ? r.doors.total : r.doors.sum), 'External door area', 'Openings');
     } else {
-      DDR.flags.push('The report lists no external doors.');
       S.doors = true;
     }
 
@@ -24398,7 +24416,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // ── what the assessor counts on the survey ───────────────────────────────────
-  var ROOM_FIELDS = [['beds', 'Bedrooms'], ['baths', 'Bathrooms'], ['ens', 'En-suites'], ['wc', 'WC'], ['living', 'Living / kitchen'], ['extra', 'Utility / other']];
+  var ROOM_FIELDS = [['total', 'Rooms'], ['wet', 'Wet rooms (incl. kitchen)']];
   function surveyTarget(kind, a, b) {
     if (kind === 'room') return a.n ? $('erf' + a.n + '-' + a.id + '-' + b) : $('fc-t5r-' + b + '-' + a.id);
     return $(a);
@@ -24419,7 +24437,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var el = $(t);
         return el ? '<label class="ddr-rc"><span>' + f[1] + '</span><input type="number" min="0" step="1" data-ddr-target="' + t + '" value="' + esc(el.value) + '"></label>' : '';
       }).join('');
-      return '<div class="ddr-rooms"><div class="ddr-rl">' + esc(who + R.level) + '</div><div class="ddr-rcs">' + cells + '</div></div>';
+      return '<div class="ddr-rooms"><div class="ddr-rl">' + esc(who + R.level) + '</div><div class="ddr-rcs">' + cells + '<span class="ddr-vent"></span></div></div>';
     };
     S.houseRooms.forEach(function (R) { h += roomRow(S.extN ? 'House · ' : '', R); });
     S.extRooms.forEach(function (R) { h += roomRow('Extension · ', R); });
@@ -24431,7 +24449,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (S.roofLights) more += surveyInput('t4-roofLights', 'Roof lights', 'nr');
     if (S.doors) more += surveyInput('t4-doorCount', 'External doors', 'nr');
     return '<div class="ddr-h">Counted on survey</div>' +
-      '<div class="ddr-sub">Not in the report. These go straight into the Floors, Roof, Rooms and Openings tabs.</div>' +
+      '<div class="ddr-sub">Not in the report. Wet rooms take the extract and every other room an air inlet. Each count goes straight into its tab.</div>' +
       h + '<div class="ddr-sfs">' + more + '</div>';
   }
 
@@ -24466,8 +24484,20 @@ document.addEventListener('DOMContentLoaded', function() {
       '<div class="ddr-sub">Every table was added up against the report’s own total: ' + totals + '</div>' +
       surveyHTML() + flags +
       '<details class="ddr-d"><summary>' + DDR.filled.length + ' values filled. Every one can be edited in its tab.</summary>' + filled + '</details>';
+    ventNotes();
   }
 
+  // Beside each floor's counts: how many extracts and air inlets they make.
+  function ventNotes() {
+    document.querySelectorAll('#ddr-result .ddr-rooms').forEach(function (row) {
+      var ins = row.querySelectorAll('input');
+      var total = parseInt(ins[0] && ins[0].value, 10) || 0, wet = parseInt(ins[1] && ins[1].value, 10) || 0;
+      var note = row.querySelector('.ddr-vent');
+      if (!note) return;
+      note.textContent = total ? (wet + (wet === 1 ? ' extract' : ' extracts') + ' \u00b7 ' + Math.max(0, total - wet) + (total - wet === 1 ? ' air inlet' : ' air inlets')) : '';
+      note.classList.toggle('ddr-bad-note', wet > total);
+    });
+  }
   // survey inputs on the panel write straight through to their fields
   document.addEventListener('input', function (e) {
     var t = e.target;
@@ -24479,6 +24509,7 @@ document.addEventListener('DOMContentLoaded', function() {
         f.dispatchEvent(new Event('input', { bubbles: true }));
         f.dispatchEvent(new Event('change', { bubbles: true }));
       }
+      ventNotes();
       return;
     }
     // a person editing a field that came from the report takes it over

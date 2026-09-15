@@ -90,6 +90,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
           cards: { floors: cards('t1', 'area'), walls: cards('t2', 'area'), roofs: cards('t3', 'area'), windows: cards('t4', 'area') },
           doors: num('t4-doorCount'), hli: num('eu-hli'), hliSource: (document.getElementById('eu-hli-source') || {}).value,
           ext, flags: S.flags.slice(),
+          doorsAsked: !!document.querySelector('#ddr-result input[data-ddr-target="t4-doorCount"]'),
         };
       });
       ok(got.applied && got.bad === 0, `[${tag}] ${mode}: read and every table matches its report total`);
@@ -100,7 +101,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       ok(near(w, got.rpt.walls), `[${tag}] ${mode}: wall areas carried whole`, `${w} vs ${got.rpt.walls}`);
       ok(near(rf, got.rpt.roofs), `[${tag}] ${mode}: roof areas carried whole`, `${rf} vs ${got.rpt.roofs}`);
       ok(near(got.cards.windows, got.rpt.windows), `[${tag}] ${mode}: window area carried, roof windows kept out`, `${got.cards.windows} vs ${got.rpt.windows}`);
-      ok(got.rpt.doors ? got.doors === got.rpt.doors : got.flags.some(x => /no external doors/.test(x)), `[${tag}] ${mode}: doors counted, or their absence flagged`);
+      ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorsAsked, `[${tag}] ${mode}: doors counted, or asked for on the survey`);
       if (mode === 'Energy Upgrade') ok(near(got.hli, got.rpt.hli) && got.hliSource === 'ber', `[${tag}] Energy Upgrade: Heat Loss Indicator from the report`, `${got.hli} (${got.hliSource})`);
       if (got.ext) ok(got.ext.read.windowArea === 0 && got.ext.read.doorCount === 0, `[${tag}] Refurbishment: extension carries no invented windows or doors`, JSON.stringify({ w: got.ext.read.windowArea, d: got.ext.read.doorCount }));
       if (got.ext) {
@@ -121,17 +122,22 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
         const g = set('#ddr-result input[data-ddr-target="t3-gablePeaks"]', '2');
         const per = document.querySelector('#ddr-result input[data-ddr-target^="fc-t1-perim-"]');
         if (per) { per.value = '41.5'; per.dispatchEvent(new Event('input', { bubbles: true })); }
-        const bed = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-beds-"]');
-        if (bed) { bed.value = '3'; bed.dispatchEvent(new Event('input', { bubbles: true })); }
+        const tot = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-total-"]');
+        const wet = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-wet-"]');
+        if (tot) { tot.value = '5'; tot.dispatchEvent(new Event('input', { bubbles: true })); }
+        if (wet) { wet.value = '1'; wet.dispatchEvent(new Event('input', { bubbles: true })); }
+        const rc = getCurrentRoomCounts();
         return {
           g, gables: document.getElementById('t3-gablePeaks').value, eu: (document.getElementById('eu-ewi-peaks') || {}).value,
           perim: per ? document.getElementById(per.dataset.ddrTarget).value : null, sumPerim: getCurrentPerimeterSum(),
-          beds: bed ? document.getElementById(bed.dataset.ddrTarget).value : null, rooms: getCurrentRoomCounts().bedrooms,
+          rooms: rc.rooms, wet: rc.wetRooms, note: (tot && tot.closest('.ddr-rooms').querySelector('.ddr-vent') || {}).textContent,
+          others: document.querySelectorAll('#ddr-result .ddr-rooms input').length === document.querySelectorAll('#ddr-result .ddr-rooms').length * 2,
         };
       });
       ok(typed.g && typed.gables === '2' && typed.eu === '2', `[${tag}] ${mode}: gable peaks reach the Roof tab and external wall insulation`, JSON.stringify(typed));
       ok(typed.perim === '41.5' && near(typed.sumPerim, 41.5), `[${tag}] ${mode}: ground floor perimeter reaches the Floors tab`);
-      ok(typed.beds === '3' && typed.rooms === 3, `[${tag}] ${mode}: room counts reach the Rooms tab`);
+      ok(typed.rooms === 5 && typed.wet === 1 && typed.others, `[${tag}] ${mode}: rooms and wet rooms per floor reach the Rooms tab`, JSON.stringify({ r: typed.rooms, w: typed.wet }));
+      ok(/1 extract · 4 air inlets/.test(typed.note || ''), `[${tag}] ${mode}: the panel shows the extracts and air inlets they make`, typed.note);
 
       // save and restore keeps it
       const kept = await p.evaluate(() => {
@@ -147,13 +153,22 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       // it prices
       await p.evaluate(m => {
         const tick = id => { const e = document.getElementById(id); if (e && !e.checked) { e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } };
-        if (m === 'Energy Upgrade') tick('eu-roof-ceiling');
-        if (m === 'Refurbishment') tick('ws-making-good');
+        if (m === 'Energy Upgrade') { tick('eu-roof-ceiling'); tick('eu-mev'); }
+        if (m === 'Refurbishment') { tick('ws-making-good'); tick('ref-eu-mev'); }
       }, mode);
       await p.evaluate(() => generate());
       await p.waitForTimeout(2500);
       const priced = await p.evaluate(() => ({ boq: !!(window.BOQ || (typeof BOQ !== 'undefined' && BOQ)), err: (document.getElementById('error-msg') || {}).textContent || '' }));
       ok(priced.boq, `[${tag}] ${mode}: the plan generates from the filled survey`, priced.err.slice(0, 100));
+      if (mode !== 'New Build') {
+        const vent = await p.evaluate(() => {
+          const sec = (BOQ.sections || []).find(x => /MECHANICAL EXTRACT VENTILATION \(MEV\)/.test(x.title));
+          if (!sec) return null;
+          const q = re => { const it = sec.items.find(i => re.test(i.description)); return it ? it.quantity : null; };
+          return { terms: q(/Extract terminals/), inlets: q(/^Air inlets/) };
+        });
+        ok(vent && vent.terms === 1 && vent.inlets === 4, `[${tag}] ${mode}: MEV prices 1 extract for the wet room and 4 air inlets for the rest`, JSON.stringify(vent));
+      }
       ok(errors.length === 0, `[${tag}] ${mode}: no page errors`, errors.join(' | ').slice(0, 200));
       ok(requests.length === 0, `[${tag}] ${mode}: nothing sent from the page while reading and pricing`, requests.slice(0, 3).join(' '));
       await p.close();

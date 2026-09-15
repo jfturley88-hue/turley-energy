@@ -143,11 +143,28 @@ assessor edits it. A room card is made for each storey found.
 ### Counted on survey
 
 The report cannot give these, so the panel asks for them straight after reading and writes
-them into the tabs: rooms on each floor (house and extension), ground floor perimeter
-(house and extension), gable end peaks, the number of windows, roof lights where the report
-has roof windows, and external doors where it has none. Gable end peaks is a new field in the
-Roof tab for every project type, kept in step with the Energy Upgrade external wall
-insulation choice.
+them into the tabs:
+
+- **Rooms on each floor, as a total and the number of wet rooms, kitchen included.** These
+  are two new fields on every Rooms tab card, house and extension. Wet rooms take the
+  extract and every other room takes an air inlet, so a ground floor of 5 rooms with 1 wet
+  room makes 1 extract and 4 air inlets; the panel shows that beside each floor.
+- Ground floor perimeter, house and extension.
+- Gable end peaks, a new Roof tab field for every project type, kept in step with the
+  Energy Upgrade external wall insulation choice.
+- The number of windows; roof lights where the report has roof windows; external doors
+  where it lists none.
+
+Once counted, the ventilation measures price from them, in Energy Upgrade and in the house
+measures of Refurbishment. MEV extract terminals and DMEV fans are one per wet room. Air
+inlets are a new line, one per remaining room, at the rate book's room air intake vent
+(the same rate as that Not Included item); MEV leaves them out when trickle vents are
+chosen instead. MVHR takes one terminal per room. With no count entered the older estimate
+from bathrooms, en-suites and an assumed kitchen stands, so existing plans price as before.
+The extension's counts are held on its card but its new-build pricing does not use them yet.
+
+The panel no longer lists notes about how the report was split; it shows only what could
+not be filled.
 
 Two small changes to the extension card came with this. Its window area and door count now
 take an entered zero as zero rather than replacing it with an estimate, and a measured
