@@ -207,22 +207,27 @@ Fixed in this pass:
 - A report with no external doors made Energy Upgrade price two by default. The panel now
   asks for doors when the report lists none.
 
-Found, not changed:
-- **Window count.** Each report row is a glazing group by orientation with a count of 1, so
-  "4 windows" is really four elevations. Energy Upgrade prints that count in the window
-  description; New Build and Refurbishment estimate their own from area. Pricing is by
-  area, so the money is right, but the count is not a number of windows.
-- **New Build roof.** Tiles, timbers, underlay and ceiling insulation are all priced on the
-  total roof area, mixing plan ceiling area, sloped rafter area and flat roof. A flat roof
-  gets tiles, and ceiling insulation covers the rafter and flat roofs too.
-- **New Build rooms by type.** Wet room tiling, sanitary accessories and drainage branches
-  come from bathroom and en-suite counts, which the panel does not ask for, so they price
-  at zero unless the Rooms tab types are filled.
-- **A measure for a roof type the house does not have** (for example rafter insulation with
-  only ceiling roofs) is priced on the whole roof area without warning.
-- **What the report gives but no plan uses yet:** the cylinder volume and, in New Build, the
-  Heat Loss Indicator.
-- **Extension windows** cannot be split from the report, so they sit with the house.
+Decided by the author and done, 16 September 2026:
+- **Windows are priced by area.** The report's Count column groups glazing by elevation, so
+  no count is filled from it and the window description no longer states one.
+- **Roofs are priced by type**, in New Build and in the Refurbishment extension. Pitched roofs
+  get timbers, underlay and covering on the slope (ceiling-level plan area × 1.22 for the
+  35° pitch assumed elsewhere; rafter and room-in-roof areas are already on the slope).
+  Ceiling insulation is priced on ceiling-level roofs, rafter insulation on rafter-level
+  roofs, and flat roofs get a deck, warm-deck insulation and a membrane, never tiles.
+- **Bathrooms, kitchens and utility rooms are counted** for the whole dwelling, on the panel
+  and in the Rooms tab; wet rooms are their sum. When the floor cards carry no room types,
+  New Build prices wall tiling, sanitary accessories and drainage from the bathrooms, and
+  kitchen and utility tiling and waste runs from the kitchens and utility rooms.
+- **A roof measure for a roof type the Roof tab lacks stops generation** with a message naming
+  the missing section, in Energy Upgrade and Refurbishment. It used to price the whole roof.
+- **The report's HLI and cylinder volume are used** in every mode: heat pump size is HLI ×
+  whole-dwelling floor area × 23 K, and the cylinder is the report's volume. In
+  Refurbishment, whole-house plant (heat pump, extract ducting, MVHR) is sized on the house
+  plus its extensions, not the house alone.
+
+Re-audited on all five reports: the three modes give the same heat pump, cylinder and duct
+run for each dwelling, and every roof, room and wet room quantity follows the counts.
 
 ### Open
 

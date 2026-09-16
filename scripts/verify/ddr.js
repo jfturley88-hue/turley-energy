@@ -130,7 +130,11 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       ok(near(rf, got.rpt.roofs), `[${tag}] ${mode}: roof areas carried whole`, `${rf} vs ${got.rpt.roofs}`);
       ok(near(got.cards.windows, got.rpt.windows), `[${tag}] ${mode}: window area carried, roof windows kept out`, `${got.cards.windows} vs ${got.rpt.windows}`);
       ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorText === '', `[${tag}] ${mode}: doors as the report counts them`);
-      ok(got.winCount === got.rpt.winCount && got.roofLights === got.rpt.roofLights, `[${tag}] ${mode}: window and roof light counts from the report`, JSON.stringify({ w: got.winCount, rl: got.roofLights }));
+      ok(got.winCount === 0 && got.roofLights === got.rpt.roofLights, `[${tag}] ${mode}: windows carry area only, no count; roof lights counted from the report`, JSON.stringify({ w: got.winCount, rl: got.roofLights }));
+      {
+        const hc = await p.evaluate(() => ({ hli: ddrHLI(), cyl: ddrCylinderL(), rh: window._ddrState.report.hli, rc: window._ddrState.report.waterStorage }));
+        ok(hc.hli === hc.rh && hc.rc > 0 && hc.cyl === hc.rc, `[${tag}] ${mode}: the report's HLI and cylinder volume are kept for pricing`, JSON.stringify(hc));
+      }
       ok(!got.asked.some(t => /fc-t4-count|t4-roofLights/.test(t)) && got.asked.includes('t4-doorCount') === !got.rpt.doors,
          `[${tag}] ${mode}: windows and roof lights never asked for; doors only when the report lists none`);
       ok(JSON.stringify(got.roomLabels) === JSON.stringify(got.rpt.storeys.map(x => x.toLowerCase())), `[${tag}] ${mode}: a room count for exactly the storeys in the report`, JSON.stringify(got.roomLabels));
@@ -162,7 +166,7 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
         const per = document.querySelector('#ddr-result input[data-ddr-target^="fc-t1-perim-"]');
         if (per) { per.value = '41.5'; per.dispatchEvent(new Event('input', { bubbles: true })); }
         const tot = document.querySelector('#ddr-result input[data-ddr-target^="fc-t5r-total-"]');
-        const wet = document.querySelector('#ddr-result input[data-ddr-target="t5-wetRooms"]');
+        const wet = document.querySelector('#ddr-result input[data-ddr-target="t5-kitchens"]');
         if (tot) { tot.value = '5'; tot.dispatchEvent(new Event('input', { bubbles: true })); }
         if (wet) { wet.value = '1'; wet.dispatchEvent(new Event('input', { bubbles: true })); }
         const rc = getCurrentRoomCounts();

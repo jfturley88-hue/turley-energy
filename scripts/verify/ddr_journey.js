@@ -69,7 +69,9 @@ function samples() {
       // 3. additional survey counts, typed as a person types them
       const boxes = await p.$$('#ddr-result input[data-ddr-target^="fc-t5r-total-"]');
       for (const bx of boxes) await bx.fill('4');
-      await p.fill('#ddr-result input[data-ddr-target="t5-wetRooms"]', '3');
+      await p.fill('#ddr-result input[data-ddr-target="t5-bathsWhole"]', '1');
+      await p.fill('#ddr-result input[data-ddr-target="t5-kitchens"]', '1');
+      await p.fill('#ddr-result input[data-ddr-target="t5-utilities"]', '1');
       for (const bx of await p.$$('#ddr-result input[data-ddr-target*="perim"]')) await bx.fill('38');
       await p.fill('#ddr-result input[data-ddr-target="t3-gablePeaks"]', '2');
       const rooms = boxes.length * 4, inlets = rooms - 3;

@@ -1637,6 +1637,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
           Add a room layout card for each floor. Ceiling heights are pulled from Tab&nbsp;1 floor cards to compute estimated <strong>internal wall area per floor</strong>.
           Totals drive: <strong>internal door count</strong>, <strong>electrical circuits</strong>, <strong>plumbing points</strong> and <strong>painting &amp; decoration</strong>. Internal doors = total rooms&nbsp;+&nbsp;1.
         </div>
+        <input type="hidden" id="t0-ddrHli" value="">
+        <input type="hidden" id="t0-ddrCylinder" value="">
         <div id="t5r-cards"></div>
         <p id="t5r-empty" class="dyn-empty">No floor room layouts added yet &mdash; click the button below to add a floor</p>
         <div style="text-align:center;margin-top:8px;">
@@ -1644,17 +1646,23 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         </div>
         <div style="margin-top:20px;padding-top:14px;border-top:1px solid #2d3f55;">
           <div style="font-size:11px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Wet Rooms</div>
-          <div class="tab-grid">
+          <input type="hidden" id="t5-wetRooms" value="0">
+          <div class="tab-grid" style="grid-template-columns:1fr 1fr 1fr;">
             <div class="tab-field">
-              <label>Number of Wet Rooms (incl. kitchen)</label>
-              <div class="unit-row">
-                <input type="number" id="t5-wetRooms" placeholder="0" min="0">
-                <span class="unit-label">nr</span>
-              </div>
+              <label>Bathrooms (incl. en-suites)</label>
+              <div class="unit-row"><input type="number" id="t5-bathsWhole" placeholder="0" min="0" oninput="syncWetRooms()"><span class="unit-label">nr</span></div>
+            </div>
+            <div class="tab-field">
+              <label>Kitchens</label>
+              <div class="unit-row"><input type="number" id="t5-kitchens" placeholder="0" min="0" oninput="syncWetRooms()"><span class="unit-label">nr</span></div>
+            </div>
+            <div class="tab-field">
+              <label>Utility Rooms</label>
+              <div class="unit-row"><input type="number" id="t5-utilities" placeholder="0" min="0" oninput="syncWetRooms()"><span class="unit-label">nr</span></div>
             </div>
           </div>
           <div class="ws-hint" style="margin-top:6px;">
-            &#x1F4A1; Whole dwelling. Wet rooms take the ventilation extract; every other room on the floor cards takes an air inlet.
+            &#x1F4A1; Whole dwelling. <span id="t5-wetRoomsNote">Wet rooms are the bathrooms, kitchens and utility rooms.</span> Each takes the ventilation extract; every other room on the floor cards takes an air inlet.
           </div>
         </div>
         <div class="tab-nav-row">
@@ -6890,7 +6898,49 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const insLab  = roofSpecIns === 'rafter'   ? lM(0.8, L.craft) : lM(0.4, L.catB);
 
   const roofItems = [];
-  if (isRoofFlat) {
+  const RT = d.roofByType || null;
+  const roofTyped = RT && ((RT.ceiling || 0) + (RT.rafter || 0) + (RT.flat || 0) + (RT.room || 0)) > 0;
+  if (roofTyped) {
+    // Each roof type priced as what it is. A ceiling-level roof's area is its plan (ceiling)
+    // area, so its covering is that area over the slope at the 35° pitch assumed elsewhere;
+    // rafter and room-in-roof areas are already on the slope. Flat roofs get a deck and a
+    // membrane, never tiles.
+    const r2 = v => Math.round(v * 100) / 100;
+    const SLOPE = 1 / Math.cos(35 * Math.PI / 180);
+    const ceilA = r2(RT.ceiling || 0), rafA = r2((RT.rafter || 0) + (RT.room || 0)), flatA = r2(RT.flat || 0);
+    const slopeA = r2(ceilA * SLOPE + rafA);
+    const pCoverDesc = isRoofFlat ? 'Concrete interlocking roof tiles' : coverDesc;
+    const pCoverMat  = isRoofFlat ? Math.round(SR.roof_tile*wasteF.tiles) : coverMat;
+    const pCoverLab  = isRoofFlat ? lM(0.65, L.craft) : coverLab;
+    const fCoverDesc = roofSpecType === 'flat-grp' ? 'GRP fibreglass flat roof system' : 'EPDM rubber flat roof membrane';
+    const fCoverMat  = roofSpecType === 'flat-grp' ? SR.roof_grp : SR.roof_epdm;
+    const fCoverLab  = roofSpecType === 'flat-grp' ? lM(0.9, L.craft) : lM(0.7, L.craft);
+    const ceilInsDesc = roofSpecIns === 'attic-200' ? 'Ceiling insulation — 200mm mineral wool at ceiling level' : 'Ceiling insulation — 300mm mineral wool at ceiling level';
+    const ceilInsMat  = roofSpecIns === 'attic-200' ? Math.round((mat.mineralWool100||8)*2*wasteF.insulation) : Math.round((mat.mineralWool100||8)*3*wasteF.insulation);
+    const rafInsMat   = Math.round((mat.pir100mm||30)*1.8*wasteF.insulation);
+    const slopeNote = [ceilA ? `ceiling-level ${ceilA}m² plan × ${SLOPE.toFixed(2)} (35° pitch assumed)` : '', rafA ? `rafter-level ${rafA}m² on the slope` : ''].filter(Boolean).join(' + ') + ` = ${slopeA}m²`;
+    let n = 0; const ref = () => `${rId}.${++n}`;
+    if (slopeA > 0) roofItems.push(
+      { ref:ref(), description:`Roof timbers — rafters, ridge & hips (${(isRoofFlat ? 'pitched-tile' : roofSpecType).replace('pitched-','')})`, unit:'m²', quantity:slopeA, matRate:Math.round(28*wasteF.timber), labRate:lM(1.2, L.craft), note:`Pitched roofs: ${slopeNote} · Craft 1.2hr/m² · +7.5% timber waste`, status:'ok', deapSource:'DEAP roof areas by type' },
+      { ref:ref(), description:'Roofing underlay (breather membrane) & tiling battens', unit:'m²', quantity:slopeA, matRate:4, labRate:lM(0.18, L.catB), note:'Pitched roofs, slope area · Cat B 0.18hr/m²', status:'ok', deapSource:'DEAP roof areas by type' },
+      { ref:ref(), description:pCoverDesc, unit:'m²', quantity:slopeA, matRate:pCoverMat, labRate:pCoverLab, note:'Pitched roofs, slope area · +10% tile/slate waste', status:'ok', deapSource:'DEAP roof areas by type' },
+    );
+    if (ceilA > 0) roofItems.push(
+      { ref:ref(), description:ceilInsDesc, unit:'m²', quantity:ceilA, matRate:ceilInsMat, labRate:lM(0.4, L.catB), note:`Ceiling-level roofs ${ceilA}m² plan · +5% insulation waste`, status:'ok', deapSource:'DEAP roof insulated at ceiling' },
+    );
+    if (rafA > 0) roofItems.push(
+      { ref:ref(), description:'Rafter-level PIR insulation (180mm) — between & below rafters', unit:'m²', quantity:rafA, matRate:rafInsMat, labRate:lM(0.8, L.craft), note:`Rafter-level roofs ${rafA}m² on the slope · +5% insulation waste`, status:'ok', deapSource:'DEAP roof insulated at rafter' },
+    );
+    if (flatA > 0) roofItems.push(
+      { ref:ref(), description:'Flat roof timber structure — joists, noggings & OSB deck', unit:'m²', quantity:flatA, matRate:Math.round(22*wasteF.timber), labRate:lM(0.8, L.craft), note:`Flat roofs ${flatA}m² · Craft 0.8hr/m² · +7.5% timber waste`, status:'ok', deapSource:'DEAP flat roof' },
+      { ref:ref(), description:'Flat roof insulation — PIR warm deck (150mm), tapered to falls', unit:'m²', quantity:flatA, matRate:Math.round((mat.pir100mm||30)*1.5*wasteF.insulation), labRate:lM(0.4, L.craft), note:`Flat roofs ${flatA}m² · +5% insulation waste`, status:'ok', deapSource:'DEAP flat roof' },
+      { ref:ref(), description:fCoverDesc, unit:'m²', quantity:r2(flatA*1.05), matRate:fCoverMat, labRate:fCoverLab, note:'Flat roofs · system inc. upstands & edge details', status:'ok', deapSource:'DEAP flat roof' },
+    );
+    roofItems.push(
+      { ref:ref(), description: slopeA > 0 ? 'UPVC fascia, soffit & gutters' : 'UPVC gutters', unit:'lm', quantity:gutterLength, matRate:14, labRate:lM(0.4, L.catB), note:`√${d.roofArea} × 4.4 = ${gutterLength}lm · Cat B 0.4hr/lm`, status:'assumed', deapSource:'derived' },
+      { ref:ref(), description:'UPVC downpipes', unit:'nr', quantity:downpipes, matRate:65, labRate:lM(1.65, L.craft), note:`1 per 12m gutter = ${downpipes}nr · Craft 1.65hr/nr`, status:'assumed', deapSource:'derived' },
+    );
+  } else if (isRoofFlat) {
     roofItems.push(
       { ref:`${rId}.1`, description:'Flat roof timber structure — joists, noggings & OSB deck', unit:'m²', quantity:d.roofArea, matRate:Math.round(22*wasteF.timber), labRate:lM(0.8, L.craft), note:`Plan area ${d.roofArea}m² · Craft 0.8hr/m² × €44/hr · +7.5% timber waste`, status:'ok', deapSource:'DEAP roof area' },
       { ref:`${rId}.2`, description:insDesc, unit:'m²', quantity:d.roofArea, matRate:insMat, labRate:insLab, note:`Plan area ${d.roofArea}m² · +5% insulation waste`, status:'ok', deapSource:'DEAP roof area' },
@@ -6991,7 +7041,8 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   const heatDemandWm2 = isRetrofit
     ? (projType.includes('Deep') ? 50 : 60)
     : (projType.includes('Extension') ? 40 : 32);
-  const heatKW = Math.max(4, Math.ceil((d.floorArea * heatDemandWm2) / 1000));
+  // The provisional BER's Heat Loss Indicator sizes the heat pump when a report was read.
+  const heatKW = d.hli > 0 ? euDesignLoadKW(d.hli, d.floorArea) : Math.max(4, Math.ceil((d.floorArea * heatDemandWm2) / 1000));
 
   // ASHP: cost scales with kW output — supply (Chadwicks/Pat O'Donnell 2026 trade)
   // Labour: plumber all-in €30/hr — full install incl. pipework, commissioning
@@ -7096,27 +7147,27 @@ function buildBOQ(d, projName, projType, county, dwellingType, grantScheme, mate
   if (d.heatingSystem === 'ASHP') {
     const c = ashpCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`Air-to-water heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*ashpFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Ground Source Heat Pump') {
     const c = gshpCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`Ground source heat pump - ${c.label} output (supply & commission)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*gshpFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Oil Boiler') {
     const c = oilBoilerCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`Oil condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*oilFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'Stove with Back Boiler') {
     const c = stoveBackBoilerCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`Stove with back boiler - ${c.label} (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*stoveFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else if (d.heatingSystem === 'LPG Boiler') {
     const c = lpgBoilerCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`LPG condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*lpgFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   } else {
     const c = gasBoilerCost(heatKW);
     msItems.push({ ref:`${msId}.1`, description:`Gas condensing boiler - ${c.label} output (supply & install)`, unit:'nr', quantity:1, matRate:Math.round(c.mat*heatM*gasFactor), labRate:Math.round(c.lab*heatM),
-      note:`${autoFloorArea}m² × ${heatDemandWm2}W/m² = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
+      note:(d.hli > 0 ? `HLI ${d.hli} W/m²K from the Dwelling Details Report × ${autoFloorArea}m² × ${HP_DESIGN_DT}K` : `${autoFloorArea}m² × ${heatDemandWm2}W/m²`) + ` = ${heatKW}kW design load -- ${sizeBand(heatKW)} unit selected`, status:'ok', deapSource:'DEAP heating + floor area' });
   }
   if (d.hasUFH) {
     msItems.push({ ref:`${msId}.2`, description:'Underfloor heating (pipes, manifold, controls)', unit:'m²', quantity:d.ufhArea, matRate:Math.round(30*ufhFactor), labRate:lM(0.83, L.plumber),
@@ -8143,7 +8194,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   const pvA     = inputs.pvArea || 0;
   const battery = inputs.battery || 'no';
   const chimneyCount = inputs.chimneyCount || inputs.chimney_count || 1;
-  const cylL = fa <= 80 ? 150 : fa <= 120 ? 210 : fa <= 180 ? 250 : 300;
+  // Whole-house plant (heat pump, ventilation) serves the house and any extension, so it is
+  // sized on the whole dwelling when the caller gives that area.
+  const wfa = inputs.wholeFloorArea > fa ? inputs.wholeFloorArea : fa;
+  const cylFromReport = (inputs.cylinderL || 0) > 0;
+  const cylL = cylFromReport ? Math.round(inputs.cylinderL) : (fa <= 80 ? 150 : fa <= 120 ? 210 : fa <= 180 ? 250 : 300);
   const cylMat = cylL <= 150 ? 950 : cylL <= 210 ? 1200 : cylL <= 250 ? 1550 : 1950;
   const solarThermalArea = inputs.solarThermalArea || 4;
   const has = m => measures.includes(m);
@@ -8556,7 +8611,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     var wLabR      = wStyle === 'sash' ? 115 : 95;  // sash: higher labour — bespoke fitting
     var wGlazLabel = wGlaz === 'triple' ? 'Triple Glazed' : 'Double Glazed';
     var wStyleNote = wStyle === 'sash' ? ' — bespoke sash' : wStyle === 'fixed' ? ' — fixed lights' : '';
-    var wDesc      = 'External windows — ' + wGlazLabel + ', ' + euLabel(wFrame, 'windows_frame') + wStyleNote + ' (' + wCount + ' nr bundle: units, installation, reveal liners, sealant)';
+    var wDesc      = 'External windows — ' + wGlazLabel + ', ' + euLabel(wFrame, 'windows_frame') + wStyleNote + ' (priced by area — bundle: units, installation, reveal liners, sealant)';
     var wItems     = [ mkItem('5.1', wDesc, 'm²', wArea, wMatR, wLabR, 'Bundled supply + install of ' + wCount + ' window units') ];
     if (inputs.windows_dispose) {
       wItems.push(mkItem('5.2', 'Window removal & disposal of existing units', 'm²', wArea, 0, WINDOW_DISPOSE_RATE, 'Labour-only; skip allowance separate'));
@@ -8639,11 +8694,11 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     // any emitter change is the contractor's to price under Variation Notes.
     const hli = inputs.hli || 0;
     const ashpKwNum = hli > 0
-      ? euDesignLoadKW(hli, fa)
+      ? euDesignLoadKW(hli, wfa)
       : (fa <= 80 ? 6 : fa <= 120 ? 8 : fa <= 160 ? 10 : 12);
     const ashpKw  = ashpKwNum + 'kW';
     const ashpSizeNote = hli > 0
-      ? 'HLI ' + euHLIText(hli) + ' W/m²K × ' + fa + 'm² × ' + HP_DESIGN_DT + 'K ÷ 1000 = ' + ashpKwNum +
+      ? 'HLI ' + euHLIText(hli) + ' W/m²K × ' + wfa + 'm² × ' + HP_DESIGN_DT + 'K ÷ 1000 = ' + ashpKwNum +
         'kW design load at ' + euFlowTemp(inputs.emitterType || 'keep-rads') + '°C flow — ' + (inputs.hliFromBER
           ? 'HLI from provisional BER — ' + HP_SIZING_BASIS
           : 'indicative HLI, confirm from provisional BER')
@@ -8704,7 +8759,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
       ...removeItems,
       mkItem('7.TA','Heat pump technical assessment — room-by-room heat loss (IS EN 12831)','item',1,0,200,'SEAI-required pre-installation survey — €200 SEAI grant available — completed by registered installer. Confirms the unit size above and sizes the emitters'),
       mkItem('7.1','Air-to-water heat pump ('+ashpKw+') — supply & commission','nr',1,ashpMat,lM(24,L.plumber), ashpSizeNote + ' — final sizing confirmed by technical assessment'),
-      mkItem('7.2','Heat pump cylinder ('+cylL+'L indirect unvented)','nr',1,cylMat,lM(8,L.plumber),cylL+'L indicative — sized from '+fa+'m² floor area. Volume confirmed by installer post heat-loss calc — mains pressure, PED compliant'),
+      mkItem('7.2','Heat pump cylinder ('+cylL+'L indirect unvented)','nr',1,cylMat,lM(8,L.plumber),cylL+'L '+(cylFromReport ? 'from the Dwelling Details Report.' : 'indicative — sized from '+fa+'m² floor area.')+' Volume confirmed by installer post heat-loss calc — mains pressure, PED compliant'),
       ...emitterItems,
       mkItem('7.4','Existing pipework modifications & system flush','item',1,580,lM(12,L.plumber),'Connections, MagnaClean, pressure test'),
       mkItem('7.5','Weather compensation & smart zone controls','item',1,380,lM(4,L.electrician),'SEAI-compliant controls'),
@@ -8877,7 +8932,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
   if (has('ventilation')) {
     const mvhrTier    = inputs.mvhr_unit || 'standard';
     // Source: ventsolve.ie, beamcentralsystems.ie, aei.ie 2025 (supply-only unit).
-    const mvhrBaseMat = fa <= 80 ? _EU_MVHR[0] : fa <= 130 ? _EU_MVHR[1] : _EU_MVHR[2];
+    const mvhrBaseMat = wfa <= 80 ? _EU_MVHR[0] : wfa <= 130 ? _EU_MVHR[1] : _EU_MVHR[2];
     const mvhrMatMult = mvhrTier === 'premium' ? 1.3 : mvhrTier === 'basic' ? 0.8 : 1.0;
     const mvhrMat     = Math.round(mvhrBaseMat * mvhrMatMult);
     const ductLabel   = inputs.mvhr_duct === 'rigid' ? 'Galvanised rigid ductwork' : 'Semi-rigid radial ductwork';
@@ -8899,7 +8954,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const trickleNr   = winCount;
     const mevItems = [
       mkItem('8.1','MEV unit (whole house continuous extract)','nr',1,_EU_MEV[0],lM(6,L.craft),'Nuaire Drimaster or equivalent'),
-      mkItem('8.2','Duct runs — extract to wet rooms','m',Math.round(fa*0.25),_EU_MEV[1],lM(0.3,L.craft),'Rigid or semi-rigid PVC duct — insulated'),
+      mkItem('8.2','Duct runs — extract to wet rooms','m',Math.round(wfa*0.25),_EU_MEV[1],lM(0.3,L.craft),'Rigid or semi-rigid PVC duct — insulated'),
       mkItem('8.3','Extract terminals — wet room grilles','nr',mevTerms,_EU_MEV[2],lM(1,L.craft),(wetSurveyed > 0 ? wetSurveyed + ' wet rooms incl. kitchen, counted on survey' : mevBaths + ' bath/ensuite + kitchen') + ' — ' + (inputs.mev_humidity ? 'humidistat' : 'timed') + ' controlled'),
       ...(inputs.mev_trickle ? [mkItem('8.4','Trickle ventilators to habitable room windows','nr',trickleNr,_EU_TRICKLE,lM(0.5,L.craft),'Background ventilation — one per window opening — TrickleVent or equivalent')] : []),
       ...(inletsNr > 0 && !inputs.mev_trickle ? [inletItem('8.5', inputs.mev_humidity)] : []),
@@ -8924,7 +8979,7 @@ function buildBOQRetrofit(inputs, projName, county, dwellingType, grantScheme, m
     const ventAT = (has('airtightness') || inputs.includeAirTest) ? [] :
       [mkItem('8.AT','Air-tightness test (blower door) — post-works verification','nr',1,0,480,'NSAI / ATTMA certified tester — included with the ventilation measure')];
     sections.push({id:String(sid++),title:ventTitle,part:'B',items:(vent==='MVHR'?[
-      mkItem('8.1','MVHR unit — whole house (' + unitLabel + ')','nr',1,mvhrMat,lM(16,L.craft),unitLabel + ' — sized to ' + fa + 'm² floor area — airtightness n50 ≤3 ACH required for effective MVHR performance'),
+      mkItem('8.1','MVHR unit — whole house (' + unitLabel + ')','nr',1,mvhrMat,lM(16,L.craft),unitLabel + ' — sized to ' + wfa + 'm² floor area — airtightness n50 ≤3 ACH required for effective MVHR performance'),
       mkItem('8.2',ductLabel + ' — supply & extract runs','m',Math.round(fa*0.4),17,lM(0.9,L.craft),'Sealed, insulated runs — all habitable rooms'),
       mkItem('8.3','Supply & extract terminals (valves/grilles)','nr',(inputs.roomsSurveyed > 0 && wetSurveyed > 0) ? inputs.roomsSurveyed : totalRooms*2,55,lM(1,L.craft),(inputs.roomsSurveyed > 0 && wetSurveyed > 0) ? 'Extract in each of ' + wetSurveyed + ' wet rooms, supply to the other ' + inletsNr + ' rooms \u2014 counted on survey' : 'One supply + one extract per habitable room'),
       mkItem('8.4','Commissioning & air balancing certificate','nr',1,0,lM(6,L.craft),'CIBSE commissioning flow rates — MVHR certification'),
@@ -9052,7 +9107,7 @@ const bMat = bKwh <= 5 ? _EU_BAT[0] : bKwh <= 10 ? _EU_BAT[1] : bKwh <= 15 ? _EU
   }
   if (has('hw_cylinder') && !has('heating') && !has('gshp')) {
     var hwBeds  = inputs.roomsUp || 3;
-    var hwCylL  = hwBeds <= 2 ? 150 : hwBeds <= 3 ? 210 : hwBeds <= 4 ? 250 : 300;
+    var hwCylL  = cylFromReport ? cylL : (hwBeds <= 2 ? 150 : hwBeds <= 3 ? 210 : hwBeds <= 4 ? 250 : 300);
     var hwCylMat = hwCylL <= 150 ? 750 : hwCylL <= 210 ? 950 : hwCylL <= 250 ? 1200 : 1550;
     sections.push({id:String(sid++), title:'HOT WATER CYLINDER UPGRADE', part:'B', items:[
       mkItem('HW.1','Unvented mains-pressure cylinder (' + hwCylL + 'L) \u2014 ' + hwBeds + ' bed','nr',1,hwCylMat,lM(10,L.plumber),'PED compliant \u2014 insulated jacket included \u2014 sized from bedroom count'),
@@ -10187,6 +10242,8 @@ function readExtensions() {
       wallFinish:    sv('ext'+n+'-wall-finish'),
       dryLining:     sv('ext'+n+'-dry-lining'),
       roofType:      sv('ext'+n+'-roof-type'),
+      roofByType:    (function () { var t = { ceiling: nv('ext'+n+'-ra-ceiling'), rafter: nv('ext'+n+'-ra-rafter'), flat: nv('ext'+n+'-ra-flat'), room: nv('ext'+n+'-ra-room') };
+                       return (t.ceiling + t.rafter + t.flat + t.room) > 0 ? t : null; })(),
       roofIns:       sv('ext'+n+'-roof-ins'),
       chimneys:      nv('ext'+n+'-chimneys'),
       rooflights:    nv('ext'+n+'-rooflights'),
@@ -11498,6 +11555,28 @@ var HP_SIZING_BASIS = 'same basis as the SEAI heat pump technical assessment';
 
 // The one place design load is calculated. The Works Selector readout and the priced BOQ
 // item both call this, so the number on screen is the number in the Cost Plan.
+// Figures carried from the Dwelling Details Report: the Heat Loss Indicator and the cylinder
+// volume. Zero when no report was read or the assessor cleared them.
+function ddrHLI() { var el = document.getElementById('t0-ddrHli'); return el ? (parseFloat(el.value) || 0) : 0; }
+function ddrCylinderL() { var el = document.getElementById('t0-ddrCylinder'); return el ? (parseFloat(el.value) || 0) : 0; }
+window.ddrHLI = ddrHLI; window.ddrCylinderL = ddrCylinderL;
+
+// A roof measure ticked for a roof type the Roof tab does not have would otherwise be priced on
+// the whole roof. With roof sections entered, that stops generation and says what is missing.
+function roofTypeMeasureMissing(prefix) {
+  if (!document.querySelector('[id^="fc-t3-area-"]') || typeof totalAreaForRoofType !== 'function') return '';
+  var names = { ceiling: ['Ceiling-level roof insulation', 'Insulated at Ceiling Level'], rafter: ['Rafter-level roof insulation', 'Insulated at Rafter Level'],
+                flat: ['Flat roof insulation', 'Flat Roof'], room: ['Room in roof insulation', 'Room in Roof'] };
+  var miss = Object.keys(names).filter(function (t) {
+    var c = document.getElementById(prefix + 'roof-' + t);
+    return c && c.checked && !(totalAreaForRoofType(t) > 0);
+  });
+  if (!miss.length) return '';
+  return miss.map(function (t) { return names[t][0] + ' is ticked, but the Roof tab has no "' + names[t][1] + '" section.'; }).join(' ') +
+    ' Add that roof section with its area, or untick the measure.';
+}
+window.roofTypeMeasureMissing = roofTypeMeasureMissing;
+
 function euDesignLoadKW(hli, fa) {
   if (!(hli > 0) || !(fa > 0)) return 0;
   return Math.max(4, Math.ceil(hli * fa * HP_DESIGN_DT / 1000));
@@ -12367,13 +12446,15 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
   if (has('heating_replacement') && !euHasHeating) {
     const hType = inputs.heatingType || 'ASHP';
     if (hType === 'ASHP') {
-      const heatKW = Math.max(4, Math.ceil((fa * 32) / 1000));
+      const _rHli = ddrHLI();
+      const _wfa = fa + (typeof readExtensions === 'function' ? readExtensions().reduce(function (a, e) { return a + (e.floorArea || 0); }, 0) : 0);
+      const heatKW = _rHli > 0 ? euDesignLoadKW(_rHli, _wfa) : Math.max(4, Math.ceil((fa * 32) / 1000));
       const ashpMat = heatKW <= 5 ? 5500 : heatKW <= 8 ? 7500 : heatKW <= 12 ? 10000 : heatKW <= 16 ? 13500 : 17500;
       const ashpLab = heatKW <= 5 ? 2200 : heatKW <= 8 ? 2800 : heatKW <= 12 ? 3400 : heatKW <= 16 ? 3900 : 4700;
       const ashpKwLabel = heatKW + 'kW';
-      const ashpCylL = fa <= 80 ? 150 : fa <= 120 ? 210 : fa <= 180 ? 250 : 300;
+      const ashpCylL = ddrCylinderL() > 0 ? Math.round(ddrCylinderL()) : (fa <= 80 ? 150 : fa <= 120 ? 210 : fa <= 180 ? 250 : 300);
       const ashpCylMat = ashpCylL <= 150 ? 950 : ashpCylL <= 210 ? 1200 : ashpCylL <= 250 ? 1550 : 1950;
-      serviceItems.push(mkItem('S.5', 'Air-to-water heat pump (' + ashpKwLabel + ') — supply & commission', 'nr', 1, ashpMat, ashpLab, fa + 'm² × 32W/m² = ' + heatKW + 'kW design load — SEAI registered installer'));
+      serviceItems.push(mkItem('S.5', 'Air-to-water heat pump (' + ashpKwLabel + ') — supply & commission', 'nr', 1, ashpMat, ashpLab, (_rHli > 0 ? 'HLI ' + _rHli + ' W/m²K from the Dwelling Details Report × ' + _wfa + 'm² × ' + HP_DESIGN_DT + 'K' : fa + 'm² × 32W/m²') + ' = ' + heatKW + 'kW design load — SEAI registered installer'));
       serviceItems.push(mkItem('S.6', 'Heat pump cylinder (' + ashpCylL + 'L indirect mains pressure)', 'nr', 1, ashpCylMat, lM(8, L.plumber), ashpCylL + 'L sized for ' + fa + 'm² floor area — mains pressure, PED compliant'));
       serviceItems.push(mkItem('S.7', 'Low-temperature radiators with TRVs', 'nr', Math.round(fa / 14), 260, lM(3.5, L.plumber), 'Oversized for ASHP flow temps'));
       serviceItems.push(mkItem('S.8', 'Smart weather compensation controls', 'item', 1, 380, lM(4, L.electrician), 'Zone control'));
@@ -12478,6 +12559,10 @@ function buildBOQRefurbSelector(inputs, projName, county, dwellingType, grantSch
     const winAEU = inputs.windowArea || inputs.win_area || Math.round(fa * 0.15);
     const euPanelInputs = {
       floorArea:    fa,
+      hli:          ddrHLI(),
+      hliFromBER:   ddrHLI() > 0,
+      wholeFloorArea: fa + (typeof readExtensions === 'function' ? readExtensions().reduce(function (a, e) { return a + (e.floorArea || 0); }, 0) : 0),
+      cylinderL:    ddrCylinderL(),
       // Counted on the survey (Rooms tab): every room on each floor, and how many are wet rooms,
       // kitchen included. Wet rooms take the extract; every other room takes an air inlet.
       roomsSurveyed:     (typeof getCurrentRoomCounts === 'function' ? (getCurrentRoomCounts().rooms || 0) : 0),
@@ -12782,6 +12867,33 @@ function buildBOQExtension(ext, county, partLetter) {
   const flatCoverDesc = ext.roofType === 'flat-epdm' ? 'EPDM rubber flat roof membrane' : 'GRP fibreglass flat roof system';
   const flatCoverMat  = ext.roofType === 'flat-epdm' ? 22 : 28;
   const flatCoverLab  = ext.roofType === 'flat-epdm' ? lM(0.7, L.craft) : lM(0.9, L.craft);
+  const RTx = ext.roofByType;
+  if (RTx) {
+    // Priced by the report's roof types, as New Build does: slope area over pitched roofs
+    // (ceiling-level plan area at the 35° pitch assumed), a deck and membrane on flat ones.
+    const x2 = v => Math.round(v * 100) / 100;
+    const SLOPEx = 1 / Math.cos(35 * Math.PI / 180);
+    const cA = x2(RTx.ceiling || 0), rA = x2((RTx.rafter || 0) + (RTx.room || 0)), fA = x2(RTx.flat || 0), sA = x2(cA * SLOPEx + rA);
+    const pDesc = ext.roofType && ext.roofType.indexOf('pitched') === 0 ? extCoverDesc : 'Concrete interlocking roof tiles';
+    const pMat  = ext.roofType && ext.roofType.indexOf('pitched') === 0 ? extCoverMat : Math.round(22*wasteF.tiles);
+    const fDesc = ext.roofType === 'flat-grp' ? 'GRP fibreglass flat roof system' : 'EPDM rubber flat roof membrane';
+    const xi = [];
+    let k = 0; const xr = () => 'ER.' + (++k);
+    if (sA > 0) {
+      xi.push(mkItem(xr(), 'Roof structure — rafters & ridge', 'm²', sA, Math.round(28*wasteF.timber), lM(0.9, L.craft), 'Pitched roofs ' + sA + 'm² on the slope · +7.5% timber waste'));
+      xi.push(mkItem(xr(), 'Sarking felt & battens', 'm²', sA, 4.5, lM(0.3, L.craft), 'Breathable membrane + tiling battens'));
+      xi.push(mkItem(xr(), pDesc, 'm²', sA, pMat, extCoverLab, 'Pitched roofs · +10% tile/slate waste'));
+    }
+    if (cA > 0) xi.push(mkItem(xr(), 'Ceiling insulation — 300mm mineral wool', 'm²', cA, (mat.mineralWool100 ? Math.round(mat.mineralWool100*3*wasteF.insulation) : 23), lM(0.3, L.catB), 'Ceiling-level roofs ' + cA + 'm² plan'));
+    if (rA > 0) xi.push(mkItem(xr(), 'Rafter-level PIR insulation (180mm)', 'm²', rA, (mat.pir100mm ? Math.round(mat.pir100mm*1.8*wasteF.insulation) : 61), lM(0.8, L.craft), 'Rafter-level roofs ' + rA + 'm² on the slope'));
+    if (fA > 0) {
+      xi.push(mkItem(xr(), 'Flat roof timber structure — joists, noggings & OSB deck', 'm²', fA, Math.round(22*wasteF.timber), lM(0.8, L.craft), 'Flat roofs ' + fA + 'm²'));
+      xi.push(mkItem(xr(), 'PIR insulation warm deck (150mm) — tapered to falls', 'm²', fA, (mat.pir100mm ? mat.pir100mm * 1.5 * wasteF.insulation : 51), lM(0.4, L.craft), '+5% insulation waste'));
+      xi.push(mkItem(xr(), fDesc, 'm²', x2(fA * 1.05), ext.roofType === 'flat-grp' ? 28 : 22, ext.roofType === 'flat-grp' ? lM(0.9, L.craft) : lM(0.7, L.craft), 'System inc. upstands & edge details'));
+    }
+    xi.push(mkItem(xr(), sA > 0 ? 'Fascia, soffit & gutters' : 'UPVC gutters & downpipes', 'm', Math.sqrt(ra) * 4, 28, lM(0.6, L.craft), 'uPVC fascia & 112mm half-round'));
+    sections.push({id: String(sid++), title: 'EXTENSION — ROOF', part: p, items: xi});
+  } else
   sections.push({id: String(sid++), title: 'EXTENSION — ROOF', part: p,
     items: isFlat ? [
       mkItem('ER.1', 'Flat roof timber structure — joists, noggings & OSB deck', 'm²', ra, Math.round(22*wasteF.timber), lM(0.8, L.craft), 'Craft 0.8hr/m² · +7.5% timber waste'),
@@ -13378,6 +13490,7 @@ function readEUSelector() {
     doorCount:         doors,
     doorArea:          doorAreaSurveyed,
     hli:               nv('eu-hli') || 0,
+    cylinderL:         ddrCylinderL(),
     hliFromBER:        euHLIFromBER(),   // typed in from the provisional BER, vs the indicative seed
     roomsDown:         rd,
     roomsUp:           ru,
@@ -13623,6 +13736,8 @@ async function generate() {
 
   if (mode === 'Refurbishment') {
     const refInputs = readRefurbSelector('ws-');
+    const _roofMissR = roofTypeMeasureMissing('ref-eu-');
+    if (_roofMissR) { errEl.textContent = _roofMissR; errEl.style.display = 'block'; return; }
     if (!county) {
       errEl.textContent = 'Please select a county in the Project Info tab.';
       errEl.style.display = 'block';
@@ -13744,6 +13859,8 @@ async function generate() {
 
   if (mode === 'Energy Upgrade') {
     const euInputs = readEUSelector();
+    const _roofMiss = roofTypeMeasureMissing('eu-');
+    if (_roofMiss) { errEl.textContent = _roofMiss; errEl.style.display = 'block'; return; }
     if (!euInputs.measures || euInputs.measures.length === 0) {
       errEl.textContent = 'Please tick at least one energy upgrade measure in the Energy Upgrade Works Selector below.';
       errEl.style.display = 'block';
@@ -13837,6 +13954,12 @@ async function generate() {
     d.dryLining        = document.getElementById('spec-dry-lining')?.value     || d.dryLining        || 'Insulated Plasterboard 52mm';
     d.roofSpecType     = document.getElementById('spec-roof-type')?.value      || 'pitched-tile';
     d.roofSpecIns      = document.getElementById('spec-roof-ins')?.value       || 'attic-300';
+    d.hli              = ddrHLI();
+    if (ddrCylinderL() > 0) d.cylinderSize = Math.round(ddrCylinderL());
+    // Roof areas by type, from the Roof tab sections: priced per type, not as one roof.
+    d.roofByType = typeof totalAreaForRoofType === 'function'
+      ? { ceiling: totalAreaForRoofType('ceiling'), rafter: totalAreaForRoofType('rafter'), flat: totalAreaForRoofType('flat'), room: totalAreaForRoofType('room') }
+      : null;
     d.windowType       = document.getElementById('spec-glazing')?.value        || d.windowType  || 'triple';
     d.ventilation      = document.getElementById('spec-ventilation')?.value    || d.ventilation || 'MVHR';
     const _specHeat    = document.getElementById('spec-heating')?.value;
@@ -21775,6 +21898,19 @@ function getCurrentFloorAreaSum() {
 }
 window.getCurrentFloorAreaSum = getCurrentFloorAreaSum;
 
+// Wet rooms are the bathrooms, kitchens and utility rooms counted for the whole dwelling.
+function syncWetRooms() {
+  var g = function(id) { var el = document.getElementById(id); return el ? (parseInt(el.value) || 0) : 0; };
+  var any = ['t5-bathsWhole', 't5-kitchens', 't5-utilities'].some(function(id) { var el = document.getElementById(id); return el && el.value !== ''; });
+  var wet = document.getElementById('t5-wetRooms');
+  if (!wet || !any) return;
+  var n = g('t5-bathsWhole') + g('t5-kitchens') + g('t5-utilities');
+  wet.value = n;
+  var note = document.getElementById('t5-wetRoomsNote');
+  if (note) note.textContent = n + ' wet room' + (n === 1 ? '' : 's') + ': the bathrooms, kitchens and utility rooms.';
+}
+window.syncWetRooms = syncWetRooms;
+
 function getCurrentRoomCounts() {
   // Prefer per-floor room cards (t5r) when any have been added
   if (typeof _dynCount === 'object' && _dynCount && _dynCount.t5r > 0) {
@@ -21793,8 +21929,15 @@ function getCurrentRoomCounts() {
       rooms  += g('fc-t5r-total-'  + i);
     }
     if (hasCard) {
+      // Room types left blank on the cards: take bathrooms, kitchens and utility rooms from the
+      // whole-dwelling counts in the Wet Rooms section.
+      if (beds + baths + ens + wc + living + extra === 0) {
+        baths  = gv5('t5-bathsWhole');
+        living = gv5('t5-kitchens') + gv5('t5-utilities');
+      }
       return { bedrooms: beds, bathrooms: baths, ensuites: ens, wc: wc,
-               livingAreas: living, additionalRooms: extra, rooms: rooms, wetRooms: gv5('t5-wetRooms') };
+               livingAreas: living, additionalRooms: extra, rooms: rooms, wetRooms: gv5('t5-wetRooms'),
+               kitchens: gv5('t5-kitchens'), utilities: gv5('t5-utilities') };
     }
   }
   // Fallback: legacy flat fields (old saves loaded before floor cards existed)
@@ -24128,6 +24271,7 @@ document.addEventListener('DOMContentLoaded', function() {
       meta: meta, dims: dims, dimTotal: dimTotal,
       floors: floors, roofs: roofs, walls: walls, doors: doors, windows: windows,
       hli: hli,
+      waterStorage: num(kv('Water storage volume [Litres]')),
       warnings: warnings,
     };
   }
@@ -24394,7 +24538,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (winArea > 0 && typeof addWindowCard === 'function') {
       addWindowCard();
       var wid = _dynCount.t4;
-      put('fc-t4-count-' + wid, cnt(wins), 'Windows', 'Openings');
+      // Windows are priced by area. The report's Count column groups glazing by elevation, so
+      // it is not a number of windows and is not filled.
+      var wcEl = $('fc-t4-count-' + wid); if (wcEl) wcEl.value = '';
       put('fc-t4-area-' + wid, winArea, 'Window area', 'Openings');
     }
     if (roofWins.length) put('t4-roofLights', cnt(roofWins), 'Roof lights (' + fmtA(sumA(roofWins, function () { return true; })) + ')', 'Openings');
@@ -24405,6 +24551,10 @@ document.addEventListener('DOMContentLoaded', function() {
       put('t4-doorCount', cnt(r.doors.rows), 'External doors', 'Openings');
       put('t4-doorArea', r2(r.doors.total != null ? r.doors.total : r.doors.sum), 'External door area', 'Openings');
     }
+
+    // The Heat Loss Indicator and cylinder volume, kept for every mode's heating and hot water
+    if (r.hli != null) put('t0-ddrHli', r.hli, 'Heat Loss Indicator', 'Heating sizing');
+    if (r.waterStorage > 0) put('t0-ddrCylinder', r.waterStorage, 'Hot water cylinder (litres)', 'Hot water');
 
     // Energy Upgrade: the heat loss indicator, and the age band from the year of construction
     if (mode === 'Energy Upgrade') {
@@ -24445,6 +24595,14 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       put('ext' + n + '-wa', sumA(r.walls.rows, isExt), 'Extension wall area', 'Extension ' + n);
       put('ext' + n + '-ra', sumA(r.roofs.rows, isExt), 'Extension roof area', 'Extension ' + n);
+      var secX = $('extension-section-' + n);
+      ['ceiling', 'rafter', 'flat', 'room'].forEach(function (kind) {
+        if (!secX) return;
+        var h = document.createElement('input');
+        h.type = 'hidden'; h.id = 'ext' + n + '-ra-' + kind;
+        h.value = sumA(r.roofs.rows, function (x) { return isExt(x) && x.kind === kind; });
+        secX.appendChild(h);
+      });
       put('ext' + n + '-wina', 0, null);
       put('ext' + n + '-doors', 0, null);
       var gSum = sumA(r.floors.rows, function (x) { return x.ground; });
@@ -24473,7 +24631,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var S = DDR.survey;
     if (!S) return '';
     var rooms = S.rooms.map(function (R) { return surveyInput('fc-t5r-total-' + R.id, 'Rooms, ' + R.label.toLowerCase(), 'nr'); }).join('');
-    var more = surveyInput('t5-wetRooms', 'Wet rooms, whole house (incl. kitchen)', 'nr', '<div class="ddr-vent"></div>');
+    var more = surveyInput('t5-bathsWhole', 'Bathrooms (incl. en-suites)', 'nr') + surveyInput('t5-kitchens', 'Kitchens', 'nr') +
+      surveyInput('t5-utilities', 'Utility rooms', 'nr', '<div class="ddr-vent"></div>');
     if (S.groundCard) more += surveyInput('fc-t1-perim-' + S.groundCard, S.parts ? 'Ground floor perimeter, existing' : 'Ground floor perimeter', 'm');
     if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Ground floor perimeter, extension', 'm');
     else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Ground floor perimeter, extension', 'm');
@@ -24524,8 +24683,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!note) return;
     var total = 0;
     document.querySelectorAll('#ddr-result input[data-ddr-target^="fc-t5r-total-"]').forEach(function (i) { total += parseInt(i.value, 10) || 0; });
-    var wetIn = document.querySelector('#ddr-result input[data-ddr-target="t5-wetRooms"]');
-    var wet = parseInt(wetIn && wetIn.value, 10) || 0;
+    var wet = 0;
+    ['t5-bathsWhole', 't5-kitchens', 't5-utilities'].forEach(function (id) {
+      var i = document.querySelector('#ddr-result input[data-ddr-target="' + id + '"]');
+      wet += parseInt(i && i.value, 10) || 0;
+    });
     note.textContent = (total && wet) ? (wet + (wet === 1 ? ' extract' : ' extracts') + ' \u00b7 ' + Math.max(0, total - wet) + (total - wet === 1 ? ' air inlet' : ' air inlets') + ' from ' + total + ' rooms') : '';
     note.classList.toggle('ddr-bad-note', wet > total);
   }
