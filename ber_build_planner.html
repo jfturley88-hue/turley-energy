@@ -753,6 +753,17 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
 /* ── Dwelling Details Report reader ── */
 .ddr-panel.ddr-over{outline:2px dashed #38bdf8;outline-offset:2px;}
+.ddr-start{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  margin-bottom:16px;padding:12px 14px;border-radius:8px;
+  background:linear-gradient(90deg,rgba(232,160,32,0.10),rgba(232,160,32,0.03));
+  border:1px solid rgba(232,160,32,0.28);}
+.ddr-start-h{font-size:12.5px;font-weight:700;color:#E8A020;letter-spacing:0.01em;margin-bottom:3px;}
+.ddr-start-s{font-size:11px;color:#8FA0B8;line-height:1.5;max-width:560px;}
+.ddr-start-btn{flex-shrink:0;cursor:pointer;background:#E8A020;color:#1A2332;border-radius:7px;
+  padding:8px 16px;font-size:12px;font-weight:700;font-family:'DM Sans',system-ui,sans-serif;
+  letter-spacing:0.01em;white-space:nowrap;transition:background .2s;}
+.ddr-start-btn:hover{background:#f2b03c;}
+.ddr-panel.ddr-over .ddr-start{border-color:#38bdf8;}
 .ddr-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
 .ddr-pick{cursor:pointer;font-size:12px;padding:6px 14px;white-space:nowrap;}
 .ddr-note{font-size:11px;color:#8FA0B8;flex:1;min-width:220px;line-height:1.45;}
@@ -892,6 +903,16 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
   <!-- PROJECT DETAILS -->
   <div class="home-details-panel" id="ddr-panel" ondragover="event.preventDefault();this.classList.add('ddr-over')" ondragleave="this.classList.remove('ddr-over')" ondrop="this.classList.remove('ddr-over');ddrDrop(event)">
     <div class="home-details-label">Project Details</div>
+
+    <!-- Dwelling Details Report: read in this page by the built-in PDF reader; nothing is uploaded -->
+    <div class="ddr-start">
+      <div>
+        <div class="ddr-start-h">Start from the Dwelling Details Report</div>
+        <div class="ddr-start-s">The DEAP report fills the details below and the survey tabs. It is read on this computer and is not sent anywhere. Every field can be edited, or filled by hand instead.</div>
+      </div>
+      <label class="ddr-start-btn">&#x1F4C4; Read report (PDF)<input type="file" accept="application/pdf,.pdf" onchange="ddrPick(this)" style="display:none"></label>
+    </div>
+
     <div class="tab-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
 
       <div class="tab-field" style="grid-column:1/-1">
@@ -990,8 +1011,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
     </div>
 
     <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(46,61,82,0.4);flex-wrap:wrap;">
-      <!-- Dwelling Details Report: read in this page by the built-in PDF reader; nothing is uploaded -->
-      <label class="tab-load-example-btn" style="font-size:10px;padding:4px 10px;cursor:pointer;" title="The report is read on this computer and is not sent anywhere">&#x1F4C4; Dwelling Details Report (PDF)<input type="file" accept="application/pdf,.pdf" onchange="ddrPick(this)" style="display:none"></label>
       <button id="demo-btn-nb"  class="tab-load-example-btn" onclick="loadNewBuildExample()"  style="font-size:10px;padding:4px 10px;">&#x1F4CB; NB — Monaghan</button>
       <button id="demo-btn-nb2" class="tab-load-example-btn" onclick="loadNewBuildExample2()" style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; NB Example 2 &#x2014; Dublin</button>
       <button id="demo-btn-rf1" class="tab-load-example-btn" onclick="loadRefurbExample()"    style="font-size:10px;padding:4px 10px;display:none;">&#x1F4CB; Refurb — Galway</button>

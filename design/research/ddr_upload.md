@@ -144,7 +144,7 @@ floor perimeter to count.
 | Doors | door count and area | the same |
 | Heat Loss Indicator, year of construction | Energy Upgrade only: HLI and age band | not used |
 
-The report is chosen from a button beside the example buttons in Project Details, and what
+The report is chosen from a row at the top of Project Details, above the fields it fills, and what
 it read, with the additional survey counts, opens inside that same panel, so the home screen
 looks as it did before until a report is read. Filled fields carry a tooltip only; wall,
 roof and floor cards carry a grey caption naming Existing or Extension and the report's
