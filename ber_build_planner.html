@@ -94,7 +94,13 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 .guide-badge{padding:3px 9px;border-radius:14px;background:rgba(232,160,32,0.15);border:1px solid rgba(232,160,32,0.3);color:#E8A020;font-size:11px;font-weight:600;}
 .new-project-btn{padding:5px 12px;border-radius:6px;background:#2E3D52;border:none;color:#C8D0DC;font-size:11px;cursor:pointer;}
 .new-project-btn:hover{background:rgba(46,61,82,0.8);color:#fff;}
-.report-hdr-info{display:flex;align-items:center;justify-content:space-between;padding:14px 0;flex-wrap:wrap;gap:10px;max-width:1120px;margin:0 auto;}
+.report-hdr-info{display:flex;flex-direction:column;gap:10px;padding:14px 0;max-width:1120px;margin:0 auto;}
+.report-hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+.report-hdr-title{flex:1 1 480px;min-width:0;}
+.report-hdr-total{flex:0 0 auto;}
+.report-hdr-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+#pdf-btn-wrap{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.report-hdr-note{flex-basis:100%;font-size:9px;color:#94a3b8;font-style:italic;letter-spacing:0.01em;}
 .report-proj-name{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:#fff;}
 .report-proj-meta{font-size:11px;color:#C8D0DC;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
 .report-total-label{font-size:10px;color:#C8D0DC;text-transform:uppercase;letter-spacing:0.08em;text-align:right;}
@@ -5851,23 +5857,23 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
         </div>
     </div>
     <div class="report-hdr-info">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
-          <button class="new-project-btn" onclick="hide('screen-report');show('screen-input');" style="padding:6px 13px;font-size:12px;">&#8592; Back to Inputs</button>
-          <button onclick="saveProject()" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#E8A020;color:#1a2332;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#cf8f1a'" onmouseout="this.style.background='#E8A020'">&#128190; Save Project</button>
-          <span id="pdf-btn-wrap"><button id="pdf-download-btn" onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128196; Download PDF</button></span>
-        </div>
-        <div>
+      <div class="report-hdr-row">
+        <div class="report-hdr-title">
           <div class="report-proj-name" id="rpt-name">BOQ Report</div>
           <div class="report-proj-meta" id="rpt-meta"></div>
           <div id="rpt-client" style="font-size:11px;color:#94a3b8;margin-top:3px;letter-spacing:0.01em;"></div>
-          <div style="font-size:9px;color:#94a3b8;margin-top:6px;font-style:italic;letter-spacing:0.01em;">PDF download opens your browser&#8217;s print dialog &#8212; select &#8220;Save as PDF&#8221; as destination.</div>
+        </div>
+        <div class="report-hdr-total">
+          <div class="report-total-label">Total Budget Guide</div>
+          <div class="report-total-value" id="rpt-total">—</div>
+          <div class="report-total-sub" id="rpt-total-sub">Prelims · VAT 13.5% incl.</div>
         </div>
       </div>
-      <div>
-        <div class="report-total-label">Total Budget Guide</div>
-        <div class="report-total-value" id="rpt-total">—</div>
-        <div class="report-total-sub" id="rpt-total-sub">Prelims · VAT 13.5% incl.</div>
+      <div class="report-hdr-tools">
+        <button class="new-project-btn" onclick="hide('screen-report');show('screen-input');" style="padding:6px 13px;font-size:12px;">&#8592; Back to Inputs</button>
+        <button onclick="saveProject()" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#E8A020;color:#1a2332;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#cf8f1a'" onmouseout="this.style.background='#E8A020'">&#128190; Save Project</button>
+        <span id="pdf-btn-wrap"><button id="pdf-download-btn" onclick="exportPDF()" title="Download as PDF (uses browser print dialog — select Save as PDF)" style="padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;letter-spacing:0.02em;transition:background 0.2s;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#128196; Download PDF</button></span>
+        <span class="report-hdr-note">PDF download opens your browser&#8217;s print dialog &#8212; select &#8220;Save as PDF&#8221; as destination.</span>
       </div>
     </div>
   </div>
@@ -18178,7 +18184,7 @@ function _updateEUPDFBtns(isPlan, mode) {
   // documents under their own name.
   // One name across every mode, matching the band on the document itself and the
   // pack's document 02.
-  var planLabel = 'Baseline Cost Plan (PDF)';
+  var planLabel = 'Baseline Cost Plan';
   if (isPlan) {
     // Two documents, for two different readers. The Cost Plan is the homeowner's — page 1 is
     // their summary and the evidence sits behind it. The Pricing Schedule is the same scope
@@ -18186,7 +18192,7 @@ function _updateEUPDFBtns(isPlan, mode) {
     var formBtn = '';
     if (mode === 'New Build') {
       var formKind  = 'nb';
-      var formLabel = 'Homeowner Selection Form (PDF)';
+      var formLabel = 'Selection Form (PDF)';
       formBtn = '<button onclick="exportSelectionForm(\'' + formKind + '\')" title="Reprint the blank client selection form" style="margin-left:6px;padding:6px 13px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128221; ' + formLabel + '</button>';
     }
     // Grant route selector at the moment of download — the same selectPlanRoute the
@@ -18209,11 +18215,11 @@ function _updateEUPDFBtns(isPlan, mode) {
       // Three documents, printed one at a time. Each is a separate Save-as-PDF from the
       // browser's own print dialog, so they cannot be bundled into one download here —
       // and printing them separately is the point: they go to different people.
-      '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:8px;">' +
-        '<span style="font-size:10px;color:#4ade80;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;">The three documents</span>' +
-        '<button onclick="exportEUPDF(\'detailed\')" title="Document 1 of 3 — the homeowner works from this for the length of the job. Measure table, scope, and what each measure does not include." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">&#128203; 1 &middot; '+planLabel+'</button>' +
-        '<button onclick="exportContractorSchedule()" title="Document 2 of 3 — goes out to contractors. Same measured scope and the same exclusions, with every figure removed." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128196; 2 &middot; Contractor Pricing Schedule (PDF)</button>' +
-        '<button onclick="exportEUPDF(\'appendix\')" title="Document 3 of 3 — the reference behind the plan: how it was calculated, itemised measurements and rates, and guide prices for everything not included." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">&#128209; 3 &middot; Appendix &amp; Not-Included Costings (PDF)</button>' +
+      '<span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 8px 4px 10px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.3);border-radius:8px;">' +
+        '<span style="font-size:10px;color:#4ade80;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;">Three documents &middot; PDF</span>' +
+        '<button onclick="exportEUPDF(\'detailed\')" title="Document 1 of 3 — the homeowner works from this for the length of the job. Measure table, scope, and what each measure does not include." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#1a3020;color:#4ade80;border:1px solid rgba(74,222,128,.4);font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#1e3d28\'" onmouseout="this.style.background=\'#1a3020\'">1 &middot; '+planLabel+'</button>' +
+        '<button onclick="exportContractorSchedule()" title="Document 2 of 3 — goes out to contractors. Same measured scope and the same exclusions, with every figure removed." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">2 &middot; Pricing Schedule</button>' +
+        '<button onclick="exportEUPDF(\'appendix\')" title="Document 3 of 3 — the reference behind the plan: how it was calculated, itemised measurements and rates, and guide prices for everything not included." style="padding:6px 11px;font-size:12px;border-radius:8px;background:#2e3d52;color:#c8d0dc;border:none;font-weight:700;cursor:pointer;font-family:\'DM Sans\',system-ui,sans-serif;letter-spacing:.02em;transition:background .2s;" onmouseover="this.style.background=\'#3a4f68\'" onmouseout="this.style.background=\'#2e3d52\'">3 &middot; Appendix &amp; Not Included</button>' +
       '</span>' +
       formBtn;
   } else {
