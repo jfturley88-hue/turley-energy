@@ -131,7 +131,8 @@ const near = (a, b) => Math.abs((a || 0) - (b || 0)) < 0.06;
       ok(near(got.cards.windows, got.rpt.windows), `[${tag}] ${mode}: window area carried, roof windows kept out`, `${got.cards.windows} vs ${got.rpt.windows}`);
       ok(got.rpt.doors ? got.doors === got.rpt.doors : got.doorText === '', `[${tag}] ${mode}: doors as the report counts them`);
       ok(got.winCount === got.rpt.winCount && got.roofLights === got.rpt.roofLights, `[${tag}] ${mode}: window and roof light counts from the report`, JSON.stringify({ w: got.winCount, rl: got.roofLights }));
-      ok(!got.asked.some(t => /fc-t4-count|t4-roofLights|t4-doorCount/.test(t)), `[${tag}] ${mode}: the panel does not ask for windows, roof lights or doors`);
+      ok(!got.asked.some(t => /fc-t4-count|t4-roofLights/.test(t)) && got.asked.includes('t4-doorCount') === !got.rpt.doors,
+         `[${tag}] ${mode}: windows and roof lights never asked for; doors only when the report lists none`);
       ok(JSON.stringify(got.roomLabels) === JSON.stringify(got.rpt.storeys.map(x => x.toLowerCase())), `[${tag}] ${mode}: a room count for exactly the storeys in the report`, JSON.stringify(got.roomLabels));
       if (mode === 'Energy Upgrade') ok(near(got.hli, got.rpt.hli) && got.hliSource === 'ber', `[${tag}] Energy Upgrade: Heat Loss Indicator from the report`, `${got.hli} (${got.hliSource})`);
       if (got.ext) ok(got.ext.read.windowArea === 0 && got.ext.read.doorCount === 0, `[${tag}] Refurbishment: extension carries no invented windows or doors`, JSON.stringify({ w: got.ext.read.windowArea, d: got.ext.read.doorCount }));

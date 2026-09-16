@@ -10176,9 +10176,9 @@ function readExtensions() {
       living:        living,
       wc:            wc,
       kitchenArea:   Math.round(gfa * 0.20),
-      partitionArea: Math.round(totalRooms * 3.5 * (nv('ext'+n+'-height') || 2.7)),
+      partitionArea: Math.round(totalRooms * 3.5 * (nv('ext'+n+'-height') || nv('ext'+n+'-fl1-height') || 2.7)),
       bathroomArea:  Math.round((baths + ensuites + wc) * gfa * 0.08),
-      height:        nv('ext'+n+'-height')    || 2.7,
+      height:        nv('ext'+n+'-height') || nv('ext'+n+'-fl1-height') || 2.7,
       floorType:     sv('ext'+n+'-floor-type'),
       floorIns:      sv('ext'+n+'-floor-ins'),
       screed:        sv('ext'+n+'-screed'),
@@ -11294,7 +11294,8 @@ function getTabInputs() {
     ensuites:              ens,
     livingAreas:           living,
     additionalRooms:       extra,
-    roomCount:             beds + baths + ens + living + extra,
+    // Room types when they are broken down; the total counted on survey when it is larger.
+    roomCount:             Math.max(beds + baths + ens + living + extra, (_rc && _rc.rooms) || 0),
     heatingSystem:         (function(v){return v==='Air Source Heat Pump'?'ASHP':v||'ASHP';})(document.getElementById('t7-heating')?.value||''),
     emitters,
     hotWater:              document.getElementById('t7-hotWater')?.value     || 'HP Cylinder 210L',
@@ -12654,8 +12655,10 @@ function buildBOQExtension(ext, county, partLetter) {
   const gfa  = ext.groundFloor || fa;
   const wa   = ext.wallArea    || Math.round(fa * 1.45);
   const ra   = ext.roofArea    || Math.round(fa * 0.55);
-  const winA = ext.windowArea  || 8;
-  const doors = ext.doorCount  || 1;
+  // A figure given for the extension, zero included, is used as it stands; only a missing one
+  // falls back to the allowance.
+  const winA = ext.windowArea != null ? ext.windowArea : 8;
+  const doors = ext.doorCount != null ? ext.doorCount : 1;
   const rooms = ext.roomCount  || 2;
   const baths = ext.bathrooms  || 1;
   const isFlat   = (ext.roofType  || '').includes('flat');
@@ -24397,6 +24400,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (roofWins.length) put('t4-roofLights', cnt(roofWins), 'Roof lights (' + fmtA(sumA(roofWins, function () { return true; })) + ')', 'Openings');
 
     // doors
+    S.noDoors = !r.doors.rows.length;
     if (r.doors.rows.length) {
       put('t4-doorCount', cnt(r.doors.rows), 'External doors', 'Openings');
       put('t4-doorArea', r2(r.doors.total != null ? r.doors.total : r.doors.sum), 'External door area', 'Openings');
@@ -24474,6 +24478,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (S.extN && S.extGroundFc) more += surveyInput('ext' + S.extN + '-fl' + S.extGroundFc + '-perim', 'Ground floor perimeter, extension', 'm');
     else if (S.extGroundCard) more += surveyInput('fc-t1-perim-' + S.extGroundCard, 'Ground floor perimeter, extension', 'm');
     more += surveyInput('t3-gablePeaks', 'Gable end peaks', 'nr');
+    if (S.noDoors) more += surveyInput('t4-doorCount', 'External doors (none in the report)', 'nr');
     return '<div class="home-details-label ddr-divider">Additional survey counts</div>' +
       '<div class="tab-grid ddr-grid">' + rooms + '</div>' +
       '<div class="tab-grid ddr-grid">' + more + '</div>';

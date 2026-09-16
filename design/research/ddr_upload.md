@@ -188,6 +188,42 @@ save and restore keeps it, the plan generates, and no request leaves the page. A
 not a report is refused. `scripts/verify/ddr_journey.js` runs the whole journey as the
 assessor clicks it, through to all three documents printed.
 
+### Accuracy audit, 16 September 2026
+
+All five reports were priced in all three modes with a broad set of measures and survey
+counts, and every priced quantity was set beside the report's own figures.
+
+Right: floor, wall, ceiling, flat and rafter areas where the roof has that type; ground floor
+area for floor insulation; first floor area for upper floors; window area; the heat pump
+size (HLI × floor area × 23 K matches the kW on every report); extract terminals and air
+inlets from the counts; gable peaks in the external wall insulation elevation.
+
+Fixed in this pass:
+- The extension builder turned an entered zero for windows and doors back into 8 m² and one
+  door. It now keeps the zero.
+- The extension's ceiling height now comes from its own floor card, not a default 2.7 m.
+- New Build counted rooms only from the room-type boxes, so a survey with room totals priced
+  one internal door. It now uses the surveyed total when that is larger.
+- A report with no external doors made Energy Upgrade price two by default. The panel now
+  asks for doors when the report lists none.
+
+Found, not changed:
+- **Window count.** Each report row is a glazing group by orientation with a count of 1, so
+  "4 windows" is really four elevations. Energy Upgrade prints that count in the window
+  description; New Build and Refurbishment estimate their own from area. Pricing is by
+  area, so the money is right, but the count is not a number of windows.
+- **New Build roof.** Tiles, timbers, underlay and ceiling insulation are all priced on the
+  total roof area, mixing plan ceiling area, sloped rafter area and flat roof. A flat roof
+  gets tiles, and ceiling insulation covers the rafter and flat roofs too.
+- **New Build rooms by type.** Wet room tiling, sanitary accessories and drainage branches
+  come from bathroom and en-suite counts, which the panel does not ask for, so they price
+  at zero unless the Rooms tab types are filled.
+- **A measure for a roof type the house does not have** (for example rafter insulation with
+  only ceiling roofs) is priced on the whole roof area without warning.
+- **What the report gives but no plan uses yet:** the cylinder volume and, in New Build, the
+  Heat Loss Indicator.
+- **Extension windows** cannot be split from the report, so they sit with the house.
+
 ### Open
 
 - A saved project does not bring back extension cards on restore. That was already so for
