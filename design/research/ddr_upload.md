@@ -229,6 +229,22 @@ Decided by the author and done, 16 September 2026:
 Re-audited on all five reports: the three modes give the same heat pump, cylinder and duct
 run for each dwelling, and every roof, room and wet room quantity follows the counts.
 
+### In the SEAI pack
+
+The reader is step 2 of the Software document, on two screens: the panel with the report read
+and the survey counts, and the Roof tab it filled. No client's report could go into a document
+that leaves the office, so `pack/make_sample_report.js` writes one — a DEAP report for the
+pack's own Westport example, every label and figure at the coordinate a real report puts it,
+so the reader parses it the same way and the screens are the live software reading a real
+file. It reads with no warnings: floors 118, roofs 118, walls 108, windows 19, doors 4.40,
+HLI 2.1, cylinder 300. `pack/shot_ddr_reader.js` takes the two screens, and `pack/shot_home.js`
+now takes the home screen too, which had been hand-made since the spring and still showed a
+home screen with no reader on it.
+
+Taking those screens found one fault of its own: the report date the app fills on load was
+captured as pristine *before* it was filled, so choosing a project type cleared it and it
+never came back. The date is now filled before the capture and after every reset.
+
 ### Open
 
 - A saved project does not bring back extension cards on restore. That was already so for

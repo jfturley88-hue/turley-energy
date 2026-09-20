@@ -1,24 +1,22 @@
 # The SEAI pack
 
-Everything that builds the seven-PDF pack. It used to live in a session scratchpad, which
+Everything that builds the five-PDF pack. It used to live in a session scratchpad, which
 is ephemeral — this directory is the source of record.
 
-## The seven documents
+## The five documents
 
 | | Document | Made from |
 |---|---|---|
 | 01 | The Value Proposition | `pack_01.html` |
-| 02 | The Cost Plan | `pack_02.html` + `ex_plan.pdf` |
-| 03 | The Pricing Schedule | `pack_03.html` + `ex_sched.pdf` |
-| 04 | The Appendix | `pack_04.html` + `ex_appx.pdf` |
-| 05 | The Workflow | `pack_05.html` |
-| 06 | The Software | `pack_06.html` |
-| 07 | The Engine | `pack_07.html` |
+| 02 | The Baseline Cost Plan | `ex_plan.pdf` |
+| 03 | The Pricing Schedule | `ex_sched.pdf` |
+| 04 | The Appendix | `ex_appx.pdf` |
+| 05 | The Software | `pack_05.html` |
 
-Documents 02–04 are the software's own output bound whole, each behind one page of notes
-saying who it is for and how long it lives. They are printed by `gen_ex_pdfs.js` driving
-`../ber_build_planner.html` — not written by hand — so the pack cannot drift from what the
-software actually prints.
+Documents 02–04 are the software's own output bound whole, with nothing in front of them;
+document 01 says who each is for and how long it lives. They are printed by `gen_ex_pdfs.js`
+driving `../ber_build_planner.html` — not written by hand — so the pack cannot drift from
+what the software actually prints.
 
 ## Rebuilding
 
@@ -30,7 +28,7 @@ pip install pypdf pillow       # pypdf assembles, pillow crops the print-dialog 
 pip install --user --force-reinstall cffi cryptography
 
 node gen_ex_pdfs.js            # 1. the three documents, from the live app
-python3 seai_pack.py           # 2. pack_01..06.html
+python3 seai_pack.py           # 2. pack_01.html and pack_05.html
 node print_pack.js             # 3. those to PDF; reports any page that overflows
 node extract_editable.js       # 4. pull the editable prose blocks out again
 node build_edit_docs.js        # 5. one Word file per document
@@ -49,9 +47,24 @@ EU Rates panel, and `crop_engine_figs.py` cuts that one capture into the three f
 them quietly stale. The slices are anchored from the bottom, because the panel grows at the top:
 the first figure absorbs the growth and the other two stay identical. Scale the first figure down
 in `seai_pack.py` if page 5 then overflows.
-`refresh_app_shots.js` regenerates the app screenshots in document 06 (`app_plan`,
+`shot_home.js` regenerates the home screen (`app_home`), framed to the question and the
+three project cards — the details panel below them is step 2's own figure. That one was
+hand-made for a long time and went quietly stale, which is why it has a script now.
+
+`refresh_app_shots.js` regenerates the app screenshots in document 05 (`app_plan`,
 `app_routes`, `app_selector`). `pack_shots.js` regenerates the Cost Plan / Schedule /
 grants shots.
+
+`shot_ddr_reader.js` regenerates the two dwelling details report figures in document 05
+(`app_ddr`, `app_ddr_tabs`). It reads `sample_dwelling_report.pdf`, which
+`make_sample_report.js` writes: a DEAP report for the pack's own Westport example, laid out
+at the coordinates a real one uses so the reader parses it the same way. Run the two in
+order, and never point this at a client's report — the pack leaves the office:
+
+```sh
+node make_sample_report.js
+node shot_ddr_reader.js
+```
 
 `shot_preview.js` is the odd one. The print-preview figure is Chrome's own dialog, which
 is browser chrome rather than page content, so no headless screenshot API can see it. It

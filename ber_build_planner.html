@@ -21239,8 +21239,16 @@ async function saveProject() {
 // back to THIS, not to defaultValue: an example loader that writes the value attribute
 // also rewrites defaultValue, and a reset that trusted it restored the previous house.
 var _planitPristine = null;
+// The date of issue is today's unless the assessor types another. It is filled before the
+// pristine capture, so choosing a project type restores today's date and not a blank field.
+function fillReportDate() {
+  var rd = document.getElementById('t0-reportDate');
+  if (rd && !rd.value) rd.value = new Date().toISOString().split('T')[0];
+}
+window.fillReportDate = fillReportDate;
 function _capturePristine() {
   if (_planitPristine) return;
+  fillReportDate();
   _planitPristine = {};
   document.body.querySelectorAll('#screen-home input, #screen-home select, #screen-home textarea, #screen-input input, #screen-input select, #screen-input textarea').forEach(function(el) {
     if (!el.id) return;
@@ -21265,6 +21273,7 @@ function resetAllInputs() {
       else { const def = el.querySelector('option[selected]'); if (def) { el.value = def.value; } else if (el.options.length) { el.selectedIndex = 0; } }
     } else { el.value = p ? p.value : (el.defaultValue || ''); }
   });
+  fillReportDate();
   var hld = document.getElementById('eu-heat-load-display'); if (hld) hld.textContent = '—';
   ['t1-cards','t2-cards','t3-cards','t4-cards','t5r-cards','t6-cards'].forEach(function(id) {
     const c = document.getElementById(id); if (c) c.innerHTML = '';
@@ -23906,8 +23915,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (window.showAdvancedOptionsForMode) window.showAdvancedOptionsForMode('New Build');
   const gbw = document.getElementById('generate-btn-wrapper');
   if (gbw) gbw.style.display = 'none';
-  const rd = document.getElementById('t0-reportDate');
-  if (rd && !rd.value) rd.value = new Date().toISOString().split('T')[0];
+  if (window.fillReportDate) window.fillReportDate();
   if (window.refreshConditionalItems) window.refreshConditionalItems();
   document.querySelectorAll(
     '#mode-fields-upgrade input[type=checkbox], #mode-fields-refurbishment input[type=checkbox]'
@@ -24180,7 +24188,9 @@ document.addEventListener('DOMContentLoaded', function() {
         return h ? h.x : null;
       };
       var areaX = colX('Area');
-      if (areaX == null) return { rows: [], total: total, found: true };
+      // The table is there but its Area column is not where this reads it. Reported by the
+      // caller as a warning rather than thrown on.
+      if (areaX == null) return { rows: [], total: total, found: true, areaX: null, col: function () { return null; }, heads: [] };
       var anchors = items.filter(function (it) { return isNum(it.s) && /\./.test(it.s) && Math.abs(it.x - areaX) < 16; });
       // header words sit above the first figures line; drop them
       var firstY = anchors.length ? anchors[0].y : -Infinity;
@@ -24232,6 +24242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function elementRows(title, kind) {
       var t = table(title);
       if (!t.found) { warnings.push(title.replace('Building Elements - ', '') + ' table was not found.'); return { rows: [], total: null }; }
+      if (t.areaX == null) { warnings.push(title.replace('Building Elements - ', '') + ': the Area column was not found, so no rows were read.'); return { rows: [], total: t.total }; }
       var descX = t.col('Description');
       var typeX = t.col('Type');
       var countX = t.col('Count');
@@ -24345,6 +24356,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (/end.{0,3}terrace/.test(t)) return 'End of Terrace';
     if (/mid.{0,3}terrace|terrace/.test(t)) return 'Mid Terrace';
     if (/apartment|maisonette|flat/.test(t)) return 'Apartment';
+    if (/bungalow/.test(t)) return 'Bungalow';
     if (/detached/.test(t)) return 'Detached';
     return null;
   }

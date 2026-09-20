@@ -20,6 +20,7 @@ IMG = {k: b64(f) for k, f in {
     'appplan': 'app_plan.png',     'rates':   'app_rates.png',
     'grants':  'app_grants.png',   'routes':  'app_routes.png',
     'preview': 'app_preview_dialog.png',
+    'ddr': 'app_ddr.png', 'ddrtabs': 'app_ddr_tabs.png',
     'routedl': 'shot_routedl.png',
     'eurates': 'app_eurates.png', 'regional': 'app_regional.png',
     'eng_a': 'app_eng_a.png', 'eng_b': 'app_eng_b.png', 'eng_c': 'app_eng_c.png',
@@ -422,19 +423,32 @@ doc6 = f'''<div class="sheet">
   {strip(5)}
   <h2>The software behind it</h2>
   <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Live software, in two parts.
-    <strong>Part one</strong> is the journey on screen: the survey goes in, the grant route is chosen,
-    and the three documents print at the end. <strong>Part two</strong> is the rate book behind those
+    <strong>Part one</strong> is the journey on screen: the dwelling details report is read, the measures
+    are ticked, the grant route is chosen, and the three documents print at the end. <strong>Part two</strong> is the rate book behind those
     figures, which the assessor can open but not edit.</p>
   <div class="kick" style="margin-top:3mm;">Part one &mdash; the journey on screen</div>
 
   {appfig('home', '152mm', '1 &middot; Choose the project type.',
     'New Build, Refurbishment and Energy Upgrade share one engine and one rate base.')}
   <div class="arrowrow">{DOWN_ARROW}</div>
-  {appfig('sel', '152mm', '2 &middot; The measures go in.',
-    'Every measure to be carried out is ticked. Quantities come from the DEAP geometry already entered, the sidebar fills as it goes in, and nothing is measured twice.')}
+  {appfig('ddr', '150mm', '2 &middot; The dwelling details report goes in.',
+    'The DEAP report is read on the assessor&rsquo;s own computer &mdash; it is not uploaded and nothing is sent anywhere. It fills the address, the dwelling and every measured area, checks each table against the report&rsquo;s own total, and asks for the few counts a report cannot carry: rooms, wet rooms, perimeter and gable ends.')}
+
+  <div class="fine">Screens from the live software, September 2026, unedited. The report read here is a sample written for this pack, not a client&rsquo;s.</div>
+  {footer(5, '1', '8')}
+</div>
+
+<div class="sheet">
+  {strip(5)}
+  <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
+  {appfig('ddrtabs', '138mm', '3 &middot; What it filled, open to edit.',
+    'Every element keeps its own card, named as the report names it, so ceiling-level and rafter-level roofs are priced as what they are. Anything the survey finds different is typed over.')}
+  <div class="arrowrow">{DOWN_ARROW}</div>
+  {appfig('sel', '152mm', '4 &middot; The measures go in.',
+    'Every measure to be carried out is ticked. Quantities come from the geometry already entered, the sidebar fills as it goes in, and nothing is measured twice.')}
 
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
-  {footer(5, '1', '7')}
+  {footer(5, '2', '8')}
 </div>
 
 <div class="sheet">
@@ -442,23 +456,23 @@ doc6 = f'''<div class="sheet">
   <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
   <div class="appshot" style="margin-bottom:2mm;">
     <img src="{IMG['routes']}" alt="">
-    <div class="ac" style="font-size:8pt;"><strong>3 &middot; The grant route, chosen on the figures.</strong>
+    <div class="ac" style="font-size:8pt;"><strong>5 &middot; The grant route, chosen on the figures.</strong>
       Three tiles, one per SEAI route &mdash; the same measured works in each, the scheme fee and the grants
       changing, and the route that leaves least to fund marked. The homeowner picks a route knowing exactly
       what each one leaves them to pay &mdash; before the plan is issued.</div>
   </div>
   <div class="arrowrow">{DOWN_ARROW}</div>
-  {appfig('appplan', '162mm', '4 &middot; The plan on screen.',
+  {appfig('appplan', '162mm', '6 &middot; The plan on screen.',
     'The baseline fixed at issue, the grant named on every line, and the live half ready to record quotes and payments as the job runs.')}
 
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
-  {footer(5, '2', '7')}
+  {footer(5, '3', '8')}
 </div>
 
 <div class="sheet">
   {strip(5)}
   <div class="arrowrow" style="padding:0 0 1.5mm;">{DOWN_ARROW}</div>
-  <h2 style="font-size:14pt;"><span style="color:#B07D1A;">5 &middot;</span> All the way to print</h2>
+  <h2 style="font-size:14pt;"><span style="color:#B07D1A;">7 &middot;</span> All the way to print</h2>
   <p class="body" style="font-size:9pt;margin-bottom:2.5mm;">Three buttons, one for each document. Each
     opens the browser&rsquo;s own print dialog on its own, ready to print on paper or save as a PDF &mdash;
     they go to different people, so they never print as one bundle.</p>
@@ -495,7 +509,7 @@ doc6 = f'''<div class="sheet">
   </div>
 
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
-  {footer(5, '3', '7')}
+  {footer(5, '4', '8')}
 </div>
 
 <div class="sheet">
@@ -515,7 +529,7 @@ doc6 = f'''<div class="sheet">
   {appfig('rates', '140mm', 'Labour, at the SEO August 2026 rates.',
     'Every labour rate and county multiplier visible, each with its source. Nothing is a black box.')}
   <div class="fine">{FINE1}</div>
-  {footer(5, '4', '7')}
+  {footer(5, '5', '8')}
 </div>'''
 
 # ── 05 · THE SOFTWARE — part two, the rate book behind it ────────────────────
@@ -536,7 +550,7 @@ doc7 = f'''<div class="sheet">
   {engfig('eng_a', '140mm', 'Walls, heat pump and ventilation.',
     'Category uplift by trade on the left; supply-only material rates on the right, the published figure in every box and the source under each group.')}
   <div class="fine">{FINE1}</div>
-  {footer(5, '5', '7')}
+  {footer(5, '6', '8')}
 </div>
 
 <div class="sheet">
@@ -544,7 +558,7 @@ doc7 = f'''<div class="sheet">
   {engfig('eng_b', '140mm', 'Fascia and soffit, ventilation units, windows and doors, solar PV and battery, and the attic ancillaries.',
     'The frame and style multipliers for windows are written out under the table, so a triple-glazed alu-clad sash window can be traced from the base rate. The attic ancillaries are the items every attic top-up carries as standard: the tank jacket, the pipe lagging, the walkway and the storage deck.')}
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
-  {footer(5, '6', '7')}
+  {footer(5, '7', '8')}
 </div>
 
 <div class="sheet">
@@ -558,7 +572,7 @@ doc7 = f'''<div class="sheet">
   {engfig('eng_c', '140mm', 'Variations &mdash; not included guide rates.',
     'Material per unit, labour from the Labour Rates tab, loaded like the plan: overhead and profit at 12%, then VAT. The flag at the foot marks a rate still to be calibrated against recorded outcomes.')}
   <div class="fine">Screens from the live software, September 2026, unedited.</div>
-  {footer(5, '7', '7')}
+  {footer(5, '8', '8')}
 </div>'''
 
 TPL = '''<!doctype html><html><head><meta charset="utf-8"><title>%s</title>

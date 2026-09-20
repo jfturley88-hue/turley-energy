@@ -11,7 +11,7 @@ alongside. The build is the only way the pack changes; see `pack/README.md`.
 | 02 | The Baseline Cost Plan | The software's own print for the worked example: scope, grant and budget estimate per measure, fixed at date of issue, with the live half beside it | 2 |
 | 03 | The Pricing Schedule | The same scope with every figure removed, for contractors to price | 2 |
 | 04 | The Appendix | The arithmetic behind each figure and the guide prices for what is not included | 4 |
-| 05 | The Software | The journey on screen, then the rate book behind it | 7 |
+| 05 | The Software | The journey on screen, from reading the dwelling details report, then the rate book behind it | 8 |
 
 Documents 02–04 are bound whole from the software's output with nothing in front of them;
 document 01 says what each is for. The worked example throughout is the same house on the
