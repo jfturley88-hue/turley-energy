@@ -406,7 +406,7 @@ doc1 = f'''<div class="sheet">
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">John Turley</span>
-    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; 087 981 0150 &middot; mc2rating@gmail.com</span>
+    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor, reg. 100615 &middot; 087 981 0150 &middot; mc2rating@gmail.com</span>
   </div>
 
   {footer(1, '2', '2')}
