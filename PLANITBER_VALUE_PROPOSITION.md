@@ -91,4 +91,4 @@ Each step produces something concrete before the next is asked for. What we are 
 
 ---
 
-*PlanitBER V1 · [Practice] · Indicative accuracy ±15–20% (to be evidenced in pilot) · Independent estimate — not prepared by any contractor · Not a substitute for a formal QS report*
+*PlanitBER V1 · Indicative accuracy ±15–20% (to be evidenced in pilot) · Independent estimate — not prepared by any contractor · Not a substitute for a formal QS report*

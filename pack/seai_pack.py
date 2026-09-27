@@ -297,8 +297,8 @@ doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
     <div style="display:flex;align-items:center;gap:2.5mm;">{GLOBE}<div class="word" style="font-size:19pt;"><span class="p">Planit</span><span class="b">BER</span></div></div>
     <div style="text-align:right;font-size:7.4pt;color:#8090A8;line-height:1.65;">
-      <div style="color:#1E293B;font-weight:700;font-size:8.4pt;">[Practice]</div>
-      <div>Co. Monaghan &middot; [Email]</div><div>[Date]</div>
+      <div>Killyleen, Ballinode, Co. Monaghan</div>
+      <div>mc2rating@gmail.com &middot; 087 981 0150</div><div>[Date]</div>
     </div>
   </div>
   <h1 style="font-size:16pt;line-height:1.2;margin:2.6mm 0 1.6mm;">Empowering homeowners with tender
@@ -400,13 +400,13 @@ doc1 = f'''<div class="sheet">
     If the pilot shows what we expect, the next step is participation in the NAS Trusted Partner API
     trial. Households which already hold a BER but have not gone ahead could then be offered the three
     documents, with their consent, and the trial would measure how many commit.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">The practice combines registered BER assessors, years of tendering
-    experience and the software built for this purpose. More retrofits is the aim and it is
+  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Behind PlanitBER are registered BER assessors, years of tendering
+    experience and software built for this purpose. More retrofits is the aim and it is
     SEAI&rsquo;s target as much as ours.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
-    <span style="font-weight:700;color:#1E293B;">[Name] &middot; [Practice]</span>
-    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; [Phone] &middot; [Email]</span>
+    <span style="font-weight:700;color:#1E293B;">John Turley</span>
+    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; 087 981 0150 &middot; mc2rating@gmail.com</span>
   </div>
 
   {footer(1, '2', '2')}
