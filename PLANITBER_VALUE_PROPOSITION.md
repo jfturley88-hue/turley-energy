@@ -71,7 +71,7 @@ It turns the stated accuracy (±15–20%) into published evidence, tunes the rat
 
 **The funding ask.** We are asking SEAI to fund the pilot and deliver it with us — recruiting assessors, collecting and verifying matched quotes and out-turn costs, tuning the tables, completing development, and independent analysis. Not the building of PlanitBER, which is paid for. It is worth funding because it produces the evidence that would justify endorsement, it produces a public asset in the cost dataset, and a jointly delivered pilot carries far more weight with the sector than one run by a private firm alone.
 
-**Governance and risk.** We would welcome a formal SEAI role in governing the method — the rate book, the grant tables, their sources and every revision open to review, with changes published and dated; annual approval if SEAI prefers. Every Cost Plan is labelled an indicative estimate with its accuracy band on its face, and Turley Energy Consultants carries professional indemnity insurance; recognition would carry no liability for SEAI. Data shared with SEAI is aggregated and anonymised, with homeowner consent. The Cost Plan is free to homeowners; assessors access PlanitBER under an annual licence, priced to be recoverable from a single assessment, and we take no commission, referral fee or contractor advertising from anyone.
+**Governance and risk.** We would welcome a formal SEAI role in governing the method — the rate book, the grant tables, their sources and every revision open to review, with changes published and dated; annual approval if SEAI prefers. Every Cost Plan is labelled an indicative estimate with its accuracy band on its face, and the practice carries professional indemnity insurance; recognition would carry no liability for SEAI. Data shared with SEAI is aggregated and anonymised, with homeowner consent. The Cost Plan is free to homeowners; assessors access PlanitBER under an annual licence, priced to be recoverable from a single assessment, and we take no commission, referral fee or contractor advertising from anyone.
 
 ---
 
@@ -91,4 +91,4 @@ Each step produces something concrete before the next is asked for. What we are 
 
 ---
 
-*PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% (to be evidenced in pilot) · Independent estimate — not prepared by any contractor · Not a substitute for a formal QS report*
+*PlanitBER V1 · [Practice] · Indicative accuracy ±15–20% (to be evidenced in pilot) · Independent estimate — not prepared by any contractor · Not a substitute for a formal QS report*

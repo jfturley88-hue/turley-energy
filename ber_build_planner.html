@@ -934,7 +934,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
       <div class="tab-field">
         <label>Prepared By</label>
-        <input type="text" id="t0-preparedBy" placeholder="e.g. Fibe / John Turley">
+        <input type="text" id="t0-preparedBy" placeholder="e.g. A. Walsh">
       </div>
 
       <div class="tab-field">
@@ -1406,7 +1406,7 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 
     <div class="tab-field">
       <label>Prepared By</label>
-      <input type="text" id="t0info-preparedBy" placeholder="e.g. Fibe / John Turley">
+      <input type="text" id="t0info-preparedBy" placeholder="e.g. A. Walsh">
     </div>
 
     <div class="tab-field">
@@ -6122,6 +6122,19 @@ function rateBookStamp() {
 }
 window.RATE_BOOK = RATE_BOOK;
 window.rateBookStamp = rateBookStamp;
+
+// Who issued the document is whoever is named in Prepared by, and nobody if that is empty.
+// One practice's name used to be written into every printed document, which put it on work
+// issued by anyone else running the software — and on the example plans bound into the pack.
+function preparerName() {
+  var el = document.getElementById('t0-preparedBy');
+  var v = el && el.value ? el.value.trim() : '';
+  if (!v && typeof BOQ !== 'undefined' && BOQ && BOQ.projectInfo) v = (BOQ.projectInfo.preparedBy || '').trim();
+  return v;
+}
+function preparedByStamp() { var n = preparerName(); return n ? 'Prepared by ' + n + ' · ' : ''; }
+function preparerStamp()   { var n = preparerName(); return n ? n + ' · ' : ''; }
+window.preparerName = preparerName;
 
 // ── BUILD SPEC RATES — New Build element rates behind the Build Spec dropdowns ──
 // These are the per-element supply rates the BOQ uses when a spec option is chosen
@@ -15280,7 +15293,7 @@ function renderEUTable(b) {
     '<div class="eu-howto"><strong>How to use this document.</strong> ' + EU_HOW_TO_USE + '</div>' +
     '<div class="eu-disclaimer">' + euTermsHTML({ head: '#C8D0DC' }) +
       '<div style="margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);">' +
-        'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + rateBookStamp() +
+        preparedByStamp() + 'PlanitBER V1 · ' + rateBookStamp() +
         ' · Independent estimate — not prepared by any contractor.' +
       '</div>' +
     '</div>' +
@@ -18703,7 +18716,7 @@ function exportEUPDF(mode) {
         '<li>Floor area: '+pi.floorArea+'m² · County: '+(pi.county||'—')+' · Dwelling: '+(pi.dwellingType||'—')+'</li>' +
       '</ul>' +
       '<div style="font-size:8pt;color:#94a3b8;border-top:1px solid #E2E8F0;padding-top:8px;">' +
-        '<strong style="color:#334155;">' + rateBookStamp() + '</strong> · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
+        '<strong style="color:#334155;">' + rateBookStamp() + '</strong> · PlanitBER V1 · ' + preparerStamp() + 'Indicative accuracy ±15–20% · Not a substitute for a formal QS report · Engage a SCSI-registered QS for procurement' +
       '</div>' +
     '</div>' +
     appendixHTML;
@@ -18725,7 +18738,7 @@ function exportEUPDF(mode) {
       '</div>' +
       // The document names itself in the eyebrow above, so the old ' · Detailed' mode tag
       // would only be a second, competing label for the same thing.
-      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20% · '+rateBookStamp()+'</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · ' + preparerStamp() + 'Indicative accuracy ±15–20% · '+rateBookStamp()+'</div>' +
     '</div>';
 
   var _bandRow = '<tr style="background:#FFF7ED;color:#92400E;">' +
@@ -18796,7 +18809,7 @@ function exportEUPDF(mode) {
     '<div style="font-size:6.8pt;color:#475569;margin-top:5px;border-top:2px solid #E2E8F0;padding-top:5px;line-height:1.5;">' +
       euTermsHTML({ head: '#1E293B' }) +
       '<div style="margin-top:5px;padding-top:4px;border-top:1px solid #E2E8F0;">' +
-        'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
+        preparedByStamp() + 'PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
       '</div>' +
     '</div>' +
   '</div>';
@@ -18911,7 +18924,7 @@ function exportContractorSchedule() {
       'Each is agreed with the homeowner before it is done.' +
     '</div>' +
     '<div style="font-size:6pt;color:#94a3b8;margin-top:5px;border-top:1px solid #E2E8F0;padding-top:5px;line-height:1.45;">' +
-      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
+      preparedByStamp() + 'PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() +
       ' · Scope prepared independently of any contractor.' +
     '</div>' +
     '</div>';
@@ -19117,7 +19130,7 @@ function exportCompactPDF() {
         (pi.storeys ? '<span>Storeys: <strong style="color:#1E293B;">'+pi.storeys+'</strong></span>' : '') +
         (pi.currentBER && pi.targetBER ? '<span>BER: <strong style="color:#1E293B;">'+pi.currentBER+' → '+pi.targetBER+'</strong></span>' : '') +
       '</div>' +
-      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · Turley Energy Consultants · Indicative accuracy ±15–20%</div>' +
+      '<div style="font-size:7pt;color:#94a3b8;">Generated: '+dateStr+' · PlanitBER V1 · ' + preparerStamp() + 'Indicative accuracy ±15–20%</div>' +
     '</div>';
 
   var thead = '<thead><tr style="background:#F1F5F9;color:#1E293B;">' +
@@ -19154,7 +19167,7 @@ function exportCompactPDF() {
       'All Budget Est. figures are fully loaded and include: <strong>VAT</strong> at 13.5% on construction works (heat pumps at 9% per Finance Act 2024; Solar PV at 0% per Revenue ruling, May 2023; professional fees at 23%); <strong>preliminaries, plant &amp; equipment</strong>; <strong>contingency</strong>. ' +
       'This document is an indicative cost estimate with an accuracy of ±15–20% and does not constitute a binding quotation, contract, or guarantee of final cost. ' +
       (hasGrants ? 'Grant figures shown are indicative SEAI rates current at time of issue and are subject to SEAI eligibility assessment, survey, and approval. Only SEAI-registered contractors qualify for grant payment. ' : '') +
-      'Prepared by Turley Energy Consultants · PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
+      preparedByStamp() + 'PlanitBER V1 · ' + dateStr + ' · ' + rateBookStamp() + ' · Independent estimate — not prepared by any contractor.' +
     '</div>' +
   '</div>';
 

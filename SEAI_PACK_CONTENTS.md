@@ -1,6 +1,6 @@
 # PlanitBER — SEAI pack contents
 
-*Turley Energy Consultants · PlanitBER V1*
+*PlanitBER V1*
 
 Five documents, built by `pack/build_pack.py` into `pack/PlanitBER_SEAI_Pack/` and zipped
 alongside. The build is the only way the pack changes; see `pack/README.md`.

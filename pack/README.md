@@ -76,6 +76,12 @@ Xvfb :99 -screen 0 1600x1200x24 &
 DISPLAY=:99 node shot_preview.js
 ```
 
+`shot_preview_win.js` does the same job on Windows: a headed Chrome on the desktop, the
+screen grabbed with PIL, and the window cropped to the work area. It serves the app over
+127.0.0.1 so the address bar carries a neutral URL rather than the folder the repository
+happens to sit in. It needs the signed-in screen — from a service or a locked session the
+grab comes back black, and the script says so and leaves the old figure alone.
+
 That figure is captioned as unedited, so it must stay a real capture — never composite it.
 
 ## Figures

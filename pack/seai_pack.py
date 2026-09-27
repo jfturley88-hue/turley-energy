@@ -297,8 +297,8 @@ doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
     <div style="display:flex;align-items:center;gap:2.5mm;">{GLOBE}<div class="word" style="font-size:19pt;"><span class="p">Planit</span><span class="b">BER</span></div></div>
     <div style="text-align:right;font-size:7.4pt;color:#8090A8;line-height:1.65;">
-      <div style="color:#1E293B;font-weight:700;font-size:8.4pt;">Turley Energy Consultants</div>
-      <div>Co. Monaghan &middot; info@turleyenergy.ie</div><div>[Date]</div>
+      <div style="color:#1E293B;font-weight:700;font-size:8.4pt;">[Practice]</div>
+      <div>Co. Monaghan &middot; [Email]</div><div>[Date]</div>
     </div>
   </div>
   <h1 style="font-size:16pt;line-height:1.2;margin:2.6mm 0 1.6mm;">Empowering homeowners with tender
@@ -405,8 +405,8 @@ doc1 = f'''<div class="sheet">
     SEAI&rsquo;s target as much as ours.</p>
 
   <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
-    <span style="font-weight:700;color:#1E293B;">[Name] &middot; Turley Energy Consultants</span>
-    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; [Phone] &middot; info@turleyenergy.ie</span>
+    <span style="font-weight:700;color:#1E293B;">[Name] &middot; [Practice]</span>
+    <span style="color:#64748B;"> &middot; SEAI-registered BER assessor &middot; [Phone] &middot; [Email]</span>
   </div>
 
   {footer(1, '2', '2')}
