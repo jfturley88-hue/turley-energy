@@ -2,16 +2,17 @@
 
 *PlanitBER V1*
 
-Five documents, built by `pack/build_pack.py` into `pack/PlanitBER_SEAI_Pack/` and zipped
+Six documents, built by `pack/build_pack.py` into `pack/PlanitBER_SEAI_Pack/` and zipped
 alongside. The build is the only way the pack changes; see `pack/README.md`.
 
 | # | Document | What it is | Pages |
 |---|---|---|---|
-| 01 | The Value Proposition | The argument, what each document is for, the BER assessor workflow, and what we are asking for | 3 |
+| 01 | The Value Proposition | The argument, what each document is for, the BER assessor workflow, and what we are asking for | 2 |
 | 02 | The Baseline Cost Plan | The software's own print for the worked example: scope, grant and budget estimate per measure, fixed at date of issue, with the live half beside it | 2 |
 | 03 | The Pricing Schedule | The same scope with every figure removed, for contractors to price | 2 |
 | 04 | The Appendix | The arithmetic behind each figure and the guide prices for what is not included | 4 |
 | 05 | The Software | The journey on screen, from reading the dwelling details report, then the rate book behind it | 8 |
+| 06 | Data Protection | Where every piece of the homeowner's data lives, how the duties are met, and what a DPIA would cover before a pilot | 3 |
 
 Documents 02–04 are bound whole from the software's output with nothing in front of them;
 document 01 says what each is for. The worked example throughout is the same house on the

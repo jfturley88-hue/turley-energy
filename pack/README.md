@@ -1,9 +1,9 @@
 # The SEAI pack
 
-Everything that builds the five-PDF pack. It used to live in a session scratchpad, which
+Everything that builds the six-PDF pack. It used to live in a session scratchpad, which
 is ephemeral — this directory is the source of record.
 
-## The five documents
+## The six documents
 
 | | Document | Made from |
 |---|---|---|
@@ -12,6 +12,7 @@ is ephemeral — this directory is the source of record.
 | 03 | The Pricing Schedule | `ex_sched.pdf` |
 | 04 | The Appendix | `ex_appx.pdf` |
 | 05 | The Software | `pack_05.html` |
+| 06 | Data Protection | `pack_06.html` |
 
 Documents 02–04 are the software's own output bound whole, with nothing in front of them;
 document 01 says who each is for and how long it lives. They are printed by `gen_ex_pdfs.js`
@@ -28,7 +29,7 @@ pip install pypdf pillow       # pypdf assembles, pillow crops the print-dialog 
 pip install --user --force-reinstall cffi cryptography
 
 node gen_ex_pdfs.js            # 1. the three documents, from the live app
-python3 seai_pack.py           # 2. pack_01.html and pack_05.html
+python3 seai_pack.py           # 2. pack_01.html, pack_05.html and pack_06.html
 node print_pack.js             # 3. those to PDF; reports any page that overflows
 node extract_editable.js       # 4. pull the editable prose blocks out again
 node build_edit_docs.js        # 5. one Word file per document

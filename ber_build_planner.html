@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BER Cost Planner — DEAP × Works → BOQ</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet"/>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',system-ui,sans-serif;background:#1A2332;min-height:100vh;}
@@ -259,31 +258,8 @@ input,select,textarea{font-family:'DM Sans',system-ui,sans-serif;}
 /* ── LICENSE FOOTER ──────────────────────────────────────────────────────── */
 .license-footer{text-align:center;padding:10px;font-size:10px;color:#8090A8;border-top:1px solid #E2E8F0;background:#F8FAFC;}
 
-/* ── PROJECT CODE MODAL ──────────────────────────────────────────────────── */
-#code-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;align-items:center;justify-content:center;}
-#code-modal.open{display:flex;}
-.code-modal-box{background:#243044;border:1px solid rgba(232,160,32,0.3);border-radius:14px;padding:28px 32px;max-width:420px;width:90%;text-align:center;}
-.code-modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:6px;}
-.code-modal-sub{font-size:12px;color:#C8D0DC;margin-bottom:18px;line-height:1.5;}
-.project-code-display{font-family:monospace;font-size:32px;font-weight:900;letter-spacing:6px;color:#E8A020;background:rgba(232,160,32,0.1);border:2px dashed rgba(232,160,32,0.4);border-radius:9px;padding:14px 20px;margin:0 0 10px;cursor:pointer;user-select:all;display:block;}
-.project-code-display:hover{background:rgba(232,160,32,0.18);}
-.code-modal-hint{font-size:11px;color:#8090A8;margin-bottom:18px;line-height:1.6;}
-.code-modal-btns{display:flex;gap:10px;justify-content:center;}
-.code-copy-btn{padding:8px 18px;border-radius:7px;background:#E8A020;border:none;color:#1A2332;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
-.code-copy-btn:hover{background:#CF8F1A;}
-.code-done-btn{padding:8px 18px;border-radius:7px;background:#2E3D52;border:1px solid rgba(46,61,82,0.9);color:#C8D0DC;font-size:13px;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
-.code-done-btn:hover{background:rgba(46,61,82,0.8);color:#fff;}
+{padding:8px 18px;border-radius:7px;background:#2E3D52;border:1px solid rgba(46,61,82,0.9);color:#C8D0DC;font-size:13px;cursor:pointer;font-family:'DM Sans',system-ui,sans-serif;}
 
-/* ── CLOUD LOAD PANEL (input screen) ────────────────────────────────────── */
-.cloud-load-panel{padding:14px 16px;border-radius:9px;background:#243044;border:1px solid #2E3D52;}
-.cloud-load-title{font-size:11px;font-weight:700;color:#C8D0DC;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
-.cloud-load-row{display:flex;gap:8px;align-items:center;}
-.cloud-code-input{flex:1;padding:9px 11px;border-radius:7px;border:1px solid rgba(46,61,82,0.9);background:#1E2D42;color:#E8A020;font-size:16px;font-family:monospace;letter-spacing:4px;text-transform:uppercase;outline:none;}
-.cloud-code-input:focus{border-color:#E8A020;}
-.cloud-code-input::placeholder{letter-spacing:1px;font-family:'DM Sans',system-ui,sans-serif;font-size:12px;text-transform:none;color:#8090A8;}
-.cloud-load-btn{padding:9px 16px;border-radius:7px;background:#E8A020;border:none;color:#1A2332;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'DM Sans',system-ui,sans-serif;}
-.cloud-load-btn:hover{background:#CF8F1A;}
-.cloud-load-status{font-size:11px;color:#C8D0DC;margin-top:7px;min-height:16px;}
 
 @media(max-width:700px){
   .input-body{flex-direction:column;}
@@ -854,14 +830,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             <button onclick="closeRecentPopupHome()" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;">&#10005;</button>
           </div>
           <div id="recent-list-container-home"></div>
-          <div style="padding:8px 12px;border-top:1px solid #2e3d52;background:rgba(232,160,32,0.05);">
-            <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">Or enter an 8-character cloud code:</div>
-            <div style="display:flex;gap:6px;">
-              <input id="cloud-code-input-home" type="text" maxlength="8" placeholder="ABCD1234" style="flex:1;padding:5px 8px;border-radius:5px;border:1px solid #2e3d52;background:#1a2332;color:#fff;font-size:11px;outline:none;text-transform:uppercase;letter-spacing:0.1em;" />
-              <button onclick="loadByCodeHome()" style="padding:5px 12px;border-radius:5px;background:#E8A020;border:none;color:#1a2332;font-size:11px;font-weight:700;cursor:pointer;">Load</button>
-            </div>
-            <div id="cloud-load-status-home" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
-          </div>
         </div>
       </div>
       <button onclick="newProject()" style="padding:4px 12px;border-radius:20px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#10010; New Project</button>
@@ -1351,14 +1319,6 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
             <button onclick="closeRecentPopup()" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:0;">&#10005;</button>
           </div>
           <div id="recent-list-container"></div>
-          <div style="padding:8px 12px;border-top:1px solid #2e3d52;background:rgba(232,160,32,0.05);">
-            <div style="font-size:10px;color:#94a3b8;margin-bottom:6px;">Or enter an 8-character cloud code:</div>
-            <div style="display:flex;gap:6px;">
-              <input id="cloud-code-input" type="text" maxlength="8" placeholder="ABCD1234" style="flex:1;padding:5px 8px;border-radius:5px;border:1px solid #2e3d52;background:#1a2332;color:#fff;font-size:11px;outline:none;text-transform:uppercase;letter-spacing:0.1em;" />
-              <button onclick="loadByCode()" style="padding:5px 12px;border-radius:5px;background:#E8A020;border:none;color:#1a2332;font-size:11px;font-weight:700;cursor:pointer;">Load</button>
-            </div>
-            <div id="cloud-load-status" style="font-size:10px;color:#94a3b8;margin-top:4px;min-height:14px;"></div>
-          </div>
         </div>
       </div>
       <button onclick="newProject()" style="padding:4px 12px;border-radius:20px;background:#2e3d52;border:none;color:#c8d0dc;font-size:12px;font-family:'DM Sans',system-ui,sans-serif;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#3a4f68'" onmouseout="this.style.background='#2e3d52'">&#10010; New Project</button>
@@ -5900,60 +5860,8 @@ input[data-estimated="true"]{border-color:rgba(232,160,32,0.55)!important;backgr
 </div>
 <div id="toast"></div>
 
-<!-- ═══ FIREBASE FIRESTORE ════════════════════════════════════════════════ -->
-<script type="module">
-import { initializeApp }                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey:            "AIzaSyDXvtUGtBTS__3VDk-Xs7NbvlyYX3M5ZgU",
-  authDomain:        "ber---bill-of-quantities.firebaseapp.com",
-  projectId:         "ber---bill-of-quantities",
-  storageBucket:     "ber---bill-of-quantities.firebasestorage.app",
-  messagingSenderId: "475509839032",
-  appId:             "1:475509839032:web:5b70e7a9f44a0cca98504d",
-  measurementId:     "G-J80LKDK3P8"
-};
-
-try {
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  window.fbSave = async function(code, data) {
-    // Firestore doesn't accept undefined values — strip them
-    const clean = JSON.parse(JSON.stringify(data));
-    await setDoc(doc(db, 'projects', code), clean);
-  };
-
-  window.fbLoad = async function(code) {
-    const snap = await getDoc(doc(db, 'projects', code.toUpperCase().trim()));
-    if (!snap.exists()) throw new Error('Project not found — check the code and try again.');
-    return snap.data();
-  };
-
-  window.fbReady = true;
-} catch(e) {
-  console.warn('Firebase init failed:', e);
-  window.fbReady = false;
-}
-</script>
-
-<!-- ═══ PROJECT CODE MODAL ════════════════════════════════════════════════ -->
-<div id="code-modal">
-  <div class="code-modal-box">
-    <div class="code-modal-title">☁ Project Saved to Cloud</div>
-    <div class="code-modal-sub">Your project code — use this to load your BOQ on any device</div>
-    <span id="code-display" class="project-code-display" onclick="copyProjectCode()" title="Click to copy"></span>
-    <div class="code-modal-hint">
-      📋 Click the code to copy it &nbsp;·&nbsp; Write it down or share it<br>
-      Anyone with this code can load your project
-    </div>
-    <div class="code-modal-btns">
-      <button class="code-copy-btn" onclick="copyProjectCode()">📋 Copy Code</button>
-      <button class="code-done-btn" onclick="closeCodeModal()">Done</button>
-    </div>
-  </div>
-</div>
+<!-- No cloud: a project is saved on this computer only. There is no server to send a
+     homeowner's name, address or measurements to, and none is sent. -->
 
 <script>
 // ── STATE ────────────────────────────────────────────────────────────────────
@@ -20555,10 +20463,25 @@ function exportPDF() {
 }
 
 // ── EXCEL EXPORT (SheetJS) — two-sided BOQ workbook ──────────────────────────
-function exportExcel() {
+// SheetJS is fetched only if somebody exports a spreadsheet, so an ordinary session asks
+// nothing of any third party. Even then only the library comes back — no project data goes out.
+function loadSheetJS() {
+  if (window.XLSX) return Promise.resolve();
+  return new Promise(function (resolve, reject) {
+    var el = document.createElement('script');
+    el.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+    el.onload = resolve;
+    el.onerror = function () { reject(new Error('SheetJS could not be loaded.')); };
+    document.head.appendChild(el);
+  });
+}
+
+async function exportExcel() {
   if (!BOQ) return;
-  if (typeof XLSX === 'undefined') {
-    alert('Excel export requires an internet connection to load the SheetJS library. Please check your connection and try again.');
+  try {
+    await loadSheetJS();
+  } catch (e) {
+    alert('Excel export needs an internet connection to load the spreadsheet library. Check your connection and try again.');
     return;
   }
   const b  = BOQ;
@@ -21217,7 +21140,7 @@ function restoreSnapshot(snap) {
   }
 }
 
-async function saveProject() {
+function saveProject() {
   var code     = generateProjectCode();
   var snapshot = buildSnapshot(code);
 
@@ -21230,18 +21153,8 @@ async function saveProject() {
 
   saveToRecentProjects(snapshot);
 
-  if (window.fbReady) {
-    try {
-      await window.fbSave(code, snapshot);
-      if (typeof showProjectCode === 'function') showProjectCode(code);
-      else if (typeof showToast === 'function') showToast('Project saved — code: ' + code);
-    } catch(e) {
-      if (typeof showToast === 'function') showToast('Cloud save failed — saved locally only.');
-    }
-  } else {
-    if (typeof showToast === 'function') {
-      showToast('Saved locally as “' + projName.substring(0, 30) + '”.');
-    }
+  if (typeof showToast === 'function') {
+    showToast('Saved on this computer as “' + projName.substring(0, 30) + '”.');
   }
 }
 
@@ -21430,27 +21343,6 @@ function closeRecentPopupHome() {
   if (pop) pop.style.display = 'none';
 }
 
-async function loadByCodeHome() {
-  const input  = document.getElementById('cloud-code-input-home');
-  const status = document.getElementById('cloud-load-status-home');
-  const code   = (input?.value || '').trim().toUpperCase();
-  if (code.length < 6) { if (status) status.textContent = '⚠ Enter your 8-character project code.'; return; }
-  if (status) status.textContent = '⏳ Loading from cloud…';
-  if (!window.fbReady) {
-    if (status) status.textContent = '⚠ Cloud not available — check your internet connection.';
-    return;
-  }
-  try {
-    const snap = await window.fbLoad(code);
-    if (status) status.textContent = '';
-    if (input) input.value = '';
-    closeRecentPopupHome();
-    restoreSnapshot(snap);
-    showToast(`Project ${code} loaded ✓`);
-  } catch(e) {
-    if (status) status.textContent = `⚠ ${e.message || 'Project not found — check the code and try again.'}`;
-  }
-}
 
 window.loadRecentProject    = loadRecentProject;
 window.deleteRecentProject  = deleteRecentProject;
@@ -21458,65 +21350,18 @@ window.toggleRecentPopup    = toggleRecentPopup;
 window.closeRecentPopup     = closeRecentPopup;
 window.toggleRecentPopupHome = toggleRecentPopupHome;
 window.closeRecentPopupHome  = closeRecentPopupHome;
-window.loadByCodeHome        = loadByCodeHome;
 
 function loadProject() {
   // Superseded by Recent Projects popup. Stub kept for backwards compatibility.
   toggleRecentPopup();
 }
 
-async function loadByCode() {
-  const input  = document.getElementById('cloud-code-input');
-  const status = document.getElementById('cloud-load-status');
-  const code   = (input?.value || '').trim().toUpperCase();
-  if (code.length < 6) { if (status) status.textContent = '⚠ Enter your 8-character project code.'; return; }
-  if (status) status.textContent = '⏳ Loading from cloud…';
-  if (!window.fbReady) {
-    if (status) status.textContent = '⚠ Cloud not available — check your internet connection.';
-    return;
-  }
-  try {
-    const snap = await window.fbLoad(code);
-    if (status) status.textContent = '';
-    if (input) input.value = '';
-    restoreSnapshot(snap);
-    showToast(`Project ${code} loaded ✓`);
-  } catch(e) {
-    if (status) status.textContent = `⚠ ${e.message || 'Project not found — check the code and try again.'}`;
-  }
-}
 
 function checkSavedProject() {
   // No-op — old load-project-btn removed in Phase 3C; recent projects now via toggleRecentPopup()
 }
 
-// ── PROJECT CODE MODAL ────────────────────────────────────────────────────────
-let _currentCode = '';
 
-function showProjectCode(code) {
-  _currentCode = code;
-  const display = document.getElementById('code-display');
-  if (display) display.textContent = code;
-  const modal = document.getElementById('code-modal');
-  if (modal) modal.classList.add('open');
-}
-
-function closeCodeModal() {
-  const modal = document.getElementById('code-modal');
-  if (modal) modal.classList.remove('open');
-}
-
-function copyProjectCode() {
-  if (!_currentCode) return;
-  navigator.clipboard.writeText(_currentCode).then(() => {
-    showToast('Code copied ✓');
-  }).catch(() => {
-    // Fallback for browsers without clipboard API
-    const el = document.getElementById('code-display');
-    if (el) { const r = document.createRange(); r.selectNode(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }
-    showToast('Select and copy the code above');
-  });
-}
 
 // __ DYNAMIC CARDS ___________________________________________
 

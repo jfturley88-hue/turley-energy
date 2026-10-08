@@ -243,7 +243,7 @@ CSS = FONTS + '''
 # nothing in front of them: document 01 says what each is for, so the notes pages that used
 # to front them are gone. Document 05 is the software and the rate book behind it.
 DOCS = ['The Value Proposition', 'The Baseline Cost Plan', 'The Pricing Schedule',
-        'The Appendix', 'The Software']
+        'The Appendix', 'The Software', 'Data Protection']
 NDOC = len(DOCS)
 
 def strip(n):
@@ -575,9 +575,159 @@ doc7 = f'''<div class="sheet">
   {footer(5, '8', '8')}
 </div>'''
 
+# ── 06 · DATA PROTECTION — where the data lives, and what is owed to the homeowner ─
+# Written from what the software actually does, checked against the file before printing:
+# no account, no server, no database, nothing transmitted but the typefaces the page is set
+# in. Every sentence here has to stay true of the build that ships with the pack.
+docdp = f'''<div class="sheet">
+  {strip(6)}
+  <h1 style="font-size:16pt;line-height:1.2;margin:1mm 0 1.6mm;">Data protection and the homeowner&rsquo;s data</h1>
+  <p class="body" style="font-size:9.6pt;line-height:1.5;margin-bottom:2mm;">PlanitBER is one file that runs
+    in the assessor&rsquo;s own browser. There is no account to create, no server to sign in to and no database
+    behind it. The dwelling details report is read on that computer and is never uploaded; the plan is built
+    there and printed there. That is a design decision, not a configuration, and it decides most of what
+    follows: the homeowner&rsquo;s data stays with the assessor they engaged.</p>
+
+  {vk('Every piece of data, and where it lives')}
+  <table class="mapt">
+    <tr><th style="width:27%;">What is held</th><th style="width:29%;">Why it is needed</th><th>Where it is, and who else can see it</th></tr>
+    <tr><td class="m">Homeowner name and site address</td><td>To address the three documents and identify the dwelling</td><td>Typed into the browser and kept in that browser&rsquo;s own storage on that computer, and printed on the documents. Nobody else sees it unless the assessor sends the documents on.</td></tr>
+    <tr><td class="m">The dwelling details report</td><td>Read for the measured geometry and the heat loss indicator</td><td>Opened from the assessor&rsquo;s own disk and read inside the page. The file is never uploaded, never copied and never seen by anybody else.</td></tr>
+    <tr><td class="m">Measured areas and elements, room and vent counts</td><td>To quantify and price the works</td><td>The same browser storage, and the printed documents. The quantities &mdash; not the homeowner&rsquo;s name &mdash; reach the contractors asked to price, through the Pricing Schedule.</td></tr>
+    <tr><td class="m">BER rating, age band, heat loss indicator</td><td>To size the heat pump and choose the grant route</td><td>The same again. These come from the dwelling details report and are not asked of the homeowner.</td></tr>
+    <tr><td class="m">The three printed documents</td><td>The purpose of the exercise</td><td>Given to the homeowner, who decides who else sees them; a copy kept by the assessor with the BER records for that dwelling.</td></tr>
+  </table>
+
+  {vk('What the software never asks for')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">No PPS number, no date of birth,
+    no bank, card or payment details, no income or means information, no photographs of the dwelling or its
+    occupants, and no special category data of any kind. No children&rsquo;s data is sought or used. The software
+    carries no analytics, no tracking, no cookies and no telemetry: it does not count its own users, and it
+    cannot, because nothing reports back to anybody.</p>
+
+  {vk('Who is responsible')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">The BER assessor is the
+    <strong>data controller</strong> for the homeowner&rsquo;s personal data: they collect it, they hold it, they
+    decide what is done with it, and the homeowner engaged them. There is no processor, because there is no
+    service &mdash; the software runs on the assessor&rsquo;s own equipment, in the way a spreadsheet does. If a
+    hosted version is ever offered, that creates a processor relationship, and a written data processing
+    agreement and a completed DPIA would come before it, not after.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.46;">In a pilot, SEAI would be a controller of what it
+    receives &mdash; which is aggregated and anonymised, as page three sets out.</p>
+
+  <div class="fine">Document 06 describes the build issued with this pack. It is written to be checked:
+    every statement here can be tested by opening the software and watching what it asks of the network.</div>
+  {footer(6, '1', '3')}
+</div>
+
+<div class="sheet">
+  {strip(6)}
+  {vk('Lawful basis')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">The homeowner&rsquo;s data is
+    processed to perform the contract they entered into with the assessor &mdash; Article 6(1)(b) &mdash; and for
+    no other purpose. Nothing is processed on the basis of legitimate interests for marketing, profiling or
+    resale, because none of those happen. Anything shared with SEAI during a pilot rests on the
+    homeowner&rsquo;s consent, recorded before it is shared and withdrawable afterwards; a withdrawal removes
+    them from the next return, and the data already aggregated cannot identify them to begin with.</p>
+
+  {vk('How long it is kept')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">A saved project sits in the
+    browser on the assessor&rsquo;s computer until it is deleted there; the printed documents are kept with the
+    assessor&rsquo;s BER records for that dwelling, for the period SEAI&rsquo;s Code of Practice requires of a
+    registered assessor, and are then destroyed. A short written retention schedule, naming that period and who
+    carries it out, is one of the items listed on page three.</p>
+
+  {vk('The homeowner&rsquo;s rights, and how each is met')}
+  <table class="mapt">
+    <tr><th style="width:26%;">The right</th><th>How it is met</th></tr>
+    <tr><td class="m">Access</td><td>The assessor holds everything in one place and can give a copy of the project and the three documents on request</td></tr>
+    <tr><td class="m">Rectification</td><td>Every figure the report filled can be typed over and the documents reissued; nothing is locked</td></tr>
+    <tr><td class="m">Erasure</td><td>The saved project is deleted in the browser and the document copies destroyed, subject only to records a registered assessor is required to keep</td></tr>
+    <tr><td class="m">Portability</td><td>The three documents are the data in a readable form, and they are the homeowner&rsquo;s already</td></tr>
+    <tr><td class="m">Objection and restriction</td><td>Addressed to the assessor, who is the controller; there is no second party to approach</td></tr>
+  </table>
+
+  {vk('Security')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">The design removes most of what
+    is usually attacked: there are no accounts to compromise, no password to leak, no API to abuse and no
+    central store to breach. What remains is ordinary and physical &mdash; the assessor&rsquo;s own computer. The
+    controls are therefore device controls: full-disk encryption, a locking screen, current operating system
+    updates, and encrypted backup. The real exposure is the one every practice has: documents sent to
+    homeowners and contractors by email. They carry a name, an address and a scope of works, and they are sent
+    deliberately, to people entitled to them.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">The page makes one request of
+    anyone else when it opens &mdash; for the two typefaces it is set in. It carries no project data, only the
+    fact that a browser asked for a font. Those files will be served from the software itself before any
+    pilot, after which an ordinary session reaches nobody at all. A spreadsheet library is fetched only if
+    somebody exports a spreadsheet, and it too carries nothing out.</p>
+
+  {vk('If something goes wrong')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;">A breach here would be a lost or stolen computer, a
+    document sent to the wrong address, or a backup left unprotected. Any of these is recorded in a breach log
+    with what happened, what data was involved and what was done; where there is a risk to the people
+    concerned, the Data Protection Commission is notified within 72 hours and the homeowner told without undue
+    delay where the risk is high.</p>
+
+  <div class="fine">The controls described here are the assessor&rsquo;s own, because the data never leaves the
+    assessor&rsquo;s own equipment.</div>
+  {footer(6, '2', '3')}
+</div>
+
+<div class="sheet">
+  {strip(6)}
+  {vk('What changed before this pack was issued')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">An earlier build offered an
+    optional cloud save: a project could be written to a hosted database and reloaded elsewhere with an
+    eight-character code. It was convenient and it was wrong &mdash; anyone holding the code could read the
+    project, and nothing expired. It was removed on 8 October 2026, before this pack was issued and before any
+    pilot. The current software has no path to any database; the projects that feature stored are being
+    deleted from the hosted service it used.</p>
+
+  {vk('The data protection impact assessment')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">A DPIA assesses a defined
+    processing operation, so the honest position is this: as the software stands, no processing happens outside
+    the assessor&rsquo;s own equipment and the threshold for a mandatory DPIA under Article 35 is not met. A full
+    DPIA will be completed, and given to SEAI, <strong>before any pilot begins</strong> &mdash; because a pilot
+    introduces processing that does not exist today. It would cover:</p>
+  <div class="ticklist" style="margin-bottom:2.4mm;">
+    <div class="tlh">What the DPIA will cover</div>
+    <div class="tl"><span class="bx">&#10003;</span><span>The processing in scope: what is collected at survey, what is derived by the software, what is printed, and what would be returned to SEAI during the pilot.</span></div>
+    <div class="tl"><span class="bx">&#10003;</span><span>Necessity and proportionality: why each field is needed to price the works, and what is deliberately not collected.</span></div>
+    <div class="tl"><span class="bx">&#10003;</span><span>The aggregation and anonymisation method for pilot returns, and a test that an individual dwelling cannot be re-identified from them.</span></div>
+    <div class="tl"><span class="bx">&#10003;</span><span>Consent: how it is sought, recorded and withdrawn, and what a withdrawal does.</span></div>
+    <div class="tl"><span class="bx">&#10003;</span><span>Risks to the people concerned, the measures against each, and the residual risk accepted in writing.</span></div>
+    <div class="tl"><span class="bx">&#10003;</span><span>Retention, deletion and the breach procedure, as a schedule rather than an intention.</span></div>
+  </div>
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">It would be redone, not amended,
+    if any of three things happened: a hosted version of the software, an integration with the NAS Trusted
+    Partner API, or any decision about a household taken automatically from the data. None of the three is
+    proposed today.</p>
+
+  {vk('What SEAI would receive in a pilot')}
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">Aggregated and anonymised
+    figures, with the homeowner&rsquo;s consent: county, dwelling type and age band, the measures planned, the
+    estimate, the grants, and &mdash; the point of the exercise &mdash; the recorded outcome against the estimate.
+    No name, no address, no Eircode, no MPRN and no BER number. SEAI holds full access to that data, which is
+    what makes the accuracy claim testable rather than asserted.</p>
+
+  {vk('Open items, to be closed before a pilot')}
+  <table class="mapt">
+    <tr><th style="width:34%;">Item</th><th>What has to happen</th></tr>
+    <tr><td class="m">Typefaces served locally</td><td>So an ordinary session makes no request of any third party at all</td></tr>
+    <tr><td class="m">Retention schedule</td><td>One page: what is kept, for how long, by whom, and how it is destroyed</td></tr>
+    <tr><td class="m">Full DPIA</td><td>Completed and given to SEAI before the first pilot plan is issued</td></tr>
+    <tr><td class="m">Consent wording</td><td>Written for the homeowner, to be reviewed before use</td></tr>
+    <tr><td class="m">Processing agreement</td><td>Only if a hosted version is ever offered; there is nothing to process today</td></tr>
+  </table>
+
+  <div class="fine">Prepared to be read alongside document 01. Comments on this document are welcome and
+    expected: it is easier to settle the data questions before a pilot than during one.</div>
+  {footer(6, '3', '3')}
+</div>'''
+
 TPL = '''<!doctype html><html><head><meta charset="utf-8"><title>%s</title>
 <style>%s</style></head><body>%s</body></html>'''
 
-for name, content in [('pack_01', doc1), ('pack_05', doc6 + doc7)]:
+for name, content in [('pack_01', doc1), ('pack_05', doc6 + doc7), ('pack_06', docdp)]:
     open(name + '.html', 'w').write(TPL % ('PlanitBER — ' + name, CSS, content))
     print('wrote', name + '.html')

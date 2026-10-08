@@ -22,6 +22,7 @@ DOCS = [
     ('PlanitBER_03_The_Pricing_Schedule.pdf',   ['ex_sched.pdf']),
     ('PlanitBER_04_The_Appendix.pdf',           ['ex_appx.pdf']),
     ('PlanitBER_05_The_Software.pdf',           ['pack_05_print.pdf']),
+    ('PlanitBER_06_Data_Protection.pdf',        ['pack_06_print.pdf']),
 ]
 
 def build():
