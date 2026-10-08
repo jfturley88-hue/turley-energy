@@ -242,6 +242,8 @@ CSS = FONTS + '''
 # Five documents. Three of them (02-04) are the software's own output, bound whole and with
 # nothing in front of them: document 01 says what each is for, so the notes pages that used
 # to front them are gone. Document 05 is the software and the rate book behind it.
+ISSUED = '8 October 2026'
+
 DOCS = ['The Value Proposition', 'The Baseline Cost Plan', 'The Pricing Schedule',
         'The Appendix', 'The Software', 'Data Protection']
 NDOC = len(DOCS)
@@ -298,7 +300,7 @@ doc1 = f'''<div class="sheet">
     <div style="display:flex;align-items:center;gap:2.5mm;">{GLOBE}<div class="word" style="font-size:19pt;"><span class="p">Planit</span><span class="b">BER</span></div></div>
     <div style="text-align:right;font-size:7.4pt;color:#8090A8;line-height:1.65;">
       <div>Killyleen, Ballinode, Co. Monaghan</div>
-      <div>mc2rating@gmail.com &middot; 087 981 0150</div><div>[Date]</div>
+      <div>mc2rating@gmail.com &middot; 087 981 0150</div><div>{ISSUED}</div>
     </div>
   </div>
   <h1 style="font-size:16pt;line-height:1.2;margin:2.6mm 0 1.6mm;">Empowering homeowners with tender
@@ -615,7 +617,7 @@ docdp = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.46;">In a pilot, SEAI would be a controller of what it
     receives &mdash; which is aggregated and anonymised, as page three sets out.</p>
 
-  <div class="fine">Document 06 describes the build issued with this pack. It is written to be checked:
+  <div class="fine">Document 06 describes the build issued with this pack on {ISSUED}. It is written to be checked:
     every statement here can be tested by opening the software and watching what it asks of the network.</div>
   {footer(6, '1', '3')}
 </div>
@@ -680,8 +682,8 @@ docdp = f'''<div class="sheet">
     optional cloud save: a project could be written to a hosted database and reloaded elsewhere with an
     eight-character code. It was convenient and it was wrong &mdash; anyone holding the code could read the
     project, and nothing expired. It was removed on 8 October 2026, before this pack was issued and before any
-    pilot. The current software has no path to any database; the projects that feature stored are being
-    deleted from the hosted service it used.</p>
+    pilot. The current software has no path to any database, and the projects that feature stored
+    have been deleted from the hosted service it used.</p>
 
   {vk('The data protection impact assessment')}
   <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">A DPIA assesses a defined
@@ -720,7 +722,7 @@ docdp = f'''<div class="sheet">
     <tr><td class="m">Processing agreement</td><td>Only if a hosted version is ever offered; there is nothing to process today</td></tr>
   </table>
 
-  <div class="fine">Prepared to be read alongside document 01. Comments on this document are welcome and
+  <div class="fine">Issued {ISSUED}, to be read alongside document 01. Comments on this document are welcome and
     expected: it is easier to settle the data questions before a pilot than during one.</div>
   {footer(6, '3', '3')}
 </div>'''
