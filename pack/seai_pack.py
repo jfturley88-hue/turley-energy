@@ -242,10 +242,11 @@ CSS = FONTS + '''
 # Five documents. Three of them (02-04) are the software's own output, bound whole and with
 # nothing in front of them: document 01 says what each is for, so the notes pages that used
 # to front them are gone. Document 05 is the software and the rate book behind it.
+BUILD  = '8 October 2026'
 ISSUED = '10 October 2026'
 
 DOCS = ['The Value Proposition', 'The Baseline Cost Plan', 'The Pricing Schedule',
-        'The Appendix', 'The Software', 'Data Protection']
+        'The Appendix', 'The Software', 'Data Protection', 'The DPIA']
 NDOC = len(DOCS)
 
 def strip(n):
@@ -627,7 +628,7 @@ docdp = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.46;">In a pilot, SEAI would be a controller of what it
     receives &mdash; which is aggregated and anonymised, as page three sets out.</p>
 
-  <div class="fine">Document 06 describes the build issued with this pack on {ISSUED}. It is written to be checked:
+  <div class="fine">Document 06 describes the build issued with this pack on {BUILD}. It is written to be checked:
     every statement here can be tested by opening the software and watching what it asks of the network.</div>
   {footer(6, '1', '3')}
 </div>
@@ -699,10 +700,10 @@ docdp = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">A DPIA assesses a defined
     processing operation, so the honest position is this: as the software stands, no processing happens outside
     the assessor&rsquo;s own equipment and the threshold for a mandatory DPIA under Article 35 is not met. A full
-    DPIA will be completed, and given to SEAI, <strong>before any pilot begins</strong> &mdash; because a pilot
-    introduces processing that does not exist today. It would cover:</p>
+    DPIA is completed and given to SEAI <strong>before any pilot begins</strong>, because a pilot introduces
+    processing that does not exist today. It covers:</p>
   <div class="ticklist" style="margin-bottom:2.4mm;">
-    <div class="tlh">What the DPIA will cover</div>
+    <div class="tlh">What the DPIA covers</div>
     <div class="tl"><span class="bx">&#10003;</span><span>The processing in scope: what is collected at survey, what is derived by the software, what is printed, and what would be returned to SEAI during the pilot.</span></div>
     <div class="tl"><span class="bx">&#10003;</span><span>Necessity and proportionality: why each field is needed to price the works, and what is deliberately not collected.</span></div>
     <div class="tl"><span class="bx">&#10003;</span><span>The aggregation and anonymisation method for pilot returns, and a test that an individual dwelling cannot be re-identified from them.</span></div>
@@ -710,10 +711,10 @@ docdp = f'''<div class="sheet">
     <div class="tl"><span class="bx">&#10003;</span><span>Risks to the people concerned, the measures against each, and the residual risk accepted in writing.</span></div>
     <div class="tl"><span class="bx">&#10003;</span><span>Retention, deletion and the breach procedure, as a schedule rather than an intention.</span></div>
   </div>
-  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">It would be redone, not amended,
-    if any of three things happened: a hosted version of the software, an integration with the NAS Trusted
-    Partner API, or any decision about a household taken automatically from the data. None of the three is
-    proposed today.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">The NAS Trusted Partner API
+    integration is now proposed, so that DPIA has been carried out. It is document 07. It would be redone
+    again if a hosted version were offered or any decision about a household were taken automatically from
+    the data.</p>
 
   {vk('What SEAI would receive in a pilot')}
   <p class="body" style="font-size:9.2pt;line-height:1.46;margin-bottom:2mm;">Aggregated and anonymised
@@ -727,7 +728,7 @@ docdp = f'''<div class="sheet">
     <tr><th style="width:34%;">Item</th><th>What has to happen</th></tr>
     <tr><td class="m">Typefaces served locally</td><td>So an ordinary session makes no request of any third party at all</td></tr>
     <tr><td class="m">Retention schedule</td><td>One page: what is kept, for how long, by whom, and how it is destroyed</td></tr>
-    <tr><td class="m">Full DPIA</td><td>Completed and given to SEAI before the first pilot plan is issued</td></tr>
+    <tr><td class="m">Full DPIA</td><td>Drafted as document 07; signed before the first request</td></tr>
     <tr><td class="m">Consent wording</td><td>Written for the homeowner, to be reviewed before use</td></tr>
     <tr><td class="m">Processing agreement</td><td>Only if a hosted version is ever offered; there is nothing to process today</td></tr>
   </table>

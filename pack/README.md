@@ -1,9 +1,9 @@
 # The SEAI pack
 
-Everything that builds the six-PDF pack. It used to live in a session scratchpad, which
+Everything that builds the seven-PDF pack. It used to live in a session scratchpad, which
 is ephemeral — this directory is the source of record.
 
-## The six documents
+## The seven documents
 
 | | Document | Made from |
 |---|---|---|
@@ -13,6 +13,7 @@ is ephemeral — this directory is the source of record.
 | 04 | The Appendix | `ex_appx.pdf` |
 | 05 | The Software | `pack_05.html` |
 | 06 | Data Protection | `pack_06.html` |
+| 07 | The DPIA | `doc_07_dpia.pdf`, written outside this directory and bound in whole |
 
 Documents 02–04 are the software's own output bound whole, with nothing in front of them;
 document 01 says who each is for and how long it lives. They are printed by `gen_ex_pdfs.js`

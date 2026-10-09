@@ -2,7 +2,7 @@
 
 *PlanitBER V1*
 
-Six documents, built by `pack/build_pack.py` into `pack/PlanitBER_SEAI_Pack/` and zipped
+Seven documents, built by `pack/build_pack.py` into `pack/PlanitBER_SEAI_Pack/` and zipped
 alongside. The build is the only way the pack changes; see `pack/README.md`.
 
 | # | Document | What it is | Pages |
@@ -13,6 +13,7 @@ alongside. The build is the only way the pack changes; see `pack/README.md`.
 | 04 | The Appendix | The arithmetic behind each figure and the guide prices for what is not included | 4 |
 | 05 | The Software | The journey on screen, from reading the dwelling details report, then the rate book behind it | 8 |
 | 06 | Data Protection | Where every piece of the homeowner's data lives, how the duties are met, and what a DPIA would cover before a pilot | 3 |
+| 07 | The DPIA | The impact assessment for the NAS Trusted Partner API trial: risks, measures, consent and sign-off | 9 |
 
 Documents 02–04 are bound whole from the software's output with nothing in front of them;
 document 01 says what each is for. The worked example throughout is the same house on the
