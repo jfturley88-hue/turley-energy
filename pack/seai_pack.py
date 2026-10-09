@@ -242,7 +242,7 @@ CSS = FONTS + '''
 # Five documents. Three of them (02-04) are the software's own output, bound whole and with
 # nothing in front of them: document 01 says what each is for, so the notes pages that used
 # to front them are gone. Document 05 is the software and the rate book behind it.
-ISSUED = '8 October 2026'
+ISSUED = '10 October 2026'
 
 DOCS = ['The Value Proposition', 'The Baseline Cost Plan', 'The Pricing Schedule',
         'The Appendix', 'The Software', 'Data Protection']
@@ -271,29 +271,35 @@ FINE1 = ('PlanitBER V1 &middot; '
 # the eye hunt for each line start. The one new step is tinted and darker-edged so the
 # page makes its argument at a glance.
 def wfstep(n, title, body, note='', last=False, add=False, sub=''):
-    arrow = '' if last else f'<div style="padding:0.5mm 0 0.2mm;">{DOWN_ARROW}</div>'
+    arrow = '' if last else f'<div style="padding:0;margin:-0.3mm 0;">{DOWN_ARROW}</div>'
     # The existing steps are context, so they recede: grey discs, no accent edge. Gold is
     # spent on the one step being proposed, which is what the page is for.
     edge  = '#B07D1A' if add else '#D8D2C4'
     bg    = '#FFFAF0' if add else '#FFFFFF'
     disc  = '#B07D1A' if add else '#AEB4BE'
     ncol  = '#B07D1A' if add else '#A0A8B4'
-    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:2.9mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
-      <div style="display:flex;align-items:center;gap:3mm;margin-bottom:1.6mm;">
+    return f'''<div style="background:{bg};border:0.6pt solid #D8D2C4;border-left:{"3.6pt" if add else "2.4pt"} solid {edge};border-radius:2pt;padding:2.0mm 4.2mm;max-width:174mm;margin:0 auto;text-align:left;">
+      <div style="display:flex;align-items:center;gap:3mm;margin-bottom:1.2mm;">
         <span style="flex-shrink:0;width:6.4mm;height:6.4mm;border-radius:50%;background:{disc};color:#fff;
                      font-family:'Fraunces',Georgia,serif;font-size:9.5pt;font-weight:800;
                      display:inline-flex;align-items:center;justify-content:center;">{n}</span>
-        <span class="wft" style="flex:1;font-family:'Fraunces',Georgia,serif;font-size:{'12.8pt' if add else '12pt'};font-weight:800;color:#1E293B;line-height:1.15;">{title}</span>
+        <span class="wft" style="flex:1;font-family:'Fraunces',Georgia,serif;font-size:{'12.2pt' if add else '11.5pt'};font-weight:800;color:#1E293B;line-height:1.15;">{title}</span>
         <span style="flex-shrink:0;font-size:7.4pt;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:{ncol};white-space:nowrap;">{note}</span>
       </div>
-      <div class="wfb" style="font-size:9.9pt;color:#3F4A5A;line-height:1.6;padding-left:9.4mm;">{body}</div>
+      <div class="wfb" style="font-size:9.4pt;color:#3F4A5A;line-height:1.46;padding-left:9.4mm;">{body}</div>
       {f'<div class="wfs" style="font-size:8.3pt;color:#64748B;line-height:1.5;padding-left:9.4mm;margin-top:1.3mm;">{sub}</div>' if sub else ''}
     </div>
     {arrow}'''
 
 # ── 01 · THE VALUE PROPOSITION — text only, one page, references the other three ─
+def apibullet(lead, rest):
+    return (f'<div style="display:flex;gap:2.4mm;font-size:9.2pt;line-height:1.46;color:#3F4A5A;'
+            f'margin:0 0 0.9mm;padding-left:1mm;">'
+            f'<span style="color:#B07D1A;font-weight:800;line-height:1.3;">&bull;</span>'
+            f'<span><strong style="color:#1E293B;">{lead}</strong> {rest}</span></div>')
+
 def vk(t):
-    return f'<div class="kick" style="margin-top:2.3mm;">{t}</div>'
+    return f'<div class="kick" style="margin-top:1.3mm;">{t}</div>'
 
 doc1 = f'''<div class="sheet">
   <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:3mm;border-bottom:2pt solid #B07D1A;">
@@ -328,7 +334,7 @@ doc1 = f'''<div class="sheet">
     parties to achieve mutual agreement. Confidence in the agreement empowers the homeowner to proceed.</p>
 
   {vk('Some of the problems it solves')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Issued before a contractor is contacted, the <strong>Baseline Cost Plan</strong>,
     <strong>Pricing Schedule</strong> and <strong>Appendix</strong> put the same scope and the same
     starting figure in front of both sides.</p>
   <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:0.6mm;">
@@ -383,30 +389,37 @@ doc1 = f'''<div class="sheet">
     last=True)}
 
   <div style="font-size:9.6pt;font-weight:700;color:#1E293B;margin:3.4mm 0 0.5mm;">The Software</div>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Live and running: the survey goes in, the measures are selected, the
-    three documents print, and the grant route can be switched at the moment of download. Document 05 shows the journey on screen and, behind it, the rate
-    book the figures come from.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Every figure in a plan comes from a rate
-    book with a version number and an effective date. Base rates are taken from the SCSI Tender Price
-    Index and House Rebuilding Guide; labour from the SEO construction sector wage agreement, at the
-    second-phase rates effective 1 August 2026; the county multiplier from the SCSI Regional Cost
-    Supplement; grants at SEAI&rsquo;s published amounts; and VAT as Revenue applies it. Each block of the
-    book names its own source beneath it. The book is held in one place, by SEAI, so the assessor prices from it and cannot change it, and every plan is priced on the same
-    rates. Any rate still to be calibrated is marked as such, so recorded outcomes during a pilot can settle it.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Live and running: the survey
+    goes in, the measures are selected and the three documents print; document 05 shows the journey and the
+    rate book behind it. Every figure comes from a rate book with a version number and an effective date &mdash;
+    base rates from the SCSI Tender Price Index and House Rebuilding Guide; labour from the SEO construction
+    sector wage agreement at the second-phase rates effective 1 August 2026; the county multiplier from the
+    SCSI Regional Cost Supplement; grants at SEAI&rsquo;s published amounts; VAT as Revenue applies it. Each
+    block names its own source. Held in one place by SEAI, the book cannot be changed by the assessor, so every
+    plan is priced on the same rates; any rate still to be calibrated is marked, for recorded outcomes to
+    settle.</p>
 
   {vk('What we are asking for')}
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">A meeting to demonstrate the software live. The measures go in, the
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">A meeting to demonstrate the software live. The measures go in, the
     documents print, and every figure can be traced to its source on screen.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">From there, we would like to discuss a pilot: a fixed number of
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">From there, we would like to discuss a pilot: a fixed number of
     plans, with recorded spend measured against the estimates, and SEAI holding full access to the data.
-    If the pilot shows what we expect, the next step is participation in the NAS Trusted Partner API
-    trial. Households which already hold a BER but have not gone ahead could then be offered the three
-    documents, with their consent, and the trial would measure how many commit.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.50;margin-bottom:2.1mm;">Behind PlanitBER are registered BER assessors, years of tendering
+    If the pilot shows what we expect, the next step is the NAS Trusted Partner API trial. The API
+    would change three things.</p>
+  {apibullet('The BER record comes in directly.',
+    'With the homeowner&rsquo;s consent, PlanitBER takes the published record as data instead of reading the dwelling details report. That removes re-keying and errors, and lets an assessor&rsquo;s existing BERs be priced without a new survey.')}
+  {apibullet('Cost sits beside the energy uplift.',
+    'The agreed measures are sent to the DEAP engine as a modified BER file, so each plan shows what the works cost and what rating they achieve, package against package.')}
+  {apibullet('It reaches the households that stalled.',
+    'Homes that already hold a BER but never went ahead can be offered the three documents with consent, and the trial would measure how many commit.')}
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">PlanitBER is built and
+    supported in-house, by a registered BER assessor acting as data requestor, for the full twelve
+    months.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Behind PlanitBER are registered BER assessors, years of tendering
     experience and software built for this purpose. More retrofits is the aim and it is
     SEAI&rsquo;s target as much as ours.</p>
 
-  <div style="margin-top:3mm;font-size:9pt;line-height:1.7;">
+  <div style="margin-top:2.2mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">John Turley</span>
     <span style="color:#64748B;"> &middot; SEAI-registered BER assessor, reg. 100615 &middot; 087 981 0150 &middot; mc2rating@gmail.com</span>
   </div>
