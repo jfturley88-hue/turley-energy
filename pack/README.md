@@ -86,6 +86,21 @@ grab comes back black, and the script says so and leaves the old figure alone.
 
 That figure is captioned as unedited, so it must stay a real capture — never composite it.
 
+## Before it is sent
+
+`python3 ../scripts/verify/pack_claims.py` checks the covering email in
+`covering_email_nas_trial.txt` against the printed PDFs: that the DPIA is described as done
+rather than planned, that consent management points at document 07 where the process is,
+that every document is numbered of 7, and that the signature is whole. Two lines report
+faults in document 07, which is written outside this repository and whose text is glyph IDs
+in subset fonts, so nothing here can edit it:
+
+- it cites document 06 as issued 8 October 2026, where document 06 says 10 October;
+- its controller block says "John Turley, trading as PlanitBER", and that business name is
+  not registered.
+
+Both have to be changed where document 07 was written. Do not send the pack until they are.
+
 ## Figures
 
 Every money figure in the prose comes from the `EX_*` constants at the top of

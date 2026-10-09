@@ -31,6 +31,10 @@ for name, ok in checks:
     bad += not ok
     print(('ok   ' if ok else 'FAIL '), name)
 
-stale = 'document 06, Data Protection, issued 8 October 2026' in pack['07'].replace('\n', ' ')
+# Faults in document 07, reported apart because they cannot be fixed from here: its text
+# is glyph IDs in subset fonts, so the edits belong where that document was written.
+stale = 'document 06, Data Protection, issued 8 October 2026' in pack['07']
+trading = 'trading as' in pack['07']
 print(('OPEN ' if stale else 'ok   '), '07 cites 06 with the right issue date')
-print('\nfailures:', bad, '| open, to be fixed in the tool that wrote 07:', int(stale))
+print(('OPEN ' if trading else 'ok   '), '07 claims no trading name — the business name is not registered')
+print('\nfailures:', bad, '| open, to be fixed where 07 was written:', int(stale) + int(trading))
