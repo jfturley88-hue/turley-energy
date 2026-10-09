@@ -88,17 +88,24 @@ That figure is captioned as unedited, so it must stay a real capture — never c
 
 ## Before it is sent
 
-`python3 ../scripts/verify/pack_claims.py` checks the covering email in
-`covering_email_nas_trial.txt` against the printed PDFs: that the DPIA is described as done
-rather than planned, that consent management points at document 07 where the process is,
-that every document is numbered of 7, that the signature is whole, and that document 07
-claims no trading name and cites document 06's real issue date. Twelve checks; all must pass
-before the pack goes out.
+```sh
+python3 ../scripts/verify/pack_claims.py
+```
+
+One gate over the finished PDFs and the covering email in `covering_email_nas_trial.txt`.
+Seventeen checks in four parts: that the pack holds together (seven documents, numbered of
+7, at the page counts `SEAI_PACK_CONTENTS.md` claims, no placeholder unfilled, no practice
+name anywhere, the letter signed with a registration that can be checked); that the worked
+example prints one set of figures; that document 07 claims no trading name and cites
+document 06 at the date document 06 gives; and that every claim the email makes is true of
+the documents attached to it. It reads what was printed, not the source that printed it,
+because the pack is what SEAI sees. It ends with a verdict and exits non-zero if anything
+fails.
 
 Document 07 is written outside this repository and arrives as a finished PDF. Two statements
 in it could not go to SEAI — a trading name that is not registered, and a stale citation of
-document 06 — so `fix_doc_07.py` corrects them in the bound copy. **Fix them at the source
-as well**, or the next export brings them back. Run it after any new export of that document:
+document 06 — and `fix_doc_07.py` corrects them in the bound copy. **The source document
+still says both**, so run this after any new export of it, before `build_pack.py`:
 
 ```sh
 python3 fix_doc_07.py            # report, change nothing
