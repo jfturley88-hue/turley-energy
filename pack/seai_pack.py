@@ -412,12 +412,9 @@ doc1 = f'''<div class="sheet">
     'The agreed measures are sent to the DEAP engine as a modified BER file, so each plan shows what the works cost and what rating they achieve, package against package.')}
   {apibullet('It reaches the households that stalled.',
     'Homes that already hold a BER but never went ahead can be offered the three documents with consent, and the trial would measure how many commit.')}
-  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">PlanitBER is built and
-    supported in-house, by a registered BER assessor acting as data requestor, for the full twelve
-    months.</p>
-  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Behind PlanitBER are registered BER assessors, years of tendering
-    experience and software built for this purpose. More retrofits is the aim and it is
-    SEAI&rsquo;s target as much as ours.</p>
+  <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Built and supported in-house
+    by a registered BER assessor, acting as data requestor for the full twelve months. More retrofits is the
+    aim, and that is SEAI&rsquo;s target as much as ours.</p>
 
   <div style="margin-top:2.2mm;font-size:9pt;line-height:1.7;">
     <span style="font-weight:700;color:#1E293B;">John Turley</span>
