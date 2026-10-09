@@ -91,15 +91,23 @@ That figure is captioned as unedited, so it must stay a real capture — never c
 `python3 ../scripts/verify/pack_claims.py` checks the covering email in
 `covering_email_nas_trial.txt` against the printed PDFs: that the DPIA is described as done
 rather than planned, that consent management points at document 07 where the process is,
-that every document is numbered of 7, and that the signature is whole. Two lines report
-faults in document 07, which is written outside this repository and whose text is glyph IDs
-in subset fonts, so nothing here can edit it:
+that every document is numbered of 7, that the signature is whole, and that document 07
+claims no trading name and cites document 06's real issue date. Twelve checks; all must pass
+before the pack goes out.
 
-- it cites document 06 as issued 8 October 2026, where document 06 says 10 October;
-- its controller block says "John Turley, trading as PlanitBER", and that business name is
-  not registered.
+Document 07 is written outside this repository and arrives as a finished PDF. Two statements
+in it could not go to SEAI — a trading name that is not registered, and a stale citation of
+document 06 — so `fix_doc_07.py` corrects them in the bound copy. **Fix them at the source
+as well**, or the next export brings them back. Run it after any new export of that document:
 
-Both have to be changed where document 07 was written. Do not send the pack until they are.
+```sh
+python3 fix_doc_07.py            # report, change nothing
+python3 fix_doc_07.py --write    # rewrite doc_07_dpia.pdf in place
+```
+
+It edits the content stream directly, because the text is glyph ids in subset fonts. It
+refuses rather than guesses: if a phrase is missing or appears twice, or a character it
+needs to insert is not already on the page to measure, nothing is written.
 
 ## Figures
 
