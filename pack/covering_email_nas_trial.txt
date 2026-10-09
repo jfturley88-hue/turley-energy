@@ -1,0 +1,52 @@
+Subject: NAS Trusted Partner API trial — application from PlanitBER
+
+Dear NAS Trusted Partner team,
+
+I am an SEAI-registered BER assessor in Co. Monaghan, registration 100615, and I
+would like to apply for the NAS Trusted Partner API trial.
+
+PlanitBER is software that turns a dwelling details report into three documents a
+homeowner can tender with: a baseline cost plan, a contractor pricing schedule and
+an appendix of guide prices for anything not included. It has been in development
+for a year and is live.
+
+It lets the homeowner tender with confidence, and it builds trust in the grants and
+in the contractors pricing the work. A pilot would also give SEAI recorded spend
+measured against the estimate, house by house.
+
+Against the five trial requirements:
+
+1. Costed home upgrade service: documents 02 to 04 are the software's output for
+   one house.
+2. Technology solution: document 05 shows the software and the rate book behind it.
+3. Registered BER assessor as data requestor: myself, reg. 100615.
+4. Consent management: set out in document 07. The homeowner is informed at the
+   survey, both consents are signed and recorded, and no request goes to SEAI until
+   they are.
+5. DPIA: carried out in full — document 07. It is signed before the first request,
+   and the six items to close before that request are listed at its end.
+
+Document 01 is our letter. It asks for a meeting to demonstrate the software live
+and sets out a pilot; we would be glad to run that alongside the trial rather than
+ahead of it. I have read the Trusted Partner Agreement and the terms and conditions.
+
+Kind regards,
+
+John Turley
+SEAI-registered BER assessor, reg. 100615
+087 981 0150 · mc2rating@gmail.com
+
+
+---------------------------------------------------------------------------
+Attachments: the seven-document pack
+
+  01  The Value Proposition      2 pages
+  02  The Baseline Cost Plan     2 pages
+  03  The Pricing Schedule       2 pages
+  04  The Appendix               4 pages
+  05  The Software               8 pages
+  06  Data Protection            3 pages
+  07  The DPIA                   9 pages
+
+Send the seven PDFs rather than the zip: government mail filters quarantine zip
+attachments routinely.
