@@ -1,0 +1,487 @@
+Document 07, the DPIA, as it is bound into the pack
+===================================================
+
+This is the text of pack/doc_07_dpia.pdf after fix_doc_07.py, kept so that a future
+export of that document can be diffed against what SEAI was actually sent. It is a
+record, not the source: the document is written elsewhere, and its source still says
+"trading as PlanitBER" and cites document 06 as issued 8 October 2026. Both are wrong
+and both are corrected here.
+
+Extracted from the bound PDF, 9 pages.
+
+--- page 1 ---
+PlanitBER — Data Protection Impact
+Assessment
+ Oct 9, 2026  · John Turley, SEAI-registered BER assessor, reg. 100615
+PlanitBER pack · document 7 of 7 · Draft for discussion, to be signed before the first
+request
+PlanitBER's processing for the NAS Trusted Partner API trial can go ahead once the six
+open items at the end are closed. No high risk to homeowners remains once the measures
+in the risk table are in place, so prior consultation with the Data Protection Commission is
+not needed.
+Document control
+Why this DPIA is needed
+The trial adds processing that PlanitBER does not do today, so a DPIA is required before it
+starts. Document 06 committed to one if the software ever integrated with the NAS
+Trusted Partner API. This is that DPIA. The Trusted Partner Agreement also requires
+Item Detail
+Controller John Turley, Killyleen,
+Ballinode, Co. Monaghan
+Role in the trial SEAI-registered BER assessor (reg. 100615) and
+named BER data requestor
+Contact mc2rating@gmail.com · 087 981 0150
+Processing assessed Use of the NAS Trusted Partner API and the
+PlanitBER software to produce homeowner tender
+documents
+Version 1.0, draft for sign-off
+Prepared 9 October 2026
+Review Before the trial starts, at month 6, and whenever
+the processing changes
+Pack reference Supports PlanitBER document 06, Data Protection
+PlanitBER — Data Protection Impact Assessment
+Page 1 of 9
+
+--- page 2 ---
+written confirmation of one (Schedule 2, Criterion 2.4).
+Today, PlanitBER is one file running in the assessor's own browser. It has no server, no
+account and no network calls carrying homeowner data. The trial changes three things:
+A government dataset is queried. The published BER record for a dwelling is pulled
+from SEAI's National Administration System (NAS), by MPRN, on the homeowner's
+consent.
+Proof of ownership is sent to SEAI. Each request must carry evidence of ownership or
+occupancy, such as a utility bill showing the MPRN (Criterion 3.4). SEAI keeps it for the
+trial.
+Modified BER files go to the DEAP engine. The agreed measures are sent as a
+modified BER file to estimate the energy uplift of each package.
+These involve personal data linked to a home and an identifiable household, matched
+against a public body's register, for a new technology use. Under Article 35 of the GDPR
+and the Data Protection Commission's guidance, that is enough to need a DPIA.
+The processing
+Everything below is processed for one purpose: producing a homeowner's cost plan,
+pricing schedule and appendix. Fields marked new only arise in the trial. The homeowner,
+and an agent where one acts for them, are the only data subjects. No special category
+data, children's data, PPS numbers, financial details or photographs are collected.
+Data Source Why it is
+needed
+Where it goes Kept for
+Name and site
+address
+Homeowner To address the
+documents and
+identify the
+dwelling
+Assessor's
+browser storage;
+printed on the
+three documents
+BER record
+period (open
+item 1)
+MPRN (new) Homeowner or
+utility bill
+SEAI's key for
+the BER record
+request
+Sent to SEAI with
+each request
+As name and
+address
+Proof of
+ownership or
+occupancy
+(new)
+Homeowner,
+usually a utility
+bill
+Required by
+SEAI with
+every request
+(Criterion 3.4)
+Uploaded to
+SEAI, which
+keeps it for the
+trial
+Not kept by the
+assessor once
+SEAI accepts
+the request
+PlanitBER — Data Protection Impact Assessment
+Page 2 of 9
+
+--- page 3 ---
+Data Source Why it is
+needed
+Where it goes Kept for
+Agent's
+authority
+(new, where
+relevant)
+Agent Shows the
+agent may act
+for the owner
+Uploaded to
+SEAI with the
+request
+As proof of
+ownership
+Consent
+record (new)
+Homeowner Proves both
+consents
+before any
+request
+Assessor's
+records;
+produced to
+SEAI on request
+Trial, plus the
+BER record
+period
+BER datafile
+(new)
+SEAI NAS,
+through the API
+Dwelling
+geometry,
+fabric, systems
+and rating, in
+place of
+reading the
+PDF
+Assessor's
+browser storage
+As name and
+address
+Modified BER
+file and uplift
+result (new)
+Built by
+PlanitBER;
+result from the
+DEAP engine
+Energy uplift of
+each package,
+beside its cost
+Sent to and
+returned from
+SEAI's DEAP
+engine
+As name and
+address
+Measures,
+quantities,
+costs and
+grant route
+Derived by
+PlanitBER
+To price the
+works
+Printed
+documents.
+Contractors get
+quantities and
+scope only, never
+the homeowner's
+name
+As name and
+address
+Recorded
+spend against
+estimate
+(pilot)
+Homeowner
+and contractor
+quotes
+To test the
+estimate
+Assessor's
+records;
+aggregated
+before any
+return to SEAI
+As name and
+address
+Assessor's
+name and
+registration
+number
+Assessor Required by
+SEAI with each
+request
+(Criterion 6)
+SEAI Not
+homeowner
+data
+PlanitBER — Data Protection Impact Assessment
+Page 3 of 9
+
+--- page 4 ---
+SEAI gets aggregated and anonymised figures only: county, dwelling type, age band,
+measures, estimate, grants and recorded outcome. It never gets the name, address,
+Eircode, MPRN or BER number in a return. Its copies of the MPRN, proof of ownership and
+request records come through the API itself, which SEAI holds as an independent
+controller (clause 3.1).
+Lawful basis, necessity and proportionality
+The trial processing rests on consent. The core PlanitBER service stays on contract.
+Necessity. The API does the same job as the PDF report the assessor already reads, with
+less re-keying and fewer transcription errors. It takes no new categories of data about the
+dwelling. The new items are the MPRN, proof of ownership and the consent record, and
+SEAI makes each a condition of every request.
+Minimisation. Requests are made one dwelling at a time, only after consent, and never in
+bulk (Terms, clause 10). Before a utility bill is uploaded, everything except the name,
+address and MPRN is blacked out: account number, balance, usage and payment details.
+The homeowner's name never reaches a contractor.
+No automated decisions. No decision about a household is made automatically. The
+assessor reviews every figure, and the homeowner decides whether to proceed.
+Transparency. Under clause 21 of the Terms, any change to the transmitted data has to be
+disclosed to the user. The modified BER file is shown to the homeowner as "your home
+with the agreed measures". The documents state that the energy uplift is an estimate
+from the DEAP engine.
+Processing Lawful basis
+Producing the three documents from a
+survey and a dwelling details report, as
+today
+Contract with the homeowner, Article 6(1)
+(b)
+SEAI releasing the BER datafile to PlanitBER Homeowner's consent, Article 6(1)(a), with
+Regulation 27(4)(c) of S.I. 243/2012
+PlanitBER processing the datafile and
+sending a modified file to the DEAP engine
+A separate consent, Article 6(1)(a), as the
+Agreement requires (Schedule 1)
+Aggregated pilot returns to SEAI Consent, as document 06 sets out
+PlanitBER — Data Protection Impact Assessment
+Page 4 of 9
+
+--- page 5 ---
+Consent management
+No request goes to SEAI until both consents are signed and recorded. SEAI's checks on
+the MPRN back this up.
+1. Inform. At the survey, the assessor gives the homeowner a one-page privacy notice
+(open item 3). It says what is requested from SEAI, why, what PlanitBER does with it,
+who sees it, how long it is kept, and how to withdraw. This meets Article 13 and clause
+3.5.
+2. Two separate consents. The homeowner ticks and signs each one separately
+(Schedule 1):
+Consent A: "I consent to SEAI releasing the BER record for my home, MPRN
+________, to John Turley (PlanitBER), BER assessor reg. 100615."
+Consent B: "I consent to PlanitBER using that record, and a modified version sent to
+SEAI's DEAP engine, to prepare my cost plan, pricing schedule and appendix."
+Where an agent signs, a third line confirms their authority to act for the owner
+(Criterion 3.2).
+3. Verify. Before sending the request, the assessor checks that the name, address and
+MPRN on the proof of ownership match the consent form. The MPRN must be clearly
+legible, because SEAI withholds the datafile if it does not match (Criterion 3.6).
+4. Record. Each consent record holds the date, the version of the wording, both
+signatures, the MPRN and the request reference. It is kept in a consent log on the
+assessor's encrypted computer.
+5. Evidence to SEAI. The signed form and the redacted proof of ownership are uploaded
+with the request, in the file format agreed with SEAI before acceptance (Criterion 3.5).
+When SEAI asks for proof of consent (Criterion 3.3), the log entry and form are sent
+within 5 working days.
+6. Withdrawal. The homeowner can withdraw either consent at any time by phone or
+email. Once Consent B is withdrawn, the datafile and modified file are deleted from the
+assessor's computer. Documents already issued stay with the homeowner. The
+household is left out of the next pilot return, and past aggregated returns cannot
+identify them. Withdrawal is logged with its date.
+The homeowner's rights
+The assessor deals with every request within one month. All the data is held in one place,
+so nothing has to be collected from other parties first. Where a request also concerns
+SEAI's copy, the assessor passes it to SEAI and helps it respond (clause 3.7).
+PlanitBER — Data Protection Impact Assessment
+Page 5 of 9
+
+--- page 6 ---
+Risks and measures
+Of the nine risks, two start at medium: a record pulled without valid consent, and a leaked
+API key. With the measures below in place, all nine are low. Likelihood and severity are
+judged for the homeowner, not the business.
+Right How it is met
+Information The privacy notice is given at the survey, before
+any consent
+Access A copy of the project, the datafile, the consent
+record and the three documents
+Rectification Any figure can be corrected and the documents
+reissued. Errors in the published BER itself are
+referred to SEAI
+Erasure The project, datafile and consent copies are
+deleted, except records an assessor must keep.
+The homeowner is told that SEAI holds the proof of
+ownership for the trial
+Withdrawing consent As easy as giving it, and recorded (Consent
+management, step 6)
+Portability The three documents and the datafile, in readable
+form
+Objection and restriction Made to the assessor as controller, or to SEAI for
+its own copy
+Complaint Contact details for the Data Protection
+Commission are in the privacy notice
+PlanitBER — Data Protection Impact Assessment
+Page 6 of 9
+
+--- page 7 ---
+# Risk to the homeowner Before measures Measures Residual
+1 A BER record is pulled
+without valid consent, or
+for the wrong dwelling
+Possible ·
+significant =
+medium
+Both consents signed
+before any request.
+Name, address and
+MPRN checked against
+proof of ownership. SEAI
+withholds the datafile on
+an MPRN mismatch.
+Consent log audited by
+SEAI
+Low
+2 The API key leaks and
+someone else pulls
+records under it
+Possible ·
+significant =
+medium
+Key never written into
+the PlanitBER file, a
+document or an email. It
+is held only on the
+assessor's encrypted
+computer. One key, one
+user. Revoked and
+replaced at once on any
+suspicion (Terms, clause
+8)
+Low
+3 Proof of ownership
+exposes more than
+needed (balance, usage,
+account number)
+Probable ·
+minimal = low
+Everything except name,
+address and MPRN is
+blacked out before
+upload. No copy kept
+once SEAI accepts the
+request
+Low
+4 Lost or stolen computer
+holding datafiles and
+consent records
+Remote ·
+significant = low
+Full-disk encryption,
+screen lock, current
+updates, encrypted
+backup. Breach log; the
+Data Protection
+Commission told within
+72 hours where there is
+risk
+Low
+5 Documents emailed to
+the wrong person
+Possible ·
+minimal = low
+Addresses checked
+before sending. The
+Pricing Schedule carries
+no homeowner name
+Low
+PlanitBER — Data Protection Impact Assessment
+Page 7 of 9
+
+--- page 8 ---
+Conclusion and sign-off
+The residual risk is low and is accepted, so the processing can go ahead without prior
+consultation under Article 36. It goes ahead only once the open items below are closed.
+The DPIA will be redone, not amended, if PlanitBER becomes a hosted service or starts
+making automated decisions about a household.
+# Risk to the homeowner Before measures Measures Residual
+6 A household is identified
+from pilot returns
+Remote ·
+significant = low
+Only aggregated figures
+are returned, with no
+name, address, Eircode,
+MPRN or BER number.
+Any group of fewer than 5
+dwellings is merged or
+held back, and each
+return is tested for re-
+identification before it is
+sent
+Low
+7 The homeowner takes
+the DEAP uplift as an
+official rating or a
+guarantee
+Possible ·
+minimal = low
+Labelled on every
+document as an estimate
+from SEAI's DEAP engine
+for the agreed measures,
+not a published BER
+(Terms, clause 21)
+Low
+8 Data kept longer than
+needed
+Possible ·
+minimal = low
+Written retention
+schedule (open item 1),
+checked at each review.
+Datafile deleted when
+consent is withdrawn
+Low
+9 Data used beyond the
+consented purpose,
+such as marketing or
+contractor leads
+Remote ·
+significant = low
+One purpose only. No
+sale or sharing beyond
+the homeowner and the
+contractors they choose.
+Disclosure limited by
+clause 4.2.2 of the
+Agreement. No third-
+party requests from the
+page once typefaces are
+served locally (open item
+4)
+Low
+PlanitBER — Data Protection Impact Assessment
+Page 8 of 9
+
+--- page 9 ---
+Open items, to close before the first request
+Sign-off
+Sources
+SEAI Pilot Projects: NAS Trusted Partner API
+Trusted Partner Agreement
+Trusted Partner Terms and Conditions
+PlanitBER document 06, Data Protection, issued 10 October 2026
+1. Retention schedule: confirm the record period SEAI's Code of Practice sets for
+assessors, and write one page on what is kept, for how long, and how it is destroyed
+2. Agree the file format for consent evidence with SEAI (Criterion 3.5), and confirm
+that a redacted utility bill is acceptable
+3. Write the privacy notice and the consent form (Consents A and B), and review both
+before first use
+4. Serve the typefaces from the software itself, so a session makes no third-party
+requests
+5. Confirm how the API key is stored once SEAI issues its technical documentation
+after acceptance, and update risk 2 if needed
+6. Set up the consent log and the breach log on the assessor's encrypted computer
+Approved by John Turley, controller
+Signature
+Date
+Next review Before the first request, at month 6 of the trial, and
+at its end
+PlanitBER — Data Protection Impact Assessment
+Page 9 of 9
