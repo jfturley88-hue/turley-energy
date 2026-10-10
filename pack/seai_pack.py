@@ -406,11 +406,9 @@ doc1 = f'''<div class="sheet">
   <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">From there, we would like to discuss a pilot: a fixed number of
     plans, with recorded spend measured against the estimates, and SEAI holding full access to the data.
     If the pilot shows what we expect, the next step is the NAS Trusted Partner API trial. The API
-    would change three things.</p>
+    would change two things.</p>
   {apibullet('The BER record comes in directly.',
     'With the homeowner&rsquo;s consent, PlanitBER takes the published record as data instead of reading the dwelling details report. That removes re-keying and errors, and lets an assessor&rsquo;s existing BERs be priced without a new survey.')}
-  {apibullet('Cost sits beside the energy uplift.',
-    'The agreed measures are sent to the DEAP engine as a modified BER file, so each plan shows what the works cost and what rating they achieve, package against package.')}
   {apibullet('It reaches the households that stalled.',
     'Homes that already hold a BER but never went ahead can be offered the three documents with consent, and the trial would measure how many commit.')}
   <p class="body" style="font-size:9.2pt;line-height:1.48;margin-bottom:1.5mm;">Created by BER assessors with
